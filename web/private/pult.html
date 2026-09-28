@@ -401,6 +401,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 <div class="lightbox" id="lightbox"><button class="lbClose" type="button">Закрыть ✕</button><img id="lbImg" alt="M5-скрин"></div>
 
 <script>
+(function(){var m=location.pathname.match(/^\/p\/([^\/]+)/);var K=m?decodeURIComponent(m[1]):"";var of=window.fetch.bind(window);window.fetch=function(u,o){if(typeof u==="string"&&u.indexOf("/api/")===0&&u.indexOf("/api/state")!==0){o=o||{};o.headers=Object.assign({},o.headers||{},{"x-pult-key":K});}return of(u,o);};})();
 (function(){
 "use strict";
 function $(id){return document.getElementById(id);}
@@ -705,7 +706,7 @@ function renderRep(){
     card.appendChild(cb);
     bIn.addEventListener('click',function(){
       if(my&&my.open){var o0=tstate();delete o0[key];tsave(o0);renderRep();return;}
-      if(my&&my.closed){if(!confirm('Отменить закрытие? Запись будет удалена из журнала.'))return;if(my.jid&&col)col.doc(my.jid).delete().catch(function(){});var o1=tstate();o1[key]={open:true,t:my.t,side:c.dir,ts:Date.now(),half:my.half||[]};tsave(o1);renderRep();return;}
+      if(my&&my.closed){if(my.jid&&col)col.doc(my.jid).delete().catch(function(){});var o1=tstate();o1[key]={open:true,t:my.t,side:c.dir,ts:Date.now(),half:my.half||[]};tsave(o1);renderRep();return;}
       var vt=tSel.value,half=[];
       try{CK[vt].items.forEach(function(r,ix){if(r[0]==='half'&&!$('r'+vt+ix).checked)half.push(r[1]);});}catch(e){}
       var o=tstate();o[key]={open:true,t:vt,side:c.dir,ts:Date.now(),half:half};tsave(o);histMark(c,vt,'В сделке');renderRep();});
@@ -902,11 +903,6 @@ renderHist();
 })();
 pcalc();
 })();
-/* страница для друга: /friend — только «Отчёт дня», без кнопок */
-if(location.pathname.indexOf('/friend')===0){
-  var fst=document.createElement('style');fst.textContent='.tabs,.acts,.closeBox,details{display:none!important}';document.head.appendChild(fst);
-  document.querySelectorAll('.tab').forEach(function(t){if(t.dataset.tab==='report')t.click();});
-}
 </script>
 
 

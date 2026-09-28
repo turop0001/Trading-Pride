@@ -11,6 +11,7 @@
 переживает между запусками, хотя каждый запуск GitHub Actions стартует с чистого контейнера.
 Печатает в конце: NEXT_MIN: <минут до следующего тика> и ARTIFACT_DOCS: <список файлов>.
 """
+import re
 import sys, os, json, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import live_check as lc
@@ -113,6 +114,9 @@ def analyze_window(state, window, today):
 # "окно закрылось, входов не было = скип", как и попросил пользователь.
 def _tg(r, closed=False):
     ls, note = r.get('line_status'), r.get('tg_note') or r.get('note', '')
+    # 29.09.2026: в Telegram-группу подписчиков идут ТОЛЬКО статусы, без причин в скобках
+    # (все причины видны в карточках Пульта). Смена одной лишь причины уведомления не даёт.
+    note = re.sub(r'\s*\(.*\)\s*$', '', str(note or '')).strip()
     if closed and ls in ('watch', 'prep') and not r.get('signal'):
         return 'skip', 'СКИП'
     return ls, note

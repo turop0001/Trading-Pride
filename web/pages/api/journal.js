@@ -1,10 +1,12 @@
 // Журнал реальных сделок: state/journal.json в репозитории. GET — список, POST {op:'add',doc} / {op:'del',id}.
 // Для записи GH_TOKEN нужен с правом Contents: Read and write; без него журнал отдаётся только на чтение.
 import { readJson, writeJson } from '../../lib/gh';
+import { keyOk } from '../../lib/auth';
 const PATH = 'state/journal.json';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+  if (!keyOk(req)) { res.status(401).json({ error: 'нет доступа (PULT_KEY)' }); return; }
   try {
     if (req.method === 'GET') {
       const { data } = await readJson(PATH, []);

@@ -1,11 +1,13 @@
 // Архив сигналов: state/history.json. Туда попадают карточки со статусом «Вход» (пишет робот
 // в GitHub Actions) и карточки, где трейдер отметил «Вошёл» / «Закрыл» (пишет эта страница).
 import { readJson, writeJson } from '../../lib/gh';
+import { keyOk } from '../../lib/auth';
 const PATH = 'state/history.json';
 const KEYS = ['id', 'date', 'symbol', 'type', 'side', 'entry', 'stop', 'target', 'risk', 'result', 'narr', 'mine'];
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+  if (!keyOk(req)) { res.status(401).json({ error: 'нет доступа (PULT_KEY)' }); return; }
   try {
     if (req.method === 'GET') {
       const { data } = await readJson(PATH, []);
