@@ -49,6 +49,7 @@ h2{font-size:16px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{background:#3fb579;border-color:#3fb579;color:#06170e}}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm{font-size:15px;padding:5px 10px}
+.jshots{margin-top:8px}.jshots .shotw img{width:170px}
 .shots{display:flex;gap:10px;flex-wrap:wrap}.shotw{display:flex;flex-direction:column;gap:4px;cursor:zoom-in}.shotw img{width:210px;max-width:100%;border:1px solid var(--border);border-radius:8px;display:block}.shotw small{font-size:12px;color:var(--muted)}
 #zoomv{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:99;padding:16px}#zoomv.open{display:flex}#zoomv img{max-width:100%;max-height:100%;border-radius:8px;background:#fff}
 .nar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}.narI{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.narI small{font-size:12px;color:var(--muted);font-weight:500}
@@ -715,12 +716,12 @@ function renderRep(){
       if(my&&my.closed){if(my.jid&&col)col.doc(my.jid).delete().catch(function(){});var o1=tstate();o1[key]={open:true,t:my.t,side:c.dir,ts:Date.now(),half:my.half||[]};tsave(o1);renderRep();return;}
       var vt=tSel.value,half=[];
       try{CK[vt].items.forEach(function(r,ix){if(r[0]==='half'&&!$('r'+vt+ix).checked)half.push(r[1]);});}catch(e){}
-      var o=tstate();o[key]={open:true,t:vt,side:c.dir,ts:Date.now(),half:half};tsave(o);histMark(c,vt,'В сделке');renderRep();});
+      var o=tstate();o[key]={open:true,t:vt,side:c.dir,ts:Date.now(),half:half};tsave(o);renderRep();});
     bOut.addEventListener('click',function(){cb.classList.toggle('open');});
     cb.querySelector('.btn.primary').addEventListener('click',function(){
       var a=Math.abs(parseFloat(rin.value))||0,r=OUT==='TP'?a:OUT==='SL'?-a:0,why=combineWhy(wsel,cb.querySelector('.whyNote').value),m=cb.querySelector('.msg');
       addTrade({symbol:c.s,type:tSel.value,side:c.dir==='short'?'short':'long',date:REPDAY,out:OUT,r:r,note:'',why:OUT==='SL'?why:'',ts:Date.now()},function(ok,err,jid){
-        if(!ok){m.textContent=err;return;}var o=tstate();o[key]={closed:true,out:OUT,t:tSel.value,jid:jid||null,half:(my&&my.half)||[]};tsave(o);histMark(c,tSel.value,'Закрыл '+(OUT==='BE'?'БУ':OUT)+' '+(r>0?'+':'')+r+'R');renderRep();});
+        if(!ok){m.textContent=err;return;}var o=tstate();o[key]={closed:true,out:OUT,t:tSel.value,jid:jid||null,half:(my&&my.half)||[]};tsave(o);renderRep();});
     });
     rg.appendChild(card);});
 }
@@ -744,10 +745,12 @@ document.querySelectorAll('#jOut button').forEach(function(b){b.addEventListener
   $('jWhyW').hidden=JO!=='SL';if(JO==='BE'){$('jR').value=0;$('jR').disabled=true;}else{$('jR').disabled=false;if(!+$('jR').value)$('jR').value=JO==='TP'?2:1;}});});
 function outOf(d){if(d.out)return d.out;var r=+d.r;return r>0.05?'TP':r<-0.05?'SL':'BE';}
 function addTrade(o,cb){if(!col){cb(false,'Журнал работает только на опубликованной странице.');return;}col.add(o).then(function(ref){cb(true,null,ref&&ref.id);}).catch(function(e){cb(false,'Не сохранилось: '+(e&&e.code||'ошибка'));});}
+var SHOTS={};
+function shotsHtml(sh){return '<span class="shots">'+['m5','h1'].filter(function(k){return sh[k];}).map(function(k){var u='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/'+sh[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</span>';}
 function rowOf(d,withDel,id){
   var o=outOf(d),r=+d.r,row=el('div','jrow '+o);row.appendChild(el('span','dot'));
   var b=el('div',null,d.symbol+' · тип '+d.type+' · '+(d.side==='short'?'Short':'Long')+' · '+(o==='BE'?'БУ':o));
-  b.appendChild(el('small',null,(d.date||'')+(d.note?' · '+d.note:'')));if(o==='SL'&&d.why)b.appendChild(el('div','why','Почему SL: '+d.why));row.appendChild(b);
+  b.appendChild(el('small',null,(d.date||'')+(d.note?' · '+d.note:'')));var sh=SHOTS[(d.date||'')+'_'+d.symbol+'_'+d.type];if(sh){var sd=el('div','jshots');sd.innerHTML=shotsHtml(sh);b.appendChild(sd);}if(o==='SL'&&d.why)b.appendChild(el('div','why','Почему SL: '+d.why));row.appendChild(b);
   row.appendChild(el('div','r',o==='BE'?'0R':sg(r)+Math.abs(r)+'R'));
   if(withDel){var x=el('button','x','✕');x.title='Удалить';x.addEventListener('click',function(){if(col)col.doc(id).delete().catch(function(){});});row.appendChild(x);}else row.appendChild(el('span'));
   return row;}
@@ -882,6 +885,7 @@ renderHist();
     var DAY=all.some(function(k){return S[k].date===REPDAY;})?REPDAY:all.map(function(k){return S[k].date;}).sort().pop();
     var keys=all.filter(function(k){return S[k].date===DAY;});
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
+    var nS=0;all.forEach(function(k){var q=S[k];if(q.shots){var id=q.date+'_'+(q.sym||k.split('_')[0])+'_'+(q.window||k.split('_')[1]);if(!SHOTS[id]){SHOTS[id]=q.shots;nS++;}}});if(nS)redraw();
     REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
     if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
@@ -915,7 +919,7 @@ renderHist();
 
   /* история сигналов: state/history.json в репозитории (если есть) */
   fetch('/api/history',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-    HIST=(j&&j.items)||[];$('hMsg').textContent='Загружено записей: '+HIST.length+'.'+(HIST.length?'':' В архив попадают карточки со статусом «Вход» и те, где вы отметили «Вошёл» или «Закрыл».');renderHist();
+    HIST=(j&&j.items)||[];HIST.forEach(function(h){if(h.shots&&h.id&&!SHOTS[h.id])SHOTS[h.id]=h.shots;});redraw();$('hMsg').textContent='Загружено записей: '+HIST.length+'.'+(HIST.length?'':' В архив попадают все сигналы Пульта со статусом «Вход».');renderHist();
   }).catch(function(){$('hMsg').textContent='История недоступна.';});
 })();
 pcalc();

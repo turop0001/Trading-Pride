@@ -34,6 +34,38 @@ def _sessions(ax, d, off, alpha, label):
                 ax.text(i0, hi, ' ' + name, fontsize=9, va='bottom', color=tc, fontweight='bold')
 
 
+def _fvg_liq(ax, h, t_in):
+    """H1 FVG (непробитые до входа) полосами и непробитая ликвидность кружками."""
+    from matplotlib.lines import Line2D
+    pre = h[h.index <= t_in]
+    n = len(pre)
+    H, L, C = pre['High'].values, pre['Low'].values, pre['Close'].values
+    atr = float((pre['High'] - pre['Low']).iloc[-48:].mean()) if n > 5 else 0
+    for i in range(2, n):
+        if L[i] > H[i - 2] and L[i] - H[i - 2] >= 0.15 * atr:      # бычий FVG
+            lo, hi, bull = H[i - 2], L[i], True
+        elif H[i] < L[i - 2] and L[i - 2] - H[i] >= 0.15 * atr:    # медвежий FVG
+            lo, hi, bull = H[i], L[i - 2], False
+        else:
+            continue
+        after = C[i + 1:]
+        if len(after) and ((after < lo).any() if bull else (after > hi).any()):
+            continue                                                # пробит телом — не рисуем
+        ax.add_patch(Rectangle((i - 2.5, lo), len(h) - i + 2, hi - lo,
+                               color='#26a69a' if bull else '#ef5350', alpha=0.13, zorder=0.5))
+    for i in range(2, n - 2):
+        if H[i] >= max(H[i - 2:i + 3]) and not (pre['High'].values[i + 1:] > H[i]).any():
+            ax.scatter([i], [H[i]], s=260, facecolors='none', edgecolors='#7b3fa0', linewidths=1.8, zorder=5)
+        if L[i] <= min(L[i - 2:i + 3]) and not (pre['Low'].values[i + 1:] < L[i]).any():
+            ax.scatter([i], [L[i]], s=260, facecolors='none', edgecolors='#1f6aa5', linewidths=1.8, zorder=5)
+    ax.legend(handles=[
+        Line2D([], [], marker='o', ls='', mfc='none', mec='#7b3fa0', ms=11, mew=1.8, label='непробитая ликвидность сверху (хай)'),
+        Line2D([], [], marker='o', ls='', mfc='none', mec='#1f6aa5', ms=11, mew=1.8, label='непробитая ликвидность снизу (лоу)'),
+        Rectangle((0, 0), 1, 1, color='#26a69a', alpha=0.25, label='H1 FVG лонговый (непробитый)'),
+        Rectangle((0, 0), 1, 1, color='#ef5350', alpha=0.25, label='H1 FVG шортовый (непробитый)'),
+    ], loc='upper left', fontsize=8, framealpha=0.9)
+
+
 def _candles(ax, d, width):
     xs = range(len(d))
     for i, (_, r) in zip(xs, d.iterrows()):
@@ -117,6 +149,7 @@ def make_shots(sym, window, r, off, date_str):
         fig, ax = plt.subplots(figsize=(13, 6.2), dpi=110)
         _candles(ax, h, 0.62)
         _sessions(ax, h, off, 0.45, False)
+        _fvg_liq(ax, h, t_in)
         ie = int((h.index <= t_in).sum()) - 1
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
         _levels(ax, len(h), sig, dec)
