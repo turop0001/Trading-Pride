@@ -23,7 +23,7 @@
 import json, os, sys, datetime as dt
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from notify import send_telegram, fmt_line, build_update, DIR_LONG, DIR_SHORT, DIR_BIAS_LONG, DIR_BIAS_SHORT
+from notify import send_telegram, fmt_line, build_update, DIR_LONG, DIR_SHORT
 
 STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'pult_state.json')
 

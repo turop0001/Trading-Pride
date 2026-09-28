@@ -258,14 +258,14 @@ def analyze(sym, d, window, now_utc, off, prev=None):
         elif boxL < pL: bias = 'short'
     res['bias'] = bias
     if bias == 'skip_envelope':
-        return _out(res, 'skip', 'bias обхват', 'СКИП (бокс шире вчерашнего с обеих сторон)')
+        return _out(res, 'skip', '—', 'СКИП (бокс шире вчерашнего с обеих сторон)')
     if bias == 'skip_inside':
-        return _out(res, 'skip', 'bias внутри', 'СКИП (внутренний день)')
+        return _out(res, 'skip', '—', 'СКИП (внутренний день)')
     if bias is None:
-        return _out(res, 'watch', '—', 'НАБЛЮДАЕМ (нет данных за вчера для bias)')
+        return _out(res, 'watch', '—', 'НАБЛЮДАЕМ (нет данных за вчера)')
     sd = 1 if bias == 'long' else -1
-    dirb = '▲ bias LONG' if sd == 1 else '🔻 bias SHORT'  # ▲ LONG / 🔻 SHORT (испр. 28.09.2026)
     dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
+    dirb = dirc  # ИСПРАВЛЕНО 29.09.2026: слово "bias" убрано из текста везде
     side_word = 'лонговый' if sd == 1 else 'шортовый'
     opp_word = 'шортовый' if sd == 1 else 'лонговый'
 
