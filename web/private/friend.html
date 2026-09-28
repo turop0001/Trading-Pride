@@ -49,6 +49,10 @@ h2{font-size:16px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{background:#3fb579;border-color:#3fb579;color:#06170e}}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm{font-size:15px;padding:5px 10px}
+.nar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}.narI{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.narI small{font-size:12px;color:var(--muted);font-weight:500}
+.nchip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;font-weight:700;font-size:14px}.nchip i{font-style:normal;font-family:var(--mono);font-weight:600;font-size:13px}
+.nchip.long{background:var(--long-bg);color:var(--long)}.nchip.short{background:var(--short-bg);color:var(--short)}.nchip.side{background:var(--side-bg);color:var(--side)}.nchip.off{background:var(--off-bg);color:var(--off);font-weight:500}
+.nchip.big{border:1.5px solid currentColor}
 .outb{display:inline-block;padding:1px 8px;border-radius:999px;font-weight:700;margin-left:6px;font-size:0.82em}
 .outb.long{background:var(--long-bg);color:var(--long)}.outb.short{background:var(--short-bg);color:var(--short)}.outb.side{background:var(--side-bg);color:var(--side)}
 .prog{display:flex;align-items:center;gap:10px;margin:4px 0 10px}
@@ -202,7 +206,7 @@ $('repTitle').textContent='Отчёт дня · '+REPDAY.split('-').reverse().jo
 $('repNote').textContent='Ждём данные проверки…';
 var REP=[];
 var WC='16:30–18:30';
-var STMAP={skip:['skip','Скип'],watch:['watch','Наблюдаем'],prep:['prep','⚠️ Готовимся'],entry:['signal','🟢 Вход']};
+var STMAP={skip:['skip','Скип'],watch:['watch','Наблюдаем'],prep:['watch','Вынос'],entry:['signal','🟢 Вход']};
 function rigaMinutesNow(){
   try{var f=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Riga',hour:'2-digit',minute:'2-digit',hour12:false});
     var o={};f.formatToParts(new Date()).forEach(function(p){o[p.type]=p.value;});return parseInt(o.hour,10)*60+parseInt(o.minute,10);}
@@ -241,7 +245,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
@@ -252,6 +256,11 @@ function renderRep(){
 }
   function stripBias(s){return String(s||'').replace(/bias\s*/gi,'').replace(/\s+/g,' ').trim();}
   function trTxt(t){if(!t)return null;if(typeof t==='string')return t;var tr=t.tr||t.trend||t.dir;if(!tr||tr==='нет данных')return null;var p=t.pct!=null?' ('+(t.pct>=0?'+':'')+t.pct+'%)':'';return tr+p;}
+  function trDir(t){var v=t&&typeof t==='object'?(t.tr||''):String(t||'');v=v.toLowerCase();return v.indexOf('лонг')===0||v.indexOf('long')===0?'long':v.indexOf('шорт')===0||v.indexOf('short')===0?'short':v?'side':null;}
+  function narChip(lbl,t){var d=trDir(t);if(!d)return '<span class="narI"><small>'+lbl+'</small> <span class="nchip off">нет данных</span></span>';var p=t&&t.pct!=null?(t.pct>0?'+':t.pct<0?'−':'')+Math.abs(t.pct).toFixed(2)+'%':'';
+    return '<span class="narI"><small>'+lbl+'</small> <span class="nchip '+d+'">'+(d==='long'?'▲ LONG':d==='short'?'▼ SHORT':'◆ 50/50')+(p?' <i>'+p+'</i>':'')+'</span></span>';}
+  function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
+    return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal};
@@ -259,9 +268,8 @@ function renderRep(){
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0&&z[0]!=='Почему скип';});
     if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0].indexOf('Вход / стоп')===0;});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
 
-    var h=trTxt(r.trend_h1),d=trTxt(r.trend_d1);
-    if(h||d){var tr=['Тренд (усилитель, не фильтр)',[h&&'H1 (7д) '+h,d&&'D1 (14д) '+d].filter(Boolean).join(' · ')];
-      var at=c.rows.findIndex(function(z){return z[0]==='Почему скип'||z[0].indexOf('Вход / стоп')===0;});if(at<0)c.rows.push(tr);else c.rows.splice(at,0,tr);}
+    var nar=narHtml(r.trend_h1,r.trend_d1);
+    var at=c.rows.findIndex(function(z){return z[0]==='Все причины'||z[0].indexOf('Вход / стоп')===0;});var nr=['Нарратив',nar];if(at<0)c.rows.push(nr);else c.rows.splice(at,0,nr);
     c._w=x.window;c._s=x.sym;return c;
   }
   function applyState(S){

@@ -338,16 +338,16 @@ def analyze(sym, d, window, now_utc, off, prev=None):
             if not any(C[j] < zlo for j in range(k + 2, len(W))): m5_block = (zlo, zhi)
 
     if not st:
-        return _out(res, 'prep', dirc, f'ГОТОВИМСЯ (вынос {"лоя" if sd == 1 else "хая"} в {sweep_t}, ждём выкуп)')
+        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} в {sweep_t}, ждём выкуп)')
     if len(st) < 2 or not back:
-        return _out(res, 'prep', dirc, 'ГОТОВИМСЯ (выкуп 1 сильная свеча, ждём вторую)')
+        return _out(res, 'prep', dirc, 'ВЫНОС (выкуп 1 сильная свеча, ждём вторую)')
     if m5_block:
-        return _out(res, 'prep', dirc, 'ГОТОВИМСЯ (ждём инверсию встречного m5 FVG)')
+        return _out(res, 'prep', dirc, 'ВЫНОС (ждём инверсию встречного m5 FVG)')
 
     # 5. вход
     je = st[0] + 1
     if je >= len(W):
-        return _out(res, 'prep', dirc, 'ГОТОВИМСЯ (выкуп подтверждён, ждём свечу входа)')
+        return _out(res, 'prep', dirc, 'ВЫНОС (выкуп подтверждён, ждём свечу входа)')
     entry = float(O[je])
     stop = extreme - sd * 0.05 * atr5
     R = abs(entry - stop)
