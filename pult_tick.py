@@ -138,6 +138,20 @@ def result_of(res):
     return n, pct
 
 
+def _hist_add(state_dir_file, item):
+    """ДОБАВЛЕНО 29.09.2026: архив карточек со статусом «Вход» для вкладки «История» (state/history.json)."""
+    import json, os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
+    try:
+        items = json.load(open(path, encoding='utf-8'))
+    except Exception:
+        items = []
+    i = next((k for k, x in enumerate(items) if x.get('id') == item['id']), None)
+    if i is None: items.append(item)
+    else: items[i] = {**items[i], **{k: v for k, v in item.items() if v is not None}}
+    json.dump(items, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+
+
 def main(send=True):
     riga, off = lc.riga_now()
     today = riga.strftime('%Y-%m-%d'); dstr = riga.strftime('%d.%m.%Y'); t = riga.strftime('%H:%M')
@@ -175,6 +189,12 @@ def main(send=True):
                 tg(build_update(dstr, win, t, changed, unchanged)); did.append('update')
         for r in sigs:
             sg = r['signal']
+            try:
+                _hist_add(None, {'id': f"{today}_{r['sym']}_{win}", 'date': today, 'symbol': r['sym'], 'type': win,
+                                 'side': sg.get('side'), 'entry': sg.get('entry'), 'stop': sg.get('stop'), 'target': sg.get('tp'),
+                                 'result': f"сигнал Пульта в {sg.get('time')} Рига"})
+            except Exception as e:
+                print('history add failed:', e)
             tg(build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], 1.0,
                             note='по правилам Пульта — проверь график')); did.append('signal')
         return text, syms, changed
@@ -216,6 +236,14 @@ def main(send=True):
             # ДОБАВЛЕНО 29.09.2026: сохраняем отчёт дня в state (коммитится в репозиторий вместе
             # с остальным state) — нужно странице Vercel, чтобы показывать тот же итог дня, что
             # ушёл в Telegram, без пересчёта.
+            try:
+                for w in ('A', 'C'):
+                    for s_ in syms_of(w):
+                        c = state.get(f'{s_}_{w}', {})
+                        if c.get('date') == today and c.get('signal'):
+                            _hist_add(None, {'id': f"{today}_{s_}_{w}", 'result': c.get('note')})
+            except Exception as e:
+                print('history result failed:', e)
             state['_daily_summary'] = {'date': dstr, 'sections': [[w, l, wl] for w, l, wl in sections], 'total_pct': total}
 
     state['_flags'] = flags

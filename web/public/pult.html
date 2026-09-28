@@ -671,6 +671,7 @@ function renderLive(m){
 var DW={long:'LONG',short:'SHORT',side:'БОКОВИК'};
 function tstate(){try{return JSON.parse(store('p_trades_'+REPDAY)||'{}');}catch(e){return {};}}
 function tsave(o){store('p_trades_'+REPDAY,JSON.stringify(o));}
+function histMark(c,type,label){try{var sg=c._sig||{};fetch('/api/history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'upsert',item:{id:REPDAY+'_'+c.s+'_'+type,date:REPDAY,symbol:c.s,type:type,side:c.eside||c.dir,entry:sg.entry,stop:sg.stop,target:sg.tp,mine:label}})}).then(function(r){return r.json();}).then(function(j){if(j&&j.items){HIST=j.items;renderHist();}}).catch(function(){});}catch(e){}}
 function renderRep(){
   var rg=$('rep');rg.innerHTML='';var TS=tstate();
   REP.forEach(function(c){
@@ -707,12 +708,12 @@ function renderRep(){
       if(my&&my.closed){if(!confirm('Отменить закрытие? Запись будет удалена из журнала.'))return;if(my.jid&&col)col.doc(my.jid).delete().catch(function(){});var o1=tstate();o1[key]={open:true,t:my.t,side:c.dir,ts:Date.now(),half:my.half||[]};tsave(o1);renderRep();return;}
       var vt=tSel.value,half=[];
       try{CK[vt].items.forEach(function(r,ix){if(r[0]==='half'&&!$('r'+vt+ix).checked)half.push(r[1]);});}catch(e){}
-      var o=tstate();o[key]={open:true,t:vt,side:c.dir,ts:Date.now(),half:half};tsave(o);renderRep();});
+      var o=tstate();o[key]={open:true,t:vt,side:c.dir,ts:Date.now(),half:half};tsave(o);histMark(c,vt,'В сделке');renderRep();});
     bOut.addEventListener('click',function(){cb.classList.toggle('open');});
     cb.querySelector('.btn.primary').addEventListener('click',function(){
       var a=Math.abs(parseFloat(rin.value))||0,r=OUT==='TP'?a:OUT==='SL'?-a:0,why=combineWhy(wsel,cb.querySelector('.whyNote').value),m=cb.querySelector('.msg');
       addTrade({symbol:c.s,type:tSel.value,side:c.dir==='short'?'short':'long',date:REPDAY,out:OUT,r:r,note:'',why:OUT==='SL'?why:'',ts:Date.now()},function(ok,err,jid){
-        if(!ok){m.textContent=err;return;}var o=tstate();o[key]={closed:true,out:OUT,t:tSel.value,jid:jid||null,half:(my&&my.half)||[]};tsave(o);renderRep();});
+        if(!ok){m.textContent=err;return;}var o=tstate();o[key]={closed:true,out:OUT,t:tSel.value,jid:jid||null,half:(my&&my.half)||[]};tsave(o);histMark(c,tSel.value,'Закрыл '+(OUT==='BE'?'БУ':OUT)+' '+(r>0?'+':'')+r+'R');renderRep();});
     });
     rg.appendChild(card);});
 }
@@ -823,7 +824,7 @@ function renderHist(){
     if(d.side)top.appendChild(el('span','tag '+d.side,DW[d.side]||d.side));
     top.appendChild(el('span','tag typ','тип '+d.type));
     var tr=matchTrade(d),o=tr?outOf(tr.d):null;
-    top.appendChild(el('span','st '+(o?o.toLowerCase():'skip'),tr?('Мой вход · '+(o==='BE'?'БУ':o)+' '+sg(+tr.d.r)+Math.abs(+tr.d.r)+'R'):'Не входил'));
+    top.appendChild(el('span','st '+(o?o.toLowerCase():(d.mine?'trade':'skip')),tr?('Мой вход · '+(o==='BE'?'БУ':o)+' '+sg(+tr.d.r)+Math.abs(+tr.d.r)+'R'):(d.mine||'Сигнал · не входил')));
     card.appendChild(top);
     var g2=el('div','rgrid');
     function row(k,v){g2.appendChild(el('span',null,k));var b=el('b');if(typeof v==='string'&&v.indexOf('<img ')===0)b.innerHTML=v;else b.textContent=v;g2.appendChild(b);}
@@ -832,6 +833,7 @@ function renderHist(){
     if(d.entry)row('Вход / стоп / цель 2R',d.entry+' / '+(d.stop||'—')+' / '+(d.target||'—'));
     if(d.risk)row('Риск',d.risk);
     if(d.result)row('Итог по правилам',d.result);
+    if(d.mine)row('Моя отметка',d.mine);
     if(d.assetId)row('M5-скрин','<img src="/_blob/'+d.assetId+'" class="shotthumb" alt="M5-скрин · нажмите, чтобы увеличить">');
     card.appendChild(g2);g.appendChild(card);
   });
@@ -851,7 +853,9 @@ renderHist();
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal};
     var c=liveCard(x);
-    c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0;});
+    c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0&&z[0]!=='Почему скип';});
+    if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0].indexOf('Вход / стоп')===0;});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
+    c._sig=r.signal||null;
     var h=trTxt(r.trend_h1),d=trTxt(r.trend_d1);
     if(h||d){var tr=['Тренд (усилитель, не фильтр)',[h&&'H1 (7д) '+h,d&&'D1 (14д) '+d].filter(Boolean).join(' · ')];
       var at=c.rows.findIndex(function(z){return z[0]==='Почему скип'||z[0].indexOf('Вход / стоп')===0;});if(at<0)c.rows.push(tr);else c.rows.splice(at,0,tr);}
@@ -893,11 +897,16 @@ renderHist();
 
   /* история сигналов: state/history.json в репозитории (если есть) */
   fetch('/api/history',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-    HIST=(j&&j.items)||[];$('hMsg').textContent='Загружено записей: '+HIST.length+'.'+(HIST.length?'':' Архив пополняется вечерним итогом дня.');renderHist();
+    HIST=(j&&j.items)||[];$('hMsg').textContent='Загружено записей: '+HIST.length+'.'+(HIST.length?'':' В архив попадают карточки со статусом «Вход» и те, где вы отметили «Вошёл» или «Закрыл».');renderHist();
   }).catch(function(){$('hMsg').textContent='История недоступна.';});
 })();
 pcalc();
 })();
+/* страница для друга: /friend — только «Отчёт дня», без кнопок */
+if(location.pathname.indexOf('/friend')===0){
+  var fst=document.createElement('style');fst.textContent='.tabs,.acts,.closeBox,details{display:none!important}';document.head.appendChild(fst);
+  document.querySelectorAll('.tab').forEach(function(t){if(t.dataset.tab==='report')t.click();});
+}
 </script>
 
 
