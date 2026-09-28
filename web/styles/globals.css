@@ -2,8 +2,8 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: #0b0f14;
-  color: #e6e8eb;
+  background: #ffffff;
+  color: #1f2937;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 .wrap {
@@ -14,16 +14,17 @@ html, body {
 h1 {
   font-size: 22px;
   margin: 0 0 4px;
+  color: #111827;
 }
 .subtitle {
-  color: #9aa0a6;
+  color: #6b7280;
   font-size: 13px;
   margin: 0 0 24px;
 }
 h2 {
   font-size: 16px;
-  color: #cdd3d9;
-  border-bottom: 1px solid #232a33;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
   padding-bottom: 8px;
   margin: 28px 0 12px;
 }
@@ -33,8 +34,8 @@ h2 {
   gap: 10px;
 }
 .card {
-  background: #131922;
-  border: 1px solid #232a33;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 12px 14px;
 }
@@ -44,42 +45,46 @@ h2 {
   gap: 8px;
   font-size: 15px;
   margin-bottom: 6px;
+  color: #111827;
 }
 .card-head strong { flex: 1; }
-.card-head .dir { color: #9aa0a6; font-size: 13px; }
+.card-head .dir { color: #6b7280; font-size: 13px; }
 .card-status {
   font-weight: 600;
   margin-bottom: 6px;
+  color: #1f2937;
 }
 .card-row {
   font-size: 12.5px;
-  color: #9aa0a6;
+  color: #6b7280;
   line-height: 1.5;
 }
 .daily {
-  background: #131922;
-  border: 1px solid #232a33;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 14px 16px;
 }
 .daily-line {
   font-size: 14px;
   padding: 3px 0;
+  color: #374151;
 }
 .daily-total {
   margin-top: 10px;
   font-weight: 700;
   font-size: 15px;
+  color: #111827;
 }
 .foot {
   margin-top: 32px;
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 12px;
   text-align: center;
 }
 .err {
-  color: #f87171;
+  color: #dc2626;
 }
-a { color: #60a5fa; }
+a { color: #2563eb; }
 
-.tick{font-size:14px;opacity:.85;margin:6px 0 14px}
+.tick{font-size:14px;opacity:.85;margin:6px 0 14px;color:#4b5563}
