@@ -213,6 +213,10 @@ def main(send=True):
                 sections.append((w, main_l, []))
             tg(build_daily_summary(dstr, sections, total).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + ' ( вместе тип A и C )', 1))
             flags['summary'] = True; did.append('summary'); text = text or 'отчёт дня отправлен'
+            # ДОБАВЛЕНО 29.09.2026: сохраняем отчёт дня в state (коммитится в репозиторий вместе
+            # с остальным state) — нужно странице Vercel, чтобы показывать тот же итог дня, что
+            # ушёл в Telegram, без пересчёта.
+            state['_daily_summary'] = {'date': dstr, 'sections': [[w, l, wl] for w, l, wl in sections], 'total_pct': total}
 
     state['_flags'] = flags
     if text:
