@@ -85,7 +85,9 @@ def _xticks(ax, d, off, fmt, n=8):
 def _levels(ax, n, sig, dec):
     for y, c, t in ((sig['entry'], C_ENTRY, 'ВХОД'), (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК 2R')):
         ax.axhline(y, color=c, linewidth=1.4 if t != 'ВХОД' else 1.0, linestyle='-' if t != 'ВХОД' else '--', zorder=4)
-        ax.text(n + 0.5, y, f' {t} {y:.{dec}f}', color=c, fontsize=9, fontweight='bold', va='center', clip_on=False)
+        ax.annotate(f'{t} {y:.{dec}f}', (n - 1, y), xytext=(0, 4), textcoords='offset points', ha='right', va='bottom',
+                    color=c, fontsize=10, fontweight='bold', zorder=7,
+                    bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=c, lw=0.8, alpha=0.95))
 
 
 def _style(fig, ax, title, subtitle):
