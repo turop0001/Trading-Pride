@@ -98,6 +98,19 @@ def analyze_window(state, window, today):
             r = dict(prev) if prev else {'sym': sym, 'window': window, 'line_status': 'skip', 'direction': '—',
                                          'note': 'СКИП (нет данных у источника)', 'status_key': 'nodata'}
         r['date'] = today
+        # 29.09.2026: скриншоты M5 и H1 в карточку — один раз, когда сделка закрылась (TP/SL)
+        if prev.get('shots'):
+            r['shots'] = prev['shots']
+        elif r.get('signal') and any(x in (r.get('note') or '') for x in ('→ TP', '→ SL')):
+            try:
+                import shots as _sh
+                sh = _sh.make_shots(sym, window, r, lc.riga_now()[1], today)
+                if sh:
+                    r['shots'] = sh
+                    _hist_add(None, {'id': f"{today}_{sym}_{window}", 'date': today, 'symbol': sym, 'type': window,
+                                     'result': r.get('note'), 'shots': sh})
+            except Exception as e:
+                print('shots failed:', sym, e)
         narr = _trend_cached(state, sym, today)
         if narr:
             r['trend_h1'] = narr.get('h1')

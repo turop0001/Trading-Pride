@@ -408,7 +408,11 @@
     "status_key": "ВХОД → TP 🎯 +2R",
     "tg_note": "ЗАКРЫТА - TP",
     "stale": false,
-    "date": "2026-09-28"
+    "date": "2026-09-28",
+    "shots": {
+      "m5": "state/shots/2026-09-28_EURUSD_C_m5.png",
+      "h1": "state/shots/2026-09-28_EURUSD_C_h1.png"
+    }
   },
   "GBPUSD_C": {
     "sym": "GBPUSD",

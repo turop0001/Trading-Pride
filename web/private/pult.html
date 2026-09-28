@@ -49,6 +49,8 @@ h2{font-size:16px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{background:#3fb579;border-color:#3fb579;color:#06170e}}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm{font-size:15px;padding:5px 10px}
+.shots{display:flex;gap:10px;flex-wrap:wrap}.shotw{display:flex;flex-direction:column;gap:4px;cursor:zoom-in}.shotw img{width:210px;max-width:100%;border:1px solid var(--border);border-radius:8px;display:block}.shotw small{font-size:12px;color:var(--muted)}
+#zoomv{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:99;padding:16px}#zoomv.open{display:flex}#zoomv img{max-width:100%;max-height:100%;border-radius:8px;background:#fff}
 .nar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}.narI{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.narI small{font-size:12px;color:var(--muted);font-weight:500}
 .nchip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;font-weight:700;font-size:14px}.nchip i{font-style:normal;font-family:var(--mono);font-weight:600;font-size:13px}
 .nchip.long{background:var(--long-bg);color:var(--long)}.nchip.short{background:var(--short-bg);color:var(--short)}.nchip.side{background:var(--side-bg);color:var(--side)}.nchip.off{background:var(--off-bg);color:var(--off);font-weight:500}
@@ -687,7 +689,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
@@ -839,6 +841,7 @@ function renderHist(){
     if(d.risk)row('Риск',d.risk);
     if(d.result)row('Итог по правилам',d.result);
     if(d.mine)row('Моя отметка',d.mine);
+    if(d.shots&&(d.shots.m5||d.shots.h1)){var hs=['m5','h1'].filter(function(k){return d.shots[k];}).map(function(k){var u='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/'+d.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('');g2.appendChild(el('span',null,'Графики сделки'));var hb=el('b');hb.innerHTML='<span class="shots">'+hs+'</span>';g2.appendChild(hb);}
     if(d.assetId)row('M5-скрин','<img src="/_blob/'+d.assetId+'" class="shotthumb" alt="M5-скрин · нажмите, чтобы увеличить">');
     card.appendChild(g2);g.appendChild(card);
   });
@@ -859,6 +862,7 @@ renderHist();
     return '<span class="narI"><small>'+lbl+'</small> <span class="nchip '+d+'">'+(d==='long'?'▲ LONG':d==='short'?'▼ SHORT':'◆ 50/50')+(p?' <i>'+p+'</i>':'')+'</span></span>';}
   function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
     return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
+  var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/';
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal};
@@ -866,8 +870,10 @@ renderHist();
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0&&z[0]!=='Почему скип';});
     if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0].indexOf('Вход / стоп')===0;});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
     c._sig=r.signal||null;
+    var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
     var nar=narHtml(r.trend_h1,r.trend_d1);
     var at=c.rows.findIndex(function(z){return z[0]==='Все причины'||z[0].indexOf('Вход / стоп')===0;});var nr=['Нарратив',nar];if(at<0)c.rows.push(nr);else c.rows.splice(at,0,nr);
+    if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
   }
   function applyState(S){
@@ -914,6 +920,10 @@ renderHist();
 })();
 pcalc();
 })();
+(function(){var z=document.createElement('div');z.id='zoomv';z.innerHTML='<img alt="">';document.body.appendChild(z);
+  z.addEventListener('click',function(){z.classList.remove('open');});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')z.classList.remove('open');});
+  document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('.shotw');if(t){e.preventDefault();z.querySelector('img').src=t.getAttribute('data-u');z.classList.add('open');}});})();
 </script>
 
 
