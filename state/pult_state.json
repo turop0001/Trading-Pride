@@ -228,13 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "17:07",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-09-29",
       "time": "17:08",
       "window": "C",
       "text": "без изменений",
@@ -789,6 +782,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "18:27",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -840,7 +840,7 @@
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "18:26",
+    "checked_at": "18:27",
     "extreme": 4165.43,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -867,7 +867,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "18:26",
+    "checked_at": "18:27",
     "extreme": 1.13295,
     "line_status": "prep",
     "direction": "▲ LONG",
@@ -894,7 +894,7 @@
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "18:26",
+    "checked_at": "18:27",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
