@@ -18,7 +18,7 @@ import live_check as lc
 from notify import (send_telegram, fmt_line, build_window_open, build_window_closed,
                     build_update, build_signal, build_daily_summary)
 
-EVENTS = [(600, 'openA'), (840, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary')]
+EVENTS = [(600, 'openA'), (840, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary'), (1320, 'final')]
 ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40']
 
 
@@ -169,6 +169,63 @@ def _hist_add(state_dir_file, item):
     json.dump(items, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 
 
+EMO_TP, EMO_SL = '\U0001F7E2', '\U0001F534'
+
+
+def final_check(state, today, dstr, off, tg, did):
+    """22:00 Рига: сделки, которые на момент закрытия окна/отчёта дня были «В СДЕЛКЕ», проверяем
+    один раз до конца дня. Если TP/SL уже случился — обновляем карточку, историю, скриншоты и
+    шлём одно короткое сообщение с итогом сделки и обновлённым итогом дня."""
+    upd = []
+    for w in ('A', 'C'):
+        for s in syms_of(w):
+            r = state.get(f'{s}_{w}', {})
+            if r.get('date') != today or not r.get('signal') or not str(r.get('note', '')).startswith('В СДЕЛКЕ'):
+                continue
+            sig = r['signal']
+            try:
+                d = lc.fetch(lc.ticker_for(s, w))
+            except Exception as e:
+                print('final fetch failed:', s, e); continue
+            if d is None: continue
+            long_ = sig.get('side') == 'long' or sig['tp'] > sig['entry']
+            out, tt = None, None
+            for ts, c in d[d.index > __import__('pandas').Timestamp(sig['t_utc'])].iterrows():
+                if (c['Low'] <= sig['stop']) if long_ else (c['High'] >= sig['stop']): out, tt = 'SL', ts; break
+                if (c['High'] >= sig['tp']) if long_ else (c['Low'] <= sig['tp']): out, tt = 'TP', ts; break
+            if not out: continue
+            r['note'] = 'ВХОД → TP 🎯 +2R' if out == 'TP' else 'ВХОД → SL −1R'
+            r['tg_note'] = 'ЗАКРЫТА - ' + out
+            r['line_status'] = 'entry' if out == 'TP' else 'skip'
+            r['status_key'] = r['note']
+            try:
+                import shots as _sh
+                sh = _sh.make_shots(s, w, r, off, today)
+                if sh: r['shots'] = sh
+            except Exception as e:
+                print('final shots failed:', s, e)
+            try:
+                _hist_add(None, {'id': f"{today}_{s}_{w}", 'result': r['note'], **({'shots': r['shots']} if r.get('shots') else {})})
+            except Exception as e:
+                print('final history failed:', e)
+            state[f'{s}_{w}'] = r
+            tm = (tt + __import__('pandas').Timedelta(hours=off)).strftime('%H:%M')
+            upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
+                       f"({'+2.0%' if out == 'TP' else '-1.0%'} депозита)")
+    if upd:
+        total = 0.0
+        for w in ('A', 'C'):
+            res = {s: state.get(f'{s}_{w}', {}) for s in syms_of(w) if state.get(f'{s}_{w}', {}).get('date') == today}
+            total += result_of(res)[1]
+        sign = '+' if total > 0 else ('-' if total < 0 else '')
+        tg("\U0001F4CA Итог сделок после отчёта дня · " + dstr + " (22:00 Рига)\n\n" + "\n".join(upd)
+           + f"\n\n\U0001F3AF Итог дня: {sign}{abs(total):.1f}% депозита")
+        ds = state.get('_daily_summary') or {}
+        ds['total_pct'] = total; state['_daily_summary'] = ds
+        did.append('final')
+    return bool(upd)
+
+
 def main(send=True):
     riga, off = lc.riga_now()
     today = riga.strftime('%Y-%m-%d'); dstr = riga.strftime('%d.%m.%Y'); t = riga.strftime('%H:%M')
@@ -262,6 +319,11 @@ def main(send=True):
             except Exception as e:
                 print('history result failed:', e)
             state['_daily_summary'] = {'date': dstr, 'sections': [[w, l, wl] for w, l, wl in sections], 'total_pct': total}
+
+    if wd < 5 and m >= 1320 and not flags.get('final') and (flags.get('openA') or flags.get('openC')):
+        flags['final'] = True
+        if final_check(state, today, dstr, off, tg, did):
+            text = text or 'итог сделок после отчёта дня отправлен'
 
     state['_flags'] = flags
     if text:
