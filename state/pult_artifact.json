@@ -10,7 +10,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4158.29,
+   "price": 4158.65,
    "boxH": 4161.3,
    "boxL": 4137.73,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "16:50"
+   "checked": "16:51"
   }
  },
  {
@@ -40,7 +40,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.1344,
+   "price": 1.13446,
    "boxH": 1.13581,
    "boxL": 1.13326,
    "prevH": null,
@@ -56,7 +56,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "16:50"
+   "checked": "16:51"
   }
  },
  {
@@ -68,9 +68,9 @@
    "window": "C",
    "status": "entry",
    "direction": "▲ LONG",
-   "note": "ВХОД (16:40, 1.32230)",
+   "note": "В СДЕЛКЕ (вход 16:40 по 1.32230)",
    "reasons": [],
-   "price": 1.32315,
+   "price": 1.32323,
    "boxH": 1.32525,
    "boxL": 1.32213,
    "prevH": null,
@@ -96,7 +96,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "16:50"
+   "checked": "16:51"
   }
  },
  {
@@ -105,27 +105,10 @@
   "data": {
    "date": "2026-09-29",
    "window": "C",
-   "time": "16:50",
-   "text": "изменилось: GBPUSD",
-   "changed": [
-    "GBPUSD"
-   ],
+   "time": "16:51",
+   "text": "без изменений",
+   "changed": [],
    "log": [
-    {
-     "date": "2026-09-29",
-     "time": "10:07",
-     "window": "A",
-     "text": "отчёт открытия окна отправлен",
-     "lines": [
-      "🟡 XAUUSD (🔻 SHORT) — НАБЛЮДАЕМ",
-      "🟡 EURUSD (🔻 SHORT) — НАБЛЮДАЕМ",
-      "🟡 GBPUSD (▲ LONG) — НАБЛЮДАЕМ",
-      "🟡 US500 (🔻 SHORT) — НАБЛЮДАЕМ",
-      "🟡 NAS100 (🔻 SHORT) — НАБЛЮДАЕМ",
-      "🟡 US30 (🔻 SHORT) — НАБЛЮДАЕМ",
-      "⚪ GER40 (—) — СКИП"
-     ]
-    },
     {
      "date": "2026-09-29",
      "time": "10:25",
@@ -424,6 +407,13 @@
      "lines": [
       "🟢 GBPUSD (▲ LONG) — ВХОД в 16:40"
      ]
+    },
+    {
+     "date": "2026-09-29",
+     "time": "16:51",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
     }
    ]
   }
