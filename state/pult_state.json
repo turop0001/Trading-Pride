@@ -168,11 +168,11 @@
       "tp": 30488.6,
       "side": "short"
     },
-    "line_status": "entry",
+    "line_status": "skip",
     "direction": "🔻 SHORT",
-    "note": "В СДЕЛКЕ (вход 11:55 по 30582.2)",
-    "status_key": "В СДЕЛКЕ (вход 11:55 по 30582.2)",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-09-29",
     "trend_h1": {
@@ -184,7 +184,13 @@
       "tr": "лонг",
       "ratio": 2.96,
       "pct": 4.62
-    }
+    },
+    "autopsy": "шла в плюс до +0.9R, стоп через 2 ч 0 мин; после стопа цель не достигнута, цена ушла дальше против на 3.1R; D1 против входа",
+    "shots": {
+      "m5": "state/shots/2026-09-29_NAS100_A_m5.png",
+      "h1": "state/shots/2026-09-29_NAS100_A_h1.png"
+    },
+    "exit_time": "13:50"
   },
   "US30_A": {
     "sym": "US30",
@@ -207,11 +213,11 @@
       "tp": 51726.0,
       "side": "short"
     },
-    "line_status": "entry",
+    "line_status": "skip",
     "direction": "🔻 SHORT",
-    "note": "В СДЕЛКЕ (вход 10:45 по 51825)",
-    "status_key": "В СДЕЛКЕ (вход 10:45 по 51825)",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-09-29",
     "trend_h1": {
@@ -223,16 +229,15 @@
       "tr": "боковик",
       "ratio": -1.24,
       "pct": -1.32
-    }
+    },
+    "autopsy": "шла в плюс до +2.0R, стоп через 3 ч 20 мин; после стопа цель 2R достигнута в 16:30 — стоп выбило",
+    "shots": {
+      "m5": "state/shots/2026-09-29_US30_A_m5.png",
+      "h1": "state/shots/2026-09-29_US30_A_h1.png"
+    },
+    "exit_time": "14:00"
   },
   "_log": [
-    {
-      "date": "2026-09-29",
-      "time": "17:12",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-09-29",
       "time": "17:13",
@@ -789,6 +794,13 @@
       "window": "—",
       "text": "отчёт дня отправлен",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "22:13",
+      "window": "—",
+      "text": "итог сделок после отчёта дня отправлен",
+      "lines": []
     }
   ],
   "_flags": {
@@ -797,7 +809,8 @@
     "closeA": true,
     "openC": true,
     "closeC": true,
-    "summary": true
+    "summary": true,
+    "final": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
@@ -1058,6 +1071,6 @@
         []
       ]
     ],
-    "total_pct": -3.0
+    "total_pct": -5.0
   }
 }
