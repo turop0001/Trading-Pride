@@ -6,16 +6,25 @@
    "date": "2026-09-29",
    "sym": "XAUUSD",
    "window": "A",
-   "status": "prep",
+   "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВЫНОС (ждём инверсию встречного m5 FVG)",
+   "note": "ВХОД (10:45, 4153.81)",
    "reasons": [],
-   "price": 4151.48,
+   "price": 4149.08,
    "boxH": 4155.53,
    "boxL": 4125.82,
    "prevH": 4257.61,
    "prevL": 4166.35,
-   "signal": null,
+   "signal": {
+    "date": "2026-09-29",
+    "window": "A",
+    "time": "10:45",
+    "t_utc": "2026-09-29 07:45:00+00:00",
+    "entry": 4153.81,
+    "stop": 4157.93,
+    "tp": 4145.57,
+    "side": "short"
+   },
    "trendH1": {
     "tr": "шорт",
     "ratio": -2.73,
@@ -26,7 +35,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -42,7 +51,7 @@
    "reasons": [
     "противоположная сторона бокса снята первой"
    ],
-   "price": 1.13533,
+   "price": 1.13507,
    "boxH": 1.13753,
    "boxL": 1.13585,
    "prevH": 1.13947,
@@ -58,7 +67,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -68,11 +77,11 @@
    "date": "2026-09-29",
    "sym": "GBPUSD",
    "window": "A",
-   "status": "watch",
+   "status": "prep",
    "direction": "▲ LONG",
-   "note": "НАБЛЮДАЕМ",
+   "note": "ВЫНОС (выкуп 1 сильная свеча, ждём вторую)",
    "reasons": [],
-   "price": 1.32336,
+   "price": 1.32333,
    "boxH": 1.32556,
    "boxL": 1.32308,
    "prevH": 1.3248,
@@ -88,7 +97,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -102,7 +111,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7745.0,
+   "price": 7743.0,
    "boxH": 7751.5,
    "boxL": 7716.0,
    "prevH": 7790.8,
@@ -118,7 +127,7 @@
     "ratio": 1.47,
     "pct": 1.47
    },
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -132,7 +141,7 @@
    "direction": "🔻 SHORT",
    "note": "ВЫНОС (выкуп 1 сильная свеча, ждём вторую)",
    "reasons": [],
-   "price": 30587.5,
+   "price": 30587.2,
    "boxH": 30607.0,
    "boxL": 30372.2,
    "prevH": 30898.2,
@@ -148,7 +157,7 @@
     "ratio": 2.96,
     "pct": 4.62
    },
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -158,16 +167,25 @@
    "date": "2026-09-29",
    "sym": "US30",
    "window": "A",
-   "status": "prep",
+   "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВЫНОС (ждём инверсию встречного m5 FVG)",
+   "note": "ВХОД (10:45, 51825)",
    "reasons": [],
-   "price": 51791.0,
+   "price": 51772.0,
    "boxH": 51847.0,
    "boxL": 51644.0,
    "prevH": 52038.0,
    "prevL": 51925.0,
-   "signal": null,
+   "signal": {
+    "date": "2026-09-29",
+    "window": "A",
+    "time": "10:45",
+    "t_utc": "2026-09-29 07:45:00+00:00",
+    "entry": 51825.0,
+    "stop": 51874.0,
+    "tp": 51726.0,
+    "side": "short"
+   },
    "trendH1": {
     "tr": "шорт",
     "ratio": -1.65,
@@ -178,7 +196,7 @@
     "ratio": -1.24,
     "pct": -1.32
    },
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -198,7 +216,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "11:02"
+   "checked": "11:16"
   }
  },
  {
@@ -207,9 +225,13 @@
   "data": {
    "date": "2026-09-29",
    "window": "A",
-   "time": "11:02",
-   "text": "без изменений",
-   "changed": [],
+   "time": "11:16",
+   "text": "изменилось: XAUUSD, GBPUSD, US30",
+   "changed": [
+    "XAUUSD",
+    "GBPUSD",
+    "US30"
+   ],
    "log": [
     {
      "date": "2026-09-29",
@@ -295,6 +317,17 @@
      "window": "A",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-09-29",
+     "time": "11:16",
+     "window": "A",
+     "text": "изменилось: XAUUSD, GBPUSD, US30",
+     "lines": [
+      "🟢 XAUUSD (🔻 SHORT) — ВХОД",
+      "⚠️ GBPUSD (▲ LONG) — ВЫНОС",
+      "🟢 US30 (🔻 SHORT) — ВХОД"
+     ]
     }
    ]
   }

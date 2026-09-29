@@ -13,5 +13,27 @@
       "m5": "state/shots/2026-09-28_EURUSD_C_m5.png",
       "h1": "state/shots/2026-09-28_EURUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-09-29_XAUUSD_A",
+    "date": "2026-09-29",
+    "symbol": "XAUUSD",
+    "type": "A",
+    "side": "short",
+    "entry": 4153.81,
+    "stop": 4157.93,
+    "target": 4145.57,
+    "result": "сигнал Пульта в 10:45 Рига"
+  },
+  {
+    "id": "2026-09-29_US30_A",
+    "date": "2026-09-29",
+    "symbol": "US30",
+    "type": "A",
+    "side": "short",
+    "entry": 51825.0,
+    "stop": 51874.0,
+    "target": 51726.0,
+    "result": "сигнал Пульта в 10:45 Рига"
   }
 ]
