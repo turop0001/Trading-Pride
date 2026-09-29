@@ -6,11 +6,11 @@
    "date": "2026-09-29",
    "sym": "XAUUSD",
    "window": "A",
-   "status": "watch",
+   "status": "prep",
    "direction": "🔻 SHORT",
-   "note": "НАБЛЮДАЕМ",
+   "note": "ВЫНОС (хая в 10:20, ждём выкуп)",
    "reasons": [],
-   "price": 4150.79,
+   "price": 4156.91,
    "boxH": 4155.53,
    "boxL": 4125.82,
    "prevH": 4257.61,
@@ -26,7 +26,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -40,7 +40,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.13636,
+   "price": 1.13598,
    "boxH": 1.13753,
    "boxL": 1.13585,
    "prevH": 1.13947,
@@ -56,7 +56,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -70,7 +70,7 @@
    "direction": "▲ LONG",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.32424,
+   "price": 1.32389,
    "boxH": 1.32556,
    "boxL": 1.32308,
    "prevH": 1.3248,
@@ -86,7 +86,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -100,7 +100,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7743.0,
+   "price": 7741.8,
    "boxH": 7751.5,
    "boxL": 7716.0,
    "prevH": 7790.8,
@@ -116,7 +116,7 @@
     "ratio": 1.47,
     "pct": 1.47
    },
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -130,7 +130,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 30548.5,
+   "price": 30561.8,
    "boxH": 30607.0,
    "boxL": 30372.2,
    "prevH": 30898.2,
@@ -146,7 +146,7 @@
     "ratio": 2.96,
     "pct": 4.62
    },
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -160,7 +160,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 51805.0,
+   "price": 51772.0,
    "boxH": 51847.0,
    "boxL": 51644.0,
    "prevH": 52038.0,
@@ -176,7 +176,7 @@
     "ratio": -1.24,
     "pct": -1.32
    },
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -196,7 +196,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "10:07"
+   "checked": "10:25"
   }
  },
  {
@@ -205,16 +205,10 @@
   "data": {
    "date": "2026-09-29",
    "window": "A",
-   "time": "10:07",
-   "text": "отчёт открытия окна отправлен",
+   "time": "10:25",
+   "text": "изменилось: XAUUSD",
    "changed": [
-    "XAUUSD",
-    "EURUSD",
-    "GBPUSD",
-    "US500",
-    "NAS100",
-    "US30",
-    "GER40"
+    "XAUUSD"
    ],
    "log": [
     {
@@ -230,6 +224,15 @@
       "🟡 NAS100 (🔻 SHORT) — НАБЛЮДАЕМ",
       "🟡 US30 (🔻 SHORT) — НАБЛЮДАЕМ",
       "⚪ GER40 (—) — СКИП"
+     ]
+    },
+    {
+     "date": "2026-09-29",
+     "time": "10:25",
+     "window": "A",
+     "text": "изменилось: XAUUSD",
+     "lines": [
+      "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
      ]
     }
    ]
