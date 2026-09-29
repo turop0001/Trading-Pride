@@ -1,0 +1,35 @@
+name: Pult loop (каждую минуту в окне)
+
+on:
+  schedule:
+    # A: 09:55 Рига, C: 16:25 Рига (летнее время; зимой GitHub запускает на час раньше по Риге — цикл просто подождёт)
+    - cron: '55 6 * * 1-5'
+    - cron: '25 13 * * 1-5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pult-loop
+  cancel-in-progress: false
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Loop
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_THREAD_ID: ${{ secrets.TG_THREAD_ID }}
+        run: |
+          git config user.name "pult-bot"; git config user.email "pult-bot@users.noreply.github.com"
+          python pult_loop.py

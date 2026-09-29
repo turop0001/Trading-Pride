@@ -341,4 +341,11 @@ def main(send=True):
 
 
 if __name__ == '__main__':
+    # 29.09.2026: если минутный цикл (pult_loop.py) жив — 5-минутный запуск ничего не делает
+    try:
+        import time as _t
+        if '--force' not in sys.argv and _t.time() - int(open('state/loop_heartbeat.txt').read()) < 180:
+            print('loop alive — skip'); sys.exit(0)
+    except (OSError, ValueError):
+        pass
     main(send='--no-send' not in sys.argv)

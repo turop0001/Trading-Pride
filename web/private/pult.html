@@ -109,7 +109,7 @@ tr.tot td{font-weight:700;background:var(--surface-2)} tr.cur td{background:var(
 .tag.long{background:var(--long-bg);color:var(--long)}.tag.short{background:var(--short-bg);color:var(--short)}.tag.side{background:var(--side-bg);color:var(--side)}
 .tag.typ{background:none;border:1px solid var(--border);color:var(--muted);font-weight:600}
 .st{margin-left:auto;font-size:17px;font-weight:700;padding:6px 15px;border-radius:99px;white-space:nowrap}
-.st.skip{background:var(--off-bg);color:var(--off)}.st.watch{background:var(--side-bg);color:var(--side)}.st.signal{background:var(--long-bg);color:var(--long)}
+.st.skip{background:var(--off-bg);color:var(--off)}.st.watch{background:var(--side-bg);color:var(--side)}.st.prep{background:#e3ecfb;color:#2f5f9e;border:1px solid #2f5f9e}.st.signal{background:var(--long-bg);color:var(--long)}
 .st.prep{background:#fbe3c7;color:#a8480c;border:1px solid #d9822b}
 :root[data-theme="dark"] .st.prep{background:#3a2412;color:#f0a35c;border-color:#b86a2a}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .st.prep{background:#3a2412;color:#f0a35c;border-color:#b86a2a}}
@@ -646,7 +646,7 @@ var REPDAY=(function(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Eur
 $('repTitle').textContent='Отчёт дня · '+REPDAY.split('-').reverse().join('.');
 $('repNote').textContent='Ждём данные живой проверки…';
 var REP=[];
-var STMAP={skip:['skip','Скип'],watch:['watch','Наблюдаем'],prep:['watch','Вынос'],entry:['signal','🟢 Вход']};
+var STMAP={skip:['skip','Скип'],watch:['watch','Наблюдаем'],prep:['prep','Вынос'],entry:['signal','🟢 Вход']};
 /* ДОБАВЛЕНО 28.09.2026: в «Отчёте дня» карточки Типа C поднимаются выше карточек Типа A, как
    только окно Типа A закрылось (14:00 Рига) — сессия дня переходит к Типу C, и не нужно листать
    вниз в поисках нужных карточек. Чек-листы в «Пульте» (ckA/ckC) при этом НЕ переставляются. */
@@ -873,7 +873,7 @@ renderHist();
   function trTxt(t){if(!t)return null;if(typeof t==='string')return t;var tr=t.tr||t.trend||t.dir;if(!tr||tr==='нет данных')return null;var p=t.pct!=null?' ('+(t.pct>=0?'+':'')+t.pct+'%)':'';return tr+p;}
   function trDir(t){var v=t&&typeof t==='object'?(t.tr||''):String(t||'');v=v.toLowerCase();return v.indexOf('лонг')===0||v.indexOf('long')===0?'long':v.indexOf('шорт')===0||v.indexOf('short')===0?'short':v?'side':null;}
   function narChip(lbl,t){var d=trDir(t);if(!d)return '<span class="narI"><small>'+lbl+'</small> <span class="nchip off">нет данных</span></span>';var p=t&&t.pct!=null?(t.pct>0?'+':t.pct<0?'−':'')+Math.abs(t.pct).toFixed(2)+'%':'';
-    return '<span class="narI"><small>'+lbl+'</small> <span class="nchip '+d+'">'+(d==='long'?'▲ LONG':d==='short'?'▼ SHORT':'◆ 50/50')+(p?' <i>'+p+'</i>':'')+'</span></span>';}
+    return '<span class="narI"><small>'+lbl+'</small> <span class="nchip '+d+'">'+(d==='long'?'▲ LONG':d==='short'?'▼ SHORT':'◆ БОКОВИК')+(p?' <i>'+p+'</i>':'')+'</span></span>';}
   function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
     return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
   var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/';
