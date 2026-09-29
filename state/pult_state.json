@@ -2,15 +2,15 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4156.91,
+    "price": 4154.48,
     "boxH": 4155.53,
     "boxL": 4125.82,
     "reasons": [],
-    "checked_at": "10:25",
+    "checked_at": "10:36",
     "prevH": 4257.61,
     "prevL": 4166.35,
     "bias": "short",
-    "extreme": 4156.91,
+    "extreme": 4157.85,
     "line_status": "prep",
     "direction": "🔻 SHORT",
     "note": "ВЫНОС (хая в 10:20, ждём выкуп)",
@@ -32,19 +32,21 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13598,
+    "price": 1.13482,
     "boxH": 1.13753,
     "boxL": 1.13585,
-    "reasons": [],
-    "checked_at": "10:25",
+    "reasons": [
+      "противоположная сторона бокса снята первой"
+    ],
+    "checked_at": "10:36",
     "prevH": 1.13947,
     "prevL": 1.13792,
     "bias": "short",
-    "line_status": "watch",
+    "line_status": "skip",
     "direction": "🔻 SHORT",
-    "note": "НАБЛЮДАЕМ",
-    "status_key": "НАБЛЮДАЕМ",
-    "tg_note": "НАБЛЮДАЕМ",
+    "note": "СКИП (противоположная сторона бокса снята первой)",
+    "status_key": "СКИП (противоположная сторона бокса снята первой)",
+    "tg_note": "СКИП",
     "stale": false,
     "date": "2026-09-29",
     "trend_h1": {
@@ -61,11 +63,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32389,
+    "price": 1.32308,
     "boxH": 1.32556,
     "boxL": 1.32308,
     "reasons": [],
-    "checked_at": "10:25",
+    "checked_at": "10:36",
     "prevH": 1.3248,
     "prevL": 1.32286,
     "bias": "long",
@@ -90,11 +92,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7741.8,
+    "price": 7745.5,
     "boxH": 7751.5,
     "boxL": 7716.0,
     "reasons": [],
-    "checked_at": "10:25",
+    "checked_at": "10:36",
     "prevH": 7790.8,
     "prevL": 7768.2,
     "bias": "short",
@@ -119,11 +121,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30561.8,
+    "price": 30579.0,
     "boxH": 30607.0,
     "boxL": 30372.2,
     "reasons": [],
-    "checked_at": "10:25",
+    "checked_at": "10:36",
     "prevH": 30898.2,
     "prevL": 30580.0,
     "bias": "short",
@@ -148,11 +150,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51772.0,
+    "price": 51797.0,
     "boxH": 51847.0,
     "boxL": 51644.0,
     "reasons": [],
-    "checked_at": "10:25",
+    "checked_at": "10:36",
     "prevH": 52038.0,
     "prevL": 51925.0,
     "bias": "short",
@@ -197,6 +199,15 @@
       "text": "изменилось: XAUUSD",
       "lines": [
         "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
+      ]
+    },
+    {
+      "date": "2026-09-29",
+      "time": "10:36",
+      "window": "A",
+      "text": "изменилось: EURUSD",
+      "lines": [
+        "⚪ EURUSD (🔻 SHORT) — СКИП"
       ]
     }
   ],
