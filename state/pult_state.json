@@ -228,13 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "16:44",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-09-29",
       "time": "16:45",
       "window": "C",
       "text": "без изменений",
@@ -791,6 +784,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "18:04",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -842,7 +842,7 @@
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "18:03",
+    "checked_at": "18:04",
     "extreme": 4172.3,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -869,7 +869,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "18:03",
+    "checked_at": "18:04",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -895,7 +895,7 @@
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "18:03",
+    "checked_at": "18:04",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
