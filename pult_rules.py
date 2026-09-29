@@ -386,7 +386,7 @@ def _track(res, d, sig, sd, dirc, fmtp):
         return _out(res, 'entry', dirc, 'ВХОД → TP 🎯 +2R', tg='ЗАКРЫТА - TP')
     if out == 'SL':
         return _out(res, 'skip', dirc, 'ВХОД → SL −1R', tg='ЗАКРЫТА - SL')
-    return _out(res, 'entry', dirc, f'В СДЕЛКЕ (вход {sig["time"]} по {fmtp(sig["entry"])})')
+    return _out(res, 'entry', dirc, 'В СДЕЛКЕ')
 
 
 # 28.09.2026 (по просьбе пользователя): уведомления/отчёты в Telegram должны показывать
