@@ -772,6 +772,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "17:24",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -823,7 +830,7 @@
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:23",
+    "checked_at": "17:24",
     "extreme": 4172.08,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -850,7 +857,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:23",
+    "checked_at": "17:24",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -876,7 +883,7 @@
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:23",
+    "checked_at": "17:24",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
