@@ -660,11 +660,12 @@ function liveCard(x){
   var dir=String(x.direction||''),es=/SHORT/.test(dir)?'short':/LONG/.test(dir)?'long':null;
   var m=STMAP[x.status]||['watch','Наблюдаем'];
   var rows=[['Направление (направление рынка)',dir||'—'],['Статус',x.note||'—']];
-  if(x.price!=null)rows.push(['Цена',x.price+(x.checked?' в '+x.checked+' Рига':'')]);
+  if(x.price!=null)rows.push(['Цена',x.price+(x.checked?' · '+x.checked:'')]);
   if(x.boxL!=null)rows.push([x.window==='C'?'Бокс Лондона':'Бокс Азии',x.boxL+' – '+x.boxH]);
   if(x.prevL!=null&&x.window!=='C')rows.push(['Вчерашний бокс',x.prevL+' – '+x.prevH]);
   if(x.status==='skip'&&x.reasons&&x.reasons.length)rows.push(['Почему скип',x.reasons.length>2?x.reasons.slice(2).join('; '):'других причин нет — основные в статусе']);
-  if(x.signal)rows.push(['Вход / стоп / цель 2R',x.signal.entry+' / '+x.signal.stop+' / '+x.signal.tp+' ('+x.signal.time+')']);
+  if(x.signal){var xt=x.exit_time?' · '+x.exit_time:'',isT=/→ TP/.test(x.note||''),isS=/→ SL/.test(x.note||'');
+    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);rows.push(['Цель 2R',x.signal.tp+(isT?xt:'')]);}
   return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false};
 }
 function renderLive(m){
@@ -699,6 +700,7 @@ function renderRep(){
       }
       else{bEl.textContent=r[1];}
       g.appendChild(bEl);});card.appendChild(g);
+    if(c.rows.some(function(r){return r[0]==='Вход'||r[0]==='Цена';})){var tn=el('div',null,'Время указано по Риге');tn.style.cssText='font-size:11px;color:var(--muted);margin-top:8px';card.appendChild(tn);}
     if(c.c){var nx=el('div','next');nx.innerHTML='Следующий шанс — <b>тип C</b>, окно '+WC+' Рига.';card.appendChild(nx);}
     var ac=el('div','acts');
     var bIn=el('button','btn sm',my&&my.open?'Вошёл ✓ · отменить':my&&my.closed?'Отменить закрытие':'Вошёл');bIn.title=my&&my.open?'Нажмите ещё раз, если отметили вход по ошибке':'';
@@ -889,11 +891,11 @@ renderHist();
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||'');
     if(isTP||isSL){c.res=isTP?'TP':'SL';c.stT=isTP?'Закрыта · TP':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0&&z[0]!=='Почему скип';});
-    if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0].indexOf('Вход / стоп')===0;});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
+    if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0]==='Вход';});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
     c._sig=r.signal||null;
     var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
     var nar=narHtml(r.trend_h1,r.trend_d1);
-    var at=c.rows.findIndex(function(z){return z[0]==='Все причины'||z[0].indexOf('Вход / стоп')===0;});var nr=['Нарратив',nar];if(at<0)c.rows.push(nr);else c.rows.splice(at,0,nr);
+    var at=c.rows.findIndex(function(z){return z[0]==='Все причины'||z[0]==='Вход';});var nr=['Нарратив',nar];if(at<0)c.rows.push(nr);else c.rows.splice(at,0,nr);
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
   }

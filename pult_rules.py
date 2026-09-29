@@ -378,8 +378,10 @@ def _track(res, d, sig, sd, dirc, fmtp):
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
     out = None
     for _, r in after.iterrows():
-        if (r['Low'] <= sig['stop']) if sd == 1 else (r['High'] >= sig['stop']): out = 'SL'; break
-        if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): out = 'TP'; break
+        if (r['Low'] <= sig['stop']) if sd == 1 else (r['High'] >= sig['stop']): out = 'SL'; xt = _.tz_convert('Europe/Riga').strftime('%H:%M') if _.tzinfo else None; break
+        if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): out = 'TP'; xt = _.tz_convert('Europe/Riga').strftime('%H:%M') if _.tzinfo else None; break
+    if out:
+        res['exit_time'] = xt
     if out == 'TP':
         return _out(res, 'entry', dirc, 'ВХОД → TP 🎯 +2R', tg='ЗАКРЫТА - TP')
     if out == 'SL':

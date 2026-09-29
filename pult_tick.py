@@ -132,6 +132,12 @@ def _tg(r, closed=False):
     note = re.sub(r'\s*\(.*\)\s*$', '', str(note or '')).strip()
     if closed and ls in ('watch', 'prep') and not r.get('signal'):
         return 'skip', 'СКИП'
+    sg = r.get('signal') or {}
+    if sg.get('time'):
+        if note.startswith('ЗАКРЫТА'):
+            note += f" в {r['exit_time']} (вход {sg['time']})" if r.get('exit_time') else f" (вход {sg['time']})"
+        elif note == 'ВХОД':
+            note += f" в {sg['time']}"
     return ls, note
 
 
@@ -210,6 +216,7 @@ def final_check(state, today, dstr, off, tg, did):
                 print('final history failed:', e)
             state[f'{s}_{w}'] = r
             tm = (tt + __import__('pandas').Timedelta(hours=off)).strftime('%H:%M')
+            r['exit_time'] = tm
             upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
                        f"({'+2.0%' if out == 'TP' else '-1.0%'} депозита)")
     if upd:
