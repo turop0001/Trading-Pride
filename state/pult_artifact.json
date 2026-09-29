@@ -10,7 +10,7 @@
    "direction": "🔻 SHORT",
    "note": "ВЫНОС (в 18:10, ждём подтверждения)",
    "reasons": [],
-   "price": 4159.94,
+   "price": 4156.58,
    "boxH": 4161.3,
    "boxL": 4137.73,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "18:24"
+   "checked": "18:25"
   }
  },
  {
@@ -36,11 +36,11 @@
    "date": "2026-09-29",
    "sym": "EURUSD",
    "window": "C",
-   "status": "watch",
-   "direction": "—",
-   "note": "НАБЛЮДАЕМ",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (в 18:20, ждём подтверждения)",
    "reasons": [],
-   "price": 1.13342,
+   "price": 1.13312,
    "boxH": 1.13581,
    "boxL": 1.13326,
    "prevH": null,
@@ -56,7 +56,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "18:24"
+   "checked": "18:25"
   }
  },
  {
@@ -70,7 +70,7 @@
    "direction": "▲ LONG",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.32074,
+   "price": 1.32057,
    "boxH": 1.32525,
    "boxL": 1.32213,
    "prevH": null,
@@ -96,7 +96,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "18:24"
+   "checked": "18:25"
   }
  },
  {
@@ -105,17 +105,12 @@
   "data": {
    "date": "2026-09-29",
    "window": "C",
-   "time": "18:24",
-   "text": "без изменений",
-   "changed": [],
+   "time": "18:25",
+   "text": "изменилось: EURUSD",
+   "changed": [
+    "EURUSD"
+   ],
    "log": [
-    {
-     "date": "2026-09-29",
-     "time": "17:45",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-09-29",
      "time": "17:46",
@@ -390,6 +385,15 @@
      "window": "C",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-09-29",
+     "time": "18:25",
+     "window": "C",
+     "text": "изменилось: EURUSD",
+     "lines": [
+      "⚠️ EURUSD (▲ LONG) — ВЫНОС"
+     ]
     }
    ]
   }
