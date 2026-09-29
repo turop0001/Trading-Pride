@@ -228,13 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "16:40",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-09-29",
       "time": "16:41",
       "window": "C",
       "text": "без изменений",
@@ -791,6 +784,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "18:00",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -838,16 +838,16 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4167.94,
+    "price": 4170.46,
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:59",
-    "extreme": 4169.13,
+    "checked_at": "18:00",
+    "extreme": 4172.3,
     "line_status": "prep",
     "direction": "🔻 SHORT",
-    "note": "ВЫНОС (в 17:50, ждём подтверждения)",
-    "status_key": "ВЫНОС (в 17:50, ждём подтверждения)",
+    "note": "ВЫНОС (в 17:55, ждём подтверждения)",
+    "status_key": "ВЫНОС (в 17:55, ждём подтверждения)",
     "tg_note": "ВЫНОС",
     "stale": false,
     "date": "2026-09-29",
@@ -865,11 +865,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.13404,
+    "price": 1.13403,
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:59",
+    "checked_at": "18:00",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -891,11 +891,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.3219,
+    "price": 1.32146,
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:59",
+    "checked_at": "18:00",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
