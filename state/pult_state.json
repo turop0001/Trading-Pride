@@ -228,21 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "10:07",
-      "window": "A",
-      "text": "отчёт открытия окна отправлен",
-      "lines": [
-        "🟡 XAUUSD (🔻 SHORT) — НАБЛЮДАЕМ",
-        "🟡 EURUSD (🔻 SHORT) — НАБЛЮДАЕМ",
-        "🟡 GBPUSD (▲ LONG) — НАБЛЮДАЕМ",
-        "🟡 US500 (🔻 SHORT) — НАБЛЮДАЕМ",
-        "🟡 NAS100 (🔻 SHORT) — НАБЛЮДАЕМ",
-        "🟡 US30 (🔻 SHORT) — НАБЛЮДАЕМ",
-        "⚪ GER40 (—) — СКИП"
-      ]
-    },
-    {
-      "date": "2026-09-29",
       "time": "10:25",
       "window": "A",
       "text": "изменилось: XAUUSD",
@@ -821,6 +806,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "17:31",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -868,11 +860,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4172.1,
+    "price": 4172.92,
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:30",
+    "checked_at": "17:31",
     "extreme": 4175.05,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -899,7 +891,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:30",
+    "checked_at": "17:31",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -921,11 +913,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.32264,
+    "price": 1.32265,
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:30",
+    "checked_at": "17:31",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
