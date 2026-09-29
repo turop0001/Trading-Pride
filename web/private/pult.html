@@ -305,7 +305,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
         <div class="field"><label for="jSide">Сторона</label><select id="jSide"><option value="long">Long</option><option value="short">Short</option></select></div>
         <div class="field"><label for="jDate">Дата</label><input id="jDate" type="date"></div>
         <div class="field"><label>Итог</label><div class="seg" id="jOut"><button type="button" data-v="TP" class="on">TP</button><button type="button" data-v="SL">SL</button><button type="button" data-v="BE">БУ</button></div></div>
-        <div class="field"><label for="jR">Сколько R</label><input id="jR" type="number" step="0.1" min="0" value="2"></div>
+        <div class="field"><label for="jR">Результат, $</label><input id="jR" type="number" step="1" min="0" inputmode="decimal" placeholder="напр. 500"><div id="jRh" style="font-size:12px;margin-top:3px;color:var(--muted)"></div></div>
         <div class="field" style="grid-column:span 2"><label for="jNote">Заметка</label><input id="jNote" type="text" placeholder="коротко"></div>
         <div class="field" id="jWhyW" hidden style="grid-column:1/-1"><label for="jWhySel">Почему SL (для разбора)</label><select id="jWhySel"></select><input id="jWhyNote" type="text" placeholder="комментарий (необязательно)" style="margin-top:6px"></div>
       </div>
@@ -744,8 +744,13 @@ var col=null,DOCS=[];
 try{$('jDate').valueAsDate=new Date();}catch(e){}
 fillSLR($('jWhySel'),$('jType').value);$('jType').addEventListener('change',function(){fillSLR($('jWhySel'),$('jType').value);});
 var JO='TP';
+function riskUsd1(){return riskNow().st/100;}
+function rFromUsd(u){var k=riskUsd1();return k>0?Math.round(Math.abs(u)/k*2)/2:0;}
+function jRcalc(){var u=parseFloat($('jR').value)||0,r=rFromUsd(u);$('jRh').textContent=u>0?('≈ '+(JO==='SL'?'−':'+')+r+'R (1R = $'+Math.round(riskUsd1())+')'):'1R = $'+Math.round(riskUsd1());}
+$('jR').addEventListener('input',jRcalc);
+try{$('jR').value=Math.round(riskUsd1()*2);}catch(e){}jRcalc();
 document.querySelectorAll('#jOut button').forEach(function(b){b.addEventListener('click',function(){JO=b.dataset.v;document.querySelectorAll('#jOut button').forEach(function(x){x.classList.toggle('on',x===b);});
-  $('jWhyW').hidden=JO!=='SL';if(JO==='BE'){$('jR').value=0;$('jR').disabled=true;}else{$('jR').disabled=false;if(!+$('jR').value)$('jR').value=JO==='TP'?2:1;}});});
+  $('jWhyW').hidden=JO!=='SL';if(JO==='BE'){$('jR').value=0;$('jR').disabled=true;}else{$('jR').disabled=false;if(!+$('jR').value)$('jR').value=Math.round(riskUsd1()*(JO==='TP'?2:1));}jRcalc();});});
 function outOf(d){if(d.out)return d.out;var r=+d.r;return r>0.05?'TP':r<-0.05?'SL':'BE';}
 function addTrade(o,cb){if(!col){cb(false,'Журнал работает только на опубликованной странице.');return;}col.add(o).then(function(ref){cb(true,null,ref&&ref.id);}).catch(function(e){cb(false,'Не сохранилось: '+(e&&e.code||'ошибка'));});}
 var SHOTS={};
@@ -762,9 +767,9 @@ function render(docs){
   var L=$('jList');L.innerHTML='';if(!DOCS.length)L.appendChild(el('div','empty','Пока нет записей'));
   DOCS.forEach(function(x){L.appendChild(rowOf(x.d,true,x.id));});renderStats();}
 $('jAdd').addEventListener('click',function(){
-  var a=Math.abs(parseFloat($('jR').value))||0,d=$('jDate').value;if(JO==='BE')a=0;if(!d){$('jMsg').textContent='Укажите дату.';return;}
+  var usd=Math.abs(parseFloat($('jR').value))||0,a=rFromUsd(usd),d=$('jDate').value;if(JO==='BE'){a=0;usd=0;}if(!d){$('jMsg').textContent='Укажите дату.';return;}
   var btn=$('jAdd');btn.disabled=true;
-  addTrade({symbol:$('jSym').value,type:$('jType').value,side:$('jSide').value,date:d,out:JO,r:JO==='TP'?a:JO==='SL'?-a:0,note:$('jNote').value.trim(),why:JO==='SL'?combineWhy($('jWhySel'),$('jWhyNote').value):'',ts:Date.now()},
+  addTrade({symbol:$('jSym').value,type:$('jType').value,side:$('jSide').value,date:d,out:JO,r:JO==='TP'?a:JO==='SL'?-a:0,usd:JO==='TP'?usd:JO==='SL'?-usd:0,note:$('jNote').value.trim(),why:JO==='SL'?combineWhy($('jWhySel'),$('jWhyNote').value):'',ts:Date.now()},
    function(ok,err){$('jMsg').textContent=ok?'Сохранено.':err;if(ok){$('jNote').value='';$('jWhySel').value='';$('jWhyNote').value='';}btn.disabled=false;});
 });
 
