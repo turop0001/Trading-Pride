@@ -10,7 +10,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4155.47,
+   "price": 4158.29,
    "boxH": 4161.3,
    "boxL": 4137.73,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "16:49"
+   "checked": "16:50"
   }
  },
  {
@@ -40,7 +40,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.13413,
+   "price": 1.1344,
    "boxH": 1.13581,
    "boxL": 1.13326,
    "prevH": null,
@@ -56,7 +56,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "16:49"
+   "checked": "16:50"
   }
  },
  {
@@ -66,16 +66,26 @@
    "date": "2026-09-29",
    "sym": "GBPUSD",
    "window": "C",
-   "status": "prep",
+   "status": "entry",
    "direction": "▲ LONG",
-   "note": "ВЫНОС (в 16:30, ждём подтверждения)",
+   "note": "ВХОД (16:40, 1.32230)",
    "reasons": [],
-   "price": 1.32258,
+   "price": 1.32315,
    "boxH": 1.32525,
    "boxL": 1.32213,
    "prevH": null,
    "prevL": null,
-   "signal": null,
+   "signal": {
+    "date": "2026-09-29",
+    "window": "C",
+    "time": "16:40",
+    "t_utc": "2026-09-29 13:40:00+00:00",
+    "entry": 1.3223,
+    "stop": 1.32174,
+    "tp": 1.32341,
+    "side": "long",
+    "src": "MT5"
+   },
    "trendH1": {
     "tr": "шорт",
     "ratio": -2.62,
@@ -86,7 +96,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "16:49"
+   "checked": "16:50"
   }
  },
  {
@@ -95,9 +105,11 @@
   "data": {
    "date": "2026-09-29",
    "window": "C",
-   "time": "16:49",
-   "text": "без изменений",
-   "changed": [],
+   "time": "16:50",
+   "text": "изменилось: GBPUSD",
+   "changed": [
+    "GBPUSD"
+   ],
    "log": [
     {
      "date": "2026-09-29",
@@ -403,6 +415,15 @@
      "window": "C",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-09-29",
+     "time": "16:50",
+     "window": "C",
+     "text": "изменилось: GBPUSD",
+     "lines": [
+      "🟢 GBPUSD (▲ LONG) — ВХОД в 16:40"
+     ]
     }
    ]
   }
