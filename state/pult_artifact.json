@@ -26,7 +26,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -58,7 +58,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -88,7 +88,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -102,7 +102,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7745.5,
+   "price": 7745.8,
    "boxH": 7751.5,
    "boxL": 7716.0,
    "prevH": 7790.8,
@@ -118,7 +118,7 @@
     "ratio": 1.47,
     "pct": 1.47
    },
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -132,7 +132,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 30579.0,
+   "price": 30578.0,
    "boxH": 30607.0,
    "boxL": 30372.2,
    "prevH": 30898.2,
@@ -148,7 +148,7 @@
     "ratio": 2.96,
     "pct": 4.62
    },
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -162,7 +162,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 51797.0,
+   "price": 51798.0,
    "boxH": 51847.0,
    "boxL": 51644.0,
    "prevH": 52038.0,
@@ -178,7 +178,7 @@
     "ratio": -1.24,
     "pct": -1.32
    },
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -198,7 +198,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "10:36"
+   "checked": "10:38"
   }
  },
  {
@@ -207,11 +207,9 @@
   "data": {
    "date": "2026-09-29",
    "window": "A",
-   "time": "10:36",
-   "text": "изменилось: EURUSD",
-   "changed": [
-    "EURUSD"
-   ],
+   "time": "10:38",
+   "text": "без изменений",
+   "changed": [],
    "log": [
     {
      "date": "2026-09-29",
@@ -245,6 +243,13 @@
      "lines": [
       "⚪ EURUSD (🔻 SHORT) — СКИП"
      ]
+    },
+    {
+     "date": "2026-09-29",
+     "time": "10:38",
+     "window": "A",
+     "text": "без изменений",
+     "lines": []
     }
    ]
   }
