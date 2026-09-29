@@ -1,30 +1,21 @@
 [
  {
   "collection": "pult",
-  "doc_id": "XAUUSD_A",
+  "doc_id": "XAUUSD_C",
   "data": {
    "date": "2026-09-29",
    "sym": "XAUUSD",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "ВХОД → SL −1R",
+   "window": "C",
+   "status": "watch",
+   "direction": "—",
+   "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4161.8,
-   "boxH": 4155.53,
-   "boxL": 4125.82,
-   "prevH": 4257.61,
-   "prevL": 4166.35,
-   "signal": {
-    "date": "2026-09-29",
-    "window": "A",
-    "time": "10:45",
-    "t_utc": "2026-09-29 07:45:00+00:00",
-    "entry": 4153.81,
-    "stop": 4157.93,
-    "tp": 4145.57,
-    "side": "short"
-   },
+   "price": 4154.04,
+   "boxH": 4161.3,
+   "boxL": 4137.73,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
    "trendH1": {
     "tr": "шорт",
     "ratio": -2.73,
@@ -35,27 +26,25 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "13:59"
+   "checked": "16:36"
   }
  },
  {
   "collection": "pult",
-  "doc_id": "EURUSD_A",
+  "doc_id": "EURUSD_C",
   "data": {
    "date": "2026-09-29",
    "sym": "EURUSD",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (противоположная сторона бокса снята первой)",
-   "reasons": [
-    "противоположная сторона бокса снята первой"
-   ],
-   "price": 1.13507,
-   "boxH": 1.13753,
-   "boxL": 1.13585,
-   "prevH": 1.13947,
-   "prevL": 1.13792,
+   "window": "C",
+   "status": "watch",
+   "direction": "—",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 1.13405,
+   "boxH": 1.13581,
+   "boxL": 1.13326,
+   "prevH": null,
+   "prevL": null,
    "signal": null,
    "trendH1": {
     "tr": "шорт",
@@ -67,35 +56,26 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "13:59"
+   "checked": "16:36"
   }
  },
  {
   "collection": "pult",
-  "doc_id": "GBPUSD_A",
+  "doc_id": "GBPUSD_C",
   "data": {
    "date": "2026-09-29",
    "sym": "GBPUSD",
-   "window": "A",
-   "status": "skip",
+   "window": "C",
+   "status": "prep",
    "direction": "▲ LONG",
-   "note": "ВХОД → SL −1R",
+   "note": "ВЫНОС (в 16:30, ждём подтверждения)",
    "reasons": [],
-   "price": 1.32349,
-   "boxH": 1.32556,
-   "boxL": 1.32308,
-   "prevH": 1.3248,
-   "prevL": 1.32286,
-   "signal": {
-    "date": "2026-09-29",
-    "window": "A",
-    "time": "11:15",
-    "t_utc": "2026-09-29 08:15:00+00:00",
-    "entry": 1.32343,
-    "stop": 1.32296,
-    "tp": 1.32438,
-    "side": "long"
-   },
+   "price": 1.32179,
+   "boxH": 1.32525,
+   "boxL": 1.32213,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
    "trendH1": {
     "tr": "шорт",
     "ratio": -2.62,
@@ -106,157 +86,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "US500_A",
-  "data": {
-   "date": "2026-09-29",
-   "sym": "US500",
-   "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (окно закрылось, входов не было)",
-   "reasons": [],
-   "price": 7748.0,
-   "boxH": 7751.5,
-   "boxL": 7716.0,
-   "prevH": 7790.8,
-   "prevL": 7768.2,
-   "signal": null,
-   "trendH1": {
-    "tr": "шорт",
-    "ratio": -1.76,
-    "pct": -1.22
-   },
-   "trendD1": {
-    "tr": "боковик",
-    "ratio": 1.47,
-    "pct": 1.47
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "NAS100_A",
-  "data": {
-   "date": "2026-09-29",
-   "sym": "NAS100",
-   "window": "A",
-   "status": "entry",
-   "direction": "🔻 SHORT",
-   "note": "В СДЕЛКЕ (вход 11:55 по 30582.2)",
-   "reasons": [],
-   "price": 30615.0,
-   "boxH": 30607.0,
-   "boxL": 30372.2,
-   "prevH": 30898.2,
-   "prevL": 30580.0,
-   "signal": {
-    "date": "2026-09-29",
-    "window": "A",
-    "time": "11:55",
-    "t_utc": "2026-09-29 08:55:00+00:00",
-    "entry": 30582.2,
-    "stop": 30629.1,
-    "tp": 30488.6,
-    "side": "short"
-   },
-   "trendH1": {
-    "tr": "боковик",
-    "ratio": -0.76,
-    "pct": -0.87
-   },
-   "trendD1": {
-    "tr": "лонг",
-    "ratio": 2.96,
-    "pct": 4.62
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "US30_A",
-  "data": {
-   "date": "2026-09-29",
-   "sym": "US30",
-   "window": "A",
-   "status": "entry",
-   "direction": "🔻 SHORT",
-   "note": "В СДЕЛКЕ (вход 10:45 по 51825)",
-   "reasons": [],
-   "price": 51825.0,
-   "boxH": 51847.0,
-   "boxL": 51644.0,
-   "prevH": 52038.0,
-   "prevL": 51925.0,
-   "signal": {
-    "date": "2026-09-29",
-    "window": "A",
-    "time": "10:45",
-    "t_utc": "2026-09-29 07:45:00+00:00",
-    "entry": 51825.0,
-    "stop": 51874.0,
-    "tp": 51726.0,
-    "side": "short"
-   },
-   "trendH1": {
-    "tr": "шорт",
-    "ratio": -1.65,
-    "pct": -1.34
-   },
-   "trendD1": {
-    "tr": "боковик",
-    "ratio": -1.24,
-    "pct": -1.32
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "GER40_A",
-  "data": {
-   "date": "2026-09-29",
-   "sym": "GER40",
-   "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных TradingView — смотреть вручную)",
-   "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
-   "signal": null,
-   "trendH1": null,
-   "trendD1": null,
-   "checked": null
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "GER40_A",
-  "data": {
-   "date": "2026-09-29",
-   "sym": "GER40",
-   "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных TradingView — смотреть вручную)",
-   "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
-   "signal": null,
-   "checked": "14:14"
+   "checked": "16:36"
   }
  },
  {
@@ -264,10 +94,14 @@
   "doc_id": "last",
   "data": {
    "date": "2026-09-29",
-   "window": "A",
-   "time": "14:14",
-   "text": "окно A закрыто, отчёт отправлен",
-   "changed": [],
+   "window": "C",
+   "time": "16:36",
+   "text": "отчёт открытия окна отправлен",
+   "changed": [
+    "XAUUSD",
+    "EURUSD",
+    "GBPUSD"
+   ],
    "log": [
     {
      "date": "2026-09-29",
@@ -492,6 +326,17 @@
      "window": "—",
      "text": "окно A закрыто, отчёт отправлен",
      "lines": []
+    },
+    {
+     "date": "2026-09-29",
+     "time": "16:36",
+     "window": "C",
+     "text": "отчёт открытия окна отправлен",
+     "lines": [
+      "🟡 XAUUSD (—) — НАБЛЮДАЕМ",
+      "🟡 EURUSD (—) — НАБЛЮДАЕМ",
+      "⚠️ GBPUSD (▲ LONG) — ВЫНОС"
+     ]
     }
    ]
   }
