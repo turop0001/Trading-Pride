@@ -228,15 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "12:21",
-      "window": "A",
-      "text": "изменилось: GBPUSD",
-      "lines": [
-        "⚪ GBPUSD (▲ LONG) — ЗАКРЫТА - SL"
-      ]
-    },
-    {
-      "date": "2026-09-29",
       "time": "12:37",
       "window": "A",
       "text": "изменилось: GBPUSD, NAS100",
@@ -800,6 +791,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "17:49",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -851,7 +849,7 @@
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:48",
+    "checked_at": "17:49",
     "extreme": 4170.72,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -878,7 +876,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:48",
+    "checked_at": "17:49",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -904,7 +902,7 @@
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:48",
+    "checked_at": "17:49",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
