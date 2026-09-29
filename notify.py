@@ -104,7 +104,7 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
             f"Вход {entry} · {time_str}\n"
             f"Стоп: {stop}\n"
             f"{E_TARGET} Цель 2R: {target_2r}\n"
-            f"{E_NEWS} Риск: {risk_pct}% (полный, {note})")
+            f"{E_NEWS} Риск: {risk_pct}%")
 
 
 def build_tp_hit(symbol, direction, target_price, time_str, pct):
