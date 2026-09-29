@@ -23,7 +23,11 @@
     "entry": 4153.81,
     "stop": 4157.93,
     "target": 4145.57,
-    "result": "сигнал Пульта в 10:45 Рига"
+    "result": "ВХОД → SL −1R",
+    "shots": {
+      "m5": "state/shots/2026-09-29_XAUUSD_A_m5.png",
+      "h1": "state/shots/2026-09-29_XAUUSD_A_h1.png"
+    }
   },
   {
     "id": "2026-09-29_US30_A",

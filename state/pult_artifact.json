@@ -6,11 +6,11 @@
    "date": "2026-09-29",
    "sym": "XAUUSD",
    "window": "A",
-   "status": "entry",
+   "status": "skip",
    "direction": "🔻 SHORT",
-   "note": "В СДЕЛКЕ (вход 10:45 по 4153.81)",
+   "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 4155.32,
+   "price": 4160.23,
    "boxH": 4155.53,
    "boxL": 4125.82,
    "prevH": 4257.61,
@@ -35,7 +35,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "13:01"
+   "checked": "13:16"
   }
  },
  {
@@ -81,7 +81,7 @@
    "direction": "▲ LONG",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.32233,
+   "price": 1.32252,
    "boxH": 1.32556,
    "boxL": 1.32308,
    "prevH": 1.3248,
@@ -106,7 +106,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "13:01"
+   "checked": "13:16"
   }
  },
  {
@@ -120,7 +120,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7742.2,
+   "price": 7742.5,
    "boxH": 7751.5,
    "boxL": 7716.0,
    "prevH": 7790.8,
@@ -136,7 +136,7 @@
     "ratio": 1.47,
     "pct": 1.47
    },
-   "checked": "13:01"
+   "checked": "13:16"
   }
  },
  {
@@ -150,7 +150,7 @@
    "direction": "🔻 SHORT",
    "note": "В СДЕЛКЕ (вход 11:55 по 30582.2)",
    "reasons": [],
-   "price": 30577.0,
+   "price": 30593.5,
    "boxH": 30607.0,
    "boxL": 30372.2,
    "prevH": 30898.2,
@@ -175,7 +175,7 @@
     "ratio": 2.96,
     "pct": 4.62
    },
-   "checked": "13:01"
+   "checked": "13:16"
   }
  },
  {
@@ -189,7 +189,7 @@
    "direction": "🔻 SHORT",
    "note": "В СДЕЛКЕ (вход 10:45 по 51825)",
    "reasons": [],
-   "price": 51783.0,
+   "price": 51791.0,
    "boxH": 51847.0,
    "boxL": 51644.0,
    "prevH": 52038.0,
@@ -214,7 +214,7 @@
     "ratio": -1.24,
     "pct": -1.32
    },
-   "checked": "13:01"
+   "checked": "13:16"
   }
  },
  {
@@ -256,7 +256,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "13:01"
+   "checked": "13:16"
   }
  },
  {
@@ -265,9 +265,11 @@
   "data": {
    "date": "2026-09-29",
    "window": "A",
-   "time": "13:01",
-   "text": "без изменений",
-   "changed": [],
+   "time": "13:16",
+   "text": "изменилось: XAUUSD",
+   "changed": [
+    "XAUUSD"
+   ],
    "log": [
     {
      "date": "2026-09-29",
@@ -448,6 +450,15 @@
      "window": "A",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-09-29",
+     "time": "13:16",
+     "window": "A",
+     "text": "изменилось: XAUUSD",
+     "lines": [
+      "⚪ XAUUSD (🔻 SHORT) — ЗАКРЫТА - SL в 13:05"
+     ]
     }
    ]
   }

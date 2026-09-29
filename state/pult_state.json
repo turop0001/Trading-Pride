@@ -2,11 +2,11 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4155.32,
+    "price": 4160.23,
     "boxH": 4155.53,
     "boxL": 4125.82,
     "reasons": [],
-    "checked_at": "13:01",
+    "checked_at": "13:16",
     "prevH": 4257.61,
     "prevL": 4166.35,
     "bias": "short",
@@ -20,13 +20,18 @@
       "tp": 4145.57,
       "side": "short"
     },
-    "line_status": "entry",
+    "exit_time": "13:05",
+    "line_status": "skip",
     "direction": "🔻 SHORT",
-    "note": "В СДЕЛКЕ (вход 10:45 по 4153.81)",
-    "status_key": "В СДЕЛКЕ (вход 10:45 по 4153.81)",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-09-29",
+    "shots": {
+      "m5": "state/shots/2026-09-29_XAUUSD_A_m5.png",
+      "h1": "state/shots/2026-09-29_XAUUSD_A_h1.png"
+    },
     "trend_h1": {
       "tr": "шорт",
       "ratio": -2.73,
@@ -72,11 +77,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32233,
+    "price": 1.32252,
     "boxH": 1.32556,
     "boxL": 1.32308,
     "reasons": [],
-    "checked_at": "13:01",
+    "checked_at": "13:16",
     "prevH": 1.3248,
     "prevL": 1.32286,
     "bias": "long",
@@ -116,11 +121,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7742.2,
+    "price": 7742.5,
     "boxH": 7751.5,
     "boxL": 7716.0,
     "reasons": [],
-    "checked_at": "13:01",
+    "checked_at": "13:16",
     "prevH": 7790.8,
     "prevL": 7768.2,
     "bias": "short",
@@ -145,11 +150,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30577.0,
+    "price": 30593.5,
     "boxH": 30607.0,
     "boxL": 30372.2,
     "reasons": [],
-    "checked_at": "13:01",
+    "checked_at": "13:16",
     "prevH": 30898.2,
     "prevL": 30580.0,
     "bias": "short",
@@ -184,11 +189,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51783.0,
+    "price": 51791.0,
     "boxH": 51847.0,
     "boxL": 51644.0,
     "reasons": [],
-    "checked_at": "13:01",
+    "checked_at": "13:16",
     "prevH": 52038.0,
     "prevL": 51925.0,
     "bias": "short",
@@ -400,6 +405,15 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "13:16",
+      "window": "A",
+      "text": "изменилось: XAUUSD",
+      "lines": [
+        "⚪ XAUUSD (🔻 SHORT) — ЗАКРЫТА - SL в 13:05"
+      ]
     }
   ],
   "_flags": {
