@@ -191,7 +191,7 @@ def final_check(state, today, dstr, off, tg, did):
                 continue
             sig = r['signal']
             try:
-                d = lc.fetch(lc.ticker_for(s, w))
+                d = lc.fetch(lc.ticker_for(s, w), sig.get('src', 'Yahoo'))
             except Exception as e:
                 print('final fetch failed:', s, e); continue
             if d is None: continue

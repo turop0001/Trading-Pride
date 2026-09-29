@@ -110,7 +110,7 @@ def make_shots(sym, window, r, off, date_str):
     if not sig.get('t_utc'):
         return None
     ticker = lc.ticker_for(sym, window)
-    d = lc.fetch(ticker)
+    d = lc.fetch(ticker, sig.get('src', 'Yahoo'))
     if d is None or len(d) < 50:
         return None
     d = d[['Open', 'High', 'Low', 'Close']].dropna()

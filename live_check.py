@@ -132,8 +132,9 @@ def trend_narrative(ticker):
         return None
 
 
-def fetch(ticker):
-    m = mt5_frame(ticker, 'M5')
+def fetch(ticker, src=None):
+    # src='Yahoo' — принудительно Yahoo (сигнал был посчитан по Yahoo: уровни фьючерса ≠ цены CFD)
+    m = None if src == 'Yahoo' else mt5_frame(ticker, 'M5')
     if m is not None: return m
     if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
@@ -286,7 +287,14 @@ def check_instrument(sym, ticker, window, prev=None):
         return {'sym': sym, 'window': window, 'line_status': 'skip', 'direction': '—',
                 'note': 'СКИП (нет свежих данных у источника)', 'status_key': 'stale', 'stale': True,
                 'price': round(float(d['Close'].iloc[-1]), 5)}
+    is_mt5 = bool(len(d)) and SRC.get(sym) == 'MT5' and str(ticker) != 'Yahoo'
+    ps = (prev or {}).get('signal') or {}
+    if ps and ps.get('src', 'Yahoo') != ('MT5' if is_mt5 else 'Yahoo'):
+        d2 = fetch(ticker, ps.get('src', 'Yahoo'))   # ведём сделку по тому же источнику, что и вход
+        if d2 is not None: d = d2
     r = pult_rules.analyze(sym, d, window, dt.datetime.utcnow(), off, prev)
+    if r.get('signal') is not None and 'src' not in r['signal']:
+        r['signal']['src'] = ps.get('src', 'MT5' if is_mt5 else 'Yahoo') if ps else ('MT5' if is_mt5 else 'Yahoo')
     if r.get('error'):
         return {'sym': sym, 'error': r['error']}
     return r
