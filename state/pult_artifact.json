@@ -1,0 +1,238 @@
+[
+ {
+  "collection": "pult",
+  "doc_id": "XAUUSD_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "XAUUSD",
+   "window": "A",
+   "status": "watch",
+   "direction": "🔻 SHORT",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 4150.79,
+   "boxH": 4155.53,
+   "boxL": 4125.82,
+   "prevH": 4257.61,
+   "prevL": 4166.35,
+   "signal": null,
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -2.73,
+    "pct": -3.8
+   },
+   "trendD1": {
+    "tr": "шорт",
+    "ratio": -2.79,
+    "pct": -3.28
+   },
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "EURUSD_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "EURUSD",
+   "window": "A",
+   "status": "watch",
+   "direction": "🔻 SHORT",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 1.13636,
+   "boxH": 1.13753,
+   "boxL": 1.13585,
+   "prevH": 1.13947,
+   "prevL": 1.13792,
+   "signal": null,
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -2.8,
+    "pct": -0.9
+   },
+   "trendD1": {
+    "tr": "шорт",
+    "ratio": -4.93,
+    "pct": -1.6
+   },
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "GBPUSD_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "GBPUSD",
+   "window": "A",
+   "status": "watch",
+   "direction": "▲ LONG",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 1.32424,
+   "boxH": 1.32556,
+   "boxL": 1.32308,
+   "prevH": 1.3248,
+   "prevL": 1.32286,
+   "signal": null,
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -2.62,
+    "pct": -1.0
+   },
+   "trendD1": {
+    "tr": "шорт",
+    "ratio": -5.14,
+    "pct": -1.93
+   },
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "US500_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "US500",
+   "window": "A",
+   "status": "watch",
+   "direction": "🔻 SHORT",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 7743.0,
+   "boxH": 7751.5,
+   "boxL": 7716.0,
+   "prevH": 7790.8,
+   "prevL": 7768.2,
+   "signal": null,
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -1.76,
+    "pct": -1.22
+   },
+   "trendD1": {
+    "tr": "боковик",
+    "ratio": 1.47,
+    "pct": 1.47
+   },
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "NAS100_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "NAS100",
+   "window": "A",
+   "status": "watch",
+   "direction": "🔻 SHORT",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 30548.5,
+   "boxH": 30607.0,
+   "boxL": 30372.2,
+   "prevH": 30898.2,
+   "prevL": 30580.0,
+   "signal": null,
+   "trendH1": {
+    "tr": "боковик",
+    "ratio": -0.76,
+    "pct": -0.87
+   },
+   "trendD1": {
+    "tr": "лонг",
+    "ratio": 2.96,
+    "pct": 4.62
+   },
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "US30_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "US30",
+   "window": "A",
+   "status": "watch",
+   "direction": "🔻 SHORT",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 51805.0,
+   "boxH": 51847.0,
+   "boxL": 51644.0,
+   "prevH": 52038.0,
+   "prevL": 51925.0,
+   "signal": null,
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -1.65,
+    "pct": -1.34
+   },
+   "trendD1": {
+    "tr": "боковик",
+    "ratio": -1.24,
+    "pct": -1.32
+   },
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "GER40_A",
+  "data": {
+   "date": "2026-09-29",
+   "sym": "GER40",
+   "window": "A",
+   "status": "skip",
+   "direction": "—",
+   "note": "СКИП (нет данных TradingView — смотреть вручную)",
+   "reasons": [],
+   "price": null,
+   "boxH": null,
+   "boxL": null,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
+   "checked": "10:07"
+  }
+ },
+ {
+  "collection": "pult_meta",
+  "doc_id": "last",
+  "data": {
+   "date": "2026-09-29",
+   "window": "A",
+   "time": "10:07",
+   "text": "отчёт открытия окна отправлен",
+   "changed": [
+    "XAUUSD",
+    "EURUSD",
+    "GBPUSD",
+    "US500",
+    "NAS100",
+    "US30",
+    "GER40"
+   ],
+   "log": [
+    {
+     "date": "2026-09-29",
+     "time": "10:07",
+     "window": "A",
+     "text": "отчёт открытия окна отправлен",
+     "lines": [
+      "🟡 XAUUSD (🔻 SHORT) — НАБЛЮДАЕМ",
+      "🟡 EURUSD (🔻 SHORT) — НАБЛЮДАЕМ",
+      "🟡 GBPUSD (▲ LONG) — НАБЛЮДАЕМ",
+      "🟡 US500 (🔻 SHORT) — НАБЛЮДАЕМ",
+      "🟡 NAS100 (🔻 SHORT) — НАБЛЮДАЕМ",
+      "🟡 US30 (🔻 SHORT) — НАБЛЮДАЕМ",
+      "⚪ GER40 (—) — СКИП"
+     ]
+    }
+   ]
+  }
+ }
+]
