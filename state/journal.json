@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "jmum5qz1ks91o",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "long",
+    "date": "2026-09-29",
+    "out": "TP",
+    "r": 2,
+    "note": "",
+    "why": "",
+    "ts": 1790654992235
+  }
+]
