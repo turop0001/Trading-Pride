@@ -4,12 +4,18 @@
 //| с сайта Пульта и открывает сделку с риском RiskPercent % баланса.  |
 //| Стоп и тейк переносятся как РАССТОЯНИЯ от цены входа сигнала.      |
 //| По умолчанию TradeEnabled=false — только пишет решения в журнал.   |
+//| v1.10: раз в минуту шлёт свечи M5/H1/D1 брокера на сайт (/api/feed) |
+//| — Пульт считает сигналы по ценам Tickmill, а не Yahoo.            |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.00"
+#property version   "1.10"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
+input string FeedURL         = "https://trading-pride-three.vercel.app/api/feed";
+input string FeedKey         = "";      // ключ личного пульта (последняя часть адреса /p/...)
+input bool   FeedEnabled     = true;    // слать свечи брокера в Пульт
+input int    FeedSec         = 60;
 input bool   TradeEnabled    = false;   // false = только журнал, без сделок
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
 input double RiskPercent     = 1.0;     // риск на сделку, % баланса
@@ -30,6 +36,7 @@ input string MapUS30   = "US30";
 input string MapGER40  = "DE40";
 
 CTrade trade;
+datetime lastFeed=0, lastFull=0;
 string NAMES[7] = {"EURUSD","GBPUSD","XAUUSD","US500","NAS100","US30","GER40"};
 
 string BrokerSym(const string s)
@@ -48,7 +55,7 @@ int OnInit()
    bool demo = AccountInfoInteger(ACCOUNT_TRADE_MODE)==ACCOUNT_TRADE_MODE_DEMO;
    Print("PultBridge: счёт ", AccountInfoInteger(ACCOUNT_LOGIN), demo?" (ДЕМО)":" (РЕАЛЬНЫЙ)",
          TradeEnabled?", торговля ВКЛ":", только журнал");
-   EventSetTimer(PollSec);
+   EventSetTimer(MathMin(PollSec,FeedSec));
    OnTimer();
    return INIT_SUCCEEDED;
 }
@@ -84,8 +91,53 @@ bool GroupBusy(const int grp, const bool isBuy)
    return false;
 }
 
+// ---------- свечи брокера -> Пульт ----------
+string BarsLine(const string psym,const string sym,ENUM_TIMEFRAMES tf,const string tfn,int cnt,int off)
+{
+   MqlRates r[]; ArraySetAsSeries(r,false);
+   int n=CopyRates(sym,tf,0,cnt,r);
+   if(n<=0) return "";
+   int dg=(int)SymbolInfoInteger(sym,SYMBOL_DIGITS);
+   string s=psym+"|"+tfn+"|";
+   for(int i=0;i<n;i++)
+   {
+      if(i>0) s+=";";
+      s+=IntegerToString((long)r[i].time-off)+","+DoubleToString(r[i].open,dg)+","+DoubleToString(r[i].high,dg)+","
+         +DoubleToString(r[i].low,dg)+","+DoubleToString(r[i].close,dg);
+   }
+   return s+"\n";
+}
+
+void SendFeed()
+{
+   if(!FeedEnabled || FeedKey=="") return;
+   datetime now=TimeLocal();
+   if(now-lastFeed<FeedSec) return;
+   bool full=(now-lastFull>=3600);          // раз в час — полная история, иначе последние бары
+   int off=(int)MathRound((double)(TimeTradeServer()-TimeGMT())/900.0)*900;
+   string body="FEED1\n";
+   for(int k=0;k<7;k++)
+   {
+      string sym=BrokerSym(NAMES[k]);
+      if(sym=="" || !SymbolSelect(sym,true)) continue;
+      body+=BarsLine(NAMES[k],sym,PERIOD_M5,"M5",full?3456:8,off);
+      body+=BarsLine(NAMES[k],sym,PERIOD_H1,"H1",full?960:3,off);
+      body+=BarsLine(NAMES[k],sym,PERIOD_D1,"D1",full?60:2,off);
+   }
+   char data[], res[]; string rh;
+   int len=StringToCharArray(body,data,0,WHOLE_ARRAY,CP_UTF8);
+   if(len>0) ArrayResize(data,len-1);
+   string hdr="Content-Type: text/plain\r\nx-pult-key: "+FeedKey+"\r\n";
+   ResetLastError();
+   int code=WebRequest("POST",FeedURL,hdr,15000,data,res,rh);
+   lastFeed=now;
+   if(code==200) { if(full) { lastFull=now; Print("Пульт: полная история свечей отправлена"); } }
+   else Print("Пульт: свечи не приняты (",code,", ошибка ",GetLastError(),") ",CharArrayToString(res,0,80));
+}
+
 void OnTimer()
 {
+   SendFeed();
    char post[], res[]; string rh;
    ResetLastError();
    int code=WebRequest("GET", SignalsURL, "", 8000, post, res, rh);

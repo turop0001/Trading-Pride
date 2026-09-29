@@ -1,0 +1,4 @@
+{
+  "git": { "deploymentEnabled": { "feed": false } },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ."
+}

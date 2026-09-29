@@ -39,13 +39,13 @@ STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', '
 # GER40 остаётся ОТКРЫТЫМ пробелом автоматики, проверять вручную до дальнейшего решения.
 TICKERS = {
     'XAUUSD': 'PAXG-USD', 'EURUSD': 'EURUSD=X', 'GBPUSD': 'GBPUSD=X',
-    'US500': 'ES=F', 'NAS100': 'NQ=F', 'US30': 'YM=F',
+    'US500': 'ES=F', 'NAS100': 'NQ=F', 'US30': 'YM=F', 'GER40': 'MT5:GER40',
 }
 
 # Инструменты по типу — Тип A торгует все 7 (GER40 временно пропущен, см. комментарий выше),
 # Тип C только 3 (XAUUSD/EURUSD/GBPUSD) — раньше main() проверял ВСЕ TICKERS в обоих окнах.
 WINDOW_SYMBOLS = {
-    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30'],
+    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40'],
     'C': ['XAUUSD', 'EURUSD', 'GBPUSD'],
 }
 
@@ -94,6 +94,9 @@ def window_now(riga_dt):
 # теперь то же самое считается прямо на облачных данных yfinance — не зависит от браузера.
 # Только справочный контекст (усилитель из чек-листа "Тренд 5 дней"), не фильтр входа.
 def fetch_ohlc(ticker, period, interval):
+    m = mt5_frame(ticker, {'60m': 'H1', '1d': 'D1'}.get(interval, 'M5'), max_age_h=72)
+    if m is not None and len(m) >= 10: return m
+    if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
     import pandas as pd
     d = yf.download(ticker, period=period, interval=interval, progress=False, auto_adjust=False)
@@ -130,6 +133,9 @@ def trend_narrative(ticker):
 
 
 def fetch(ticker):
+    m = mt5_frame(ticker, 'M5')
+    if m is not None: return m
+    if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
     import pandas as pd
     # ИСПРАВЛЕНО 28.09.2026: period 5d -> 10d. Для вычисления bias нужен бокс ПРЕДЫДУЩЕГО
@@ -141,6 +147,66 @@ def fetch(ticker):
     if isinstance(d.columns, pd.MultiIndex):
         d.columns = d.columns.get_level_values(0)
     d = d.tz_convert('UTC')
+    return d
+
+
+# 29.09.2026: ЦЕНЫ БРОКЕРА ИЗ MT5 вместо Yahoo. Советник PultBridge.mq5 (Tickmill) раз в минуту
+# шлёт свечи M5/H1/D1 на сайт (/api/feed) -> ветка `feed`, файл feed/mt5.json. Если свежих свечей
+# MT5 нет (терминал выключен) — прежний запасной путь Yahoo (кроме GER40: у Yahoo его нет).
+FEED_URL = 'https://api.github.com/repos/turop0001/Trading-Pride/contents/feed/{}.json?ref=feed'
+_FEED = {'t': 0, 'data': None}
+SRC = {}   # sym -> 'MT5' | 'Yahoo' (для логов/карточек)
+
+
+def _feed():
+    import time, urllib.request
+    if time.time() - _FEED['t'] < 40: return _FEED['data']
+    _FEED['t'] = time.time()
+    try:
+        h = {'Accept': 'application/vnd.github.raw', 'User-Agent': 'pult'}
+        tok = os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
+        if tok: h['Authorization'] = f'Bearer {tok}'
+        parts = []
+        for name in ('hist', 'live'):
+            try:
+                parts.append(json.load(urllib.request.urlopen(urllib.request.Request(FEED_URL.format(name), headers=h), timeout=20)))
+            except Exception as e:
+                print(f'MT5 feed {name} недоступен:', str(e)[:120])
+        syms = {}
+        for p in parts:   # live поверх hist: одинаковое время бара — берём более свежий
+            for sym, tfs in (p.get('syms') or {}).items():
+                for tf, bars in tfs.items():
+                    m = syms.setdefault(sym, {}).setdefault(tf, {})
+                    for b in bars: m[b[0]] = b
+        _FEED['data'] = {'syms': {s: {tf: [m[k] for k in sorted(m)] for tf, m in t.items()} for s, t in syms.items()}} if syms else None
+    except Exception as e:
+        print('MT5 feed недоступен:', str(e)[:120]); _FEED['data'] = None
+    return _FEED['data']
+
+
+def _sym_of(ticker):
+    t = str(ticker)
+    if t.startswith('MT5:'): return t[4:]
+    for k, v in TICKERS.items():
+        if v == t: return k
+    return None
+
+
+def mt5_frame(ticker, tf='M5', max_age_h=None):
+    """DataFrame (UTC, Open/High/Low/Close) из свечей MT5 или None, если данных нет / они несвежие."""
+    import time
+    import pandas as pd
+    sym = _sym_of(ticker)
+    data = _feed() if sym else None
+    bars = (((data or {}).get('syms') or {}).get(sym) or {}).get(tf) or []
+    if len(bars) < 10: return None
+    if max_age_h is None:   # M5: в окне — не старше 20 мин, вне окна — 12 ч
+        max_age_h = 20 / 60 if window_now(riga_now()[0]) else 12
+    if time.time() - bars[-1][0] > max_age_h * 3600 + (86400 if tf == 'D1' else 3600 if tf == 'H1' else 300):
+        return None
+    d = pd.DataFrame(bars, columns=['t', 'Open', 'High', 'Low', 'Close'])
+    d.index = pd.to_datetime(d.pop('t'), unit='s', utc=True)
+    if tf == 'M5': SRC[sym] = 'MT5'
     return d
 
 

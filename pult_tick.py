@@ -51,7 +51,7 @@ def syms_of(w):
 
 
 def syms(w):
-    return lc.WINDOW_SYMBOLS[w] + (['GER40'] if w == 'A' else [])
+    return lc.WINDOW_SYMBOLS[w] + (['GER40'] if w == 'A' and 'GER40' not in lc.WINDOW_SYMBOLS[w] else [])
 
 
 def ger40_result(state, today):
@@ -116,7 +116,8 @@ def analyze_window(state, window, today):
             r['trend_h1'] = narr.get('h1')
             r['trend_d1'] = narr.get('d1')
         res[sym] = r
-    if window == 'A':
+    # 29.09.2026: GER40 теперь считается по свечам MT5 (DE40 Tickmill); заглушка — только если их нет
+    if window == 'A' and (res.get('GER40') or {}).get('status_key') in (None, 'nodata'):
         res['GER40'] = ger40_result(state, today)
     return res
 
