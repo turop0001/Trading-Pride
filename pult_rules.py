@@ -106,6 +106,62 @@ def _fvgs(F, min_size):
     return out
 
 
+def fvg_ctx(sd, d, now_utc, off, extreme, price, box_a, box_b, sweep_t0, fmtp, tp=None, days=10, typ='A'):
+    """ИНФО-пометки по FVG H1/H4 (окно `days` суток, только неинвертированные). Вход НЕ блокируют.
+    Возвращает список dict(n=номер пункта чек-листа, on=bool, t=текст)."""
+    out = []
+    try:
+        offh = '1h' if off == 3 else '2h'
+        H1 = _completed(_resample(d, '1h'), now_utc, 60)
+        H4 = _completed(_resample(d, '4h', offh), now_utc, 240)
+        if len(H1) < 20 or len(H4) < 6:
+            return out
+        atr1 = float((H1['High'] - H1['Low']).iloc[-14:].mean())
+        atr4 = float((H4['High'] - H4['Low']).iloc[-14:].mean())
+        F1 = _fvgs(H1.iloc[-days * 24:], 0.15 * atr1)
+        F4 = _fvgs(H4.iloc[-days * 6:], 0.15 * atr4)
+        rng = lambda f: f'{fmtp(f["lo"])}–{fmtp(f["hi"])}'
+        A_ = (lambda n, on, t: out.append(dict(n=n, on=bool(on), t=t)))
+        # батут по направлению: неинвертированный FVG в нашу сторону, экстремум выноса внутри/рядом
+        if extreme is not None:
+            b = []
+            for nm, F, at in (('H1', F1, atr1), ('H4', F4, atr4)):
+                for f in F:
+                    if f['dir'] == sd and f['inv_t'] is None and f['lo'] - 0.2 * at <= extreme <= f['hi'] + 0.2 * at:
+                        b.append(f'{nm} {rng(f)}')
+                        break
+            A_(24, b, ('батут ' + ', '.join(b)) if b else 'батута под выносом нет')
+        # встречные на пути
+        for nm, F, n_ in (('H1', F1, 21), ('H4', F4, 21)):
+            cand = [f for f in F if f['dir'] == -sd and f['inv_t'] is None and ((f['lo'] > price) if sd == 1 else (f['hi'] < price))]
+            if cand:
+                f = min(cand, key=lambda z: z['lo']) if sd == 1 else max(cand, key=lambda z: z['hi'])
+                lvl = f['lo'] if sd == 1 else f['hi']
+                pre = ''
+                if tp is not None:
+                    pre = ', до цели 2R' if ((lvl < tp) if sd == 1 else (lvl > tp)) else ', за целью 2R'
+                A_(n_, True, f'встречный {nm} {rng(f)}{pre}')
+        # H4 встречный с реакцией (касание + отскок)
+        r4 = [f for f in F4 if f['dir'] == -sd and f['inv_t'] is None and f['reject']]
+        if r4:
+            A_(15, True, f'H4 встречный с реакцией {rng(r4[-1])}')
+        # встречный H1, образованный внутри бокса (Азия / Лондон)
+        if box_a is not None:
+            ia = [f for f in F1 if f['dir'] == -sd and f['inv_t'] is None and box_a <= f['t'] < box_b]
+            A_(18, ia, ('встречный H1 внутри бокса ' + rng(ia[-1])) if ia else 'встречного H1 внутри бокса нет')
+        # встречный H1, образованный выносом
+        if sweep_t0 is not None:
+            t0 = sweep_t0.floor('1h') - pd.Timedelta(hours=1)
+            sw = [f for f in F1 if f['dir'] == -sd and f['inv_t'] is None and f['t'] >= t0]
+            A_(14, sw, ('вынос образовал встречный H1 ' + rng(sw[-1])) if sw else 'вынос встречного H1 не образовал')
+    except Exception:
+        pass
+    if typ == 'C':
+        mp = {15: 11, 24: 12}
+        out = [dict(x, n=mp.get(x['n'], 0)) for x in out]
+    return out
+
+
 def _strong(o, h, l, c, sd):
     rng = h - l
     return (c - o) * sd > 0 and rng > 0 and abs(c - o) / rng >= 0.6
@@ -175,6 +231,10 @@ def _analyze_C(sym, d, now_utc, off, prev):
     extreme = float(AL[ext] if sd == 1 else AH[ext])
     res['extreme'] = round(extreme, dec)
     sweep_t = (Dtoday.index[ext] + pd.Timedelta(hours=off)).strftime('%H:%M')
+    _bs = pd.Timestamp(dt.datetime.combine(today, dt.time(0, 0)) + dt.timedelta(minutes=ba) - dt.timedelta(hours=off), tz='UTC')
+    _be = _bs + dt.timedelta(minutes=bb - ba)
+    _sw = Dtoday.index[(dn if sd == 1 else up)[0]]
+    res['fx'] = fvg_ctx(sd, d, now_utc, off, extreme, price, _bs, _be, _sw, fmtp, typ='C')
 
     # opp: до 1 свечи ПРОТИВ направления сделки, ищем от ext назад (вкл.) на 4 свечи —
     # может залезать за начало окна входа (в конец лондонского бокса), как в nyscan3.
@@ -220,6 +280,8 @@ def _analyze_C(sym, d, now_utc, off, prev):
                        tp=round(tp, dec), side=bias)
             res['ck'] = sorted(set(res['ck'] + [4, 5, 6, 7, 8]))
             sig['ck'] = list(res['ck'])
+            res['fx'] = fvg_ctx(sd, d, now_utc, off, extreme, price, _bs, _be, _sw, fmtp, tp=tp, typ='C')
+            sig['fx'] = res['fx']
             break
 
     if sig:
@@ -321,6 +383,11 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     if other and (not need or other[0] < need[0]):
         skips.append('противоположная сторона бокса снята первой')
 
+    _bs = pd.Timestamp(dt.datetime.combine(today, dt.time(0, 0)) + dt.timedelta(minutes=ba) - dt.timedelta(hours=off), tz='UTC')
+    _be = _bs + dt.timedelta(minutes=bb - ba)
+    _ex = float(Ll[need[-1]] if sd == 1 else Hh[need[-1]]) if need else None
+    _sw = W.index[need[0]] if need else None
+    res['fx'] = fvg_ctx(sd, d, now_utc, off, _ex, price, _bs, _be, _sw, fmtp)
     if skips:
         res['ckf'] = [5]
         short = [re.sub(r'\s*\([^)]*\d[^)]*\)', '', x) for x in skips[:2]]
@@ -399,6 +466,8 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     sig = dict(date=str(today), window=window, time=(W.index[je] + pd.Timedelta(hours=off)).strftime('%H:%M'),
                t_utc=str(W.index[je]), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
                ck=list(res['ck']))
+    res['fx'] = fvg_ctx(sd, d, now_utc, off, extreme, price, _bs, _be, _sw, fmtp, tp=tp)
+    sig['fx'] = res['fx']
     res['signal'] = sig
     res['new_signal'] = True
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
@@ -450,6 +519,7 @@ def autopsy(sig, sd, d, res=None):
 def _track(res, d, sig, sd, dirc, fmtp):
     res['signal'] = sig
     if sig.get('ck'): res['ck'] = list(sig['ck']); res['ckf'] = []
+    if sig.get('fx'): res['fx'] = sig['fx']
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
     out = None
     for _, r in after.iterrows():
