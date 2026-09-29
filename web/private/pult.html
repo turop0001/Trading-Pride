@@ -909,12 +909,14 @@ renderHist();
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
     var nS=0;all.forEach(function(k){var q=S[k];if(q.shots){var id=q.date+'_'+(q.sym||k.split('_')[0])+'_'+(q.window||k.split('_')[1]);if(!SHOTS[id]){SHOTS[id]=q.shots;nS++;}}});if(nS)redraw();
     REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
-    if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else renderRep();
+    if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else if(!repBusy())renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];
     if(last){renderLive({date:last.date,time:last.time,window:last.window,text:last.text,log:log.filter(function(r){return r.date===last.date;})});}
     else $('liveLine').textContent='Проверок пока не было.';
   }
+  // не перерисовывать карточки, пока открыта форма «Закрыл» или курсор в поле карточки
+  function repBusy(){var r=$('rep');if(!r)return false;if(r.querySelector('.closeBox.open'))return true;var a=document.activeElement;return !!(a&&a!==document.body&&r.contains(a)&&/INPUT|SELECT|TEXTAREA/.test(a.tagName));}
   function poll(){fetch('/api/state',{cache:'no-store'}).then(function(r){return r.json();}).then(applyState).catch(function(e){$('repNote').textContent='Ошибка загрузки данных: '+e;});}
   poll();setInterval(poll,30000);
 
