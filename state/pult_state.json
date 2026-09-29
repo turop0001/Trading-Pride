@@ -2,11 +2,11 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4149.72,
+    "price": 4155.26,
     "boxH": 4155.53,
     "boxL": 4125.82,
     "reasons": [],
-    "checked_at": "12:37",
+    "checked_at": "12:52",
     "prevH": 4257.61,
     "prevL": 4166.35,
     "bias": "short",
@@ -41,13 +41,13 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13392,
+    "price": 1.13366,
     "boxH": 1.13753,
     "boxL": 1.13585,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "12:37",
+    "checked_at": "12:52",
     "prevH": 1.13947,
     "prevL": 1.13792,
     "bias": "short",
@@ -72,11 +72,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32286,
+    "price": 1.32249,
     "boxH": 1.32556,
     "boxL": 1.32308,
     "reasons": [],
-    "checked_at": "12:37",
+    "checked_at": "12:52",
     "prevH": 1.3248,
     "prevL": 1.32286,
     "bias": "long",
@@ -116,11 +116,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7738.5,
+    "price": 7738.8,
     "boxH": 7751.5,
     "boxL": 7716.0,
     "reasons": [],
-    "checked_at": "12:37",
+    "checked_at": "12:52",
     "prevH": 7790.8,
     "prevL": 7768.2,
     "bias": "short",
@@ -145,15 +145,14 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30550.5,
+    "price": 30556.8,
     "boxH": 30607.0,
     "boxL": 30372.2,
     "reasons": [],
-    "checked_at": "12:37",
+    "checked_at": "12:52",
     "prevH": 30898.2,
     "prevL": 30580.0,
     "bias": "short",
-    "extreme": 30628.0,
     "signal": {
       "date": "2026-09-29",
       "window": "A",
@@ -166,8 +165,8 @@
     },
     "line_status": "entry",
     "direction": "🔻 SHORT",
-    "note": "ВХОД (11:55, 30582.2)",
-    "status_key": "ВХОД (11:55, 30582.2)",
+    "note": "В СДЕЛКЕ (вход 11:55 по 30582.2)",
+    "status_key": "В СДЕЛКЕ (вход 11:55 по 30582.2)",
     "tg_note": "ВХОД",
     "stale": false,
     "date": "2026-09-29",
@@ -185,11 +184,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51765.0,
+    "price": 51755.0,
     "boxH": 51847.0,
     "boxL": 51644.0,
     "reasons": [],
-    "checked_at": "12:37",
+    "checked_at": "12:52",
     "prevH": 52038.0,
     "prevL": 51925.0,
     "bias": "short",
@@ -387,6 +386,13 @@
         "⚪ GBPUSD (▲ LONG) — ЗАКРЫТА - SL в 12:10 (вход 11:15)",
         "🟢 NAS100 (🔻 SHORT) — ВХОД в 11:55"
       ]
+    },
+    {
+      "date": "2026-09-29",
+      "time": "12:52",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
