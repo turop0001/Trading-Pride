@@ -22,5 +22,17 @@
     "note": "",
     "why": "",
     "ts": 1790677659607
+  },
+  {
+    "id": "jmuml04puq7ki",
+    "symbol": "NAS100",
+    "type": "A",
+    "side": "short",
+    "date": "2026-09-29",
+    "out": "SL",
+    "r": -1,
+    "note": "",
+    "why": "Нет order flow — шёл ½ риска",
+    "ts": 1790680613744
   }
 ]
