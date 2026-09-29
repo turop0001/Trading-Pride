@@ -379,6 +379,49 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
 
 
+def autopsy(sig, sd, d, res=None):
+    """Короткий разбор закрытого по SL сигнала (≤3 фразы): как шла сделка, что было после стопа,
+    что из рамки было против входа. Только по цифрам; визуальные пункты чек-листа не считаем."""
+    try:
+        R = abs(sig['entry'] - sig['stop'])
+        if R <= 0: return ''
+        t0 = pd.Timestamp(sig['t_utc'])
+        aft = d[d.index > t0]
+        sl_t = None
+        for ts, r in aft.iterrows():
+            if (r['Low'] <= sig['stop']) if sd == 1 else (r['High'] >= sig['stop']): sl_t = ts; break
+        if sl_t is None: return ''
+        pre = aft[aft.index < sl_t]
+        mfe = 0.0
+        if len(pre):
+            mfe = ((pre['High'].max() - sig['entry']) if sd == 1 else (sig['entry'] - pre['Low'].min())) / R
+        held = int((sl_t - t0).total_seconds() // 60) + 5
+        hh = f'{held // 60} ч {held % 60} мин' if held >= 60 else f'{held} мин'
+        p1 = ('сразу пошла против входа' if mfe < 0.15 else f'шла в плюс до +{mfe:.1f}R') + f', стоп через {hh}'
+        post = aft[aft.index > sl_t]
+        if len(post) < 6:
+            p2 = 'после стопа данных пока мало'
+        else:
+            hit = None
+            for ts, r in post.iterrows():
+                if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): hit = ts; break
+            if hit is not None:
+                tt = hit.tz_convert('Europe/Riga').strftime('%H:%M') if hit.tzinfo else str(hit)[11:16]
+                p2 = f'после стопа цель 2R достигнута в {tt} — стоп выбило'
+            else:
+                ex = ((sig['entry'] - post['Low'].min()) if sd == 1 else (post['High'].max() - sig['entry'])) / R
+                p2 = 'после стопа цель не достигнута' + (f', цена ушла дальше против на {ex:.1f}R' if ex > 1.2 else '')
+        bad = []
+        for k, nm in (('trend_h1', 'H1'), ('trend_d1', 'D1')):
+            tr = str((res or {}).get(k, {}).get('tr', '')).lower()
+            if tr and ((sd == 1 and 'шорт' in tr) or (sd == -1 and 'лонг' in tr)):
+                bad.append(nm)
+        p3 = (' и '.join(bad) + ' против входа') if bad else ''
+        return '; '.join(x for x in (p1, p2, p3) if x)
+    except Exception:
+        return ''
+
+
 def _track(res, d, sig, sd, dirc, fmtp):
     res['signal'] = sig
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
@@ -391,6 +434,7 @@ def _track(res, d, sig, sd, dirc, fmtp):
     if out == 'TP':
         return _out(res, 'entry', dirc, 'ВХОД → TP 🎯 +2R', tg='ЗАКРЫТА - TP')
     if out == 'SL':
+        res['autopsy'] = autopsy(sig, sd, d, res)
         return _out(res, 'skip', dirc, 'ВХОД → SL −1R', tg='ЗАКРЫТА - SL')
     return _out(res, 'entry', dirc, 'В СДЕЛКЕ')
 

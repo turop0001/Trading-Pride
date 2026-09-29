@@ -108,13 +108,25 @@ def analyze_window(state, window, today):
                 if sh:
                     r['shots'] = sh
                     _hist_add(None, {'id': f"{today}_{sym}_{window}", 'date': today, 'symbol': sym, 'type': window,
-                                     'result': r.get('note'), 'shots': sh})
+                                     'result': r.get('note'), 'autopsy': r.get('autopsy'), 'shots': sh})
             except Exception as e:
                 print('shots failed:', sym, e)
         narr = _trend_cached(state, sym, today)
         if narr:
             r['trend_h1'] = narr.get('h1')
             r['trend_d1'] = narr.get('d1')
+            # разбор стопа: добавляем «H1/D1 против входа», если тренд стал известен только сейчас
+            try:
+                if r.get('autopsy') and 'против входа' not in r['autopsy'] and r.get('signal'):
+                    sd_ = 1 if r['signal'].get('side') == 'long' else -1
+                    bad = [nm for k, nm in (('trend_h1', 'H1'), ('trend_d1', 'D1'))
+                           if (sd_ == 1 and 'шорт' in str((r.get(k) or {}).get('tr', '')).lower())
+                           or (sd_ == -1 and 'лонг' in str((r.get(k) or {}).get('tr', '')).lower())]
+                    if bad:
+                        r['autopsy'] += '; ' + ' и '.join(bad) + ' против входа'
+                        _hist_add(None, {'id': f"{today}_{sym}_{window}", 'autopsy': r['autopsy']})
+            except Exception as e:
+                print('autopsy trend failed:', e)
         res[sym] = r
     # 29.09.2026: GER40 теперь считается по свечам MT5 (DE40 Tickmill); заглушка — только если их нет
     if window == 'A' and (res.get('GER40') or {}).get('status_key') in (None, 'nodata'):
@@ -203,6 +215,9 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             if not out: continue
             r['note'] = 'ВХОД → TP 🎯 +2R' if out == 'TP' else 'ВХОД → SL −1R'
             r['tg_note'] = 'ЗАКРЫТА - ' + out
+            if out == 'SL':
+                import pult_rules as _pr
+                r['autopsy'] = _pr.autopsy(sig, -1 if long_ is False else 1, d, r)
             r['line_status'] = 'entry' if out == 'TP' else 'skip'
             r['status_key'] = r['note']
             try:
@@ -212,7 +227,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             except Exception as e:
                 print('final shots failed:', s, e)
             try:
-                _hist_add(None, {'id': f"{today}_{s}_{w}", 'result': r['note'], **({'shots': r['shots']} if r.get('shots') else {})})
+                _hist_add(None, {'id': f"{today}_{s}_{w}", 'result': r['note'], 'autopsy': r.get('autopsy'), **({'shots': r['shots']} if r.get('shots') else {})})
             except Exception as e:
                 print('final history failed:', e)
             state[f'{s}_{w}'] = r
@@ -325,7 +340,7 @@ def main(send=True):
                     for s_ in syms_of(w):
                         c = state.get(f'{s_}_{w}', {})
                         if c.get('date') == today and c.get('signal'):
-                            _hist_add(None, {'id': f"{today}_{s_}_{w}", 'result': c.get('note')})
+                            _hist_add(None, {'id': f"{today}_{s_}_{w}", 'result': c.get('note'), 'autopsy': c.get('autopsy')})
             except Exception as e:
                 print('history result failed:', e)
             state['_daily_summary'] = {'date': dstr, 'sections': [[w, l, wl] for w, l, wl in sections], 'total_pct': total}
