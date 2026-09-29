@@ -135,7 +135,7 @@ def _tg(r, closed=False):
     sg = r.get('signal') or {}
     if sg.get('time'):
         if note.startswith('ЗАКРЫТА'):
-            note += f" в {r['exit_time']} (вход {sg['time']})" if r.get('exit_time') else f" (вход {sg['time']})"
+            if r.get('exit_time'): note += f" в {r['exit_time']}"
         elif note == 'ВХОД':
             note += f" в {sg['time']}"
     return ls, note
