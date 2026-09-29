@@ -10,7 +10,7 @@
    "direction": "🔻 SHORT",
    "note": "В СДЕЛКЕ (вход 10:45 по 4153.81)",
    "reasons": [],
-   "price": 4152.15,
+   "price": 4149.72,
    "boxH": 4155.53,
    "boxL": 4125.82,
    "prevH": 4257.61,
@@ -35,7 +35,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -51,7 +51,7 @@
    "reasons": [
     "противоположная сторона бокса снята первой"
    ],
-   "price": 1.13417,
+   "price": 1.13392,
    "boxH": 1.13753,
    "boxL": 1.13585,
    "prevH": 1.13947,
@@ -67,7 +67,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -81,7 +81,7 @@
    "direction": "▲ LONG",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.32307,
+   "price": 1.32286,
    "boxH": 1.32556,
    "boxL": 1.32308,
    "prevH": 1.3248,
@@ -106,7 +106,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -120,7 +120,7 @@
    "direction": "🔻 SHORT",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7743.2,
+   "price": 7738.5,
    "boxH": 7751.5,
    "boxL": 7716.0,
    "prevH": 7790.8,
@@ -136,7 +136,7 @@
     "ratio": 1.47,
     "pct": 1.47
    },
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -146,16 +146,25 @@
    "date": "2026-09-29",
    "sym": "NAS100",
    "window": "A",
-   "status": "prep",
+   "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВЫНОС (ждём инверсию встречного m5 FVG)",
+   "note": "ВХОД (11:55, 30582.2)",
    "reasons": [],
-   "price": 30581.8,
+   "price": 30550.5,
    "boxH": 30607.0,
    "boxL": 30372.2,
    "prevH": 30898.2,
    "prevL": 30580.0,
-   "signal": null,
+   "signal": {
+    "date": "2026-09-29",
+    "window": "A",
+    "time": "11:55",
+    "t_utc": "2026-09-29 08:55:00+00:00",
+    "entry": 30582.2,
+    "stop": 30629.1,
+    "tp": 30488.6,
+    "side": "short"
+   },
    "trendH1": {
     "tr": "боковик",
     "ratio": -0.76,
@@ -166,7 +175,7 @@
     "ratio": 2.96,
     "pct": 4.62
    },
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -180,7 +189,7 @@
    "direction": "🔻 SHORT",
    "note": "В СДЕЛКЕ (вход 10:45 по 51825)",
    "reasons": [],
-   "price": 51797.0,
+   "price": 51765.0,
    "boxH": 51847.0,
    "boxL": 51644.0,
    "prevH": 52038.0,
@@ -205,7 +214,7 @@
     "ratio": -1.24,
     "pct": -1.32
    },
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -225,7 +234,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "12:21"
+   "checked": "12:37"
   }
  },
  {
@@ -234,10 +243,11 @@
   "data": {
    "date": "2026-09-29",
    "window": "A",
-   "time": "12:21",
-   "text": "изменилось: GBPUSD",
+   "time": "12:37",
+   "text": "изменилось: GBPUSD, NAS100",
    "changed": [
-    "GBPUSD"
+    "GBPUSD",
+    "NAS100"
    ],
    "log": [
     {
@@ -394,6 +404,16 @@
      "text": "изменилось: GBPUSD",
      "lines": [
       "⚪ GBPUSD (▲ LONG) — ЗАКРЫТА - SL"
+     ]
+    },
+    {
+     "date": "2026-09-29",
+     "time": "12:37",
+     "window": "A",
+     "text": "изменилось: GBPUSD, NAS100",
+     "lines": [
+      "⚪ GBPUSD (▲ LONG) — ЗАКРЫТА - SL в 12:10 (вход 11:15)",
+      "🟢 NAS100 (🔻 SHORT) — ВХОД в 11:55"
      ]
     }
    ]

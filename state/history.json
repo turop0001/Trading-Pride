@@ -50,5 +50,16 @@
       "m5": "state/shots/2026-09-29_GBPUSD_A_m5.png",
       "h1": "state/shots/2026-09-29_GBPUSD_A_h1.png"
     }
+  },
+  {
+    "id": "2026-09-29_NAS100_A",
+    "date": "2026-09-29",
+    "symbol": "NAS100",
+    "type": "A",
+    "side": "short",
+    "entry": 30582.2,
+    "stop": 30629.1,
+    "target": 30488.6,
+    "result": "сигнал Пульта в 11:55 Рига"
   }
 ]
