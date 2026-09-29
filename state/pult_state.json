@@ -228,16 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "10:50",
-      "window": "A",
-      "text": "изменилось: NAS100, US30",
-      "lines": [
-        "⚠️ NAS100 (🔻 SHORT) — ВЫНОС",
-        "⚠️ US30 (🔻 SHORT) — ВЫНОС"
-      ]
-    },
-    {
-      "date": "2026-09-29",
       "time": "10:52",
       "window": "A",
       "text": "без изменений",
@@ -809,6 +799,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "17:37",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -860,7 +857,7 @@
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:36",
+    "checked_at": "17:37",
     "extreme": 4174.6,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -887,7 +884,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:36",
+    "checked_at": "17:37",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -913,7 +910,7 @@
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:36",
+    "checked_at": "17:37",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
