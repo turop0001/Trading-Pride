@@ -228,17 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "16:36",
-      "window": "C",
-      "text": "отчёт открытия окна отправлен",
-      "lines": [
-        "🟡 XAUUSD (—) — НАБЛЮДАЕМ",
-        "🟡 EURUSD (—) — НАБЛЮДАЕМ",
-        "⚠️ GBPUSD (▲ LONG) — ВЫНОС"
-      ]
-    },
-    {
-      "date": "2026-09-29",
       "time": "16:40",
       "window": "C",
       "text": "без изменений",
@@ -795,6 +784,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "17:59",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -846,7 +842,7 @@
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:58",
+    "checked_at": "17:59",
     "extreme": 4169.13,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -873,7 +869,7 @@
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:58",
+    "checked_at": "17:59",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -899,7 +895,7 @@
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:58",
+    "checked_at": "17:59",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
