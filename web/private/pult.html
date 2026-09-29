@@ -808,11 +808,11 @@ function filt(){
 }
 function kpi(l,v,c){return '<div class="kpi"><small>'+l+'</small><b'+(c?' class="'+c+'"':'')+'>'+v+'</b></div>';}
 function renderStats(){
-  var L=filt(),n=L.length,tp=0,sl=0,be=0,sum=0,pk=0,dd=0,run=0,ser=0,ms=0,pts=[0];
-  L.forEach(function(d){var o=outOf(d),r=+d.r||0;if(o==='TP')tp++;else if(o==='SL')sl++;else be++;sum+=r;run=sum;pk=Math.max(pk,run);dd=Math.min(dd,run-pk);ser=o==='SL'?ser+1:(o==='TP'?0:ser);ms=Math.max(ms,ser);pts.push(sum);});
+  var L=filt(),n=L.length,tp=0,sl=0,be=0,sum=0,usdSum=0,pk=0,dd=0,run=0,ser=0,ms=0,pts=[0];
+  L.forEach(function(d){var o=outOf(d),r=+d.r||0;if(o==='TP')tp++;else if(o==='SL')sl++;else be++;sum+=r;usdSum+=(d.usd!==undefined&&isFinite(+d.usd))?+d.usd:r*riskNow().st/100;run=sum;pk=Math.max(pk,run);dd=Math.min(dd,run-pk);ser=o==='SL'?ser+1:(o==='TP'?0:ser);ms=Math.max(ms,ser);pts.push(sum);});
   var riskUSD=riskNow().st/100;
   $('sKpi').innerHTML=kpi('Сделок',n)+kpi('Win rate',n?Math.round(tp/n*100)+'%':'—')+kpi('TP / БУ / SL',tp+' / '+be+' / '+sl)+
-    kpi('Итог, R',sg(sum)+Math.abs(Math.round(sum*10)/10),sum>=0?'pos':'neg')+kpi('Итог, $ (1% = $'+fm(riskUSD)+')',sg(sum)+'$'+fm(Math.abs(sum*riskUSD)),sum>=0?'pos':'neg')+
+    kpi('Итог, R',sg(sum)+Math.abs(Math.round(sum*10)/10),sum>=0?'pos':'neg')+(SRC==='robot'?kpi('Итог, $ условно (1R = $'+fm(riskUSD)+')',sg(sum)+'$'+fm(Math.abs(sum*riskUSD)),sum>=0?'pos':'neg'):kpi('Итог, $ (по суммам сделок)',(usdSum<0?'−':usdSum>0?'+':'')+'$'+Math.abs(usdSum).toLocaleString('ru-RU',{maximumFractionDigits:2}),usdSum>=0?'pos':'neg'))+
     kpi('Макс. просадка, R',dd?'−'+Math.abs(Math.round(dd*10)/10):'0',dd?'neg':null)+kpi('SL подряд, макс',ms);
   var ch=$('sChart');
   if(!n){ch.innerHTML='<div class="empty">Нет сделок по фильтру</div>';}
