@@ -6,11 +6,11 @@
    "date": "2026-09-29",
    "sym": "XAUUSD",
    "window": "C",
-   "status": "watch",
-   "direction": "—",
-   "note": "НАБЛЮДАЕМ",
+   "status": "prep",
+   "direction": "🔻 SHORT",
+   "note": "ВЫНОС (в 16:50, ждём подтверждения)",
    "reasons": [],
-   "price": 4158.65,
+   "price": 4161.91,
    "boxH": 4161.3,
    "boxL": 4137.73,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -2.79,
     "pct": -3.28
    },
-   "checked": "16:54"
+   "checked": "16:55"
   }
  },
  {
@@ -56,7 +56,7 @@
     "ratio": -4.93,
     "pct": -1.6
    },
-   "checked": "16:54"
+   "checked": "16:55"
   }
  },
  {
@@ -70,7 +70,7 @@
    "direction": "▲ LONG",
    "note": "В СДЕЛКЕ (вход 16:40 по 1.32230)",
    "reasons": [],
-   "price": 1.32323,
+   "price": 1.32318,
    "boxH": 1.32525,
    "boxL": 1.32213,
    "prevH": null,
@@ -96,7 +96,7 @@
     "ratio": -5.14,
     "pct": -1.93
    },
-   "checked": "16:54"
+   "checked": "16:55"
   }
  },
  {
@@ -105,17 +105,12 @@
   "data": {
    "date": "2026-09-29",
    "window": "C",
-   "time": "16:54",
-   "text": "без изменений",
-   "changed": [],
+   "time": "16:55",
+   "text": "изменилось: XAUUSD",
+   "changed": [
+    "XAUUSD"
+   ],
    "log": [
-    {
-     "date": "2026-09-29",
-     "time": "10:39",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-09-29",
      "time": "10:45",
@@ -410,6 +405,15 @@
      "window": "C",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-09-29",
+     "time": "16:55",
+     "window": "C",
+     "text": "изменилось: XAUUSD",
+     "lines": [
+      "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
+     ]
     }
    ]
   }
