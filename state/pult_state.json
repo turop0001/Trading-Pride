@@ -442,11 +442,19 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "14:14",
+      "window": "—",
+      "text": "окно A закрыто, отчёт отправлен",
+      "lines": []
     }
   ],
   "_flags": {
     "date": "2026-09-29",
-    "openA": true
+    "openA": true,
+    "closeA": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
