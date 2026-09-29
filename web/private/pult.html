@@ -673,9 +673,10 @@ function liveCard(x){
   if(x.status==='skip'&&x.reasons&&x.reasons.length)rows.push(['Почему скип',x.reasons.length>2?x.reasons.slice(2).join('; '):'других причин нет — основные в статусе']);
   if(x.signal){var xt=x.exit_time?' · '+x.exit_time:'',isT=/→ TP/.test(x.note||''),isS=/→ SL/.test(x.note||'');
     rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);rows.push(['Цель 2R',x.signal.tp+(isT?xt:'')]);
+    var curR=null;
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
-      if(rk>0&&isFinite(pr)){var cr=(es==='short'?en-pr:pr-en)/rk;cr=Math.round(cr*100)/100;rows.push(['Сейчас',(cr>0?'+':'')+cr.toFixed(2).replace(/\.?0+$/,'')+'R']);}}}
-  return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false};
+      if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
+  return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:(typeof curR!=='undefined'?curR:null)};
 }
 function renderLive(m){
   if(!m){return;}
@@ -700,7 +701,7 @@ function renderRep(){
     var top=el('div','rtop');top.appendChild(el('span','sym',c.s));
     if(c.eside){top.appendChild(el('span','tag '+c.eside,c.eside==='long'?'LONG':'SHORT'));}
     var ty=my?my.t:c.t;top.appendChild(el('span','tag typ','тип '+ty));
-    var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
+    var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(c.curR&&(stc==='signal'||stc==='trade'))stt+=' · '+c.curR;if(my&&my.open){stc='trade';stt='В сделке'+(c.curR?' · '+c.curR:'');}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
       if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
