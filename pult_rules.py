@@ -214,9 +214,15 @@ def _analyze_C(sym, d, now_utc, off, prev):
         res['signal'] = sig
         res['new_signal'] = True
         return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(sig["entry"])})')
+    way = 'вниз' if sd == -1 else 'вверх'
+    n_st = len([j for j in range(ext + 1, len(AO)) if _strong(AO[j], AH[j], AL[j], AC[j], sd)])
     if not opp:
-        return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём выкуп)')
-    return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём подтверждения)')
+        return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём откат и сильную свечу {way})')
+    if n_st == 0:
+        return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём две сильные свечи {way})')
+    if n_st == 1:
+        return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём вторую сильную свечу {way})')
+    return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём свечу-поглощение {way})')
 
 
 def analyze(sym, d, window, now_utc, off, prev=None):

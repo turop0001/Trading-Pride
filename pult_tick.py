@@ -179,7 +179,7 @@ def _hist_add(state_dir_file, item):
 EMO_TP, EMO_SL = '\U0001F7E2', '\U0001F534'
 
 
-def final_check(state, today, dstr, off, tg, did):
+def final_check(state, today, dstr, off, tg, did, final=True):
     """22:00 Рига: сделки, которые на момент закрытия окна/отчёта дня были «В СДЕЛКЕ», проверяем
     один раз до конца дня. Если TP/SL уже случился — обновляем карточку, историю, скриншоты и
     шлём одно короткое сообщение с итогом сделки и обновлённым итогом дня."""
@@ -226,7 +226,9 @@ def final_check(state, today, dstr, off, tg, did):
             res = {s: state.get(f'{s}_{w}', {}) for s in syms_of(w) if state.get(f'{s}_{w}', {}).get('date') == today}
             total += result_of(res)[1]
         sign = '+' if total > 0 else ('-' if total < 0 else '')
-        tg("\U0001F4CA Итог сделок после отчёта дня · " + dstr + " (22:00 Рига)\n\n" + "\n".join(upd)
+        head = ("\U0001F4CA Итог сделок после отчёта дня · " + dstr + " (22:00 Рига)") if final else \
+               ("\U0001F514 Обновление по сделкам · " + dstr)
+        tg(head + "\n\n" + "\n".join(upd)
            + f"\n\n\U0001F3AF Итог дня: {sign}{abs(total):.1f}% депозита")
         ds = state.get('_daily_summary') or {}
         ds['total_pct'] = total; state['_daily_summary'] = ds
@@ -327,6 +329,15 @@ def main(send=True):
             except Exception as e:
                 print('history result failed:', e)
             state['_daily_summary'] = {'date': dstr, 'sections': [[w, l, wl] for w, l, wl in sections], 'total_pct': total}
+
+    # ДОБАВЛЕНО 29.09.2026: сделки, оставшиеся открытыми после закрытия своего окна (A → в окне C),
+    # проверяем каждые 5 минут, чтобы SL/TP появлялся в карточке и Telegram сразу, а не в 22:00.
+    if wd < 5 and window == 'C' and m % 5 == 0 and m < 1320:
+        try:
+            if final_check(state, today, dstr, off, tg, did, final=False):
+                text = text or 'закрыта сделка окна A — карточка обновлена'
+        except Exception as e:
+            print('sweep failed:', e)
 
     if wd < 5 and m >= 1320 and not flags.get('final') and (flags.get('openA') or flags.get('openC')):
         flags['final'] = True
