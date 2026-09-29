@@ -228,16 +228,6 @@
   "_log": [
     {
       "date": "2026-09-29",
-      "time": "12:37",
-      "window": "A",
-      "text": "изменилось: GBPUSD, NAS100",
-      "lines": [
-        "⚪ GBPUSD (▲ LONG) — ЗАКРЫТА - SL в 12:10 (вход 11:15)",
-        "🟢 NAS100 (🔻 SHORT) — ВХОД в 11:55"
-      ]
-    },
-    {
-      "date": "2026-09-29",
       "time": "12:52",
       "window": "A",
       "text": "без изменений",
@@ -798,6 +788,15 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-29",
+      "time": "17:50",
+      "window": "C",
+      "text": "изменилось: GBPUSD",
+      "lines": [
+        "🔴 GBPUSD (▲ LONG) — ЗАКРЫТА - SL в 17:45"
+      ]
     }
   ],
   "_flags": {
@@ -845,16 +844,16 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4167.47,
+    "price": 4164.34,
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "17:49",
-    "extreme": 4170.72,
+    "checked_at": "17:50",
+    "extreme": 4167.91,
     "line_status": "prep",
     "direction": "🔻 SHORT",
-    "note": "ВЫНОС (в 17:40, ждём подтверждения)",
-    "status_key": "ВЫНОС (в 17:40, ждём подтверждения)",
+    "note": "ВЫНОС (в 17:45, ждём подтверждения)",
+    "status_key": "ВЫНОС (в 17:45, ждём подтверждения)",
     "tg_note": "ВЫНОС",
     "stale": false,
     "date": "2026-09-29",
@@ -872,11 +871,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.13427,
+    "price": 1.13407,
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "17:49",
+    "checked_at": "17:50",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -898,11 +897,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.3224,
+    "price": 1.32217,
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "17:49",
+    "checked_at": "17:50",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
@@ -914,13 +913,18 @@
       "side": "long",
       "src": "MT5"
     },
-    "line_status": "entry",
+    "exit_time": "17:45",
+    "line_status": "skip",
     "direction": "▲ LONG",
-    "note": "В СДЕЛКЕ (вход 16:40 по 1.32230)",
-    "status_key": "В СДЕЛКЕ (вход 16:40 по 1.32230)",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-09-29",
+    "shots": {
+      "m5": "state/shots/2026-09-29_GBPUSD_C_m5.png",
+      "h1": "state/shots/2026-09-29_GBPUSD_C_h1.png"
+    },
     "trend_h1": {
       "tr": "шорт",
       "ratio": -2.62,

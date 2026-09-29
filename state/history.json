@@ -75,6 +75,10 @@
     "entry": 1.3223,
     "stop": 1.32174,
     "target": 1.32341,
-    "result": "сигнал Пульта в 16:40 Рига"
+    "result": "ВХОД → SL −1R",
+    "shots": {
+      "m5": "state/shots/2026-09-29_GBPUSD_C_m5.png",
+      "h1": "state/shots/2026-09-29_GBPUSD_C_h1.png"
+    }
   }
 ]
