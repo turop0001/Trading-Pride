@@ -197,7 +197,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
           <h2>FundingPips · 2 Step · этап 2</h2>
           <div class="row2">
             <div class="field"><label for="pStart">Старт депозита, $</label><input id="pStart" type="number" value="25000"></div>
-            <div class="field"><label for="pNow">Текущий баланс, $</label><input id="pNow" type="number" value="23300"></div>
+            <div class="field"><label for="pNow">Текущий баланс, $</label><input id="pNow" type="number" step="0.01" value="23300"><small id="pNowHint" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div>
           </div>
           <div class="field"><label for="pTarget">Цель этапа 2, % от старта</label><input id="pTarget" type="number" step="0.1" value="5"></div>
           <div class="out">
@@ -636,6 +636,13 @@ function pcalc(){
   calc();upd();
 }
 ['pStart','pNow','pTarget'].forEach(function(k){$(k).addEventListener('input',pcalc);});
+/* 29.09.2026: текущий баланс = база (введена вручную) + точные суммы $ закрытых сделок журнала,
+   сохранённых ПОСЛЕ ввода базы. Правка поля «Текущий баланс» задаёт новую базу. */
+function balAnchor(){try{var a=JSON.parse(store('p_balAnchor')||'null');if(a&&isFinite(a.v))return a;}catch(e){}return {v:+$('pNow').value||23300,ts:0};}
+function balApply(){var a=balAnchor(),sum=0,n=0;(typeof DOCS!=='undefined'?DOCS:[]).forEach(function(x){var d=x.d;if(d&&isFinite(+d.usd)&&d.usd!==undefined&&(d.ts||0)>a.ts){sum+=+d.usd;n++;}});
+  var v=Math.round((a.v+sum)*100)/100;if(document.activeElement!==$('pNow')){$('pNow').value=v;pcalc();}
+  var h=$('pNowHint');if(h)h.textContent=n?('база $'+a.v.toLocaleString('ru-RU')+(sum>=0?' + ':' − ')+'$'+Math.abs(Math.round(sum*100)/100).toLocaleString('ru-RU')+' по '+n+' сделк'+(n===1?'е':'ам')+' журнала'):'обновляется по суммам закрытых сделок';}
+$('pNow').addEventListener('change',function(){store('p_balAnchor',JSON.stringify({v:+$('pNow').value||0,ts:Date.now()}));balApply();});
 
 /* report — данные обновляет монитор */
 /* ИСПРАВЛЕНО 28.09.2026: карточки «Отчёта дня» больше не зашиты в страницу (там висели данные
@@ -748,7 +755,7 @@ var col=null,DOCS=[];
 try{$('jDate').valueAsDate=new Date();}catch(e){}
 fillSLR($('jWhySel'),$('jType').value);$('jType').addEventListener('change',function(){fillSLR($('jWhySel'),$('jType').value);});
 var JO='TP';
-function riskUsd1(){return riskNow().st/100;}
+function riskUsd1(){var r=riskNow();return r.now*r.pct/100||r.st/100;}
 function rFromUsd(u){var k=riskUsd1();return k>0?Math.round(Math.abs(u)/k*2)/2:0;}
 function jRcalc(){var u=parseFloat($('jR').value)||0,r=rFromUsd(u);$('jRh').textContent=u>0?('≈ '+(JO==='SL'?'−':'+')+r+'R (1R = $'+Math.round(riskUsd1())+')'):'1R = $'+Math.round(riskUsd1());}
 $('jR').addEventListener('input',jRcalc);
@@ -769,7 +776,7 @@ function rowOf(d,withDel,id){
 function render(docs){
   DOCS=docs.map(function(s){var d=s.data();return d?{id:s.id,d:d}:null;}).filter(Boolean).sort(function(a,b){return (b.d.ts||0)-(a.d.ts||0);});
   var L=$('jList');L.innerHTML='';if(!DOCS.length)L.appendChild(el('div','empty','Пока нет записей'));
-  DOCS.forEach(function(x){L.appendChild(rowOf(x.d,true,x.id));});renderStats();}
+  DOCS.forEach(function(x){L.appendChild(rowOf(x.d,true,x.id));});renderStats();try{balApply();}catch(e){}}
 $('jAdd').addEventListener('click',function(){
   var usd=Math.abs(parseFloat($('jR').value))||0,a=rFromUsd(usd),d=$('jDate').value;if(JO==='BE'){a=0;usd=0;}if(!d){$('jMsg').textContent='Укажите дату.';return;}
   var btn=$('jAdd');btn.disabled=true;
