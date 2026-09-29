@@ -46,6 +46,8 @@ def fmt_line(status, symbol, direction, note):
     с необязательной краткой пометкой в скобках у ГОТОВИМСЯ), а не полное предложение —
     подробности (bias/причина) переехали в direction, тоже в короткой форме."""
     emo = {'skip': E_SKIP, 'entry': E_ENTRY, 'watch': E_WATCH, 'prep': E_PREP}.get(status, E_WATCH)
+    if 'ЗАКРЫТА - SL' in str(note):
+        emo = E_STOP  # 🔴 стоп; ⚪ только для СКИП
     return f"{emo} {symbol} ({direction}) — {note}"
 
 
