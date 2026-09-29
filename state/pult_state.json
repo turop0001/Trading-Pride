@@ -6,7 +6,7 @@
     "boxH": 4155.53,
     "boxL": 4125.82,
     "reasons": [],
-    "checked_at": "13:16",
+    "checked_at": "13:19",
     "prevH": 4257.61,
     "prevL": 4166.35,
     "bias": "short",
@@ -46,13 +46,13 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13379,
+    "price": 1.13404,
     "boxH": 1.13753,
     "boxL": 1.13585,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "13:01",
+    "checked_at": "13:19",
     "prevH": 1.13947,
     "prevL": 1.13792,
     "bias": "short",
@@ -81,7 +81,7 @@
     "boxH": 1.32556,
     "boxL": 1.32308,
     "reasons": [],
-    "checked_at": "13:16",
+    "checked_at": "13:19",
     "prevH": 1.3248,
     "prevL": 1.32286,
     "bias": "long",
@@ -121,11 +121,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7742.5,
+    "price": 7745.0,
     "boxH": 7751.5,
     "boxL": 7716.0,
     "reasons": [],
-    "checked_at": "13:16",
+    "checked_at": "13:19",
     "prevH": 7790.8,
     "prevL": 7768.2,
     "bias": "short",
@@ -150,11 +150,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30593.5,
+    "price": 30603.5,
     "boxH": 30607.0,
     "boxL": 30372.2,
     "reasons": [],
-    "checked_at": "13:16",
+    "checked_at": "13:19",
     "prevH": 30898.2,
     "prevL": 30580.0,
     "bias": "short",
@@ -189,11 +189,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51791.0,
+    "price": 51803.0,
     "boxH": 51847.0,
     "boxL": 51644.0,
     "reasons": [],
-    "checked_at": "13:16",
+    "checked_at": "13:19",
     "prevH": 52038.0,
     "prevL": 51925.0,
     "bias": "short",
@@ -414,6 +414,13 @@
       "lines": [
         "⚪ XAUUSD (🔻 SHORT) — ЗАКРЫТА - SL в 13:05"
       ]
+    },
+    {
+      "date": "2026-09-29",
+      "time": "13:19",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
