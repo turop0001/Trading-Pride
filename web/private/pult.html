@@ -274,7 +274,9 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   <!-- TRADE STATS -->
   <section id="tab-jstats" hidden>
     <div class="card">
-      <h2>Статистика реальных сделок</h2>
+      <h2 id="jsTitle">Статистика · сигналы Пульта</h2>
+      <p class="note" style="margin:0 0 10px" id="jsNote">Все сигналы робота со статусом «Вход», закрытые по TP (+2R) или SL (−1R): так же считали бэктест — WR, итог в R, просадка, серия стопов. Ваши личные входы — во втором режиме.</p>
+      <div class="seg" id="jsSrc" style="margin-bottom:12px"><button type="button" data-w="robot" class="on">Сигналы Пульта</button><button type="button" data-w="mine">Мои сделки</button></div>
       <div class="filters">
         <div class="field"><label>Период</label><select id="fPer"><option value="all">Всё время</option><option value="7">7 дней</option><option value="30">30 дней</option><option value="custom">Свой период</option></select></div>
         <div class="field" id="fFromW" hidden><label>С</label><input id="fFrom" type="date"></div>
@@ -771,11 +773,19 @@ var VIEW='line';
 document.querySelectorAll('#fView button').forEach(function(b){b.addEventListener('click',function(){VIEW=b.dataset.w;document.querySelectorAll('#fView button').forEach(function(x){x.classList.toggle('on',x===b);});renderStats();});});
 $('fPer').addEventListener('change',function(){var c=this.value==='custom';$('fFromW').hidden=!c;$('fToW').hidden=!c;renderStats();});
 ['fFrom','fTo','fType','fSym','fOut'].forEach(function(k){$(k).addEventListener('change',renderStats);});
+var SRC='robot';
+function srcDocs(){
+  if(SRC==='mine')return DOCS.map(function(x){return x.d;});
+  return (typeof HIST==='undefined'?[]:(HIST||[])).filter(function(h){return /→ (TP|SL)/.test(h.result||'');}).map(function(h){var tp=/→ TP/.test(h.result);
+    return {symbol:h.symbol,type:h.type,side:h.side,date:h.date,out:tp?'TP':'SL',r:tp?2:-1,note:h.result||'',why:'',ts:0};});
+}
+document.querySelectorAll('#jsSrc button').forEach(function(b){b.addEventListener('click',function(){SRC=b.dataset.w;document.querySelectorAll('#jsSrc button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('jsTitle').textContent=SRC==='robot'?'Статистика · сигналы Пульта':'Статистика · мои сделки';renderStats();});});
 function filt(){
   var p=$('fPer').value,from=null,to=null,now=new Date();
   if(p==='7'||p==='30'){var d=new Date(now);d.setDate(d.getDate()-(+p));from=d.toISOString().slice(0,10);}
   if(p==='custom'){from=$('fFrom').value||null;to=$('fTo').value||null;}
-  return DOCS.map(function(x){return x.d;}).filter(function(d){
+  return srcDocs().filter(function(d){
     if(from&&d.date<from)return false;if(to&&d.date>to)return false;
     if($('fType').value&&d.type!==$('fType').value)return false;if($('fSym').value&&d.symbol!==$('fSym').value)return false;
     if($('fOut').value&&outOf(d)!==$('fOut').value)return false;return true;}).sort(function(a,b){return (a.date+(a.ts||0))<(b.date+(b.ts||0))?-1:1;});
