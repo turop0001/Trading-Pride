@@ -557,8 +557,8 @@ var SLR_T={
     ['c_lon_cont','Лондон продолжил движение — вынос оказался пробоем'],
     ['c_ny','Движение Нью-Йорка против входа']]};
 function slrList(t){return (t&&SLR_T[t]?SLR_T[t]:SLR_T.A.concat(SLR_T.C)).concat(SLR_COMMON);}
-function slrLabel(code){var f=slrList().filter(function(x){return x[0]===code;})[0];if(!f&&code==='weak_trend')return 'Слабый тренд — шёл ½ риска';return f?f[1]:'';}
-function fillSLR(sel,t){var cur=sel.value;sel.innerHTML='';var b=document.createElement('option');b.value='';b.textContent='Выберите причину…';sel.appendChild(b);
+function slrLabel(code){if(code==='sys')return 'Стоп по сигналу системы';var f=slrList().filter(function(x){return x[0]===code;})[0];if(!f&&code==='weak_trend')return 'Слабый тренд — шёл ½ риска';return f?f[1]:'';}
+function fillSLR(sel,t){var cur=sel.value;sel.innerHTML='';var b=document.createElement('option');b.value='';b.textContent='Выберите причину…';sel.appendChild(b);var sy=document.createElement('option');sy.value='sys';sy.textContent='Стоп по сигналу системы (разбирать не нужно)';sel.appendChild(sy);sel.value='sys';
   slrList(t).forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];sel.appendChild(op);});
   if(cur&&slrList(t).some(function(o){return o[0]===cur;}))sel.value=cur;}
 function combineWhy(sel,note){var l=slrLabel(sel.value);note=(note||'').trim();return l?(l+(note?' — '+note:'')):note;}
@@ -715,13 +715,13 @@ function renderRep(){
     var bOut=el('button','btn sm','Закрыл');bOut.disabled=!(my&&my.open);
     ac.appendChild(tSel);ac.appendChild(bIn);ac.appendChild(bOut);card.appendChild(ac);
     var cb=el('div','closeBox');var OUT='TP';
-    cb.innerHTML='<div class="row2"><div class="field"><label>Итог</label><div class="seg"><button type="button" data-v="TP" class="on">TP</button><button type="button" data-v="SL">SL</button><button type="button" data-v="BE">БУ</button></div></div><div class="field"><label>Результат, $</label><input type="number" step="1" min="0" inputmode="decimal" placeholder="напр. 500"><small class="rh" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div></div><div class="field wW" hidden><label>Почему SL</label><select class="whySel"></select><small class="autohint muted" style="display:block;margin:4px 0"></small><input type="text" class="whyNote" placeholder="комментарий (необязательно)"></div><button class="btn primary sm">Сохранить в журнал</button><div class="msg"></div>';
+    cb.innerHTML='<div class="row2"><div class="field"><label>Итог</label><div class="seg"><button type="button" data-v="TP" class="on">TP</button><button type="button" data-v="SL">SL</button><button type="button" data-v="BE">БУ</button></div></div><div class="field"><label>Результат, $</label><input type="number" step="1" min="0" inputmode="decimal" placeholder="напр. 500"><small class="rh" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div></div><div class="field wW" hidden><label>Почему SL (необязательно)</label><select class="whySel"></select><small class="autohint muted" style="display:block;margin:4px 0"></small><input type="text" class="whyNote" placeholder="комментарий (необязательно)"></div><button class="btn primary sm">Сохранить в журнал</button><div class="msg"></div>';
     var sb=cb.querySelectorAll('.seg button'),rin=cb.querySelector('input'),ww=cb.querySelector('.wW'),wsel=cb.querySelector('.whySel'),whint=cb.querySelector('.autohint');
     var rh=cb.querySelector('.rh');function rcalc(){var u=parseFloat(rin.value)||0;rh.textContent=u>0?('≈ '+(OUT==='SL'?'−':OUT==='BE'?'':'+')+rFromUsd(u)+'R (1R = $'+Math.round(riskUsd1())+')'):'1R = $'+Math.round(riskUsd1());}
     rin.value=Math.round(riskUsd1()*2);rin.addEventListener('input',rcalc);rcalc();
     fillSLR(wsel,tSel.value);tSel.addEventListener('change',function(){fillSLR(wsel,tSel.value);});
     sb.forEach(function(b){b.addEventListener('click',function(){OUT=b.dataset.v;sb.forEach(function(x){x.classList.toggle('on',x===b);});
-      if(OUT==='SL'){ww.hidden=false;var auto=autoSLReason(my&&my.half,tSel.value);if(auto){wsel.value=auto;whint.textContent='Предложено по чек-листу на момент входа — проверьте и при необходимости смените.';}else{whint.textContent='';}}
+      if(OUT==='SL'){ww.hidden=false;if(!wsel.value)wsel.value='sys';whint.textContent='Необязательно: можно оставить как есть и просто сохранить.';}
       else ww.hidden=true;
       rin.disabled=OUT==='BE';if(OUT==='BE')rin.value=0;else if(!+rin.value)rin.value=Math.round(riskUsd1()*(OUT==='TP'?2:1));rcalc();});});
     card.appendChild(cb);
