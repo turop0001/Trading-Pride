@@ -576,6 +576,13 @@
       "lines": [
         "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
       ]
+    },
+    {
+      "date": "2026-09-29",
+      "time": "16:56",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -623,11 +630,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4161.91,
+    "price": 4161.93,
     "boxH": 4161.3,
     "boxL": 4137.73,
     "reasons": [],
-    "checked_at": "16:55",
+    "checked_at": "16:56",
     "extreme": 4164.34,
     "line_status": "prep",
     "direction": "🔻 SHORT",
@@ -650,11 +657,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.13446,
+    "price": 1.13447,
     "boxH": 1.13581,
     "boxL": 1.13326,
     "reasons": [],
-    "checked_at": "16:55",
+    "checked_at": "16:56",
     "line_status": "watch",
     "direction": "—",
     "note": "НАБЛЮДАЕМ",
@@ -676,11 +683,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.32318,
+    "price": 1.32325,
     "boxH": 1.32525,
     "boxL": 1.32213,
     "reasons": [],
-    "checked_at": "16:55",
+    "checked_at": "16:56",
     "signal": {
       "date": "2026-09-29",
       "window": "C",
