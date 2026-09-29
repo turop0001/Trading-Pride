@@ -82,10 +82,14 @@ def _xticks(ax, d, off, fmt, n=8):
     ax.set_xticklabels([(d.index[i] + pd.Timedelta(hours=off)).strftime(fmt) for i in idx], rotation=35, ha='right', fontsize=8)
 
 
-def _levels(ax, n, sig, dec):
+def _levels(ax, n, sig, dec, ie=None):
     for y, c, t in ((sig['entry'], C_ENTRY, 'ВХОД'), (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК 2R')):
         ax.axhline(y, color=c, linewidth=1.4 if t != 'ВХОД' else 1.0, linestyle='-' if t != 'ВХОД' else '--', zorder=4)
-        ax.annotate(f'{t} {y:.{dec}f}', (n - 1, y), xytext=(0, 4), textcoords='offset points', ha='right', va='bottom',
+        if t == 'ВХОД' and ie is not None:
+            x, ha = min(ie + max(6, int(n * 0.07)), n - 1), 'left'      # правее точки входа, чтобы не закрывать её
+        else:
+            x, ha = n - 1, 'right'
+        ax.annotate(f'{t} {y:.{dec}f}', (x, y), xytext=(0, 4), textcoords='offset points', ha=ha, va='bottom',
                     color=c, fontsize=10, fontweight='bold', zorder=7,
                     bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=c, lw=0.8, alpha=0.95))
 
@@ -136,9 +140,9 @@ def make_shots(sym, window, r, off, date_str):
             ax.text(0, r['prevH'], ' вчерашний бокс', fontsize=8, color=C_PREV, va='bottom')
         ie = int((m.index <= t_in).sum()) - 1
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
-        ax.annotate(f"вход {sig['time']}", (ie, sig['entry']), textcoords='offset points', xytext=(10, -18 if side == 'LONG' else 14),
+        ax.annotate(f"вход {sig['time']}", (ie, sig['entry']), textcoords='offset points', xytext=(14, -20 if side == 'LONG' else 16),
                     fontsize=9, color=C_ENTRY, fontweight='bold')
-        _levels(ax, len(m), sig, dec)
+        _levels(ax, len(m), sig, dec, ie)
         _xticks(ax, m, off, '%H:%M')
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", f"M5 · {pd.Timestamp(date_str).strftime('%d.%m.%Y')} · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
         p = os.path.join(SHOT_DIR, base + '_m5.png'); fig.savefig(p); plt.close(fig)
@@ -154,7 +158,7 @@ def make_shots(sym, window, r, off, date_str):
         _fvg_liq(ax, h, t_in)
         ie = int((h.index <= t_in).sum()) - 1
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
-        _levels(ax, len(h), sig, dec)
+        _levels(ax, len(h), sig, dec, ie)
         _xticks(ax, h, off, '%d.%m %H:%M', n=10)
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", "H1 · 5 дней до входа · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
         p = os.path.join(SHOT_DIR, base + '_h1.png'); fig.savefig(p); plt.close(fig)

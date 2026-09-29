@@ -119,7 +119,8 @@ tr.tot td{font-weight:700;background:var(--surface-2)} tr.cur td{background:var(
 .liveBar .lg div{display:flex;gap:10px;border-bottom:1px dashed var(--border);padding-bottom:3px}.liveBar .lg b{font-family:var(--mono);min-width:48px}
 .liveBar .chg{color:var(--accent);font-weight:600}
 .st.trade{background:var(--blue-bg);color:var(--blue)}.st.done{background:var(--surface-2);color:var(--text)}
-.st.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}.st.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.st.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}
+.st.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}.st.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700}.stchip.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}
+.st.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}
 .rgrid{display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:17px;line-height:1.45}
 @media (max-width:560px){.rgrid{grid-template-columns:1fr;gap:2px}.rgrid span{margin-top:8px;font-size:15px}}
 .rgrid span{color:var(--muted)}.rgrid b{font-weight:600}
@@ -247,7 +248,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
@@ -268,6 +269,8 @@ function renderRep(){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal};
     var c=liveCard(x);
+    var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||'');
+    if(isTP||isSL){c.res=isTP?'TP':'SL';c.stT=isTP?'Закрыта · TP':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0&&z[0]!=='Почему скип';});
     if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0].indexOf('Вход / стоп')===0;});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
 
