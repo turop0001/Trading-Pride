@@ -135,7 +135,8 @@ def _analyze_C(sym, d, now_utc, off, prev):
     boxH, boxL = float(box['High'].max()), float(box['Low'].min())
     price = float(d['Close'].iloc[-1])
     res = dict(sym=sym, window=window, price=round(price, dec), boxH=round(boxH, dec), boxL=round(boxL, dec),
-               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'))
+               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'), ck=[1], ckf=[])
+    # ck/ckf — номера пунктов чек-листа Типа C (нумерация вкладки «Чек-лист»)
 
     if prev.get('signal') and prev['signal'].get('date') == str(today) and prev['signal'].get('window') == window:
         sd0 = 1 if prev['signal']['side'] == 'long' else -1
@@ -169,6 +170,7 @@ def _analyze_C(sym, d, now_utc, off, prev):
         ext, sd = dn[-1], 1
     bias = 'long' if sd == 1 else 'short'
     dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
+    res['ck'] = [1, 2] + ([3] if (up and dn) else [])
 
     extreme = float(AL[ext] if sd == 1 else AH[ext])
     res['extreme'] = round(extreme, dec)
@@ -184,6 +186,14 @@ def _analyze_C(sym, d, now_utc, off, prev):
 
     sig = None
     if opp:
+        try:
+            _mo = max(AO[j] for j in opp) if sd == 1 else min(AO[j] for j in opp)
+            if any(i > ext and (AC[i] - _mo) * sd > 0 and (AC[i] - AO[i]) * sd > 0 for i in win_idx):
+                res['ck'] = sorted(set(res['ck'] + [4]))
+            if len([j for j in range(ext + 1, len(AO)) if _strong(AO[j], AH[j], AL[j], AC[j], sd)]) >= 2:
+                res['ck'] = sorted(set(res['ck'] + [5]))
+        except Exception:
+            pass
         for i in win_idx:
             if i <= ext:
                 continue
@@ -208,6 +218,8 @@ def _analyze_C(sym, d, now_utc, off, prev):
                        time=(Dtoday.index[je] + pd.Timedelta(hours=off)).strftime('%H:%M'),
                        t_utc=str(Dtoday.index[je]), entry=round(entry, dec), stop=round(stop, dec),
                        tp=round(tp, dec), side=bias)
+            res['ck'] = sorted(set(res['ck'] + [4, 5, 6, 7, 8]))
+            sig['ck'] = list(res['ck'])
             break
 
     if sig:
@@ -251,7 +263,8 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     boxH, boxL = float(box['High'].max()), float(box['Low'].min())
     price = float(d['Close'].iloc[-1])
     res = dict(sym=sym, window=window, price=round(price, dec), boxH=round(boxH, dec), boxL=round(boxL, dec),
-               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'))
+               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'), ck=[1], ckf=[])
+    # ck/ckf — номера пунктов чек-листа Типа A (нумерация вкладки «Чек-лист»: обязательные → скип-условия → усилители → ½ риска)
 
     # 1. bias
     bias = None
@@ -264,12 +277,15 @@ def analyze(sym, d, window, now_utc, off, prev=None):
         elif boxL < pL: bias = 'short'
     res['bias'] = bias
     if bias == 'skip_envelope':
+        res['ckf'] = [2]
         return _out(res, 'skip', '—', 'СКИП (бокс шире вчерашнего с обеих сторон)')
     if bias == 'skip_inside':
+        res['ckf'] = [2]
         return _out(res, 'skip', '—', 'СКИП (внутренний день)')
     if bias is None:
         return _out(res, 'watch', '—', 'НАБЛЮДАЕМ (нет данных за вчера)')
     sd = 1 if bias == 'long' else -1
+    res['ck'] = [1, 2, 4]
     dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
     dirb = dirc  # ИСПРАВЛЕНО 29.09.2026: слово "bias" убрано из текста везде
     side_word = 'лонговый' if sd == 1 else 'шортовый'
@@ -306,10 +322,13 @@ def analyze(sym, d, window, now_utc, off, prev=None):
         skips.append('противоположная сторона бокса снята первой')
 
     if skips:
+        res['ckf'] = [5]
         short = [re.sub(r'\s*\([^)]*\d[^)]*\)', '', x) for x in skips[:2]]
         return _out(res, 'skip', dirb, f'СКИП ({"; ".join(short)})', skips)
+    res['ck'] = [1, 2, 4, 5]
     if not need:
         return _out(res, 'watch', dirb, 'НАБЛЮДАЕМ')
+    res['ck'] = [1, 2, 3, 4, 5]
 
     # 3. вынос подтверждён закрытием
     ext = need[-1]
@@ -325,11 +344,14 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     if len(after) > 24:
         st_all = [j for j in after[:24] if _strong(O[j], Hh[j], Ll[j], C[j], sd)]
         if len(st_all) < 2:
+            res['ckf'] = [9]
             return _out(res, 'skip', dirb, 'СКИП (выкуп не сформировался за 2 часа)')
     st = [j for j in after if _strong(O[j], Hh[j], Ll[j], C[j], sd)]
     edge = boxL if sd == 1 else boxH
     back = any(((C[j] >= edge) if sd == 1 else (C[j] <= edge)) or
                abs(C[j] - extreme) >= 0.3 * abs(edge - extreme) for j in after)
+    if back: res['ck'] = sorted(set(res['ck'] + [6]))
+    if len(st) >= 2: res['ck'] = sorted(set(res['ck'] + [8]))
 
     # m5 встречный FVG в выносных свечах (последние 5 до ext) должен быть инвертирован телом
     lo5 = max(0, need[0] - 4)
@@ -349,6 +371,7 @@ def analyze(sym, d, window, now_utc, off, prev=None):
         return _out(res, 'prep', dirc, 'ВЫНОС (выкуп 1 сильная свеча, ждём вторую)')
     if m5_block:
         return _out(res, 'prep', dirc, 'ВЫНОС (ждём инверсию встречного m5 FVG)')
+    res['ck'] = sorted(set(res['ck'] + [10]))
 
     # 5. вход
     je = st[0] + 1
@@ -372,8 +395,10 @@ def analyze(sym, d, window, now_utc, off, prev=None):
                         return _out(res, 'skip', dirb, f'СКИП (встречный H1 FVG до цели 1:2, {fmtp(f["lo"])})')
                     if sd == -1 and f['hi'] < entry and f['hi'] > tp and (entry - f['hi']) < 1.9 * R:
                         return _out(res, 'skip', dirb, f'СКИП (встречный H1 FVG до цели 1:2, {fmtp(f["hi"])})')
+    res['ck'] = sorted(set(res['ck'] + [7]))
     sig = dict(date=str(today), window=window, time=(W.index[je] + pd.Timedelta(hours=off)).strftime('%H:%M'),
-               t_utc=str(W.index[je]), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias)
+               t_utc=str(W.index[je]), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
+               ck=list(res['ck']))
     res['signal'] = sig
     res['new_signal'] = True
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
@@ -424,6 +449,7 @@ def autopsy(sig, sd, d, res=None):
 
 def _track(res, d, sig, sd, dirc, fmtp):
     res['signal'] = sig
+    if sig.get('ck'): res['ck'] = list(sig['ck']); res['ckf'] = []
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
     out = None
     for _, r in after.iterrows():
