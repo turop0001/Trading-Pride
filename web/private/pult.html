@@ -708,13 +708,15 @@ function renderRep(){
     var bOut=el('button','btn sm','Закрыл');bOut.disabled=!(my&&my.open);
     ac.appendChild(tSel);ac.appendChild(bIn);ac.appendChild(bOut);card.appendChild(ac);
     var cb=el('div','closeBox');var OUT='TP';
-    cb.innerHTML='<div class="row2"><div class="field"><label>Итог</label><div class="seg"><button type="button" data-v="TP" class="on">TP</button><button type="button" data-v="SL">SL</button><button type="button" data-v="BE">БУ</button></div></div><div class="field"><label>Сколько R</label><input type="number" step="0.1" min="0" value="2"></div></div><div class="field wW" hidden><label>Почему SL</label><select class="whySel"></select><small class="autohint muted" style="display:block;margin:4px 0"></small><input type="text" class="whyNote" placeholder="комментарий (необязательно)"></div><button class="btn primary sm">Сохранить в журнал</button><div class="msg"></div>';
+    cb.innerHTML='<div class="row2"><div class="field"><label>Итог</label><div class="seg"><button type="button" data-v="TP" class="on">TP</button><button type="button" data-v="SL">SL</button><button type="button" data-v="BE">БУ</button></div></div><div class="field"><label>Результат, $</label><input type="number" step="1" min="0" inputmode="decimal" placeholder="напр. 500"><small class="rh" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div></div><div class="field wW" hidden><label>Почему SL</label><select class="whySel"></select><small class="autohint muted" style="display:block;margin:4px 0"></small><input type="text" class="whyNote" placeholder="комментарий (необязательно)"></div><button class="btn primary sm">Сохранить в журнал</button><div class="msg"></div>';
     var sb=cb.querySelectorAll('.seg button'),rin=cb.querySelector('input'),ww=cb.querySelector('.wW'),wsel=cb.querySelector('.whySel'),whint=cb.querySelector('.autohint');
+    var rh=cb.querySelector('.rh');function rcalc(){var u=parseFloat(rin.value)||0;rh.textContent=u>0?('≈ '+(OUT==='SL'?'−':OUT==='BE'?'':'+')+rFromUsd(u)+'R (1R = $'+Math.round(riskUsd1())+')'):'1R = $'+Math.round(riskUsd1());}
+    rin.value=Math.round(riskUsd1()*2);rin.addEventListener('input',rcalc);rcalc();
     fillSLR(wsel,tSel.value);tSel.addEventListener('change',function(){fillSLR(wsel,tSel.value);});
     sb.forEach(function(b){b.addEventListener('click',function(){OUT=b.dataset.v;sb.forEach(function(x){x.classList.toggle('on',x===b);});
       if(OUT==='SL'){ww.hidden=false;var auto=autoSLReason(my&&my.half,tSel.value);if(auto){wsel.value=auto;whint.textContent='Предложено по чек-листу на момент входа — проверьте и при необходимости смените.';}else{whint.textContent='';}}
       else ww.hidden=true;
-      rin.disabled=OUT==='BE';if(OUT==='BE')rin.value=0;else if(!+rin.value)rin.value=OUT==='TP'?2:1;});});
+      rin.disabled=OUT==='BE';if(OUT==='BE')rin.value=0;else if(!+rin.value)rin.value=Math.round(riskUsd1()*(OUT==='TP'?2:1));rcalc();});});
     card.appendChild(cb);
     bIn.addEventListener('click',function(){
       if(my&&my.open){var o0=tstate();delete o0[key];tsave(o0);renderRep();return;}
@@ -724,8 +726,8 @@ function renderRep(){
       var o=tstate();o[key]={open:true,t:vt,side:c.dir,ts:Date.now(),half:half};tsave(o);renderRep();});
     bOut.addEventListener('click',function(){cb.classList.toggle('open');});
     cb.querySelector('.btn.primary').addEventListener('click',function(){
-      var a=Math.abs(parseFloat(rin.value))||0,r=OUT==='TP'?a:OUT==='SL'?-a:0,why=combineWhy(wsel,cb.querySelector('.whyNote').value),m=cb.querySelector('.msg');
-      addTrade({symbol:c.s,type:tSel.value,side:c.dir==='short'?'short':'long',date:REPDAY,out:OUT,r:r,note:'',why:OUT==='SL'?why:'',ts:Date.now()},function(ok,err,jid){
+      var usd=Math.abs(parseFloat(rin.value))||0,a=rFromUsd(usd),r=OUT==='TP'?a:OUT==='SL'?-a:0,usdS=OUT==='TP'?usd:OUT==='SL'?-usd:0,why=combineWhy(wsel,cb.querySelector('.whyNote').value),m=cb.querySelector('.msg');
+      addTrade({symbol:c.s,type:tSel.value,side:c.dir==='short'?'short':'long',date:REPDAY,out:OUT,r:r,usd:usdS,note:'',why:OUT==='SL'?why:'',ts:Date.now()},function(ok,err,jid){
         if(!ok){m.textContent=err;return;}var o=tstate();o[key]={closed:true,out:OUT,t:tSel.value,jid:jid||null,half:(my&&my.half)||[]};tsave(o);renderRep();});
     });
     rg.appendChild(card);});
