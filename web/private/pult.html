@@ -319,88 +319,76 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   <!-- ANALYTICS v4 -->
   <section id="tab-stats" hidden>
     <div class="card">
-      <h2>2026 год по месяцам · Тип A + Тип C вместе (полный тест на Dukascopy — обновлено 30.09.2026)</h2>
-      <p class="note" style="margin:0 0 8px">Прямой причинный (тик-за-тиком, как реально работает Пульт) бэктест боевой функции `analyze()`, данные Dukascopy (M5) 01.2024–09.2026, все 7 инструментов Типа A включая GER40.</p>
+      <h2>Тип A · честный итог 2024–2026 (пересчёт 30.09.2026)</h2>
+      <p class="note" style="margin:0 0 8px">Причинная симуляция на Dukascopy M5 (01.2024–09.2026): вход по открытию следующей свечи после сигнала, стоп за экстремум выноса + 0,5 ATR(M5), TP 3R, выходные не держим. Индексы US500 / US30 / NAS100 и золото, окно 10:00–14:00 Рига, тренд H1 по структуре (HH+HL / LH+LL), вынос ≤12 свечей, опора, без встречного H1 FVG до цели. Спред не учтён. <b>Это кандидат на v7: правило в боевом коде Пульта пока прежнее.</b></p>
       <div class="tw"><table>
-        <thead><tr><th>Месяц</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
+        <thead><tr><th>Уровень качества (цепочка HH/HL на H1)</th><th>Сделок</th><th>В мес.</th><th>WR</th><th>ΣR (риск 1×)</th><th>Просадка</th><th>2024 / 2025 / 2026</th></tr></thead>
         <tbody>
-<tr><td>2026-01</td><td>26</td><td>69,2%</td><td class="pos">+28R</td><td class="neg">−2R</td><td>2</td></tr>
-<tr><td>2026-02</td><td>36</td><td>75,0%</td><td class="pos">+45R</td><td class="neg">−2R</td><td>2</td></tr>
-<tr><td>2026-03</td><td>31</td><td>67,7%</td><td class="pos">+32R</td><td class="neg">−3R</td><td>3</td></tr>
-<tr><td>2026-04</td><td>31</td><td>51,6%</td><td class="pos">+17R</td><td class="neg">−4R</td><td>4</td></tr>
-<tr><td>2026-05</td><td>37</td><td>59,5%</td><td class="pos">+29R</td><td class="neg">−3R</td><td>3</td></tr>
-<tr><td>2026-06</td><td>42</td><td>57,1%</td><td class="pos">+30R</td><td class="neg">−4R</td><td>3</td></tr>
-<tr><td>2026-07</td><td>46</td><td>56,5%</td><td class="pos">+32R</td><td class="neg">−5R</td><td>4</td></tr>
-<tr><td>2026-08</td><td>39</td><td>61,5%</td><td class="pos">+33R</td><td class="neg">−5R</td><td>5</td></tr>
-<tr><td>2026-09</td><td>36</td><td>58,3%</td><td class="pos">+27R</td><td class="neg">−4R</td><td>4</td></tr>
-<tr class="tot"><td>Итого (01.01–28.09.2026)</td><td>324</td><td>61,4%</td><td class="pos">+273R</td><td class="neg">−5R</td><td>5</td></tr>
+<tr><td>T1 · цепочка ≥2 (риск ×2)</td><td>41</td><td>1,2</td><td>54%</td><td class="pos">+49R</td><td class="neg">−2R</td><td>+23 / +10 / +16</td></tr>
+<tr><td>T2 · цепочка = 1 (риск ×1)</td><td>95</td><td>2,9</td><td>34%</td><td class="pos">+37R</td><td class="neg">−8R</td><td>+16 / +16 / +5</td></tr>
+<tr><td>T3 · цепочка = 0 (риск ×0,5)</td><td>170</td><td>5,2</td><td>29%</td><td class="pos">+34R</td><td class="neg">−10R</td><td>+13 / +8 / +13</td></tr>
+<tr><td>Все вместе, риск 1×</td><td>306</td><td>9,3</td><td>34%</td><td class="pos">+120R</td><td class="neg">−11R</td><td>+52 / +34 / +34</td></tr>
+<tr class="tot"><td>Все вместе, риск ×2 / ×1 / ×0,5</td><td>306</td><td>9,3</td><td>34%</td><td class="pos">+152R (4,6R/мес)</td><td class="neg">−8,5R</td><td>+68,5 / +40 / +43,5</td></tr>
 </tbody>
       </table></div>
-      <p class="note" style="margin-top:12px">Просадка и серия SL — максимум внутри месяца, риск 1% на сделку. Инструменты: A — XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40 (7); C — XAUUSD, EURUSD, GBPUSD (3).</p>
+      <p class="note" style="margin-top:12px">Только элита (T1, риск ×2): 41 сделка, +98R (3R/мес), просадка −4R; с TP 1,5R (широкая формула) WR 76%, +33R, просадка −3R, но 1,2 сделки в месяц. Серия SL до 10, отрицательных месяцев 10 из 33. Цель 15–20 сделок, WR 60–70%, +10–20R/мес при просадке ≤8R на этих данных недостижима.</p>
     </div>
     <div class="card" style="margin-top:16px">
-      <h2>Многолетняя проверка на Dukascopy (2024–2026, по годам)</h2>
-      <p class="note" style="margin:0 0 12px">Прямой бэктест боевой функции `analyze()` — правила 2,3,4,5,8 убраны из кода (см. чек-лист ниже), стоп v75 (только последняя свеча выноса). Источник данных — Dukascopy M5 (2024-01 → 2026-09), не Yahoo и не MT5. Проверка тик-за-тиком, шаг 30 минут внутри окна, вход по первому сигналу, исход до 22:00 Риги.</p>
+      <h2>По годам и месяцам 2026 (риск ×2 / ×1 / ×0,5)</h2>
       <div class="g2">
-        <div><h2>Тип A (7 инструментов, с GER40)</h2><div class="tw"><table>
+        <div><div class="tw"><table>
           <thead><tr><th>Год</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
           <tbody>
-<tr><td>2024</td><td>311</td><td>59,5%</td><td class="pos">+244R</td><td class="neg">−6R</td><td>5</td></tr>
-<tr><td>2025</td><td>289</td><td>57,8%</td><td class="pos">+212R</td><td class="neg">−6R</td><td>6</td></tr>
-<tr><td>2026</td><td>224</td><td>61,6%</td><td class="pos">+190R</td><td class="neg">−7R</td><td>7</td></tr>
-<tr class="tot"><td>Итого (01.01.24–28.09.26)</td><td>824</td><td>59,5%</td><td class="pos">+646R</td><td class="neg">−7R</td><td>7</td></tr>
-</tbody>
-        </table></div></div>
-        <div><h2>Тип C (3 инструмента)</h2><div class="tw"><table>
-          <thead><tr><th>Год</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
+<tr><td>2024</td><td>122</td><td>35%</td><td class="pos">+68,5R</td><td class="neg">−7,5R</td><td>8</td></tr>
+<tr><td>2025</td><td>113</td><td>32%</td><td class="pos">+40R</td><td class="neg">−6,5R</td><td>7</td></tr>
+<tr><td>2026 (до 28.09)</td><td>71</td><td>35%</td><td class="pos">+43,5R</td><td class="neg">−8,5R</td><td>10</td></tr>
+<tr class="tot"><td>Итого</td><td>306</td><td>34%</td><td class="pos">+152R</td><td class="neg">−8,5R</td><td>10</td></tr>
+</tbody></table></div></div>
+        <div><div class="tw"><table>
+          <thead><tr><th>Месяц 2026</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th></tr></thead>
           <tbody>
-<tr><td>2024</td><td>146</td><td>63,0%</td><td class="pos">+130R</td><td class="neg">−5R</td><td>5</td></tr>
-<tr><td>2025</td><td>122</td><td>59,8%</td><td class="pos">+97R</td><td class="neg">−7R</td><td>5</td></tr>
-<tr><td>2026</td><td>100</td><td>61,0%</td><td class="pos">+83R</td><td class="neg">−3R</td><td>3</td></tr>
-<tr class="tot"><td>Итого (01.01.24–28.09.26)</td><td>368</td><td>61,4%</td><td class="pos">+310R</td><td class="neg">−7R</td><td>5</td></tr>
-</tbody>
-        </table></div></div>
+<tr><td>2026-01</td><td>12</td><td>50%</td><td class="pos">+19R</td><td class="neg">−2R</td></tr>
+<tr><td>2026-02</td><td>6</td><td>67%</td><td class="pos">+12R</td><td class="neg">−1R</td></tr>
+<tr><td>2026-03</td><td>8</td><td>12%</td><td class="neg">−2R</td><td class="neg">−3R</td></tr>
+<tr><td>2026-04</td><td>8</td><td>50%</td><td class="pos">+3,5R</td><td class="neg">−1,5R</td></tr>
+<tr><td>2026-05</td><td>9</td><td>11%</td><td class="neg">−5R</td><td class="neg">−6R</td></tr>
+<tr><td>2026-06</td><td>5</td><td>40%</td><td class="pos">+5,5R</td><td class="neg">−2R</td></tr>
+<tr><td>2026-07</td><td>8</td><td>12%</td><td class="neg">−2,5R</td><td class="neg">−3,5R</td></tr>
+<tr><td>2026-08</td><td>9</td><td>56%</td><td class="pos">+14,5R</td><td class="neg">−3R</td></tr>
+<tr><td>2026-09</td><td>6</td><td>17%</td><td class="neg">−1,5R</td><td class="neg">−3R</td></tr>
+</tbody></table></div></div>
       </div>
-      <div class="tw" style="margin-top:16px"><table>
-        <thead><tr><th>Год (A+C вместе)</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
-        <tbody>
-<tr><td>2024</td><td>457</td><td>60,6%</td><td class="pos">+374R</td><td class="neg">−5R</td><td>5</td></tr>
-<tr><td>2025</td><td>411</td><td>58,4%</td><td class="pos">+309R</td><td class="neg">−5R</td><td>5</td></tr>
-<tr><td>2026</td><td>324</td><td>61,4%</td><td class="pos">+273R</td><td class="neg">−5R</td><td>5</td></tr>
-<tr class="tot"><td>Итого на единой эквити-кривой</td><td>1192</td><td>60,1%</td><td class="pos">+956R</td><td class="neg">−5R</td><td>5</td></tr>
-</tbody>
-      </table></div>
-      <p class="note" style="margin-top:12px">Полный пересчёт 30.09.2026 на истории Dukascopy: 1192 сделки, WR 60,1%, +956R, просадка −5R, серия SL 5. Боевая логика v77 не менялась. FVG-пометки (батут, встречный FVG) проверены как усилители: батут ничего не даёт, встречный FVG до цели 2R ухудшает WR (47% против 64%), но такие сделки остаются в плюсе, поэтому вход не блокируется — только предупреждение. Числа Типа C отличаются от прежних (501 сделка, +378R) — другой источник данных и шаг проверки; ориентироваться стоит на сравнение вариантов, а не на абсолют.</p>
     </div>
     <div class="g2" style="margin-top:16px">
-      <div class="card"><h2>По типам · 2026</h2><div class="tw"><table>
-        <thead><tr><th>Тип</th><th>Сделок</th><th>WR</th><th>ΣR</th></tr></thead>
+      <div class="card"><h2>По инструментам (TP 3R, риск 1×)</h2><div class="tw"><table>
+        <thead><tr><th>Инстр.</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>2024 / 25 / 26</th></tr></thead>
         <tbody>
-<tr><td>A (7 инстр.)</td><td>224</td><td>61,6%</td><td class="pos">+190R</td></tr>
-<tr><td>C (3 инстр.)</td><td>100</td><td>61,0%</td><td class="pos">+83R</td></tr>
-</tbody></table></div></div>
-      <div class="card"><h2>По инструментам · 2026</h2><div class="tw"><table><thead><tr><th>Инстр.</th><th>Тип</th><th>n</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR</th></tr></thead><tbody>
-<tr><td>GER40 (DAX)</td><td>A</td><td>34</td><td>25</td><td>9</td><td>73,5%</td><td class="pos">+41R</td></tr>
-<tr><td>GBP/USD</td><td>C</td><td>33</td><td>24</td><td>9</td><td>72,7%</td><td class="pos">+39R</td></tr>
-<tr><td>EUR/USD</td><td>A</td><td>37</td><td>24</td><td>13</td><td>64,9%</td><td class="pos">+35R</td></tr>
-<tr><td>US 30</td><td>A</td><td>37</td><td>21</td><td>16</td><td>56,8%</td><td class="pos">+26R</td></tr>
-<tr><td>US 500</td><td>A</td><td>31</td><td>19</td><td>12</td><td>61,3%</td><td class="pos">+26R</td></tr>
-<tr><td>XAUUSD</td><td>C</td><td>32</td><td>19</td><td>13</td><td>59,4%</td><td class="pos">+25R</td></tr>
-<tr><td>GBP/USD</td><td>A</td><td>36</td><td>20</td><td>16</td><td>55,6%</td><td class="pos">+24R</td></tr>
-<tr><td>NAS100 (US 100)</td><td>A</td><td>26</td><td>16</td><td>10</td><td>61,5%</td><td class="pos">+22R</td></tr>
-<tr><td>EUR/USD</td><td>C</td><td>35</td><td>18</td><td>17</td><td>51,4%</td><td class="pos">+19R</td></tr>
-<tr><td>XAUUSD</td><td>A</td><td>23</td><td>13</td><td>10</td><td>56,5%</td><td class="pos">+16R</td></tr>
-
+<tr><td>NAS100</td><td>90</td><td>37%</td><td class="pos">+47R</td><td class="neg">−5R</td><td>+20 / +20 / +7</td></tr>
+<tr><td>US 500</td><td>87</td><td>34%</td><td class="pos">+35R</td><td class="neg">−9R</td><td>+23 / +4 / +8</td></tr>
+<tr><td>XAUUSD</td><td>31</td><td>45%</td><td class="pos">+26R</td><td class="neg">−5R</td><td>+4 / +16 / +6</td></tr>
+<tr><td>US 30</td><td>98</td><td>28%</td><td class="pos">+12R</td><td class="neg">−18R</td><td>+5 / −6 / +13</td></tr>
 </tbody></table></div>
-        <p class="note">Все связки в плюсе за 2026 год; EUR/USD (C) — самая слабая по винрейту (51,4%), кандидат на отдельную проверку. GER40 (A) теперь в таблице — история получена с Dukascopy.</p></div>
-      <div class="card"><h2>Серии и плохие дни · 2026</h2><div class="list">
-        <div class="li"><span>Торговых дней с сигналами (A+C)</span><b>147</b></div>
-        <div class="li"><span>Дней с 3+ SL суммарно за день</span><b>9</b></div>
-        <div class="li"><span>Дней с 4+ SL суммарно за день</span><b>2</b></div>
-        <div class="li"><span>Худший день (14.05.2026)</span><b class="neg">−3R (−3% при риске 1%)</b></div>
-        <div class="li"><span>Дневной лимит FundingPips</span><b>5%</b></div>
+        <p class="note">EUR/USD, GBP/USD, GER40 из типа A убраны: цепочка ≥2 на семи инструментах даёт 68 сделок и +31R против 38 сделок и +33R на четырёх. US30 — кандидат на половинный риск (итог +145R, просадка −7,2R).</p></div>
+      <div class="card"><h2>Время входа и направление (TP 3R, риск 1×)</h2><div class="tw"><table>
+        <thead><tr><th>Окно (Рига)</th><th>n</th><th>WR</th><th>ΣR</th></tr></thead>
+        <tbody>
+<tr><td>10:00–10:30</td><td>60</td><td>27%</td><td class="pos">+4R</td></tr>
+<tr><td>10:30–11:30</td><td>120</td><td>31%</td><td class="pos">+29R</td></tr>
+<tr><td>11:30–12:00</td><td>43</td><td>42%</td><td class="pos">+30R</td></tr>
+<tr><td>12:00–13:00</td><td>51</td><td>49%</td><td class="pos">+51R</td></tr>
+<tr><td>13:00–14:00</td><td>32</td><td>25%</td><td class="pos">+6R</td></tr>
+<tr><td>Лонг</td><td>191</td><td>35%</td><td class="pos">+79R</td></tr>
+<tr><td>Шорт</td><td>115</td><td>33%</td><td class="pos">+41R</td></tr>
+</tbody></table></div>
+        <p class="note">Лучшее время — 11:30–13:00; шорты слабее лонгов, но в плюсе.</p></div>
+      <div class="card"><h2>Тип C и общий вывод</h2><div class="list">
+        <div class="li"><span>Тип C (реактивный, коробка Лондона, окно 15:00–17:30) с фильтрами H1/D1/цепочка</span><b class="neg">нет преимущества: −23…−45R, 2025–26 в минусе</b></div>
+        <div class="li"><span>Тип A + тип C вместе</span><b>= тип A; C остаётся «наблюдаем», вес 0</b></div>
+        <div class="li"><span>Что даёт доход</span><b>RR 1:3 (+152R против +99R при 1:2), вес риска по цепочке</b></div>
+        <div class="li"><span>Что даёт частоту</span><b>только слабые уровни T3 (0,5× риска); шире формула — просадка вдвое</b></div>
+        <div class="li"><span>Опция: D1 по направлению как множитель ×1,25 / ×0,75</span><b>+163,5R, просадка −9,4R</b></div>
       </div></div>
-      <div class="card"><h2>FVG-пометки · тест 2024–2026 (A+C, 1192 сделки)</h2><div class="tw"><table>
+      <div class="card"><h2>FVG-пометки · старый тест 2024–2026 (A+C, 1192 сделки, вход до подтверждения — цифры завышены)</h2><div class="tw"><table>
         <thead><tr><th>Пометка</th><th>Есть: n · WR</th><th>Нет: n · WR</th><th>Вывод</th></tr></thead>
         <tbody>
         <tr><td>Батут H1 или H4</td><td>741 · 61%</td><td>451 · 59%</td><td>не влияет (справка)</td></tr>
@@ -415,7 +403,12 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
         </tbody></table></div>
         <p class="note">Если блокировать встречный FVG (H1 или H4): 863 сделки, WR 65%, +814R (вместо +956R). Заблокированные 329 сделок — WR 48%, но +142R. Вход не блокируется.</p></div>
       <div class="card"><h2>Проверено и отклонено</h2><div class="list">
-                <div class="li"><span>Батут H1/H4 как усилитель (1192 сделки, 2024–26)</span><b class="neg">WR 61% vs 59%, p=0,43 — не влияет</b></div>
+        <div class="li"><span>Старые цифры «1192 сделки · +956R · DD −5R» (вход по цене до подтверждения сигнала)</span><b class="neg">недостижимы, честно A: 805 · WR 39% · +143R · DD −29R</b></div>
+        <div class="li"><span>Структура H4 как фильтр качества (цепочка H4 ≥2)</span><b class="neg">18 сделок · WR 47% — не помогает</b></div>
+        <div class="li"><span>Тип C (реактивный, окно 15:00–17:30) с фильтрами H1/D1/цепочка</span><b class="neg">−23…−45R, 2025–26 в минусе</b></div>
+        <div class="li"><span>BTC / серебро в формуле типа A</span><b class="neg">≈ +2R / ≈ +1R — нет преимущества</b></div>
+        <div class="li"><span>Ослабить формулу ради частоты (все триггеры, без опоры/FVG)</span><b class="neg">R на сделку ×0,5, просадка −17…−28R</b></div>
+        <div class="li"><span>Батут H1/H4 как усилитель (1192 сделки, 2024–26)</span><b class="neg">WR 61% vs 59%, p=0,43 — не влияет</b></div>
         <div class="li"><span>Блок входа при встречном FVG до цели 2R</span><b class="neg">WR 65% vs 60%, но итог +814R против +956R</b></div>
 <div class="li"><span>Лимит OTE 0.705 (C) + Order Block (A), стоп ≥0.25R — честно, лимит после закрытия свечи</span><b class="neg">+55% · −14.7%</b></div>
         <div class="li"><span>½ риска после 3 SL подряд</span><b class="neg">+89% · −6.1% (хуже)</b></div>
