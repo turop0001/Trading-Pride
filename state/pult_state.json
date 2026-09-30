@@ -2,13 +2,13 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4192.63,
+    "price": 4191.91,
     "boxH": 4194.91,
     "boxL": 4165.81,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1,
       2,
@@ -63,11 +63,11 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13593,
+    "price": 1.13581,
     "boxH": 1.13572,
     "boxL": 1.1329,
     "reasons": [],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1,
       2,
@@ -101,7 +101,7 @@
         "t": "вынос встречного H1 не образовал"
       }
     ],
-    "extreme": 1.13595,
+    "extreme": 1.13606,
     "line_status": "prep",
     "direction": "🔻 SHORT",
     "note": "ВЫНОС (хая в 11:55, ждём выкуп)",
@@ -123,11 +123,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32759,
+    "price": 1.32751,
     "boxH": 1.32611,
     "boxL": 1.32232,
     "reasons": [],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1
     ],
@@ -158,11 +158,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7684.9,
+    "price": 7682.6,
     "boxH": 7693.4,
     "boxL": 7673.6,
     "reasons": [],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1,
       2,
@@ -216,11 +216,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30363.4,
+    "price": 30346.5,
     "boxH": 30462.1,
     "boxL": 30265.9,
     "reasons": [],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1,
       2,
@@ -274,13 +274,13 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51512.0,
+    "price": 51501.0,
     "boxH": 51583.0,
     "boxL": 51454.0,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1,
       2,
@@ -333,13 +333,6 @@
     }
   },
   "_log": [
-    {
-      "date": "2026-09-30",
-      "time": "10:41",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-09-30",
       "time": "10:42",
@@ -900,6 +893,13 @@
       "lines": [
         "⚠️ EURUSD (🔻 SHORT) — ВЫНОС"
       ]
+    },
+    {
+      "date": "2026-09-30",
+      "time": "12:01",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -934,11 +934,11 @@
   "GER40_A": {
     "sym": "GER40",
     "window": "A",
-    "price": 25416.7,
+    "price": 25406.7,
     "boxH": 25580.6,
     "boxL": 25446.6,
     "reasons": [],
-    "checked_at": "12:00",
+    "checked_at": "12:01",
     "ck": [
       1,
       2,
@@ -982,7 +982,7 @@
         "t": "вынос встречного H1 не образовал"
       }
     ],
-    "extreme": 25415.7,
+    "extreme": 25405.7,
     "line_status": "prep",
     "direction": "▲ LONG",
     "note": "ВЫНОС (лоя в 11:35, ждём выкуп)",
