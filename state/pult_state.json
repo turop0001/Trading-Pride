@@ -6,7 +6,7 @@
     "boxH": 4194.91,
     "boxL": 4165.81,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1,
       2,
@@ -64,7 +64,7 @@
     "boxH": 1.13572,
     "boxL": 1.1329,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1,
       2,
@@ -112,7 +112,7 @@
     "boxH": 1.32611,
     "boxL": 1.32232,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1
     ],
@@ -147,7 +147,7 @@
     "boxH": 7693.4,
     "boxL": 7673.6,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1,
       2,
@@ -205,7 +205,7 @@
     "boxH": 30462.1,
     "boxL": 30265.9,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1,
       2,
@@ -263,7 +263,7 @@
     "boxH": 51583.0,
     "boxL": 51454.0,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1,
       2,
@@ -393,6 +393,13 @@
       "lines": [
         "🟡 XAUUSD (▲ LONG) — НАБЛЮДАЕМ"
       ]
+    },
+    {
+      "date": "2026-09-30",
+      "time": "10:12",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -431,7 +438,7 @@
     "boxH": 25580.6,
     "boxL": 25446.6,
     "reasons": [],
-    "checked_at": "10:11",
+    "checked_at": "10:12",
     "ck": [
       1,
       2,
