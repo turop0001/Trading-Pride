@@ -125,7 +125,7 @@ tr.tot td{font-weight:700;background:var(--surface-2)} tr.cur td{background:var(
 .st.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}
 .rgrid{display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:17px;line-height:1.45}
 @media (max-width:560px){.rgrid{grid-template-columns:1fr;gap:2px}.rgrid span{margin-top:8px;font-size:15px}}
-.rgrid span{color:var(--muted)}.rgrid b{font-weight:600}
+.rgrid span{color:var(--muted)}.rgrid b{font-weight:600}.rgrid b .fxl{display:block;font-weight:400;font-size:12.5px;line-height:1.55}
 .next{font-size:16px;padding:8px 11px;border-radius:9px;background:var(--surface-2);color:var(--muted)}
 .next b{color:var(--text)}
 .shot{display:block;cursor:zoom-in;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fbfaf7}.shot img{display:block;width:100%;height:auto}
@@ -319,85 +319,105 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   <!-- ANALYTICS v4 -->
   <section id="tab-stats" hidden>
     <div class="card">
-      <h2>2026 год по месяцам · Тип A + Тип C вместе (v77 — обновлено 29.09.2026)</h2>
-      <p class="note" style="margin:0 0 8px">Прямой причинный (тик-за-тиком, как реально работает Пульт) бэктест боевой функции `analyze()`, без GER40 (нет истории для бэктеста).</p>
+      <h2>2026 год по месяцам · Тип A + Тип C вместе (полный тест на Dukascopy — обновлено 30.09.2026)</h2>
+      <p class="note" style="margin:0 0 8px">Прямой причинный (тик-за-тиком, как реально работает Пульт) бэктест боевой функции `analyze()`, данные Dukascopy (M5) 01.2024–09.2026, все 7 инструментов Типа A включая GER40.</p>
       <div class="tw"><table>
         <thead><tr><th>Месяц</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
         <tbody>
-          <tr><td>2026-01</td><td>26</td><td>65,4%</td><td class="pos">+25R</td><td class="neg">−2R</td><td>2</td></tr>
-          <tr><td>2026-02</td><td>38</td><td>71,1%</td><td class="pos">+43R</td><td class="neg">−3R</td><td>3</td></tr>
-          <tr><td>2026-03</td><td>30</td><td>66,7%</td><td class="pos">+30R</td><td class="neg">−5R</td><td>5</td></tr>
-          <tr><td>2026-04</td><td>32</td><td>46,9%</td><td class="pos">+13R</td><td class="neg">−4R</td><td>4</td></tr>
-          <tr><td>2026-05</td><td>39</td><td>56,4%</td><td class="pos">+27R</td><td class="neg">−4R</td><td>4</td></tr>
-          <tr><td>2026-06</td><td>44</td><td>54,5%</td><td class="pos">+28R</td><td class="neg">−5R</td><td>4</td></tr>
-          <tr><td>2026-07</td><td>49</td><td>53,1%</td><td class="pos">+29R</td><td class="neg">−6R</td><td>4</td></tr>
-          <tr><td>2026-08</td><td>38</td><td>60,5%</td><td class="pos">+31R</td><td class="neg">−4R</td><td>4</td></tr>
-          <tr><td>2026-09</td><td>29</td><td>65,5%</td><td class="pos">+28R</td><td class="neg">−2R</td><td>2</td></tr>
-          <tr class="tot"><td>Итого (01.01–29.09.2026)</td><td>325</td><td>59,4%</td><td class="pos">+254R</td><td class="neg">−6R</td><td>5</td></tr>
-        </tbody>
+<tr><td>2026-01</td><td>26</td><td>69,2%</td><td class="pos">+28R</td><td class="neg">−2R</td><td>2</td></tr>
+<tr><td>2026-02</td><td>36</td><td>75,0%</td><td class="pos">+45R</td><td class="neg">−2R</td><td>2</td></tr>
+<tr><td>2026-03</td><td>31</td><td>67,7%</td><td class="pos">+32R</td><td class="neg">−3R</td><td>3</td></tr>
+<tr><td>2026-04</td><td>31</td><td>51,6%</td><td class="pos">+17R</td><td class="neg">−4R</td><td>4</td></tr>
+<tr><td>2026-05</td><td>37</td><td>59,5%</td><td class="pos">+29R</td><td class="neg">−3R</td><td>3</td></tr>
+<tr><td>2026-06</td><td>42</td><td>57,1%</td><td class="pos">+30R</td><td class="neg">−4R</td><td>3</td></tr>
+<tr><td>2026-07</td><td>46</td><td>56,5%</td><td class="pos">+32R</td><td class="neg">−5R</td><td>4</td></tr>
+<tr><td>2026-08</td><td>39</td><td>61,5%</td><td class="pos">+33R</td><td class="neg">−5R</td><td>5</td></tr>
+<tr><td>2026-09</td><td>36</td><td>58,3%</td><td class="pos">+27R</td><td class="neg">−4R</td><td>4</td></tr>
+<tr class="tot"><td>Итого (01.01–28.09.2026)</td><td>324</td><td>61,4%</td><td class="pos">+273R</td><td class="neg">−5R</td><td>5</td></tr>
+</tbody>
       </table></div>
-      <p class="note" style="margin-top:12px">Просадка и серия SL — максимум внутри месяца, риск 1% на сделку. Инструменты: A — XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30 (6, без GER40); C — XAUUSD, EURUSD, GBPUSD (3).</p>
+      <p class="note" style="margin-top:12px">Просадка и серия SL — максимум внутри месяца, риск 1% на сделку. Инструменты: A — XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40 (7); C — XAUUSD, EURUSD, GBPUSD (3).</p>
     </div>
     <div class="card" style="margin-top:16px">
-      <h2>Многолетняя проверка v77 (2024–2026, по годам)</h2>
-      <p class="note" style="margin:0 0 12px">Прямой бэктест боевой функции `analyze()` — правила 2,3,4,5,8 убраны из кода (см. чек-лист ниже), стоп v75 (только последняя свеча выноса). 2023 год не показан — данные покрывают только декабрь.</p>
+      <h2>Многолетняя проверка на Dukascopy (2024–2026, по годам)</h2>
+      <p class="note" style="margin:0 0 12px">Прямой бэктест боевой функции `analyze()` — правила 2,3,4,5,8 убраны из кода (см. чек-лист ниже), стоп v75 (только последняя свеча выноса). Источник данных — Dukascopy M5 (2024-01 → 2026-09), не Yahoo и не MT5. Проверка тик-за-тиком, шаг 30 минут внутри окна, вход по первому сигналу, исход до 22:00 Риги.</p>
       <div class="g2">
-        <div><h2>Тип A (6 инструментов, без GER40)</h2><div class="tw"><table>
+        <div><h2>Тип A (7 инструментов, с GER40)</h2><div class="tw"><table>
           <thead><tr><th>Год</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
           <tbody>
-            <tr><td>2024</td><td>285</td><td>58,9%</td><td class="pos">+219R</td><td class="neg">−7R</td><td>7</td></tr>
-            <tr><td>2025</td><td>246</td><td>58,9%</td><td class="pos">+189R</td><td class="neg">−6R</td><td>6</td></tr>
-            <tr><td>2026</td><td>188</td><td>59,6%</td><td class="pos">+148R</td><td class="neg">−7R</td><td>7</td></tr>
-            <tr class="tot"><td>Итого (01.01.24–28.09.26)</td><td>719</td><td>59,1%</td><td class="pos">+556R</td><td class="neg">−7R</td><td>7</td></tr>
-          </tbody>
+<tr><td>2024</td><td>311</td><td>59,5%</td><td class="pos">+244R</td><td class="neg">−6R</td><td>5</td></tr>
+<tr><td>2025</td><td>289</td><td>57,8%</td><td class="pos">+212R</td><td class="neg">−6R</td><td>6</td></tr>
+<tr><td>2026</td><td>224</td><td>61,6%</td><td class="pos">+190R</td><td class="neg">−7R</td><td>7</td></tr>
+<tr class="tot"><td>Итого (01.01.24–28.09.26)</td><td>824</td><td>59,5%</td><td class="pos">+646R</td><td class="neg">−7R</td><td>7</td></tr>
+</tbody>
         </table></div></div>
         <div><h2>Тип C (3 инструмента)</h2><div class="tw"><table>
           <thead><tr><th>Год</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
           <tbody>
-            <tr><td>2024</td><td>194</td><td>59,8%</td><td class="pos">+154R</td><td class="neg">−5R</td><td>5</td></tr>
-            <tr><td>2025</td><td>170</td><td>56,5%</td><td class="pos">+118R</td><td class="neg">−7R</td><td>7</td></tr>
-            <tr><td>2026</td><td>137</td><td>59,1%</td><td class="pos">+106R</td><td class="neg">−4R</td><td>4</td></tr>
-            <tr class="tot"><td>Итого (01.01.24–29.09.26)</td><td>501</td><td>58,5%</td><td class="pos">+378R</td><td class="neg">−7R</td><td>7</td></tr>
-          </tbody>
+<tr><td>2024</td><td>146</td><td>63,0%</td><td class="pos">+130R</td><td class="neg">−5R</td><td>5</td></tr>
+<tr><td>2025</td><td>122</td><td>59,8%</td><td class="pos">+97R</td><td class="neg">−7R</td><td>5</td></tr>
+<tr><td>2026</td><td>100</td><td>61,0%</td><td class="pos">+83R</td><td class="neg">−3R</td><td>3</td></tr>
+<tr class="tot"><td>Итого (01.01.24–28.09.26)</td><td>368</td><td>61,4%</td><td class="pos">+310R</td><td class="neg">−7R</td><td>5</td></tr>
+</tbody>
         </table></div></div>
       </div>
       <div class="tw" style="margin-top:16px"><table>
         <thead><tr><th>Год (A+C вместе)</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
         <tbody>
-          <tr><td>2024</td><td>479</td><td>59,3%</td><td class="pos">+373R</td><td class="neg">−6R</td><td>6</td></tr>
-          <tr><td>2025</td><td>416</td><td>57,9%</td><td class="pos">+307R</td><td class="neg">−5R</td><td>5</td></tr>
-          <tr><td>2026</td><td>325</td><td>59,4%</td><td class="pos">+254R</td><td class="neg">−6R</td><td>5</td></tr>
-          <tr class="tot"><td>Итого на единой эквити-кривой</td><td>1220</td><td>58,9%</td><td class="pos">+934R</td><td class="neg">−6R</td><td>6</td></tr>
-        </tbody>
+<tr><td>2024</td><td>457</td><td>60,6%</td><td class="pos">+374R</td><td class="neg">−5R</td><td>5</td></tr>
+<tr><td>2025</td><td>411</td><td>58,4%</td><td class="pos">+309R</td><td class="neg">−5R</td><td>5</td></tr>
+<tr><td>2026</td><td>324</td><td>61,4%</td><td class="pos">+273R</td><td class="neg">−5R</td><td>5</td></tr>
+<tr class="tot"><td>Итого на единой эквити-кривой</td><td>1192</td><td>60,1%</td><td class="pos">+956R</td><td class="neg">−5R</td><td>5</td></tr>
+</tbody>
       </table></div>
-      <p class="note" style="margin-top:12px">Тип A — та же боевая логика v76 (изменений нет: проверено 9 альтернативных вариантов входа/выкупа/стопа, ни один не дал лучше 719/+556R/DD-7R). Тип C с 29.09.2026 — на реактивном bias и engulf-выкупе (nyscan3-логика, h1_block=False), перенесено в боевой код и честно проверено ПРИЧИННЫМ тик-харнессом (не ретроспективой): было 130/60,8%/+107R/DD-5R, стало 501/58,5%/+378R/DD-7R — просадка и серия SL немного выросли, доход почти утроился. Подробности версии v76 — в «трейдинг/решение-фильтры-v76.md».</p>
+      <p class="note" style="margin-top:12px">Полный пересчёт 30.09.2026 на истории Dukascopy: 1192 сделки, WR 60,1%, +956R, просадка −5R, серия SL 5. Боевая логика v77 не менялась. FVG-пометки (батут, встречный FVG) проверены как усилители: батут ничего не даёт, встречный FVG до цели 2R ухудшает WR (47% против 64%), но такие сделки остаются в плюсе, поэтому вход не блокируется — только предупреждение. Числа Типа C отличаются от прежних (501 сделка, +378R) — другой источник данных и шаг проверки; ориентироваться стоит на сравнение вариантов, а не на абсолют.</p>
     </div>
     <div class="g2" style="margin-top:16px">
       <div class="card"><h2>По типам · 2026</h2><div class="tw"><table>
         <thead><tr><th>Тип</th><th>Сделок</th><th>WR</th><th>ΣR</th></tr></thead>
-        <tbody><tr><td>A (6 инстр., без GER40)</td><td>188</td><td>59,6%</td><td class="pos">+148R</td></tr>
-        <tr><td>C (3 инстр.)</td><td>137</td><td>59,1%</td><td class="pos">+106R</td></tr></tbody></table></div></div>
+        <tbody>
+<tr><td>A (7 инстр.)</td><td>224</td><td>61,6%</td><td class="pos">+190R</td></tr>
+<tr><td>C (3 инстр.)</td><td>100</td><td>61,0%</td><td class="pos">+83R</td></tr>
+</tbody></table></div></div>
       <div class="card"><h2>По инструментам · 2026</h2><div class="tw"><table><thead><tr><th>Инстр.</th><th>Тип</th><th>n</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR</th></tr></thead><tbody>
-        <tr><td>GBP/USD</td><td>C</td><td>43</td><td>28</td><td>15</td><td>65,1%</td><td class="pos">+41R</td></tr>
-        <tr><td>XAUUSD</td><td>C</td><td>46</td><td>28</td><td>18</td><td>60,9%</td><td class="pos">+38R</td></tr>
-        <tr><td>EUR/USD</td><td>A</td><td>36</td><td>23</td><td>13</td><td>63,9%</td><td class="pos">+33R</td></tr>
-        <tr><td>US 500</td><td>A</td><td>30</td><td>19</td><td>11</td><td>63,3%</td><td class="pos">+27R</td></tr>
-        <tr><td>EUR/USD</td><td>C</td><td>48</td><td>25</td><td>23</td><td>52,1%</td><td class="pos">+27R</td></tr>
-        <tr><td>US 30</td><td>A</td><td>37</td><td>21</td><td>16</td><td>56,8%</td><td class="pos">+26R</td></tr>
-        <tr><td>GBP/USD</td><td>A</td><td>36</td><td>20</td><td>16</td><td>55,6%</td><td class="pos">+24R</td></tr>
-        <tr><td>NAS100 (US 100)</td><td>A</td><td>26</td><td>16</td><td>10</td><td>61,5%</td><td class="pos">+22R</td></tr>
-        <tr><td>XAUUSD</td><td>A</td><td>23</td><td>13</td><td>10</td><td>56,5%</td><td class="pos">+16R</td></tr>
-      </tbody></table></div>
-        <p class="note">Все связки в плюсе за 2026 год; EUR/USD (C) — самая слабая по винрейту (52,1%), кандидат на отдельную проверку. GER40 (A) в таблице нет — нет истории для бэктеста.</p></div>
+<tr><td>GER40 (DAX)</td><td>A</td><td>34</td><td>25</td><td>9</td><td>73,5%</td><td class="pos">+41R</td></tr>
+<tr><td>GBP/USD</td><td>C</td><td>33</td><td>24</td><td>9</td><td>72,7%</td><td class="pos">+39R</td></tr>
+<tr><td>EUR/USD</td><td>A</td><td>37</td><td>24</td><td>13</td><td>64,9%</td><td class="pos">+35R</td></tr>
+<tr><td>US 30</td><td>A</td><td>37</td><td>21</td><td>16</td><td>56,8%</td><td class="pos">+26R</td></tr>
+<tr><td>US 500</td><td>A</td><td>31</td><td>19</td><td>12</td><td>61,3%</td><td class="pos">+26R</td></tr>
+<tr><td>XAUUSD</td><td>C</td><td>32</td><td>19</td><td>13</td><td>59,4%</td><td class="pos">+25R</td></tr>
+<tr><td>GBP/USD</td><td>A</td><td>36</td><td>20</td><td>16</td><td>55,6%</td><td class="pos">+24R</td></tr>
+<tr><td>NAS100 (US 100)</td><td>A</td><td>26</td><td>16</td><td>10</td><td>61,5%</td><td class="pos">+22R</td></tr>
+<tr><td>EUR/USD</td><td>C</td><td>35</td><td>18</td><td>17</td><td>51,4%</td><td class="pos">+19R</td></tr>
+<tr><td>XAUUSD</td><td>A</td><td>23</td><td>13</td><td>10</td><td>56,5%</td><td class="pos">+16R</td></tr>
+
+</tbody></table></div>
+        <p class="note">Все связки в плюсе за 2026 год; EUR/USD (C) — самая слабая по винрейту (51,4%), кандидат на отдельную проверку. GER40 (A) теперь в таблице — история получена с Dukascopy.</p></div>
       <div class="card"><h2>Серии и плохие дни · 2026</h2><div class="list">
-        <div class="li"><span>Торговых дней с сигналами (A+C)</span><b>145</b></div>
-        <div class="li"><span>Дней с 3+ SL суммарно за день</span><b>10</b></div>
+        <div class="li"><span>Торговых дней с сигналами (A+C)</span><b>147</b></div>
+        <div class="li"><span>Дней с 3+ SL суммарно за день</span><b>9</b></div>
         <div class="li"><span>Дней с 4+ SL суммарно за день</span><b>2</b></div>
-        <div class="li"><span>Худший день (22.06.2026)</span><b class="neg">−3R (−3% при риске 1%)</b></div>
+        <div class="li"><span>Худший день (14.05.2026)</span><b class="neg">−3R (−3% при риске 1%)</b></div>
         <div class="li"><span>Дневной лимит FundingPips</span><b>5%</b></div>
       </div></div>
+      <div class="card"><h2>FVG-пометки · тест 2024–2026 (A+C, 1192 сделки)</h2><div class="tw"><table>
+        <thead><tr><th>Пометка</th><th>Есть: n · WR</th><th>Нет: n · WR</th><th>Вывод</th></tr></thead>
+        <tbody>
+        <tr><td>Батут H1 или H4</td><td>741 · 61%</td><td>451 · 59%</td><td>не влияет (справка)</td></tr>
+        <tr><td><b>Встречный FVG только ЗА целью 2R (усилитель) · Тип A</b></td><td>288 · 71%</td><td>536 · 53%</td><td class="pos">усилитель</td></tr>
+        <tr><td><b>То же · Тип C</b></td><td>174 · 74%</td><td>194 · 51%</td><td class="pos">усилитель</td></tr>
+        <tr><td>Встречный H1 до цели 2R</td><td>291 · 47%</td><td>901 · 64%</td><td class="neg">предупреждение</td></tr>
+        <tr><td>Встречный H4 до цели 2R</td><td>91 · 44%</td><td>1101 · 61%</td><td class="neg">предупреждение</td></tr>
+        <tr><td>Встречный H1/H4 на пути</td><td>617 · 59%</td><td>575 · 62%</td><td>не влияет</td></tr>
+        <tr><td>H4 встречный с реакцией</td><td>342 · 59%</td><td>850 · 60%</td><td>не влияет</td></tr>
+        <tr><td>Встречный H1 внутри бокса</td><td>351 · 56%</td><td>841 · 62%</td><td>слабо (p=0,08)</td></tr>
+        <tr><td>Вынос образовал встречный H1</td><td>161 · 58%</td><td>1031 · 60%</td><td>не влияет</td></tr>
+        </tbody></table></div>
+        <p class="note">Если блокировать встречный FVG (H1 или H4): 863 сделки, WR 65%, +814R (вместо +956R). Заблокированные 329 сделок — WR 48%, но +142R. Вход не блокируется.</p></div>
       <div class="card"><h2>Проверено и отклонено</h2><div class="list">
-        <div class="li"><span>Лимит OTE 0.705 (C) + Order Block (A), стоп ≥0.25R — честно, лимит после закрытия свечи</span><b class="neg">+55% · −14.7%</b></div>
+                <div class="li"><span>Батут H1/H4 как усилитель (1192 сделки, 2024–26)</span><b class="neg">WR 61% vs 59%, p=0,43 — не влияет</b></div>
+        <div class="li"><span>Блок входа при встречном FVG до цели 2R</span><b class="neg">WR 65% vs 60%, но итог +814R против +956R</b></div>
+<div class="li"><span>Лимит OTE 0.705 (C) + Order Block (A), стоп ≥0.25R — честно, лимит после закрытия свечи</span><b class="neg">+55% · −14.7%</b></div>
         <div class="li"><span>½ риска после 3 SL подряд</span><b class="neg">+89% · −6.1% (хуже)</b></div>
         <div class="li"><span>Скип C по перекрытому FVG / 2+ сильным свечам</span><b class="neg">режет прибыль</b></div>
         <div class="li"><span>XAG/USD (серебро), весь период, оба типа</span><b class="neg">−5.1% · DD −11.4% · WR 27%</b></div>
@@ -502,16 +522,16 @@ var CK={
   ['skip','Нет крупной ликвидности рядом слева за экстремумом','если есть — цена может пойти её снимать, не входим.'],
   ['skip','Цель уже собрана — сама Азия/Лондон сняла свою же ликвидность заранее','нечего собирать ни внутри, ни за целью, даже при формально верном сломе структуры — скип, проверять на графике вручную.'],
   ['plus','Азия уже сняла ликвидность у противоположной стороны сама внутри себя (self-sweep)','если Азия bias=LONG уже обновила свой хай внутри себя (или bias=SHORT — свой лой), это не повод скипать день: ждём снятие нужной стороны снаружи и входим по остальным правилам, а если ликвидность у цели ещё цела — плюс-усилитель.'],
-  ['skip','Вынос своими свечами сформировал встречный H1 FVG (визуально, с 28.09.2026 не в коде)','встречный H1 FVG, сформированный самими выносными свечами — контекстный сигнал против сделки, проверять минимум за 5 дней назад.'],
-  ['skip','На H4 есть встречный FVG, в который цена уже заходила и от которого оттолкнулась (визуально, с 28.09.2026 не в коде)','это перекрывает даже формально верный bias — цена уже показала реальное намерение на старшем таймфрейме.'],
+  ['skip','Вынос своими свечами сформировал встречный H1 FVG (инфо-пометка в карточке, вход не блокирует)','встречный H1 FVG, сформированный самими выносными свечами — контекстный сигнал против сделки, проверять минимум за 5 дней назад.'],
+  ['skip','На H4 есть встречный FVG, в который цена уже заходила и от которого оттолкнулась (инфо-пометка в карточке, вход не блокирует)','это перекрывает даже формально верный bias — цена уже показала реальное намерение на старшем таймфрейме.'],
   ['skip','Рядом на H1 есть непрозаполненный гэп (разрыв пятница→понедельник)','настоящий гэп цена обычно закрывает полностью, а не отбивается от него как от опоры — при таком гэпе рядом сделку пропускаем.'],
-  ['skip','До экстремума в этот день уже пробит телом своего же H1 FVG в сторону сделки (визуально, с 28.09.2026 не в коде)','если цена до выноса уже закрылась телом за своим FVG H1 в направлении будущей сделки — скип.'],
+  ['skip','До экстремума в этот день уже пробит телом своего же H1 FVG в сторону сделки (смотреть на графике, в коде нет)','если цена до выноса уже закрылась телом за своим FVG H1 в направлении будущей сделки — скип.'],
   ['skip','Сама Азия оттолкнулась (не пробила) от встречного H1 FVG и ушла в противоположную сторону','если рядом есть встречный H1 FVG и Азия отбилась от него телом свечи, не пробив — сигнал против сделки, скип.'],
   ['skip','Вход позже 14:00 Рига — конец окна Типа A','окно Типа A — 10:00–14:00 Рига, позже входа по правилам нет.'],
-  ['plus','Реакция от H1/H4 FVG-«батута» в сторону входа','усилитель вероятности — цена коснулась и дала реакцию в нужном направлении.'],
+  ['plus','Встречный H1/H4 FVG лежит ЗА целью 2R, а не между входом и целью (инфо-пометка, вход не блокирует)','усилитель по тесту Dukascopy 2024–26 (Тип A): WR 71% против 53% у остальных сделок и 48% при FVG между входом и целью; стабильно по годам 73% / 68% / 73%. Батут больше не усилитель — только справка в карточке.'],
   ['skip','Цена прошила H1/H4 FVG-«батут» насквозь и закрепилась телом на H1 TF','закрытие свечи H1 за батутом без реакции — скип, а не просто отсутствие усилителя.'],
   ['plus','Тренд 5 дней по входу','усилитель, не фильтр.'],
-  ['skip','До цели 1:2 нет блокирующего H1 FVG (визуально, не в коде для Типа A)','встречный H1 FVG на пути к цели без достаточного места до него для RR 1:2 — контекстный минус, для Типа C остаётся обязательным скипом (см. ниже).'],
+  ['skip','До цели 1:2 нет блокирующего H1 FVG (инфо-пометка в карточке, вход не блокирует)','встречный H1 FVG на пути к цели без достаточного места до него для RR 1:2 — контекстный минус, для Типа C остаётся обязательным скипом (см. ниже).'],
   ['plus','Длинный фитиль у свечи выноса на m15','признак силы покупателя/продавца — можно входить на 2-й свече выкупа.'],
   ['plus','3-свечной фрактал на экстремуме','средняя свеча — самая нижняя (лонг) / самая верхняя (шорт), 2-я свеча выкупа сильная.'],
   ['plus','Компрессия ликвидности на противоположной стороне','много несобранных хаёв/лоёв Лондона и Азии в сторону цели — магнит для цены.'],
@@ -536,11 +556,11 @@ var CK={
   ['base','Стоп — хай/лоу ТОЛЬКО последней подтверждающей свечи выноса (v75) − 0.05×ATR','не истинный экстремум всего сегмента выноса — тот же принцип, что и в Типе A.'],
   ['base','Цель 2R, блокирующего H1 FVG-фильтра больше нет','снят 29.09.2026 (h1_block=False) — раньше встречный H1 FVG на пути к цели превращал сделку в скип/½ риска, теперь не проверяется вообще.'],
   ['skip','Цель уже собрана — сам Лондон снял свою же ликвидность внутри себя (self-sweep, визуально, не в коде)','нечего собирать даже при формально верном bias — проверять на графике вручную.'],
-  ['skip','На H4 есть встречный FVG, в который цена уже заходила и от которого оттолкнулась (визуально, не в коде)','перекрывает формально верный bias — скип по своему усмотрению.'],
-  ['plus','Реакция от H1/H4 FVG-«батута» в сторону входа (визуально, не в коде)','усилитель вероятности — цена коснулась и дала реакцию в нужном направлении.'],
-  ['plus','Длинный фитиль у свечи выноса на m15 (визуально, не в коде)','признак силы покупателя/продавца.'],
-  ['plus','Компрессия ликвидности / равные хаи-лои на противоположной стороне (визуально, не в коде)','магнит для цены к цели — не влияет на срабатывание в коде.'],
-  ['plus','Есть order flow на H1 (визуально, не в коде)','здоровый тренд: откаты в FVG с реакцией по направлению, снятие ликвидности, новый BOS.']],
+  ['skip','На H4 есть встречный FVG, в который цена уже заходила и от которого оттолкнулась (инфо-пометка в карточке, вход не блокирует)','перекрывает формально верный bias — скип по своему усмотрению.'],
+  ['plus','Встречный H1/H4 FVG лежит ЗА целью 2R, а не между входом и целью (инфо-пометка, вход не блокирует)','усилитель по тесту Dukascopy 2024–26 (Тип C): WR 74% против 51% без него; при FVG между входом и целью 45%. Стабильно по годам 76% / 73% / 71%. Батут — только справка в карточке.'],
+  ['plus','Длинный фитиль у свечи выноса на m15 (смотреть на графике, в коде нет)','признак силы покупателя/продавца.'],
+  ['plus','Компрессия ликвидности / равные хаи-лои на противоположной стороне (смотреть на графике, в коде нет)','магнит для цены к цели — не влияет на срабатывание в коде.'],
+  ['plus','Есть order flow на H1 (смотреть на графике, в коде нет)','здоровый тренд: откаты в FVG с реакцией по направлению, снятие ликвидности, новый BOS.']],
   mng:'<b>После входа:</b> цель 2R, стоп в безубыток не переносить. Реактивный bias + engulf-выкуп (nyscan3-логика, h1_block=False) — перенесено в боевой код 29.09.2026, честно проверено причинным тик-харнессом: 130/+107R → 501/+378R, DD−5R→−7R.'}
 };
 (function(){var o={base:0,skip:1,plus:2,half:3};['A','C'].forEach(function(t){
@@ -594,7 +614,7 @@ function buildCK(t){
 function verdict(t){
   var g=CK[t],base=[],skip=[],half=[],n=0;
   g.items.forEach(function(r,ix){var c=$('r'+t+ix).checked;if(r[0]==='plus'){return;}if(c)n++;else(r[0]==='base'?base:r[0]==='skip'?skip:half).push(r[1]);});
-  var NN=g.items.filter(function(r){return r[0]!=='plus';}).length;var p=n/NN;$('bn'+t).textContent=n+'/'+NN;$('bf'+t).style.width=(p*100)+'%';$('bf'+t).style.background=pcol(p);
+  var NN=g.items.filter(function(r){return r[0]!=='plus';}).length;var PP=g.items.length-NN,np=0;g.items.forEach(function(r,ix){if(r[0]==='plus'&&$('r'+t+ix).checked)np++;});var p=n/NN;$('bn'+t).textContent='Основные '+n+'/'+NN+' · усилители '+np+'/'+PP;$('bf'+t).style.width=(p*100)+'%';$('bf'+t).style.background=pcol(p);
   var v=$('v'+t),r=riskNow(),c,bg,hd,sb;
   if(!n){v.style.borderColor='var(--border)';v.style.background='var(--surface-2)';v.innerHTML='<div class="vh" style="color:var(--muted)">Отмечай условия по мере выполнения</div>';return;}
   if(base.length){c='var(--off)';bg='var(--off-bg)';hd='НЕТ СЕТАПА';sb='Нет: '+base.join(', ');}
@@ -681,8 +701,15 @@ function liveCard(x){
     var curR=null;
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
-  if(x.ck&&x.ck.length||x.ckf&&x.ckf.length){var ckt=(x.ck||[]).slice().sort(function(a,b){return a-b;}).join(' · ');
-    if(x.ckf&&x.ckf.length)ckt+=(ckt?' · ':'')+'✗ '+x.ckf.join(', ');rows.push(['Чек-лист',ckt]);}
+  if(x.ck&&x.ck.length||x.ckf&&x.ckf.length||x.fx&&x.fx.length){
+    var cg=CK[x.window]?CK[x.window].items:[],bs=[],pl=[],nb=0,npl=0;
+    cg.forEach(function(r){if(r[0]==='plus')npl++;else nb++;});
+    (x.ck||[]).slice().sort(function(a,b){return a-b;}).forEach(function(n){var it=cg[n-1];if(it&&it[0]==='plus')pl.push(n);else bs.push(n);});
+    rows.push(['Чек-лист · основные',(bs.length?bs.join(' · ')+'  ('+bs.length+' из '+nb+')':'пока нет')]);
+    rows.push(['Чек-лист · усилители',(pl.length?pl.join(' · ')+'  ('+pl.length+' из '+npl+')':'пока нет из '+npl)]);
+    if(x.ckf&&x.ckf.length)rows.push(['Чек-лист · сработал скип','№ '+x.ckf.join(', ')]);
+    if(x.fx&&x.fx.length){var fl=x.fx.map(function(f){var good=(f.n===24);var warn=f.on&&!good&&f.n!==0&&!/за целью/.test(f.t);return (f.on?(good?'＋ ':(warn?'⚠ ':'· ')):'· ')+(f.n?'№'+f.n+' ':'')+f.t;});
+      rows.push(['FVG · инфо (вход не блокируют)','<span class="fxl">'+fl.map(function(z){return z.replace(/&/g,'&amp;').replace(/</g,'&lt;');}).join('<br>')+'</span>']);}}
   return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:(typeof curR!=='undefined'?curR:null)};
 }
 function renderLive(m){
@@ -711,7 +738,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(c.curR&&(stc==='signal'||stc==='trade'))stt+=' · '+c.curR;if(my&&my.open){stc='trade';stt='В сделке'+(c.curR?' · '+c.curR:'');}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
@@ -905,7 +932,7 @@ renderHist();
   var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/';
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
-      note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:r.ck,ckf:r.ckf};
+      note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:r.ck,ckf:r.ckf,fx:r.fx};
     var c=liveCard(x);
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||'');
     if(isTP||isSL){c.res=isTP?'TP':'SL';c.stT=isTP?'Закрыта · TP':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}

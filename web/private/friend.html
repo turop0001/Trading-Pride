@@ -248,7 +248,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
