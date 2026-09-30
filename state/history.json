@@ -90,5 +90,16 @@
       "m5": "state/shots/2026-09-29_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-09-29_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-09-30_EURUSD_A",
+    "date": "2026-09-30",
+    "symbol": "EURUSD",
+    "type": "A",
+    "side": "short",
+    "entry": 1.13523,
+    "stop": 1.13601,
+    "target": 1.13367,
+    "result": "сигнал Пульта в 12:10 Рига"
   }
 ]
