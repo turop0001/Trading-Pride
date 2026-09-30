@@ -390,6 +390,11 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     # 2. противоположная сторона снята первой
     if other and (not need or other[0] < need[0]):
         skips.append('противоположная сторона бокса снята первой')
+    else:
+        # вынос ТЕНЬЮ противоположной стороны раньше нашего выноса — тоже снятие (тест 2024–26: WR 17–21% vs 40–44%)
+        _ow = [i for i in range(len(W)) if (Hh[i] > boxH if sd == 1 else Ll[i] < boxL)]
+        if _ow and (not need or _ow[0] < need[0]):
+            skips.append('противоположная сторона бокса снята тенью первой')
 
     _bs = pd.Timestamp(dt.datetime.combine(today, dt.time(0, 0)) + dt.timedelta(minutes=ba) - dt.timedelta(hours=off), tz='UTC')
     _be = _bs + dt.timedelta(minutes=bb - ba)
