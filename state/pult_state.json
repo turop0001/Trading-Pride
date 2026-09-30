@@ -411,15 +411,6 @@
   "_log": [
     {
       "date": "2026-09-30",
-      "time": "12:40",
-      "window": "A",
-      "text": "изменилось: EURUSD",
-      "lines": [
-        "🟢 EURUSD (🔻 SHORT) — ВХОД в 12:10"
-      ]
-    },
-    {
-      "date": "2026-09-30",
       "time": "12:41",
       "window": "A",
       "text": "без изменений",
@@ -974,11 +965,19 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "14:00",
+      "window": "—",
+      "text": "окно A закрыто, отчёт отправлен",
+      "lines": []
     }
   ],
   "_flags": {
     "date": "2026-09-30",
-    "openA": true
+    "openA": true,
+    "closeA": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
