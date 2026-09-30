@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       if (op === 'add' && doc && typeof doc === 'object') {
         newId = 'j' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
         const clean = {};
-        ['symbol', 'type', 'side', 'date', 'out', 'r', 'note', 'why', 'ts'].forEach((k) => { if (doc[k] !== undefined) clean[k] = doc[k]; });
+        ['symbol', 'type', 'side', 'date', 'out', 'r', 'usd', 'note', 'why', 'ts'].forEach((k) => { if (doc[k] !== undefined) clean[k] = doc[k]; });
         items.push({ id: newId, ...clean });
       } else if (op === 'del' && id) {
         items = items.filter((x) => x.id !== id);

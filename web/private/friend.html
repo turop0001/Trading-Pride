@@ -234,7 +234,7 @@ function renderLive(m){
   var ln=$('liveLine');
   ln.appendChild(document.createTextNode((today?'Окно '+m.window+' · проверено в '+m.time+' Рига — ':'Последняя проверка '+m.date+' '+m.time+' — ')));
   var t=el('span',m.text==='без изменений'?null:'chg',m.text||'');ln.appendChild(t);
-  ln.appendChild(el('small',null,'обновляется каждые 5 минут в окнах A/C'));
+  ln.appendChild(el('small',null,'обновляется каждую минуту в окнах A/C'));
   $('repNote').textContent=(today?'Окно '+m.window+' — проверено в '+m.time+' Рига: ':'Последняя проверка '+m.date+' '+m.time+': ')+(m.text||'');
 }
 var DW={long:'LONG',short:'SHORT',side:'БОКОВИК'};
