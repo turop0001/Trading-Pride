@@ -411,13 +411,6 @@
   "_log": [
     {
       "date": "2026-09-30",
-      "time": "12:50",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-09-30",
       "time": "12:51",
       "window": "A",
       "text": "без изменений",
@@ -976,6 +969,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "16:46",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -1082,11 +1082,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4186.65,
+    "price": 4183.5,
     "boxH": 4219.34,
     "boxL": 4176.5,
     "reasons": [],
-    "checked_at": "16:45",
+    "checked_at": "16:46",
     "ck": [
       1
     ],
@@ -1112,11 +1112,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.13561,
+    "price": 1.13578,
     "boxH": 1.13803,
     "boxL": 1.13452,
     "reasons": [],
-    "checked_at": "16:45",
+    "checked_at": "16:46",
     "ck": [
       1
     ],
@@ -1142,11 +1142,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.32842,
+    "price": 1.32836,
     "boxH": 1.33113,
     "boxL": 1.32554,
     "reasons": [],
-    "checked_at": "16:45",
+    "checked_at": "16:46",
     "ck": [
       1
     ],
