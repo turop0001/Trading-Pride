@@ -2,13 +2,13 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4191.38,
+    "price": 4188.44,
     "boxH": 4194.91,
     "boxL": 4165.81,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1,
       2,
@@ -63,11 +63,11 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13523,
+    "price": 1.13526,
     "boxH": 1.13572,
     "boxL": 1.1329,
     "reasons": [],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1,
       2,
@@ -124,11 +124,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32672,
+    "price": 1.327,
     "boxH": 1.32611,
     "boxL": 1.32232,
     "reasons": [],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1
     ],
@@ -159,11 +159,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7678.6,
+    "price": 7682.4,
     "boxH": 7693.4,
     "boxL": 7673.6,
     "reasons": [],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1,
       2,
@@ -217,11 +217,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30320.4,
+    "price": 30350.1,
     "boxH": 30462.1,
     "boxL": 30265.9,
     "reasons": [],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1,
       2,
@@ -275,13 +275,13 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51465.0,
+    "price": 51480.0,
     "boxH": 51583.0,
     "boxL": 51454.0,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1,
       2,
@@ -334,13 +334,6 @@
     }
   },
   "_log": [
-    {
-      "date": "2026-09-30",
-      "time": "10:55",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-09-30",
       "time": "10:56",
@@ -901,6 +894,13 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "12:15",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -935,11 +935,11 @@
   "GER40_A": {
     "sym": "GER40",
     "window": "A",
-    "price": 25374.7,
+    "price": 25390.7,
     "boxH": 25580.6,
     "boxL": 25446.6,
     "reasons": [],
-    "checked_at": "12:14",
+    "checked_at": "12:15",
     "ck": [
       1,
       2,
