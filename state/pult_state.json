@@ -2,13 +2,13 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4185.5,
+    "price": 4185.0,
     "boxH": 4194.91,
     "boxL": 4165.81,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1,
       2,
@@ -63,11 +63,11 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13554,
+    "price": 1.13558,
     "boxH": 1.13572,
     "boxL": 1.1329,
     "reasons": [],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1,
       2,
@@ -176,11 +176,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32921,
+    "price": 1.32919,
     "boxH": 1.32611,
     "boxL": 1.32232,
     "reasons": [],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1
     ],
@@ -211,11 +211,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7672.9,
+    "price": 7673.1,
     "boxH": 7693.4,
     "boxL": 7673.6,
     "reasons": [],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1,
       2,
@@ -281,11 +281,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30315.9,
+    "price": 30315.7,
     "boxH": 30462.1,
     "boxL": 30265.9,
     "reasons": [],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1,
       2,
@@ -339,13 +339,13 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51364.0,
+    "price": 51368.0,
     "boxH": 51583.0,
     "boxL": 51454.0,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1,
       2,
@@ -408,13 +408,6 @@
     }
   },
   "_log": [
-    {
-      "date": "2026-09-30",
-      "time": "12:31",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-09-30",
       "time": "12:32",
@@ -973,6 +966,13 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "13:51",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -1011,7 +1011,7 @@
     "boxH": 25580.6,
     "boxL": 25446.6,
     "reasons": [],
-    "checked_at": "13:50",
+    "checked_at": "13:51",
     "ck": [
       1,
       2,
