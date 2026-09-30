@@ -73,8 +73,10 @@ def prev_trading_date(d):
 
 def _completed(df, now_utc, minutes):
     """Оставляем только ЗАКРЫТЫЕ бары (последний бар yfinance часто ещё формируется)."""
+    # 30.09.2026: запас 40 с после закрытия бара — на границе (тик в :01) источник (MT5-мост) ещё отдаёт
+    # незавершённый бар: в 10:05 цена 4195,03 «закрылась» выше бокса (СКИП), в 10:06 итоговое закрытие 4193,90.
     end = df.index + pd.Timedelta(minutes=minutes)
-    return df[end <= pd.Timestamp(now_utc, tz='UTC')]
+    return df[end <= pd.Timestamp(now_utc, tz='UTC') - pd.Timedelta(seconds=40)]
 
 
 def _resample(d, rule, offset=None):
@@ -130,8 +132,9 @@ def fvg_ctx(sd, d, now_utc, off, extreme, price, box_a, box_b, sweep_t0, fmtp, t
                     if f['dir'] == sd and f['inv_t'] is None and f['lo'] - 0.2 * at <= extreme <= f['hi'] + 0.2 * at:
                         b.append(f'{nm} {rng(f)}')
                         break
-            A_(24, b, ('батут ' + ', '.join(b)) if b else 'батута под выносом нет')
+            A_(0, b, ('справка: батут ' + ', '.join(b)) if b else 'справка: батута под выносом нет')
         # встречные на пути
+        _pre = []
         for nm, F, n_ in (('H1', F1, 21), ('H4', F4, 21)):
             cand = [f for f in F if f['dir'] == -sd and f['inv_t'] is None and ((f['lo'] > price) if sd == 1 else (f['hi'] < price))]
             if cand:
@@ -140,7 +143,12 @@ def fvg_ctx(sd, d, now_utc, off, extreme, price, box_a, box_b, sweep_t0, fmtp, t
                 pre = ''
                 if tp is not None:
                     pre = ', до цели 2R' if ((lvl < tp) if sd == 1 else (lvl > tp)) else ', за целью 2R'
+                _pre.append(pre)
                 A_(n_, True, f'встречный {nm} {rng(f)}{pre}')
+        # УСИЛИТЕЛЬ (тест Dukascopy 2024–26: Тип A 71% против 53%, Тип C 74% против 51%): встречный FVG есть, но ЗА целью 2R, между входом и целью — нет
+        if tp is not None:
+            _far = bool(_pre) and all(x == ', за целью 2R' for x in _pre)
+            A_(24, _far, 'встречный FVG за целью 2R, до цели чисто (усилитель)' if _far else 'встречного FVG за целью 2R (при чистом пути) нет')
         # H4 встречный с реакцией (касание + отскок)
         r4 = [f for f in F4 if f['dir'] == -sd and f['inv_t'] is None and f['reject']]
         if r4:
