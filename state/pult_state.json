@@ -411,13 +411,6 @@
   "_log": [
     {
       "date": "2026-09-30",
-      "time": "12:41",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-09-30",
       "time": "12:42",
       "window": "A",
       "text": "без изменений",
@@ -972,12 +965,24 @@
       "window": "—",
       "text": "окно A закрыто, отчёт отправлен",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "16:35",
+      "window": "C",
+      "text": "отчёт открытия окна отправлен",
+      "lines": [
+        "🟡 XAUUSD (—) — НАБЛЮДАЕМ",
+        "🟡 EURUSD (—) — НАБЛЮДАЕМ",
+        "🟡 GBPUSD (—) — НАБЛЮДАЕМ"
+      ]
     }
   ],
   "_flags": {
     "date": "2026-09-30",
     "openA": true,
-    "closeA": true
+    "closeA": true,
+    "openC": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
@@ -1077,97 +1082,91 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4156.75,
-    "boxH": 4161.3,
-    "boxL": 4137.73,
+    "price": 4193.55,
+    "boxH": 4219.34,
+    "boxL": 4176.5,
     "reasons": [],
-    "checked_at": "18:29",
-    "extreme": 4165.43,
-    "line_status": "prep",
-    "direction": "🔻 SHORT",
-    "note": "ВЫНОС (в 18:10, ждём подтверждения)",
-    "status_key": "ВЫНОС (в 18:10, ждём подтверждения)",
-    "tg_note": "ВЫНОС",
+    "checked_at": "16:35",
+    "ck": [
+      1
+    ],
+    "ckf": [],
+    "line_status": "watch",
+    "direction": "—",
+    "note": "НАБЛЮДАЕМ",
+    "status_key": "НАБЛЮДАЕМ",
+    "tg_note": "НАБЛЮДАЕМ",
     "stale": false,
-    "date": "2026-09-29",
+    "date": "2026-09-30",
     "trend_h1": {
       "tr": "шорт",
-      "ratio": -2.73,
-      "pct": -3.8
+      "ratio": -2.12,
+      "pct": -3.18
     },
     "trend_d1": {
-      "tr": "шорт",
-      "ratio": -2.79,
-      "pct": -3.28
+      "tr": "боковик",
+      "ratio": -1.14,
+      "pct": -2.3
     }
   },
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.13313,
-    "boxH": 1.13581,
-    "boxL": 1.13326,
+    "price": 1.13628,
+    "boxH": 1.13803,
+    "boxL": 1.13452,
     "reasons": [],
-    "checked_at": "18:29",
-    "extreme": 1.13295,
-    "line_status": "prep",
-    "direction": "▲ LONG",
-    "note": "ВЫНОС (в 18:20, ждём подтверждения)",
-    "status_key": "ВЫНОС (в 18:20, ждём подтверждения)",
-    "tg_note": "ВЫНОС",
+    "checked_at": "16:35",
+    "ck": [
+      1
+    ],
+    "ckf": [],
+    "line_status": "watch",
+    "direction": "—",
+    "note": "НАБЛЮДАЕМ",
+    "status_key": "НАБЛЮДАЕМ",
+    "tg_note": "НАБЛЮДАЕМ",
     "stale": false,
-    "date": "2026-09-29",
+    "date": "2026-09-30",
     "trend_h1": {
       "tr": "шорт",
-      "ratio": -2.8,
-      "pct": -0.9
+      "ratio": -1.82,
+      "pct": -0.63
     },
     "trend_d1": {
       "tr": "шорт",
-      "ratio": -4.93,
-      "pct": -1.6
+      "ratio": -3.62,
+      "pct": -1.56
     }
   },
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.32059,
-    "boxH": 1.32525,
-    "boxL": 1.32213,
+    "price": 1.32927,
+    "boxH": 1.33113,
+    "boxL": 1.32554,
     "reasons": [],
-    "checked_at": "18:29",
-    "signal": {
-      "date": "2026-09-29",
-      "window": "C",
-      "time": "16:40",
-      "t_utc": "2026-09-29 13:40:00+00:00",
-      "entry": 1.3223,
-      "stop": 1.32174,
-      "tp": 1.32341,
-      "side": "long",
-      "src": "MT5"
-    },
-    "exit_time": "17:45",
-    "line_status": "skip",
-    "direction": "▲ LONG",
-    "note": "ВХОД → SL −1R",
-    "status_key": "ВХОД → SL −1R",
-    "tg_note": "ЗАКРЫТА - SL",
+    "checked_at": "16:35",
+    "ck": [
+      1
+    ],
+    "ckf": [],
+    "line_status": "watch",
+    "direction": "—",
+    "note": "НАБЛЮДАЕМ",
+    "status_key": "НАБЛЮДАЕМ",
+    "tg_note": "НАБЛЮДАЕМ",
     "stale": false,
-    "date": "2026-09-29",
-    "shots": {
-      "m5": "state/shots/2026-09-29_GBPUSD_C_m5.png",
-      "h1": "state/shots/2026-09-29_GBPUSD_C_h1.png"
-    },
+    "date": "2026-09-30",
     "trend_h1": {
       "tr": "шорт",
-      "ratio": -2.62,
-      "pct": -1.0
+      "ratio": -1.16,
+      "pct": -0.46
     },
     "trend_d1": {
       "tr": "шорт",
-      "ratio": -5.14,
-      "pct": -1.93
+      "ratio": -3.09,
+      "pct": -1.56
     }
   },
   "XAUUSD_trend": {
