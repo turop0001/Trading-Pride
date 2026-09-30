@@ -411,15 +411,6 @@
   "_log": [
     {
       "date": "2026-09-30",
-      "time": "13:05",
-      "window": "A",
-      "text": "изменилось: EURUSD",
-      "lines": [
-        "🔴 EURUSD (🔻 SHORT) — ЗАКРЫТА - SL в 13:00"
-      ]
-    },
-    {
-      "date": "2026-09-30",
       "time": "13:06",
       "window": "A",
       "text": "без изменений",
@@ -976,6 +967,13 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "17:01",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -1082,11 +1080,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4182.66,
+    "price": 4177.59,
     "boxH": 4219.34,
     "boxL": 4176.5,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:01",
     "ck": [
       1
     ],
@@ -1112,11 +1110,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.13586,
+    "price": 1.13558,
     "boxH": 1.13803,
     "boxL": 1.13452,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:01",
     "ck": [
       1
     ],
@@ -1142,11 +1140,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.32852,
+    "price": 1.32822,
     "boxH": 1.33113,
     "boxL": 1.32554,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:01",
     "ck": [
       1
     ],
