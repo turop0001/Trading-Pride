@@ -978,7 +978,8 @@
     "closeA": true,
     "openC": true,
     "closeC": true,
-    "summary": true
+    "summary": true,
+    "final": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
