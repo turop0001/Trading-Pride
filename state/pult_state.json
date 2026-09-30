@@ -2,13 +2,13 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4186.5,
+    "price": 4188.49,
     "boxH": 4194.91,
     "boxL": 4165.81,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1,
       2,
@@ -63,11 +63,11 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.13564,
+    "price": 1.13582,
     "boxH": 1.13572,
     "boxL": 1.1329,
     "reasons": [],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1,
       2,
@@ -176,11 +176,11 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32951,
+    "price": 1.32975,
     "boxH": 1.32611,
     "boxL": 1.32232,
     "reasons": [],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1
     ],
@@ -211,17 +211,18 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7673.6,
+    "price": 7674.8,
     "boxH": 7693.4,
     "boxL": 7673.6,
     "reasons": [],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1,
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
     "ckf": [],
     "prevH": 7689.0,
@@ -281,11 +282,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30312.2,
+    "price": 30320.7,
     "boxH": 30462.1,
     "boxL": 30265.9,
     "reasons": [],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1,
       2,
@@ -339,13 +340,13 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51384.0,
+    "price": 51394.0,
     "boxH": 51583.0,
     "boxL": 51454.0,
     "reasons": [
       "противоположная сторона бокса снята первой"
     ],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1,
       2,
@@ -408,13 +409,6 @@
     }
   },
   "_log": [
-    {
-      "date": "2026-09-30",
-      "time": "12:20",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-09-30",
       "time": "12:21",
@@ -973,6 +967,13 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-09-30",
+      "time": "13:40",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -1007,11 +1008,11 @@
   "GER40_A": {
     "sym": "GER40",
     "window": "A",
-    "price": 25365.7,
+    "price": 25372.7,
     "boxH": 25580.6,
     "boxL": 25446.6,
     "reasons": [],
-    "checked_at": "13:39",
+    "checked_at": "13:40",
     "ck": [
       1,
       2,
@@ -1055,7 +1056,7 @@
         "t": "вынос образовал встречный H1 25412.7–25447.7"
       }
     ],
-    "extreme": 25355.7,
+    "extreme": 25352.7,
     "line_status": "prep",
     "direction": "▲ LONG",
     "note": "ВЫНОС (лоя в 11:35, ждём выкуп)",
