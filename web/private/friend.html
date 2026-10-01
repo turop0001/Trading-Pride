@@ -1,4 +1,23 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.pills{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.pxp{display:flex;flex-wrap:wrap;gap:6px}
+.pl{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;border:1px solid var(--border);background:var(--surface-2);color:var(--text);white-space:nowrap}
+.pl i{font-style:normal;font-weight:500;opacity:.75;font-size:11.5px}.pl b{font-family:var(--mono)}.pl small{font-family:var(--mono);opacity:.7;font-size:11px}
+.pl.base{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}.pl.plus,.pl.long,.pl.prob-high{background:var(--long-bg);color:var(--long);border-color:var(--long)}
+.pl.minus,.pl.short,.pl.prob-low{background:var(--short-bg);color:var(--short);border-color:var(--short)}.pl.side,.pl.prob-mid{background:var(--side-bg);color:var(--side);border-color:var(--side)}
+.pl.req{background:var(--short-bg);color:var(--short);border-color:var(--short)}.pl.cond{background:var(--off-bg);color:var(--off);border-color:var(--off)}.pl.warn{background:var(--side-bg);color:var(--side);border-color:var(--side)}
+.pl.tr i{opacity:1;font-weight:800;font-size:12.5px;color:var(--text);padding-right:7px;margin-right:2px;border-right:1px solid currentColor;letter-spacing:.02em}
+.pxp.st3{flex-wrap:nowrap;gap:5px}.pxp.st3 .pl{padding:4px 9px;font-size:12px;gap:4px;min-width:0}.pxp.st3 .pl.tr i{font-size:12px;padding-right:5px}.pxp.st3 .pl.rec{font-size:15px;padding:5px 11px;gap:6px;border-width:2px}.pxp.st3 .pl.rec i{font-size:10.5px;padding-right:6px}.pxp.st3 .pl small{font-size:10px}@media(max-width:560px){.pxp.st3{flex-wrap:wrap}}
+.pl.rec{font-weight:800;font-size:17px;padding:7px 18px;gap:8px;border-width:2px;letter-spacing:.01em}.pl.rec i{font-size:13px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.04em;padding-right:8px;border-right:1px solid currentColor}.pl.prob-high,.pl.prob-mid,.pl.prob-low{font-size:15.5px;font-weight:800;padding:6px 16px;border-width:2px}.pl.prob-high::before,.pl.prob-mid::before,.pl.prob-low::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pxn{display:flex;flex-direction:column;gap:5px}.pxn .nl{display:block;font-size:13.5px;font-weight:500;padding:3px 10px;border-left:3px solid var(--border);background:var(--surface-2);border-radius:0 8px 8px 0}
+.pxn .nl.long{border-left-color:var(--long);color:var(--long);font-weight:700}.pxn .nl.short{border-left-color:var(--short);color:var(--short);font-weight:700}.pxn .nl.side{border-left-color:var(--side);color:var(--side);font-weight:700}.pxn .nl.liq{color:var(--muted);border-left-color:var(--blue)}
+details.pxc{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:6px 10px;width:100%}details.pxc>summary{cursor:pointer;list-style:none;display:block}details.pxc>summary::-webkit-details-marker{display:none}
+.pxh{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700}.pxh em{font-style:normal;font-family:var(--mono);font-weight:600}
+.pxc.k-req .pxh{color:var(--short)}.pxc.k-cond .pxh{color:var(--off)}.pxc.k-plus .pxh{color:var(--long)}.pxc.k-minus .pxh{color:var(--side)}
+.pxbar{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:5px 0}.pxbar i{display:block;height:100%;border-radius:99px}
+.pxchips{display:flex;flex-wrap:wrap;gap:4px}.pxchips .ch{min-width:26px;text-align:center;padding:1px 7px;border-radius:7px;font-size:12px;font-family:var(--mono);border:1px solid var(--border);color:var(--muted)}
+.pxc.k-req .ch.on{background:var(--short);border-color:var(--short);color:#fff}.pxc.k-cond .ch.on{background:var(--off);border-color:var(--off);color:#fff}.pxc.k-plus .ch.on{background:var(--long);border-color:var(--long);color:#fff}.pxc.k-minus .ch.on{background:var(--side);border-color:var(--side);color:#fff}
+.pxd{margin-top:8px;display:flex;flex-direction:column;gap:3px}.pxd div{font-size:12.5px;font-weight:400;color:var(--muted)}.pxd div.on{color:var(--text);font-weight:600}
+.st.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}
+</style></head><body>
 
 
 
@@ -216,16 +235,98 @@ function rigaMinutesNow(){
   catch(e){return 0;}
 }
 function winRank(w){var cFirst=rigaMinutesNow()>=840;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
+var CK={
+ A:{title:'Тип A',when:WA+' Рига',items:[
+  ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40)','правило одно для всех 7; по тесту сильнее всех индексы США.'],
+  ['base','Азия вышла за вчерашний бокс только с одной стороны — есть сторона сделки','лонг: хай Азии выше вчерашнего, а лой не ниже; шорт — зеркально.'],
+  ['base','Вынос границы Азии тенью в окне 10:00–14:00 в сторону сделки','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая Азии. Экстремум выноса — самая дальняя точка.'],
+  ['base','V-разворот: свеча входа не позже 5 свечей M5 после экстремума выноса','затяжной разворот (позже 5 свечей) не берём.'],
+  ['base','M5 FVG выноса перекрыт закрытиями (или его нет)','пока закрытие свечи выкупа не вышло за дальнюю границу FVG — входа нет.'],
+  ['base','Триггер входа есть: ≥3 сильные свечи (тело ≥60% диапазона) ИЛИ откат ≥30% пути от экстремума к границе Азии','вход по открытию следующей свечи после триггера.'],
+  ['base','Параметры сделки заданы: стоп = экстремум выноса − 0,3 ATR(M5, 14), цель 2R, закрытие не позже 22:00 Рига','стоп не переносим; не дошли ни до цели, ни до стопа — закрываем по рынку в 22:00.'],
+  ['skip','Азия не внутри вчерашней и не шире неё с обеих сторон — сторона сделки есть','внутренний день и обхват с обеих сторон — сетапа нет.'],
+  ['skip','Направление сделки совпадает со стороной Азии','не берём контртренд к стороне Азии.'],
+  ['skip','Вынос и вход случились до 14:00 Рига','свеча входа должна открыться до 14:00.'],
+  ['skip','Внутри цели 1:2 нет встречного H1 FVG','встречный непробитый H1 FVG между входом и целью 2R — скип.'],
+  ['skip','Это первый вход по инструменту за день','после SL/TP повторного входа нет.'],
+  ['plus','Батут: под лоем Азии (для шорта — над хаем) лежит нетронутый H1 FVG в сторону сделки','цена, снявшая лой, отталкивается от FVG; ищем ближе 50% длины Азии (параметр уточнён мной).'],
+  ['plus','На пути к цели есть ликвидность в пределах 30% длины Азии от границы Азии','хай/лой H1 и D1, вчерашний день/Лондон: цена тянется забрать её.'],
+  ['plus','По тренду: сторона сделки совпадает с рекомендацией структуры (Swing и Sub)','структура — только контекст, правилом входа не является.'],
+  ['minus','У стороны выноса нет несобранной ликвидности в пределах 30% длины Азии','если она есть — цена захочет её снять, выкупа может не быть (ухудшитель).']],
+  mng:'<b>После входа:</b> цель 2R, стоп не переносим, в 22:00 Рига закрываем по рынку. Структура Swing/Sub, ликвидность и FVG H1 показываются в карточке и влияют на оценку вероятности, но вход определяют только пункты 1–12. Мои бэктесты (451 сделка, 2022–2026): WR 78%, +602R при 1:2 — см. вкладку «Аналитика».'},
+ C:{title:'Тип C',when:WC+' Рига',items:[
+  ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD)','только 3 инструмента, на которых тип протестирован.'],
+  ['base','Бокс Лондона 11:00–16:25 Рига сформирован','границы бокса — хай и лой 11:00–16:25.'],
+  ['base','Вынос границы бокса в окне 16:30–18:30 (закрытием тела или тенью): вниз → лонг, вверх → шорт','вчерашний Лондон не важен.'],
+  ['base','Свечей выноса не больше 4 (доджи с коротким телом не считаются)','если дольше — скип.'],
+  ['base','Вход: выкуп ≥30% длины выноса (от экстремума к границе бокса) — ИЛИ, если вынос одной свечой, поглощение этой свечи','вынос одной свечой (неважно, телом или тенью за границу бокса) — вход только на её поглощении: закрытие выше хая этой свечи (шорт — ниже лоя), по закрытию. Иначе вход на уровне выкупа 30%.'],
+  ['base','Параметры сделки заданы: стоп за экстремумом + 0,1R, цель 2R, стоп в БУ на 70% пути к цели','0,1R считаю от расстояния вход–экстремум (моё допущение, уточните при необходимости).'],
+  ['skip','Нет широкого M5 FVG (длина ≥2× средней свечи Лондона за последние 20) в 3 свечах перед экстремумом','широкий FVG перед экстремумом — скип.'],
+  ['skip','Внутри цели 1:2 нет встречного H1 FVG','непробитый встречный H1 FVG на пути от входа — скип.'],
+  ['skip','Стоп не меньше 0,25 ATR(M5) — исполнимо со спредом','моя защита: при микростопе спред съедает сделку; в ваши правила не входило.'],
+  ['skip','Это первый вход по инструменту за день','после SL/TP/БУ повторного входа нет.'],
+  ['plus','Батут: H1 FVG, от которого отреагировали свечи выноса и пошёл выкуп','экстремум выноса внутри/рядом с H1 FVG в сторону сделки.'],
+  ['plus','Тренд не против: по тренду или боковик (структура Swing + Sub)','тренд правилом не является — только усилитель.']],
+  mng:'<b>После входа:</b> цель 2R, на 70% пути стоп переносим в безубыток. Структура и ликвидность — только контекст в карточке. Мои бэктесты Типа C (44 сделки, 07–09.2026): WR 84%, +67R — см. вкладку «Аналитика».'}
+};
+(function(){var o={base:0,skip:1,plus:2,minus:3,half:4};['A','C'].forEach(function(t){
+  var it=CK[t].items.map(function(x,i){return {x:x,i:i};});
+  it.sort(function(a,b){return o[a.x[0]]-o[b.x[0]]||a.i-b.i;});
+  CK[t].items=it.map(function(z){return z.x;});});})();
+function escA(t){return String(t||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function trPill(lbl,v){v=String(v||'—');var up=/▲/.test(v),dn=/▼/.test(v),cls=up?'long':dn?'short':'side';
+  var w=up?'рост':dn?'падение':/сжат/.test(v)?'сжатие':/расшир/.test(v)?'расширение':v.replace(/[◆▲▼]\s*/,'');
+  var code=(v.match(/HH\/HL|LH\/LL/)||[''])[0];
+  return '<span class="pl tr '+cls+'"><i>'+lbl+'</i> '+(up?'▲':dn?'▼':'◆')+' '+w+(code?' <small>'+code+'</small>':'')+'</span>';}
+function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<2)return null;
+  return '<div class="pxn">'+p.map(function(t){var c=/^слом/i.test(t)?'short':/вероятнее вверх/i.test(t)?'long':/вероятнее вниз/i.test(t)?'short':/неясно/i.test(t)?'side':/^Ликвидность/i.test(t)?'liq':'';
+    return '<span class="nl '+c+'">'+t.charAt(0).toUpperCase()+t.slice(1)+'</span>';}).join('')+'</div>';}
+function ckBlock(kind,title,nums,cgi,pick){
+  var items=[];cgi.forEach(function(r,i){if(pick(r))items.push([i+1,r[1]]);});
+  var tot=items.length,n=0;items.forEach(function(it){if(nums.indexOf(it[0])>=0)n++;});
+  var p=tot?n/tot:0,col=kind==='req'?'var(--short)':kind==='cond'?'var(--off)':kind==='plus'?'var(--long)':'var(--side)';
+  var head=kind==='minus'?(n?n+' из '+tot+' · условие не выполнено':'нет · всё в порядке'):kind==='plus'?(n+' из '+tot+(n?'':' · не сработали')):(n+' из '+tot+(n?'':' · пока ничего'));
+  var chips=items.map(function(it){return '<span class="ch'+(nums.indexOf(it[0])>=0?' on':'')+'" title="'+escA(it[1])+'">'+it[0]+'</span>';}).join('');
+  var det=items.map(function(it){var on=nums.indexOf(it[0])>=0;return '<div class="'+(on?'on':'')+'">'+(on?(kind==='minus'?'✕ ':'✓ '):'○ ')+it[0]+'. '+escA(it[1])+'</div>';}).join('');
+  return '<div class="pxw"><details class="pxc k-'+kind+'"><summary><div class="pxh"><span>'+(kind==='req'?'Обязательные':kind==='cond'?'Условия входа':kind==='plus'?'Что усиливает':'Что ухудшает')+'</span><em>'+head+'</em></div><div class="pxbar"><i style="width:'+Math.round((kind==='minus'?(tot?n/tot:0):p)*100)+'%;background:'+col+'"></i></div><div class="pxchips">'+chips+'</div></summary><div class="pxd">'+det+'</div></details></div>';}
 function liveCard(x){
   var dir=String(x.direction||''),es=/SHORT/.test(dir)?'short':/LONG/.test(dir)?'long':null;
   var m=STMAP[x.status]||['watch','Наблюдаем'];
-  var rows=[['Направление (направление рынка)',dir||'—'],['Статус',x.note||'—']];
-  if(x.price!=null)rows.push(['Цена',x.price+(x.checked?' в '+x.checked+' Рига':'')]);
-  if(x.boxL!=null)rows.push([x.window==='C'?'Бокс Лондона':'Бокс Азии',x.boxL+' – '+x.boxH]);
-  if(x.prevL!=null&&x.window!=='C')rows.push(['Вчерашний бокс',x.prevL+' – '+x.prevH]);
-  if(x.status==='skip'&&x.reasons&&x.reasons.length)rows.push(['Почему скип',x.reasons.length>2?x.reasons.slice(2).join('; '):'других причин нет — основные в статусе']);
-  if(x.signal)rows.push(['Вход / стоп / цель 2R',x.signal.entry+' / '+x.signal.stop+' / '+x.signal.tp+' ('+x.signal.time+')']);
-  return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false};
+  var cgi=CK[x.window]?CK[x.window].items:[];
+  var rows=[['Направление (направление рынка)',dir||'—']];
+  var stn=x.note||'—';
+  if(x.status==='skip'&&x.ckf&&x.ckf.length&&!/→ (TP|SL)/.test(x.note||''))stn+=' · пункт №'+x.ckf.join(', ');
+  rows.push(['Статус',stn]);
+  /* структура: Swing (главная) и Sub (внутренняя) + рекомендация; только контекст, не правило входа */
+  if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
+    rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+rc+'</span></div>']);
+    if(x.struct.line){var nh=narrHTML(x.struct.line);rows.push(['Где цена',nh||String(x.struct.line)]);}}
+  if(x.window==='C'){if(x.boxH!=null&&x.boxL!=null)rows.push(['Бокс Лондона','хай '+x.boxH+' · лой '+x.boxL]);}
+  else if(x.pos)rows.push(['Цена / Бокс Азии','<div class="pxp"><span class="pl side">'+x.pos+'</span></div>']);
+  if(x.prob){var pc=x.prob==='высокая'?'high':x.prob==='низкая'?'low':'mid';
+    rows.push(['Вероятность цели','<div class="pxp"><span class="pl prob-'+pc+'">'+x.prob+'</span></div>']);}
+  if(x.ck&&x.ck.length||x.ckf&&x.ckf.length||x.worse&&x.worse.length){
+    var rq=[],cd=[],pl=[],nr=0,nc2=0,npl=0,nmin=0;
+    cgi.forEach(function(r){if(r[0]==='plus')npl++;else if(r[0]==='minus')nmin++;else if(r[0]==='base')nr++;else nc2++;});
+    (x.ck||[]).slice().sort(function(a,b){return a-b;}).forEach(function(n){var it=cgi[n-1];if(!it)return;if(it[0]==='plus')pl.push(n);else if(it[0]==='base')rq.push(n);else if(it[0]!=='minus')cd.push(n);});
+    if(nr)rows.push(['Обязательные',ckBlock('req','Обязательные',rq,cgi,function(it){return it[0]==='base';})]);
+    if(nc2)rows.push(['Условия входа',ckBlock('cond','Условия входа',cd,cgi,function(it){return it[0]!=='base'&&it[0]!=='plus'&&it[0]!=='minus';})]);
+    if(npl)rows.push(['Усилители',ckBlock('plus','Усилители',pl,cgi,function(it){return it[0]==='plus';})]);
+    if(nmin)rows.push(['Ухудшители',ckBlock('minus','Ухудшители',x.worse||[],cgi,function(it){return it[0]==='minus';})]);
+    if(x.status==='skip'&&x.ckf&&x.ckf.length&&!/→ (TP|SL)/.test(x.note||'')){
+      var fb=x.ckf.filter(function(n){return cgi[n-1]&&cgi[n-1][0]==='base';}),fs=x.ckf.filter(function(n){return !(cgi[n-1]&&cgi[n-1][0]==='base');});
+      if(fb.length)rows.push(['Не выполнено','<div class="pxp">'+fb.map(function(n){return '<span class="pl warn" title="'+escA(cgi[n-1]?cgi[n-1][1]:'')+'">№'+n+'</span>';}).join('')+'</div>']);
+      if(fs.length)rows.push(['Сработал скип','<div class="pxp">'+fs.map(function(n){return '<span class="pl minus" title="'+escA(cgi[n-1]?cgi[n-1][1]:'')+'">№'+n+'</span>';}).join('')+'</div>']);}}
+  if(x.why&&x.why.length)rows.push(['Все причины',x.why.join('; ')]);
+  if(x.sl_why)rows.push(['Разбор SL',x.sl_why]);
+  var curR=null;
+  if(x.signal){var xt=x.exit_time?' · '+x.exit_time:'',isT=/→ TP/.test(x.note||''),isS=/→ SL/.test(x.note||'');
+    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);rows.push(['Цель '+(x.signal.rr||2)+'R',x.signal.tp+(isT?xt:'')]);
+    if(x.signal.be_at)rows.push(['Стоп в БУ при',String(x.signal.be_at)+' (70% пути)']);
+    if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
+      if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
+  rows.push(['Проверено',(x.price!=null?x.price+' · ':'')+(x.checked||'—')]);
+  return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:curR};
 }
 function renderLive(m){
   if(!m){return;}
@@ -248,7 +349,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<div class="px')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
@@ -267,16 +368,16 @@ function renderRep(){
   var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/';
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
-      note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal};
+      note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:r.ck,ckf:r.ckf,fx:r.fx,
+      struct:r.struct,pos:r.pos,prob:r.prob,plus:r.plus,worse:r.worse,why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
+    var wcl=x.window==='A'?840:1110;
+    if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'14:00':'18:30')+')';x.ckf=[];}
     var c=liveCard(x);
-    var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||'');
-    if(isTP||isSL){c.res=isTP?'TP':'SL';c.stT=isTP?'Закрыта · TP':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
-    c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0&&z[0]!=='Почему скип';});
-    if(r.reasons&&r.reasons.length){var ai=c.rows.findIndex(function(z){return z[0].indexOf('Вход / стоп')===0;});var rr=['Все причины',r.reasons.join('; ')];if(ai<0)c.rows.push(rr);else c.rows.splice(ai,0,rr);}
-
+    var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||''),isBE=/→ БУ/.test(x.note||'');
+    if(isTP||isSL||isBE){c.res=isTP?'TP':isBE?'BE':'SL';c.stT=isTP?'Закрыта · TP':isBE?'Закрыта · БУ':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':isBE?'be':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
+    c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0;});
+    c._sig=r.signal||null;
     var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
-    var nar=narHtml(r.trend_h1,r.trend_d1);
-    var at=c.rows.findIndex(function(z){return z[0]==='Все причины'||z[0].indexOf('Вход / стоп')===0;});var nr=['Нарратив',nar];if(at<0)c.rows.push(nr);else c.rows.splice(at,0,nr);
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
   }

@@ -14,7 +14,29 @@ export default async function handler(req, res) {
       res.status(200).json({ items: Array.isArray(data) ? data : [] });
       return;
     }
-    const { op, item } = req.body || {};
+    const { op, item, id } = req.body || {};
+    if (op === 'del' || op === 'restore') {
+      // удаление записи из архива и восстановление (кнопка «Отменить») — полная запись возвращается как была
+      const rid = op === 'del' ? id : (item && item.id);
+      if (!rid) { res.status(400).json({ error: 'bad op' }); return; }
+      for (let a = 0; a < 3; a++) {
+        const { data, sha } = await readJson(PATH, []);
+        let items = Array.isArray(data) ? data : [];
+        if (op === 'del') items = items.filter((x) => x.id !== rid);
+        else if (!items.some((x) => x.id === rid)) items.push(item);
+        try {
+          await writeJson(PATH, items, sha, `history: ${op} ${rid}`);
+          res.status(200).json({ ok: true, items });
+          return;
+        } catch (e) {
+          if (e.status === 409 || e.status === 422) continue;
+          res.status(200).json({ ok: false, error: String(e.message) });
+          return;
+        }
+      }
+      res.status(200).json({ ok: false, error: 'конфликт записи' });
+      return;
+    }
     if (op !== 'upsert' || !item || !item.id) { res.status(400).json({ error: 'bad op' }); return; }
     for (let a = 0; a < 3; a++) {
       const { data, sha } = await readJson(PATH, []);
