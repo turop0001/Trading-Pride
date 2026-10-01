@@ -15,21 +15,6 @@
     }
   },
   {
-    "id": "2026-09-29_XAUUSD_A",
-    "date": "2026-09-29",
-    "symbol": "XAUUSD",
-    "type": "A",
-    "side": "short",
-    "entry": 4153.81,
-    "stop": 4157.93,
-    "target": 4145.57,
-    "result": "ВХОД → SL −1R",
-    "shots": {
-      "m5": "state/shots/2026-09-29_XAUUSD_A_m5.png",
-      "h1": "state/shots/2026-09-29_XAUUSD_A_h1.png"
-    }
-  },
-  {
     "id": "2026-09-29_US30_A",
     "date": "2026-09-29",
     "symbol": "US30",
