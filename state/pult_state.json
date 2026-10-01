@@ -219,13 +219,6 @@
   "_log": [
     {
       "date": "2026-10-01",
-      "time": "17:10",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-01",
       "time": "17:11",
       "window": "C",
       "text": "без изменений",
@@ -782,13 +775,21 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-10-01",
+      "time": "18:30",
+      "window": "—",
+      "text": "окно C закрыто, отчёт отправлен",
+      "lines": []
     }
   ],
   "_flags": {
     "date": "2026-10-01",
     "openA": true,
     "closeA": true,
-    "openC": true
+    "openC": true,
+    "closeC": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
