@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       const t = Date.parse(String(sg.t_utc).replace(' ', 'T').replace('+00:00', 'Z'));
       if (!t || now - t > 2 * 86400000) return;
       const note = String(r.note || '');
-      const status = note.indexOf('→ TP') >= 0 ? 'tp' : note.indexOf('→ SL') >= 0 ? 'sl' : 'open';
+      const status = note.indexOf('→ TP') >= 0 ? 'tp' : note.indexOf('→ SL') >= 0 ? 'sl' : (note.indexOf('→ БУ') >= 0 || note.indexOf('закрыта в 22:00') >= 0) ? 'closed' : 'open';
       const sym = r.sym || k.split('_')[0];
       lines.push([`${sg.date}_${sym}_${sg.window || k.split('_')[1]}`, sym, sg.side, Math.floor(t / 1000), sg.entry, sg.stop, sg.tp, status].join('|'));
     });
