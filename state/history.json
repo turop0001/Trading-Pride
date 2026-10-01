@@ -106,5 +106,16 @@
       "m5": "state/shots/2026-09-30_EURUSD_A_m5.png",
       "h1": "state/shots/2026-09-30_EURUSD_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-01_EURUSD_C",
+    "date": "2026-10-01",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 1.12639,
+    "stop": 1.12619,
+    "target": 1.12679,
+    "result": "сигнал Пульта в 17:55 Рига"
   }
 ]
