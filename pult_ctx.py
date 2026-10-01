@@ -34,6 +34,77 @@ def _trend(df, n):
     return dict(tr=tr, txt=txt, hi=h2, lo=l2, brk=brk)
 
 
+PCT, MAXPB, BUF, BUILD_BARS, BUILD_PCT = 0.30, 0.70, 0.25, 8, 0.15
+
+
+def _atr(df, n=14):
+    pc = df['Close'].shift()
+    tr = pd.concat([df['High'] - df['Low'], (df['High'] - pc).abs(), (df['Low'] - pc).abs()], axis=1).max(axis=1)
+    return tr.rolling(n).mean().bfill().values
+
+
+def _dyn(df, start=0, k=1.0):
+    """Динамический подход к структуре (видео «Динамический подход» + уточнения 01.10.2026).
+    Диапазон коррекции — от HL (LH) до экстремума. Откат >=30% диапазона создаёт HH (LL); при затяжном билдинге
+    ликвидности/консолидации достаточно >=15%. HL (LH) рождается только после закрепления ТЕЛОМ за HH (LL)
+    не менее чем на 0.25 ATR. Слом — закрытие телом за HL (LH). Откат >70% — структура под вопросом."""
+    H, L, C = (df[c].values.astype(float) for c in ('High', 'Low', 'Close'))
+    A = _atr(df) * k
+    n = len(df)
+    hi = lo = start; tr = 0; i0 = start + 1
+    for i in range(start + 1, n):
+        if H[i] > H[hi]: hi = i
+        if L[i] < L[lo]: lo = i
+        if H[hi] - L[lo] >= 3 * A[i]:
+            tr = 1 if lo < hi else -1; i0 = i + 1; break
+    if tr == 0: return None
+    piv = []; ev = []; deep = False
+    if tr == 1: anc = (lo, L[lo]); ext = (hi, H[hi]); piv.append((lo, L[lo], 'L'))
+    else: anc = (hi, H[hi]); ext = (lo, L[lo]); piv.append((hi, H[hi], 'H'))
+    pend = None
+    for i in range(i0, n):
+        up = tr == 1
+        if (C[i] < anc[1] - BUF * A[i]) if up else (C[i] > anc[1] + BUF * A[i]):
+            ev.append((i, 'CHoCH↓' if up else 'CHoCH↑'))
+            hp = pend if pend else ext
+            if not pend: piv.append((ext[0], ext[1], 'H' if up else 'L'))
+            j = hp[0] + int(np.argmin(L[hp[0]:i + 1]) if up else np.argmax(H[hp[0]:i + 1]))
+            anc = (hp[0], hp[1]); ext = (j, L[j] if up else H[j]); tr = -tr; pend = None; deep = False
+            continue
+        if pend is None:
+            if (H[i] > ext[1]) if up else (L[i] < ext[1]): ext = (i, H[i] if up else L[i])
+            rng = max(abs(ext[1] - anc[1]), 1e-9)
+            dep = ((ext[1] - L[i]) if up else (H[i] - ext[1])) / rng
+            if dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS):
+                pend = ext; piv.append((ext[0], ext[1], 'H' if up else 'L'))
+        else:
+            if (C[i] > pend[1] + BUF * A[i]) if up else (C[i] < pend[1] - BUF * A[i]):
+                j = pend[0] + int(np.argmin(L[pend[0]:i + 1]) if up else np.argmax(H[pend[0]:i + 1]))
+                piv.append((j, L[j] if up else H[j], 'L' if up else 'H'))
+                dp = ((pend[1] - L[j]) if up else (H[j] - pend[1])) / max(abs(pend[1] - anc[1]), 1e-9)
+                deep = dp > MAXPB
+                ev.append((i, 'BOS↑' if up else 'BOS↓'))
+                anc = (j, L[j] if up else H[j]); ext = (i, H[i] if up else L[i]); pend = None
+    e = pend if pend else ext
+    cur = C[-1]
+    rng = max(abs(e[1] - anc[1]), 1e-9)
+    dep = ((e[1] - cur) if tr == 1 else (cur - e[1])) / rng
+    return dict(tr=tr, anc=anc, ext=e, pend=pend is not None, dep=dep, deep=deep or dep > MAXPB, ev=ev, piv=piv, n=n)
+
+
+def _trend_dyn(df, start=0, k=1.0):
+    r = _dyn(df, start, k)
+    if r is None: return dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
+    tr = r['tr']; a, e = r['anc'][1], r['ext'][1]
+    hi, lo = (e, a) if tr == 1 else (a, e)
+    brk = ''
+    if r['ev'] and r['ev'][-1][0] >= r['n'] - 6 and r['ev'][-1][1].startswith('CHoCH'):
+        brk = 'слом вниз (закрытие телом за HL)' if r['ev'][-1][1].endswith('↓') else 'слом вверх (закрытие телом за LH)'
+    txt = 'HH/HL' if tr == 1 else 'LH/LL'
+    if r['dep'] > MAXPB: txt += ', откат глубже 70%'
+    return dict(tr=tr, txt=txt, hi=hi, lo=lo, brk=brk, dep=r['dep'], deep=r['dep'] > MAXPB, piv=r['piv'])
+
+
 def _arrow(t):
     return '▲' if t == 1 else '▼' if t == -1 else '◆'
 
@@ -87,8 +158,21 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
     if len(h1c) < 60:
         h1c = completed(resample_h1(d), now_utc, 60)
     ctx = dict(h1c=h1c)
-    sw = _trend(h4_from_h1(h1c).iloc[-120:], 2) if len(h1c) >= 60 else dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
-    sb = _trend(h1c.iloc[-300:], 3) if len(h1c) >= 60 else dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
+    sw = dict(tr=0, txt='мало данных', hi=None, lo=None, brk=''); sb = dict(sw)
+    if len(h1c) >= 60:
+        h4 = h4_from_h1(h1c).iloc[-300:]
+        try:
+            sw = _trend_dyn(h4)
+            # Sub — структура H1 внутри текущей ноги Swing (от предпоследней точки Swing)
+            s0 = 0
+            if sw.get('piv') and len(sw['piv']) >= 2:
+                t0 = h4.index[min(sw['piv'][-2][0], len(h4) - 1)]
+                s0 = int(h1c.index.searchsorted(t0))
+            h1w = h1c.iloc[-400:]
+            s0 = max(0, s0 - (len(h1c) - len(h1w)))
+            sb = _trend_dyn(h1w, s0, 0.6)
+        except Exception:
+            sw = _trend(h4_from_h1(h1c).iloc[-120:], 2); sb = _trend(h1c.iloc[-300:], 3)
     if sw['tr'] == sb['tr'] and sw['tr'] != 0: rec = 'LONG' if sw['tr'] == 1 else 'SHORT'
     else: rec = '50/50'
     ctx.update(swing=sw, sub=sb, rec=rec)
@@ -108,6 +192,7 @@ def struct_line(ctx, price, liq, fm):
         elif sw['tr'] == -1: parts.append('откат внутри нисходящего Swing' if f > 0.5 else 'импульс в нисходящем Swing')
         else: parts.append('цена внутри диапазона Swing')
     if sw.get('brk'): parts.append(sw['brk'])
+    if sw.get('deep'): parts.append('откат глубже 70% — структура под вопросом')
     parts.append({'LONG': 'вероятнее вверх', 'SHORT': 'вероятнее вниз', '50/50': 'направление неясно'}[rec])
     liqs = []
     if up: liqs.append('↑ ' + up[0]['name'])
