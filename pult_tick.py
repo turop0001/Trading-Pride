@@ -148,7 +148,7 @@ def _tg(r, closed=False):
     sg = r.get('signal') or {}
     if sg.get('time'):
         if note.startswith('ЗАКРЫТА'):
-            if r.get('exit_time'): note += f" в {r['exit_time']}"
+            if r.get('exit_time') and not note.endswith('22:00'): note += f" в {r['exit_time']}"
         elif note == 'ВХОД':
             note += f" в {sg['time']}"
     return ls, note
@@ -169,8 +169,10 @@ def result_of(res):
     for r in res.values():
         if r.get('signal'):
             n += 1
-            if 'TP' in r.get('note', ''): pct += 2.0
+            rr = float((r.get('signal') or {}).get('rr') or 2)
+            if 'TP' in r.get('note', ''): pct += rr
             elif 'SL' in r.get('note', ''): pct -= 1.0
+            elif r.get('exit_r') is not None and 'закрыта в 22:00' in r.get('note', ''): pct += float(r['exit_r'])
     return n, pct
 
 
@@ -208,17 +210,20 @@ def final_check(state, today, dstr, off, tg, did, final=True):
                 print('final fetch failed:', s, e); continue
             if d is None: continue
             long_ = sig.get('side') == 'long' or sig['tp'] > sig['entry']
-            out, tt = None, None
-            for ts, c in d[d.index > __import__('pandas').Timestamp(sig['t_utc'])].iterrows():
-                if (c['Low'] <= sig['stop']) if long_ else (c['High'] >= sig['stop']): out, tt = 'SL', ts; break
-                if (c['High'] >= sig['tp']) if long_ else (c['Low'] <= sig['tp']): out, tt = 'TP', ts; break
-            if not out: continue
-            r['note'] = 'ВХОД → TP 🎯 +2R' if out == 'TP' else 'ВХОД → SL −1R'
-            r['tg_note'] = 'ЗАКРЫТА - ' + out
+            import pult_rules as _pr
+            import pandas as _pd
+            sd_ = 1 if long_ else -1
+            tr = _pr._track({}, _pr._completed(d, dt.datetime.utcnow(), 5), sig, sd_, r.get('direction', ''), str)
+            nt = str(tr.get('note', ''))
+            if nt.startswith('В СДЕЛКЕ'): continue
+            out = 'TP' if '→ TP' in nt else ('SL' if '→ SL' in nt else 'T22')
+            if out == 'T22' and not final: continue
+            r['note'] = nt
+            r['tg_note'] = tr.get('tg_note') or ('ЗАКРЫТА - ' + out)
+            if tr.get('exit_r') is not None: r['exit_r'] = tr['exit_r']
             if out == 'SL':
-                import pult_rules as _pr
-                r['autopsy'] = _pr.autopsy(sig, -1 if long_ is False else 1, d, r)
-            r['line_status'] = 'entry' if out == 'TP' else 'skip'
+                r['autopsy'] = tr.get('autopsy') or _pr.autopsy(sig, sd_, d, r)
+            r['line_status'] = 'skip' if out == 'SL' else 'entry'
             r['status_key'] = r['note']
             try:
                 import shots as _sh
@@ -231,10 +236,16 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             except Exception as e:
                 print('final history failed:', e)
             state[f'{s}_{w}'] = r
-            tm = (tt + __import__('pandas').Timedelta(hours=off)).strftime('%H:%M')
+            tm = tr.get('exit_time') or '22:00'
             r['exit_time'] = tm
-            upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
-                       f"({'+2.0%' if out == 'TP' else '-1.0%'} депозита)")
+            rr_ = float(sig.get('rr') or 2)
+            if out == 'T22':
+                xr = float(r.get('exit_r') or 0)
+                upd.append(f"{EMO_TP if xr > 0 else EMO_SL} {s} ({r['direction']}) — закрыта в 22:00 Рига "
+                           f"({xr:+.1f}% депозита)")
+            else:
+                upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
+                           f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
     if upd:
         total = 0.0
         for w in ('A', 'C'):
@@ -278,7 +289,7 @@ def main(send=True):
             if r.pop('new_signal', False): sigs.append(r)
             state[f'{s}_{win}'] = r
         if first:
-            nxt = ('C', '16:30') if win == 'A' else (None, None)
+            nxt = ('C', '16:30') if (win == 'A' and lc.C_ENABLED) else (None, None)
             txt = build_window_open(dstr, win, '10:00–14:00' if win == 'A' else '16:30–18:30', lines_for(win, res), *nxt)
             if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00 Рига."
             tg(txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
@@ -295,7 +306,7 @@ def main(send=True):
             except Exception as e:
                 print('history add failed:', e)
             tg(build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], 1.0,
-                            note='по правилам Пульта — проверь график')); did.append('signal')
+                            note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2)); did.append('signal')
         return text, syms, changed
 
     text, syms, changed_lines = None, [], []
@@ -309,7 +320,7 @@ def main(send=True):
             flags['allskip' + window] = True
             text = (text + '; ' if text and text != 'без изменений' else '') + 'все инструменты — СКИП, ждём закрытия окна'
     if wd < 5:
-        for w, close_m, rng, nxt in (('A', 840, '10:00–14:00', ('C', '16:30')), ('C', 1110, '16:30–18:30', (None, None))):
+        for w, close_m, rng, nxt in (('A', 840, '10:00–14:00', ('C', '16:30') if lc.C_ENABLED else (None, None)), ('C', 1110, '16:30–18:30', (None, None))):
             if m >= close_m and flags.get('open' + w) and not flags.get('close' + w):
                 res = {s: state.get(f'{s}_{w}', {}) for s in syms_of(w) if state.get(f'{s}_{w}', {}).get('date') == today}
                 n, pct = result_of(res)
@@ -330,7 +341,7 @@ def main(send=True):
                 # в итоговом отчёте дня больше нет (по просьбе пользователя).
                 main_l = lines_for(w, res, closed=True)
                 sections.append((w, main_l, []))
-            tg(build_daily_summary(dstr, sections, total).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + ' ( вместе тип A и C )', 1))
+            tg(build_daily_summary(dstr, sections, total).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + (' ( вместе тип A и C )' if lc.C_ENABLED else ' (тип A)'), 1))
             flags['summary'] = True; did.append('summary'); text = text or 'отчёт дня отправлен'
             # ДОБАВЛЕНО 29.09.2026: сохраняем отчёт дня в state (коммитится в репозиторий вместе
             # с остальным state) — нужно странице Vercel, чтобы показывать тот же итог дня, что
@@ -347,7 +358,7 @@ def main(send=True):
 
     # ДОБАВЛЕНО 29.09.2026: сделки, оставшиеся открытыми после закрытия своего окна (A → в окне C),
     # проверяем каждые 5 минут, чтобы SL/TP появлялся в карточке и Telegram сразу, а не в 22:00.
-    if wd < 5 and window == 'C' and m % 5 == 0 and m < 1320:
+    if wd < 5 and window != 'A' and 840 <= m < 1320:
         try:
             if final_check(state, today, dstr, off, tg, did, final=False):
                 text = text or 'закрыта сделка окна A — карточка обновлена'

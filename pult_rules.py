@@ -307,13 +307,18 @@ def _analyze_C(sym, d, now_utc, off, prev):
     return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём свечу-поглощение {way})')
 
 
-def analyze(sym, d, window, now_utc, off, prev=None):
+LEGACY_A = False   # True — старая логика Типа A (v77, 2R); с 01.10.2026 по умолчанию S1
+
+
+def analyze(sym, d, window, now_utc, off, prev=None, h1=None):
     """d — 5m OHLC (UTC index) за ~10 дней. prev — прошлое состояние инструмента (для сигнала/TP/SL).
-    Возвращает dict со статусом в коротком формате Пульта + список причин."""
+    h1 — часовые бары (UTC, ~40 суток) для цепочки H1 (Тип A, S1). Возвращает dict со статусом в формате Пульта."""
     prev = prev or {}
     if window == 'C':
         d2 = _completed(d, now_utc, 5).copy()
         return _analyze_C(sym, d2, now_utc, off, prev)
+    if window == 'A' and not LEGACY_A:
+        return _analyze_A_s1(sym, d, now_utc, off, prev, h1)
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
     d = _completed(d, now_utc, 5).copy()
@@ -486,6 +491,93 @@ def analyze(sym, d, window, now_utc, off, prev=None):
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
 
 
+def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
+    """Тип A, версия S1 (01.10.2026): см. pult_s1.py. Статусы в формате Пульта: СКИП / НАБЛЮДАЕМ / ВЫНОС / ВХОД.
+    Нумерация ck/ckf — пункты вкладки «Чек-лист» Типа A (обязательные 1–8, скипы 9–13)."""
+    import pult_s1 as S1
+    dec = DEC.get(sym, 5)
+    fmtp = lambda x: f"{x:.{dec}f}"
+    d = _completed(d, now_utc, 5).copy()
+    if len(d) < 50:
+        return dict(error='no_data')
+    loc = d.index + pd.Timedelta(hours=off)
+    d['rdate'] = [x.date() for x in loc]
+    d['rmin'] = [x.hour * 60 + x.minute for x in loc]
+    today = (now_utc + dt.timedelta(hours=off)).date()
+    ba, bb = BOX['A']
+    box = _box(d, today, ba, bb)
+    pbox = _box(d, prev_trading_date(today), ba, bb)
+    if len(box) < 10:
+        return dict(error='no_box')
+    boxH, boxL = float(box['High'].max()), float(box['Low'].min())
+    price = float(d['Close'].iloc[-1])
+    res = dict(sym=sym, window='A', price=round(price, dec), boxH=round(boxH, dec), boxL=round(boxL, dec),
+               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'), ck=[1], ckf=[])
+    bias = None
+    if len(pbox) >= 10:
+        pH, pL = float(pbox['High'].max()), float(pbox['Low'].min())
+        res['prevH'], res['prevL'] = round(pH, dec), round(pL, dec)
+        if boxH > pH and boxL < pL: bias = 'skip_envelope'
+        elif boxH <= pH and boxL >= pL: bias = 'skip_inside'
+        elif boxH > pH: bias = 'long'
+        elif boxL < pL: bias = 'short'
+    res['bias'] = bias
+    if bias == 'skip_envelope':
+        res['ckf'] = [9]
+        return _out(res, 'skip', '—', 'СКИП (бокс шире вчерашнего с обеих сторон)')
+    if bias == 'skip_inside':
+        res['ckf'] = [9]
+        return _out(res, 'skip', '—', 'СКИП (внутренний день)')
+    if bias is None:
+        return _out(res, 'watch', '—', 'НАБЛЮДАЕМ (нет данных за вчера)')
+    sd = 1 if bias == 'long' else -1
+    res['ck'] = [1, 2]
+    dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
+
+    # сделка уже есть — только ведём (TP 3R / SL / закрытие в 22:00)
+    if prev.get('signal') and prev['signal'].get('date') == str(today) and prev['signal'].get('window') == 'A':
+        return _track(res, d, prev['signal'], sd, dirc, fmtp)
+
+    if h1 is None:
+        h1 = S1.h1_from_m5(d)
+    r = S1.analyze_day(d, today, off, sd, h1)
+    chain = r.get('last_chain') if r.get('last_chain') is not None else r.get('chain_now', 0)
+    res['chain_h1'] = int(chain or 0)
+    if chain is not None and chain >= 2: res['ck'] = [1, 2, 3]
+    if r['start'] is None:
+        return _out(res, 'watch', dirc, 'НАБЛЮДАЕМ')
+    sweep_t = (d.index[r['start']] + pd.Timedelta(hours=off)).strftime('%H:%M')
+    res['ck'] = sorted(set(res['ck'] + [4]))
+    c = r['cand']
+    if c is None:
+        res['extreme'] = round(sd * (r['last_ext_f'] if r.get('last_ext_f') is not None else 0), dec)
+        if (chain or 0) < 2:
+            res['ckf'] = [3]
+            res['reasons'] = [f'цепочка H1 = {int(chain or 0)} (нужно ≥2)']
+        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} в {sweep_t}, ждём вход)')
+    g = c['g']
+    ext = sd * c['ext_f']                      # реальная цена экстремума выноса
+    res['extreme'] = round(ext, dec)
+    res['ck'] = [1, 2, 3, 4, 5, 6, 7]
+    if g + 1 >= len(d):
+        return _out(res, 'prep', dirc, 'ВЫНОС (условия входа выполнены, ждём свечу входа)')
+    entry = float(d['Open'].iloc[g + 1])
+    stop = ext - sd * S1.BUF * c['atr']
+    R = abs(entry - stop)
+    if (entry - stop) * sd <= 0 or R <= 0:
+        return _out(res, 'skip', dirc, 'СКИП (некорректный стоп)')
+    tp = entry + sd * S1.RR * R
+    t_in = d.index[g + 1]
+    end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(S1.END_M // 60, S1.END_M % 60)) - dt.timedelta(hours=off), tz='UTC')
+    res['ck'] = [1, 2, 3, 4, 5, 6, 7, 8]
+    sig = dict(date=str(today), window='A', time=(t_in + pd.Timedelta(hours=off)).strftime('%H:%M'),
+               t_utc=str(t_in), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
+               rr=S1.RR, end_utc=str(end_utc), ck=list(res['ck']), chain=int(c['chain']), strong=int(c['strong']))
+    res['signal'] = sig
+    res['new_signal'] = True
+    return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
+
+
 def autopsy(sig, sd, d, res=None):
     """Короткий разбор закрытого по SL сигнала (≤3 фразы): как шла сделка, что было после стопа,
     что из рамки было против входа. Только по цифрам; визуальные пункты чек-листа не считаем."""
@@ -514,7 +606,7 @@ def autopsy(sig, sd, d, res=None):
                 if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): hit = ts; break
             if hit is not None:
                 tt = hit.tz_convert('Europe/Riga').strftime('%H:%M') if hit.tzinfo else str(hit)[11:16]
-                p2 = f'после стопа цель 2R достигнута в {tt} — стоп выбило'
+                p2 = f'после стопа цель {float(sig.get("rr") or 2):g}R достигнута в {tt} — стоп выбило'
             else:
                 ex = ((sig['entry'] - post['Low'].min()) if sd == 1 else (post['High'].max() - sig['entry'])) / R
                 p2 = 'после стопа цель не достигнута' + (f', цена ушла дальше против на {ex:.1f}R' if ex > 1.2 else '')
@@ -530,18 +622,32 @@ def autopsy(sig, sd, d, res=None):
 
 
 def _track(res, d, sig, sd, dirc, fmtp):
+    """Ведём сделку по барам. Цель = sig['rr'] R (по умолчанию 2), у S1 — 3R и закрытие по времени в 22:00 Рига
+    (sig['end_utc'] — момент закрытия; бары с этого времени уже не учитываются)."""
     res['signal'] = sig
     if sig.get('ck'): res['ck'] = list(sig['ck']); res['ckf'] = []
     if sig.get('fx'): res['fx'] = sig['fx']
+    rr = float(sig.get('rr') or 2)
+    rtxt = f'{rr:g}R'
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
-    out = None
+    end_utc = pd.Timestamp(sig['end_utc']) if sig.get('end_utc') else None
+    if end_utc is not None: after = after[after.index < end_utc]
+    out = None; xt = None
     for _, r in after.iterrows():
         if (r['Low'] <= sig['stop']) if sd == 1 else (r['High'] >= sig['stop']): out = 'SL'; xt = _.tz_convert('Europe/Riga').strftime('%H:%M') if _.tzinfo else None; break
         if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): out = 'TP'; xt = _.tz_convert('Europe/Riga').strftime('%H:%M') if _.tzinfo else None; break
+    if out is None and end_utc is not None and len(d) and d.index[-1] + pd.Timedelta(minutes=5) >= end_utc:
+        # 22:00: ни цель, ни стоп — закрываем по рынку (последняя свеча до 22:00)
+        px = float(after['Close'].iloc[-1]) if len(after) else float(sig['entry'])
+        R = abs(sig['entry'] - sig['stop']) or 1e-12
+        rres = (px - sig['entry']) * sd / R
+        res['exit_time'] = '22:00'; res['exit_r'] = round(rres, 2)
+        sg = f'{rres:+.1f}'.replace('.', ',')
+        return _out(res, 'entry', dirc, f'ВХОД → закрыта в 22:00 ({sg}R)', tg='ЗАКРЫТА - 22:00')
     if out:
         res['exit_time'] = xt
     if out == 'TP':
-        return _out(res, 'entry', dirc, 'ВХОД → TP 🎯 +2R', tg='ЗАКРЫТА - TP')
+        return _out(res, 'entry', dirc, f'ВХОД → TP 🎯 +{rtxt}', tg='ЗАКРЫТА - TP')
     if out == 'SL':
         res['autopsy'] = autopsy(sig, sd, d, res)
         return _out(res, 'skip', dirc, 'ВХОД → SL −1R', tg='ЗАКРЫТА - SL')

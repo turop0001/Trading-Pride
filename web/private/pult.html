@@ -185,7 +185,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
     <div class="tab" data-tab="history" tabindex="0">История</div>
     <div class="tab" data-tab="jstats" tabindex="0">Статистика сделок</div>
     <div class="tab" data-tab="journal" tabindex="0">Журнал</div>
-    <div class="tab" data-tab="stats" tabindex="0">Аналитика (v6)</div>
+    <div class="tab" data-tab="stats" tabindex="0">Аналитика (S1)</div>
   </div>
 
   <!-- PULT -->
@@ -236,7 +236,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
             <div class="kv"><span>Объём позиции</span><span class="v" id="oVol">—</span></div>
             <div class="kv"><span>ЛОТ</span><span class="v" id="oLot">—</span></div>
             <div class="kv"><span>Маржа при плече 1:100</span><span class="v" id="oMrg">—</span></div>
-            <div class="kv"><span>Прибыль на 2R</span><span class="v" id="oWin">—</span></div>
+            <div class="kv"><span>Прибыль на 3R</span><span class="v" id="oWin">—</span></div>
           </div>
           <div class="tw"><table style="margin-top:10px"><thead><tr><th>Стоп в TV</th><th>Объём</th><th>Лот</th></tr></thead><tbody id="cTab"></tbody></table></div>
           <p class="note" style="margin:6px 0 0">Объём = сумма риска ÷ стоп (0.100% = 10, в единицах по $10 000). Коэффициент = лотов на $10 000 = 10 000 ÷ (размер контракта × цена) — пересчитывается от текущей цены. Лот округляется вниз до 0.01, чтобы риск не превысил план. Плечо на размер лота не влияет, только на маржу.</p>
@@ -276,7 +276,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   <section id="tab-jstats" hidden>
     <div class="card">
       <h2 id="jsTitle">Статистика · сигналы Пульта</h2>
-      <p class="note" style="margin:0 0 10px" id="jsNote">Все сигналы робота со статусом «Вход», закрытые по TP (+2R) или SL (−1R): так же считали бэктест — WR, итог в R, просадка, серия стопов. Ваши личные входы — во втором режиме.</p>
+      <p class="note" style="margin:0 0 10px" id="jsNote">Все сигналы робота со статусом «Вход», закрытые по TP (+3R у Типа A S1; раньше +2R), SL (−1R) или по времени в 22:00: так же считали бэктест — WR, итог в R, просадка, серия стопов. Ваши личные входы — во втором режиме.</p>
       <div class="seg" id="jsSrc" style="margin-bottom:12px"><button type="button" data-w="robot" class="on">Сигналы Пульта</button><button type="button" data-w="mine">Мои сделки</button></div>
       <div class="filters">
         <div class="field"><label>Период</label><select id="fPer"><option value="all">Всё время</option><option value="7">7 дней</option><option value="30">30 дней</option><option value="custom">Свой период</option></select></div>
@@ -316,109 +316,77 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
     <div class="card"><h2>Сделки · новые сверху</h2><div class="jlist" id="jList"><div class="empty">Пока нет записей</div></div></div>
   </section>
 
-  <!-- ANALYTICS v4 -->
+  <!-- ANALYTICS S1 (01.10.2026) -->
   <section id="tab-stats" hidden>
     <div class="card">
-      <h2>Тип A · честный итог 2024–2026 (пересчёт 30.09.2026)</h2>
-      <p class="note" style="margin:0 0 8px">Причинная симуляция на Dukascopy M5 (01.2024–09.2026): вход по открытию следующей свечи после сигнала, стоп за экстремум выноса + 0,5 ATR(M5), TP 3R, выходные не держим. Индексы US500 / US30 / NAS100 и золото, окно 10:00–14:00 Рига, тренд H1 по структуре (HH+HL / LH+LL), вынос ≤12 свечей, опора, без встречного H1 FVG до цели. Спред не учтён. <b>Это кандидат на v7: правило в боевом коде Пульта пока прежнее.</b></p>
+      <h2>Тип A · правила S1 · итог 5 лет (10.2021–09.2026)</h2>
+      <p class="note" style="margin:0 0 8px">Тест на Dukascopy M5, все 7 инструментов, окно 10:00–14:00 Рига. Вход по открытию свечи после сигнала (решение по закрытой свече), стоп = экстремум выноса − 0,3 ATR(M5, 14), цель 3R, сделка закрывается не позже 22:00, одна сделка на инструмент в день (первый подходящий вход), одновременные цель и стоп в одной свече считаются стопом. <b>Спред и комиссии не учтены.</b> Живой Пульт воспроизводит выбор теста: на истории с июля 2025 совпало 48 из 48 сделок.</p>
       <div class="tw"><table>
-        <thead><tr><th>Уровень качества (цепочка HH/HL на H1)</th><th>Сделок</th><th>В мес.</th><th>WR</th><th>ΣR (риск 1×)</th><th>Просадка</th><th>2024 / 2025 / 2026</th></tr></thead>
+        <thead><tr><th>Период</th><th>Сделок</th><th>В мес.</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
         <tbody>
-<tr><td>T1 · цепочка ≥2 (риск ×2)</td><td>41</td><td>1,2</td><td>54%</td><td class="pos">+49R</td><td class="neg">−2R</td><td>+23 / +10 / +16</td></tr>
-<tr><td>T2 · цепочка = 1 (риск ×1)</td><td>95</td><td>2,9</td><td>34%</td><td class="pos">+37R</td><td class="neg">−8R</td><td>+16 / +16 / +5</td></tr>
-<tr><td>T3 · цепочка = 0 (риск ×0,5)</td><td>170</td><td>5,2</td><td>29%</td><td class="pos">+34R</td><td class="neg">−10R</td><td>+13 / +8 / +13</td></tr>
-<tr><td>Все вместе, риск 1×</td><td>306</td><td>9,3</td><td>34%</td><td class="pos">+120R</td><td class="neg">−11R</td><td>+52 / +34 / +34</td></tr>
-<tr class="tot"><td>Все вместе, риск ×2 / ×1 / ×0,5</td><td>306</td><td>9,3</td><td>34%</td><td class="pos">+152R (4,6R/мес)</td><td class="neg">−8,5R</td><td>+68,5 / +40 / +43,5</td></tr>
-</tbody>
-      </table></div>
-      <p class="note" style="margin-top:12px">Только элита (T1, риск ×2): 41 сделка, +98R (3R/мес), просадка −4R; с TP 1,5R (широкая формула) WR 76%, +33R, просадка −3R, но 1,2 сделки в месяц. Серия SL до 10, отрицательных месяцев 10 из 33. Цель 15–20 сделок, WR 60–70%, +10–20R/мес при просадке ≤8R на этих данных недостижима.</p>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h2>По годам и месяцам 2026 (риск ×2 / ×1 / ×0,5)</h2>
-      <div class="g2">
-        <div><div class="tw"><table>
-          <thead><tr><th>Год</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
-          <tbody>
-<tr><td>2024</td><td>122</td><td>35%</td><td class="pos">+68,5R</td><td class="neg">−7,5R</td><td>8</td></tr>
-<tr><td>2025</td><td>113</td><td>32%</td><td class="pos">+40R</td><td class="neg">−6,5R</td><td>7</td></tr>
-<tr><td>2026 (до 28.09)</td><td>71</td><td>35%</td><td class="pos">+43,5R</td><td class="neg">−8,5R</td><td>10</td></tr>
-<tr class="tot"><td>Итого</td><td>306</td><td>34%</td><td class="pos">+152R</td><td class="neg">−8,5R</td><td>10</td></tr>
-</tbody></table></div></div>
-        <div><div class="tw"><table>
-          <thead><tr><th>Месяц 2026</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th></tr></thead>
-          <tbody>
-<tr><td>2026-01</td><td>12</td><td>50%</td><td class="pos">+19R</td><td class="neg">−2R</td></tr>
-<tr><td>2026-02</td><td>6</td><td>67%</td><td class="pos">+12R</td><td class="neg">−1R</td></tr>
-<tr><td>2026-03</td><td>8</td><td>12%</td><td class="neg">−2R</td><td class="neg">−3R</td></tr>
-<tr><td>2026-04</td><td>8</td><td>50%</td><td class="pos">+3,5R</td><td class="neg">−1,5R</td></tr>
-<tr><td>2026-05</td><td>9</td><td>11%</td><td class="neg">−5R</td><td class="neg">−6R</td></tr>
-<tr><td>2026-06</td><td>5</td><td>40%</td><td class="pos">+5,5R</td><td class="neg">−2R</td></tr>
-<tr><td>2026-07</td><td>8</td><td>12%</td><td class="neg">−2,5R</td><td class="neg">−3,5R</td></tr>
-<tr><td>2026-08</td><td>9</td><td>56%</td><td class="pos">+14,5R</td><td class="neg">−3R</td></tr>
-<tr><td>2026-09</td><td>6</td><td>17%</td><td class="neg">−1,5R</td><td class="neg">−3R</td></tr>
-</tbody></table></div></div>
-      </div>
-    </div>
-    <div class="g2" style="margin-top:16px">
-      <div class="card"><h2>По инструментам (TP 3R, риск 1×)</h2><div class="tw"><table>
-        <thead><tr><th>Инстр.</th><th>n</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>2024 / 25 / 26</th></tr></thead>
-        <tbody>
-<tr><td>NAS100</td><td>90</td><td>37%</td><td class="pos">+47R</td><td class="neg">−5R</td><td>+20 / +20 / +7</td></tr>
-<tr><td>US 500</td><td>87</td><td>34%</td><td class="pos">+35R</td><td class="neg">−9R</td><td>+23 / +4 / +8</td></tr>
-<tr><td>XAUUSD</td><td>31</td><td>45%</td><td class="pos">+26R</td><td class="neg">−5R</td><td>+4 / +16 / +6</td></tr>
-<tr><td>US 30</td><td>98</td><td>28%</td><td class="pos">+12R</td><td class="neg">−18R</td><td>+5 / −6 / +13</td></tr>
-</tbody></table></div>
-        <p class="note">EUR/USD, GBP/USD, GER40 из типа A убраны: цепочка ≥2 на семи инструментах даёт 68 сделок и +31R против 38 сделок и +33R на четырёх. US30 — кандидат на половинный риск (итог +145R, просадка −7,2R).</p></div>
-      <div class="card"><h2>Время входа и направление (TP 3R, риск 1×)</h2><div class="tw"><table>
-        <thead><tr><th>Окно (Рига)</th><th>n</th><th>WR</th><th>ΣR</th></tr></thead>
-        <tbody>
-<tr><td>10:00–10:30</td><td>60</td><td>27%</td><td class="pos">+4R</td></tr>
-<tr><td>10:30–11:30</td><td>120</td><td>31%</td><td class="pos">+29R</td></tr>
-<tr><td>11:30–12:00</td><td>43</td><td>42%</td><td class="pos">+30R</td></tr>
-<tr><td>12:00–13:00</td><td>51</td><td>49%</td><td class="pos">+51R</td></tr>
-<tr><td>13:00–14:00</td><td>32</td><td>25%</td><td class="pos">+6R</td></tr>
-<tr><td>Лонг</td><td>191</td><td>35%</td><td class="pos">+79R</td></tr>
-<tr><td>Шорт</td><td>115</td><td>33%</td><td class="pos">+41R</td></tr>
-</tbody></table></div>
-        <p class="note">Лучшее время — 11:30–13:00; шорты слабее лонгов, но в плюсе.</p></div>
-      <div class="card"><h2>Тип C и общий вывод</h2><div class="list">
-        <div class="li"><span>Тип C (реактивный, коробка Лондона, окно 15:00–17:30) с фильтрами H1/D1/цепочка</span><b class="neg">нет преимущества: −23…−45R, 2025–26 в минусе</b></div>
-        <div class="li"><span>Тип A + тип C вместе</span><b>= тип A; C остаётся «наблюдаем», вес 0</b></div>
-        <div class="li"><span>Что даёт доход</span><b>RR 1:3 (+152R против +99R при 1:2), вес риска по цепочке</b></div>
-        <div class="li"><span>Что даёт частоту</span><b>только слабые уровни T3 (0,5× риска); шире формула — просадка вдвое</b></div>
-        <div class="li"><span>Опция: D1 по направлению как множитель ×1,25 / ×0,75</span><b>+163,5R, просадка −9,4R</b></div>
-      </div></div>
-      <div class="card"><h2>FVG-пометки · старый тест 2024–2026 (A+C, 1192 сделки, вход до подтверждения — цифры завышены)</h2><div class="tw"><table>
-        <thead><tr><th>Пометка</th><th>Есть: n · WR</th><th>Нет: n · WR</th><th>Вывод</th></tr></thead>
-        <tbody>
-        <tr><td>Батут H1 или H4</td><td>741 · 61%</td><td>451 · 59%</td><td>не влияет (справка)</td></tr>
-        <tr><td><b>Встречный FVG только ЗА целью 2R (усилитель) · Тип A</b></td><td>288 · 71%</td><td>536 · 53%</td><td class="pos">усилитель</td></tr>
-        <tr><td><b>То же · Тип C</b></td><td>174 · 74%</td><td>194 · 51%</td><td class="pos">усилитель</td></tr>
-        <tr><td>Встречный H1 до цели 2R</td><td>291 · 47%</td><td>901 · 64%</td><td class="neg">предупреждение</td></tr>
-        <tr><td>Встречный H4 до цели 2R</td><td>91 · 44%</td><td>1101 · 61%</td><td class="neg">предупреждение</td></tr>
-        <tr><td>Встречный H1/H4 на пути</td><td>617 · 59%</td><td>575 · 62%</td><td>не влияет</td></tr>
-        <tr><td>H4 встречный с реакцией</td><td>342 · 59%</td><td>850 · 60%</td><td>не влияет</td></tr>
-        <tr><td>Встречный H1 внутри бокса</td><td>351 · 56%</td><td>841 · 62%</td><td>слабо (p=0,08)</td></tr>
-        <tr><td>Вынос образовал встречный H1</td><td>161 · 58%</td><td>1031 · 60%</td><td>не влияет</td></tr>
+<tr><td><b>5 лет (10.2021–09.2026)</b></td><td>238</td><td>4,0</td><td>38%</td><td class="pos">+108,5R</td><td class="neg">−8R</td><td>7</td></tr>
+<tr><td>4 года (10.2022–09.2026)</td><td>198</td><td>4,1</td><td>38%</td><td class="pos">+87,7R</td><td class="neg">−8R</td><td>7</td></tr>
+<tr><td>Первая половина (10.2021–03.2024)</td><td>—</td><td>—</td><td>—</td><td class="pos">+77R</td><td>—</td><td>—</td></tr>
+<tr><td>Вторая половина (04.2024–09.2026)</td><td>—</td><td>—</td><td>—</td><td class="pos">+31R</td><td>—</td><td>—</td></tr>
+<tr><td>Последние 12 месяцев</td><td>47</td><td>3,9</td><td>34%</td><td class="pos">+15R</td><td class="neg">−6R</td><td>—</td></tr>
         </tbody></table></div>
-        <p class="note">Если блокировать встречный FVG (H1 или H4): 863 сделки, WR 65%, +814R (вместо +956R). Заблокированные 329 сделок — WR 48%, но +142R. Вход не блокируется.</p></div>
-      <div class="card"><h2>Проверено и отклонено</h2><div class="list">
-        <div class="li"><span>Старые цифры «1192 сделки · +956R · DD −5R» (вход по цене до подтверждения сигнала)</span><b class="neg">недостижимы, честно A: 805 · WR 39% · +143R · DD −29R</b></div>
-        <div class="li"><span>Структура H4 как фильтр качества (цепочка H4 ≥2)</span><b class="neg">18 сделок · WR 47% — не помогает</b></div>
-        <div class="li"><span>Тип C (реактивный, окно 15:00–17:30) с фильтрами H1/D1/цепочка</span><b class="neg">−23…−45R, 2025–26 в минусе</b></div>
-        <div class="li"><span>BTC / серебро в формуле типа A</span><b class="neg">≈ +2R / ≈ +1R — нет преимущества</b></div>
-        <div class="li"><span>Ослабить формулу ради частоты (все триггеры, без опоры/FVG)</span><b class="neg">R на сделку ×0,5, просадка −17…−28R</b></div>
-        <div class="li"><span>Батут H1/H4 как усилитель (1192 сделки, 2024–26)</span><b class="neg">WR 61% vs 59%, p=0,43 — не влияет</b></div>
-        <div class="li"><span>Блок входа при встречном FVG до цели 2R</span><b class="neg">WR 65% vs 60%, но итог +814R против +956R</b></div>
-<div class="li"><span>Лимит OTE 0.705 (C) + Order Block (A), стоп ≥0.25R — честно, лимит после закрытия свечи</span><b class="neg">+55% · −14.7%</b></div>
-        <div class="li"><span>½ риска после 3 SL подряд</span><b class="neg">+89% · −6.1% (хуже)</b></div>
-        <div class="li"><span>Скип C по перекрытому FVG / 2+ сильным свечам</span><b class="neg">режет прибыль</b></div>
-        <div class="li"><span>XAG/USD (серебро), весь период, оба типа</span><b class="neg">−5.1% · DD −11.4% · WR 27%</b></div>
-        <div class="li"><span>USDJPY в типе C — убран 24.09, остаётся в типе A</span><b class="neg">+2.1% за 41 сделку, WR 27% — не отличимо от нуля</b></div>
-        <div class="li"><span>Turtle Soup D1 · Silver Bullet · Power of 3</span><b class="neg">−89R · −34R · −31R</b></div>
-        <div class="li"><span>SMT-дивергенция</span><b class="neg">не работает</b></div>
-      </div></div>
+      <p class="note">Средний выигрыш +2,8R (часть сделок закрывается в 22:00 раньше цели), средний проигрыш −1,0R. Из 57 месяцев теста в минусе 18; худший месяц −3R, лучший +9R.</p>
     </div>
+    <div class="card"><h2>По годам</h2><div class="tw"><table>
+      <thead><tr><th>Год</th><th>Сделок</th><th>WR</th><th>ΣR</th><th>Просадка</th></tr></thead>
+      <tbody>
+<tr><td>2021 (3 мес.)</td><td>6</td><td>17%</td><td class="neg">−2R</td><td class="neg">−4R</td></tr>
+<tr><td>2022</td><td>48</td><td>40%</td><td class="pos">+26R</td><td class="neg">−4R</td></tr>
+<tr><td>2023</td><td>64</td><td>45%</td><td class="pos">+46R</td><td class="neg">−5R</td></tr>
+<tr><td>2024</td><td>51</td><td>31%</td><td class="pos">+11R</td><td class="neg">−8R</td></tr>
+<tr><td>2025</td><td>33</td><td>36%</td><td class="pos">+11R</td><td class="neg">−7R</td></tr>
+<tr><td>2026 (9 мес.)</td><td>36</td><td>36%</td><td class="pos">+16R</td><td class="neg">−6R</td></tr>
+      </tbody></table></div>
+      <p class="note">2022–2023 были лучшими годами (+72R из +108R); с 2024 года результат вдвое скромнее: около +11…+16R в год.</p></div>
+    <div class="card"><h2>По инструментам (все 7 в работе)</h2><div class="tw"><table>
+      <thead><tr><th>Инструмент</th><th>Сделок</th><th>WR</th><th>ΣR</th><th>Просадка</th></tr></thead>
+      <tbody>
+<tr><td>NAS100</td><td>36</td><td>50%</td><td class="pos">+36R</td><td class="neg">−5R</td></tr>
+<tr><td>US30</td><td>38</td><td>42%</td><td class="pos">+23R</td><td class="neg">−6R</td></tr>
+<tr><td>US500</td><td>30</td><td>43%</td><td class="pos">+22R</td><td class="neg">−5R</td></tr>
+<tr><td>GER40</td><td>50</td><td>36%</td><td class="pos">+12R</td><td class="neg">−12R</td></tr>
+<tr><td>GBPUSD</td><td>38</td><td>32%</td><td class="pos">+10R</td><td class="neg">−6R</td></tr>
+<tr><td>XAUUSD</td><td>15</td><td>33%</td><td class="pos">+5R</td><td class="neg">−6R</td></tr>
+<tr><td>EURUSD</td><td>31</td><td>26%</td><td>0R</td><td class="neg">−9R</td></tr>
+      </tbody></table></div>
+      <p class="note">Основной вклад дают индексы США (NAS100, US30, US500: +81R из +108R). EURUSD в нуле, золото — мало сделок; правило оставлено одним для всех 7 по решению пользователя.</p></div>
+    <div class="card"><h2>Направление и время входа</h2><div class="tw"><table>
+      <thead><tr><th>Срез</th><th>Сделок</th><th>WR</th><th>ΣR</th><th>Просадка</th></tr></thead>
+      <tbody>
+<tr><td>Лонг</td><td>133</td><td>40%</td><td class="pos">+67R</td><td class="neg">−10R</td></tr>
+<tr><td>Шорт</td><td>105</td><td>35%</td><td class="pos">+42R</td><td class="neg">−8R</td></tr>
+<tr><td>Вход 10:00–11:00</td><td>120</td><td>35%</td><td class="pos">+39R</td><td class="neg">−11R</td></tr>
+<tr><td>Вход 11:00–12:00</td><td>75</td><td>40%</td><td class="pos">+43R</td><td class="neg">−6R</td></tr>
+<tr><td>Вход 12:00–13:00</td><td>26</td><td>38%</td><td class="pos">+12R</td><td class="neg">−7R</td></tr>
+<tr><td>Вход 13:00–14:00</td><td>17</td><td>47%</td><td class="pos">+15R</td><td class="neg">−4R</td></tr>
+      </tbody></table></div></div>
+    <div class="card"><h2>Что режет сделки: убираем правила по одному (5 лет)</h2><div class="tw"><table>
+      <thead><tr><th>Вариант</th><th>В мес.</th><th>WR</th><th>ΣR</th><th>Просадка</th><th>Серия SL</th></tr></thead>
+      <tbody>
+<tr class="tot"><td>S1 целиком</td><td>4,0</td><td>38%</td><td class="pos">+108,5R</td><td class="neg">−8R</td><td>7</td></tr>
+<tr><td>без цепочки H1 ≥ 2</td><td>55,1</td><td>29%</td><td class="pos">+241R</td><td class="neg">−90R</td><td>22</td></tr>
+<tr><td>без M5 FVG выноса</td><td>5,8</td><td>31%</td><td class="pos">+76R</td><td class="neg">−11R</td><td>9</td></tr>
+<tr><td>без V-разворота (≤5 свечей)</td><td>5,7</td><td>37%</td><td class="pos">+112R</td><td class="neg">−10R</td><td>10</td></tr>
+<tr><td>без стороны по Азии</td><td>4,8</td><td>38%</td><td class="pos">+130R</td><td class="neg">−8R</td><td>8</td></tr>
+<tr><td>без правила входа (3 сильные / откат ≥30%)</td><td>4,0</td><td>37%</td><td class="pos">+105R</td><td class="neg">−8R</td><td>7</td></tr>
+<tr><td>Азия + цепочка H1 ≥ 2 (только эти два)</td><td>7,0</td><td>32%</td><td class="pos">+69R</td><td class="neg">−15R</td><td>15</td></tr>
+<tr><td>Только Азия, без фильтров</td><td>69,9</td><td>28%</td><td class="pos">+343R</td><td class="neg">−71R</td><td>24</td></tr>
+      </tbody></table></div>
+      <p class="note"><b>Больше всего сделок режет цепочка H1 ≥ 2</b> — она оставляет около 7% кандидатов (4 вместо 55 в месяц). Остальные правила режут слабо (5–30% сделок) и в основном держат просадку и серию стопов: без цепочки итог по R больше, но просадка −90R и серия 22 стопов — торговать такое нельзя. Отношение прибыли к просадке: S1 13,6, без цепочки 2,7.</p></div>
+    <div class="card"><h2>Честные выводы</h2><div class="list">
+      <div class="li"><span>Частота</span><b>≈ 4 сделки в месяц на все 7 инструментов; в среднем 1 сделка в неделю</b></div>
+      <div class="li"><span>Доходность при риске 0,75% на сделку</span><b>≈ +1,4% в месяц в тесте без спреда; реалистично +0,5…+1%</b></div>
+      <div class="li"><span>Просадка 8R при риске 0,75%</span><b>≈ −6% депозита; серия до 7 стопов подряд — нормальна</b></div>
+      <div class="li"><span>Цель 5% в месяц</span><b class="neg">этой формулой механически не достигается</b></div>
+      <div class="li"><span>Устойчивость</span><b>плюс в обеих половинах теста (+77R / +31R), но с 2024 года слабее</b></div>
+      <div class="li"><span>Спред</span><b class="neg">не учтён — при стопе ≈ 0,3 ATR он заметно уменьшает R на каждую сделку</b></div>
+      <div class="li"><span>Тип C</span><b>на паузе; в отчётах и Telegram только Тип A</b></div>
+    </div></div>
   </section>
 </div>
 
@@ -500,44 +468,21 @@ function riskNow(){
 
 /* checklists */
 var CK={
- A:{title:'Тип A',when:WA+' Рига',items:[
-  ['base','Инструмент из списка','XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40 — 7 инструментов, каждый лично протестирован.'],
-  ['base','Азия выше или ниже вчерашней','выше → ищем лонг, ниже → шорт; внутри или шире — нет сетапа; против bias вход не берём.'],
-  ['skip','Вход против bias без модели «контр-bias» — скип по умолчанию','входы против bias — только как ручное исключение с явным объяснением, не как правило.'],
-  ['base','Вынос нужной стороны Азии','бокс Азии '+ASIA+': лонг — сняли лой, шорт — сняли хай; вынос засчитан только при закрытии свечи за границей бокса, не по тени — если было несколько волн, экстремум и стоп берём от последней подтверждённой волны.'],
-  ['skip','Противоположная сторона Азии ещё не снята','если первой сняли другую сторону — скип на весь день.'],
-  ['skip','Выкуп: свеча 5m закрылась обратно внутри Азии ИЛИ откатила ≥30% пути от экстремума выноса к границе Азии','вход на закрытии этой свечи; откат меньше 30% и цена не вернулась — входа нет.'],
-  ['skip','Вход на 2-й сильной свече выкупа','вход на открытии 2-й свечи, если 1-я уже сильная (тело ≥60% диапазона); правило симметрично для LONG и SHORT.'],
-  ['skip','В выкупе минимум 2 сильные свечи','считаем свечи по направлению сделки от экстремума выноса до входа с телом >60% диапазона; свечи самого выноса не считаются.'],
-  ['skip','За 2 часа (24 свечи m5) после выноса выкуп не набрал 2 сильные свечи','жёсткий лимит по времени в коде (не 10 свечей и не CHoCH — этого в коде Типа A нет, это осталось только как визуальный/ручной ориентир, см. ½ риска ниже) — статус остаётся ГОТОВИМСЯ, пока не истекут 2 часа, затем СКИП.'],
-  ['skip','Встречный m5 FVG в 5 выносных свечах инвертирован телом свечи','не инвертирован — Пульт просто ждёт (статус ГОТОВИМСЯ) сколько угодно в пределах окна и 2-часового лимита выше; отдельной ветки «CHoCH» в коде нет — это ручной визуальный ориентир (исключение — ½ риска, см. ниже).'],
-  ['skip','Точка входа лежит внутри крупного встречного m5 FVG самой выносной свечи','заходить внутри такого имбаланса бессмысленно даже при формально верных 2 свечах выкупа — скип.'],
-  ['skip','Нет крупной ликвидности рядом слева за экстремумом','если есть — цена может пойти её снимать, не входим.'],
-  ['skip','Цель уже собрана — сама Азия/Лондон сняла свою же ликвидность заранее','нечего собирать ни внутри, ни за целью, даже при формально верном сломе структуры — скип, проверять на графике вручную.'],
-  ['plus','Азия уже сняла ликвидность у противоположной стороны сама внутри себя (self-sweep)','если Азия bias=LONG уже обновила свой хай внутри себя (или bias=SHORT — свой лой), это не повод скипать день: ждём снятие нужной стороны снаружи и входим по остальным правилам, а если ликвидность у цели ещё цела — плюс-усилитель.'],
-  ['skip','Вынос своими свечами сформировал встречный H1 FVG (инфо-пометка в карточке, вход не блокирует)','встречный H1 FVG, сформированный самими выносными свечами — контекстный сигнал против сделки, проверять минимум за 5 дней назад.'],
-  ['skip','На H4 есть встречный FVG, в который цена уже заходила и от которого оттолкнулась (инфо-пометка в карточке, вход не блокирует)','это перекрывает даже формально верный bias — цена уже показала реальное намерение на старшем таймфрейме.'],
-  ['skip','Рядом на H1 есть непрозаполненный гэп (разрыв пятница→понедельник)','настоящий гэп цена обычно закрывает полностью, а не отбивается от него как от опоры — при таком гэпе рядом сделку пропускаем.'],
-  ['skip','До экстремума в этот день уже пробит телом своего же H1 FVG в сторону сделки (смотреть на графике, в коде нет)','если цена до выноса уже закрылась телом за своим FVG H1 в направлении будущей сделки — скип.'],
-  ['skip','Сама Азия оттолкнулась (не пробила) от встречного H1 FVG и ушла в противоположную сторону','если рядом есть встречный H1 FVG и Азия отбилась от него телом свечи, не пробив — сигнал против сделки, скип.'],
-  ['skip','Вход позже 14:00 Рига — конец окна Типа A','окно Типа A — 10:00–14:00 Рига, позже входа по правилам нет.'],
-  ['plus','Встречный H1/H4 FVG лежит ЗА целью 2R, а не между входом и целью (инфо-пометка, вход не блокирует)','усилитель по тесту Dukascopy 2024–26 (Тип A): WR 71% против 53% у остальных сделок и 48% при FVG между входом и целью; стабильно по годам 73% / 68% / 73%. Батут больше не усилитель — только справка в карточке.'],
-  ['skip','Цена прошила H1/H4 FVG-«батут» насквозь и закрепилась телом на H1 TF','закрытие свечи H1 за батутом без реакции — скип, а не просто отсутствие усилителя.'],
-  ['plus','Тренд 5 дней по входу','усилитель, не фильтр.'],
-  ['skip','До цели 1:2 нет блокирующего H1 FVG (инфо-пометка в карточке, вход не блокирует)','встречный H1 FVG на пути к цели без достаточного места до него для RR 1:2 — контекстный минус, для Типа C остаётся обязательным скипом (см. ниже).'],
-  ['plus','Длинный фитиль у свечи выноса на m15','признак силы покупателя/продавца — можно входить на 2-й свече выкупа.'],
-  ['plus','3-свечной фрактал на экстремуме','средняя свеча — самая нижняя (лонг) / самая верхняя (шорт), 2-я свеча выкупа сильная.'],
-  ['plus','Компрессия ликвидности на противоположной стороне','много несобранных хаёв/лоёв Лондона и Азии в сторону цели — магнит для цены.'],
-  ['plus','2–3 ликвидности на одной линии (равные хаи/лои)','сильный усилитель ×2 — снятие двойной ликвидности слева даёт резкую реакцию.'],
-  ['plus','Компрессия и скопление ликвидности внутри самой Азии','Азия набрала много равных хаёв/лоёв — топливо для движения к противоположной стороне.'],
-  ['plus','Вынос снял и Азию, и Франкфурт (10:00–11:00 Рига)','нейтральное наблюдение, не усилитель.'],
-  ['half','Встречный H1 FVG выше/ниже на пути, но от своего H1 FVG была резкая реакция','вход разрешён на ½ риска.'],
-  ['half','Встречный m5 FVG в выносных свечах не инвертирован','обычно ждём инверсии или CHoCH; вход без инверсии — только ½ риска и только при сильном усилителе ликвидности.'],
-  ['half','Резкие сильные H1-свечи против сделки внутри Азии','сильный импульс на H1 против сделки перед входом — повод на ½ риска.'],
-  ['half','Свечи выкупа — «щётка» с длинными тенями в обе стороны, а не чёткое тело','признак нерешительности рынка — вход только на ½ риска при остальных сильных усилителях.'],
-  ['skip','«Щётка» после выноса не затяжная','много свечей нерешительности после выноса, вход только на сломе после затяжной щётки — иначе скип.'],
-  ['half','Есть order flow на H1','здоровый тренд: откаты в FVG с реакцией по направлению, снятие ликвидности, новый BOS; нет OF → ½ риска.']],
-  mng:'<b>После входа:</b> цель 2R, стоп с запасом (буфер ~0.05-0.2 ATR за экстремумом, не впритык); стоп в безубыток не переносить. «Экстремум» = хай/лоу только последней подтверждающей свечи выноса (v75), буфер накладывается поверх неё.'},
+ A:{title:'Тип A · S1',when:WA+' Рига',items:[
+  ['base','Инструмент из списка','XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40 — все 7. По тесту 5 лет сильнее всех NAS100, US30, US500; EURUSD в нуле, золото — мало сделок, но правило одно для всех.'],
+  ['base','Азия ('+ASIA+') выше вчерашней по хаю, а лой не ниже → только лонг; ниже по лою, а хай не выше → только шорт','без допусков: выше хотя бы на пункт — уже выше. Внутри вчерашней или шире с обеих сторон — сетапа нет.'],
+  ['base','Цепочка H1 ≥ 2 в сторону сделки','структура H1: зигзаг, откат ≥30% ноги; тренд = закрытие H1 за последней вершиной (лонг) или впадиной (шорт); цепочка = минимум из подряд растущих хаёв и подряд растущих лоёв (шорт — зеркально). Нужно ≥2 на момент сигнала. Самое «режущее» правило: без него 55 сделок в месяц, WR 29%, просадка −90R.'],
+  ['base','Вынос границы Азии тенью в окне 10:00–14:00','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая Азии. Экстремум выноса — самая дальняя точка (его могут обновлять несколько свечей подряд).'],
+  ['base','V-разворот: свеча входа — не позже 5 свечей M5 после экстремума выноса','затяжной разворот (позже 5 свечей) не берём.'],
+  ['base','M5 FVG выноса перекрыт закрытиями (или его нет)','если в самом выносе остался M5 FVG против сделки — ждём, пока закрытие свечи выкупа выйдет за его дальнюю границу; пока не перекрыт — входа нет.'],
+  ['base','Вход: первая свеча в сторону сделки, когда набрано ≥3 сильных свечи (тело ≥60% диапазона) ИЛИ откат ≥30% пути от экстремума к границе Азии','вход по открытию следующей свечи после триггера; сама свеча-триггер закрывается в сторону сделки; свеча входа открывается до 14:00.'],
+  ['base','Стоп = экстремум выноса − 0,3 ATR(M5, 14); цель 3R; позиция закрывается не позже 22:00 Рига','стоп в безубыток не переносим; не дошли ни до цели, ни до стопа — закрываем по рынку в 22:00. Одна сделка на инструмент в день — первый подходящий вход.'],
+  ['skip','Азия внутри вчерашней или шире с обеих сторон','нет стороны — нет сетапа на день.'],
+  ['skip','Вход против стороны Азии','лонг при шортовой Азии и наоборот — не берём, даже красивый контртренд.'],
+  ['skip','Вынос не случился или вход позже 14:00 Рига','окно входа 10:00–14:00; свеча входа должна открыться до 14:00.'],
+  ['skip','Цепочка H1 меньше 2','отсекает около 93% кандидатов — это главный фильтр, обходить его нельзя.'],
+  ['skip','Повторный вход по тому же инструменту в тот же день','после SL или TP второй попытки нет — так считал бэктест (первый подходящий вход на инструмент в день).']],
+  mng:'<b>После входа:</b> цель 3R, стоп не переносим, в 22:00 Рига позицию закрываем по рынку. Тест S1 (5 лет, 7 инструментов, без спреда): 238 сделок, WR 38%, +108R, просадка −8R, серия до 7 стопов; ≈4 сделки в месяц. Пульт сам считает пункты 1–8 и показывает номера выполненных; визуальных фильтров (FVG H1/H4, ликвидность, тренд 5 дней) в S1 нет — тест их не подтвердил.'},
  C:{title:'Тип C',when:WC+' Рига',items:[
   ['base','Инструмент из списка','XAUUSD, EURUSD, GBPUSD — только 3, единственные лично протестированные для Типа C.'],
   ['base','Bias — реактивный пробой лондонского бокса прямо в окне входа (v77, 29.09.2026)','бокс Лондона 11:00–16:25 Рига; закрытие свечи за его верхней/нижней границей ПРЯМО в окне входа 16:30–18:30 задаёт направление — не сравнение со вчерашним боксом, как раньше.'],
@@ -632,7 +577,7 @@ function calc(){
   var rs=$('cRisk').value,prop=$('cProp').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||25000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,so=$('cSym').options[$('cSym').selectedIndex],cs=+so.dataset[prop==='ftmo'?'csFtmo':'csFp'],px=+$('cPx').value||+so.dataset.px,q=so.dataset.q==='inv'?1/px:(+so.dataset.q||1),k=10000/(cs*px*q),sp=+$('cStopP').value;
   $('cK').textContent='Контракт '+cs+' ('+(prop==='ftmo'?'FTMO':'FundingPips')+') · цена '+px+(q!==1?' · пересчёт в $ ×'+q.toFixed(4):'')+' → коэффициент '+k.toFixed(4)+' лота на $10 000';
   store('p_calc',JSON.stringify({d:$('cDep').value,r:rs,s:$('cSym').selectedIndex,p:prop}));
-  $('oRisk').innerHTML='<b>$'+fm(risk)+'</b><small>'+pct.toFixed(2)+'%</small>';$('oWin').innerHTML='<b class="pos">+$'+fm(risk*2)+'</b><small>+'+(pct*2).toFixed(2)+'%</small>';
+  $('oRisk').innerHTML='<b>$'+fm(risk)+'</b><small>'+pct.toFixed(2)+'%</small>';$('oWin').innerHTML='<b class="pos">+$'+fm(risk*3)+'</b><small>+'+(pct*3).toFixed(2)+'%</small>';
   var cur=sp?Math.round(sp*1000)/10:null,tb=$('cTab');tb.innerHTML='';
   [5,10,15,20,30,40,50].forEach(function(c){var tr=el('tr',c===cur?'cur':null);tr.appendChild(el('td',null,(c/100).toFixed(3)+'%'));tr.appendChild(el('td',null,(risk/c).toFixed(2)));tr.appendChild(el('td',null,(Math.floor(risk/c*k*100)/100).toFixed(2)));tb.appendChild(tr);});
   if(!sp){$('oVol').textContent='—';$('oLot').textContent='—';$('oMrg').textContent='—';return;}
@@ -690,7 +635,7 @@ function liveCard(x){
   if(x.prevL!=null&&x.window!=='C')rows.push(['Вчерашний бокс',x.prevL+' – '+x.prevH]);
   if(x.status==='skip'&&x.reasons&&x.reasons.length)rows.push(['Почему скип',x.reasons.length>2?x.reasons.slice(2).join('; '):'других причин нет — основные в статусе']);
   if(x.signal){var xt=x.exit_time?' · '+x.exit_time:'',isT=/→ TP/.test(x.note||''),isS=/→ SL/.test(x.note||'');
-    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);rows.push(['Цель 2R',x.signal.tp+(isT?xt:'')]);
+    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);rows.push(['Цель '+(x.signal.rr||2)+'R',x.signal.tp+(isT?xt:'')]);
     var curR=null;
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
@@ -748,12 +693,12 @@ function renderRep(){
     cb.innerHTML='<div class="row2"><div class="field"><label>Итог</label><div class="seg"><button type="button" data-v="TP" class="on">TP</button><button type="button" data-v="SL">SL</button><button type="button" data-v="BE">БУ</button></div></div><div class="field"><label>Результат, $</label><input type="number" step="1" min="0" inputmode="decimal" placeholder="напр. 500"><small class="rh" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div></div><div class="field wW" hidden><label>Почему SL (необязательно)</label><select class="whySel"></select><small class="autohint muted" style="display:block;margin:4px 0"></small><input type="text" class="whyNote" placeholder="комментарий (необязательно)"></div><button class="btn primary sm">Сохранить в журнал</button><div class="msg"></div>';
     var sb=cb.querySelectorAll('.seg button'),rin=cb.querySelector('input'),ww=cb.querySelector('.wW'),wsel=cb.querySelector('.whySel'),whint=cb.querySelector('.autohint');
     var rh=cb.querySelector('.rh');function rcalc(){var u=parseFloat(rin.value)||0;rh.textContent=u>0?('≈ '+(OUT==='SL'?'−':OUT==='BE'?'':'+')+rFromUsd(u)+'R (1R = $'+Math.round(riskUsd1())+')'):'1R = $'+Math.round(riskUsd1());}
-    rin.value=Math.round(riskUsd1()*2);rin.addEventListener('input',rcalc);rcalc();
+    rin.value=Math.round(riskUsd1()*3);rin.addEventListener('input',rcalc);rcalc();
     fillSLR(wsel,tSel.value);tSel.addEventListener('change',function(){fillSLR(wsel,tSel.value);});
     sb.forEach(function(b){b.addEventListener('click',function(){OUT=b.dataset.v;sb.forEach(function(x){x.classList.toggle('on',x===b);});
       if(OUT==='SL'){ww.hidden=false;if(!wsel.value)wsel.value='sys';whint.textContent='Необязательно: можно оставить как есть и просто сохранить.';}
       else ww.hidden=true;
-      rin.disabled=OUT==='BE';if(OUT==='BE')rin.value=0;else if(!+rin.value)rin.value=Math.round(riskUsd1()*(OUT==='TP'?2:1));rcalc();});});
+      rin.disabled=OUT==='BE';if(OUT==='BE')rin.value=0;else if(!+rin.value)rin.value=Math.round(riskUsd1()*(OUT==='TP'?3:1));rcalc();});});
     card.appendChild(cb);
     bIn.addEventListener('click',function(){
       if(my&&my.open){var o0=tstate();delete o0[key];tsave(o0);renderRep();return;}
@@ -789,9 +734,9 @@ function riskUsd1(){var r=riskNow();return r.now*r.pct/100||r.st/100;}
 function rFromUsd(u){var k=riskUsd1();return k>0?Math.round(Math.abs(u)/k*2)/2:0;}
 function jRcalc(){var u=parseFloat($('jR').value)||0,r=rFromUsd(u);$('jRh').textContent=u>0?('≈ '+(JO==='SL'?'−':'+')+r+'R (1R = $'+Math.round(riskUsd1())+')'):'1R = $'+Math.round(riskUsd1());}
 $('jR').addEventListener('input',jRcalc);
-try{$('jR').value=Math.round(riskUsd1()*2);}catch(e){}jRcalc();
+try{$('jR').value=Math.round(riskUsd1()*3);}catch(e){}jRcalc();
 document.querySelectorAll('#jOut button').forEach(function(b){b.addEventListener('click',function(){JO=b.dataset.v;document.querySelectorAll('#jOut button').forEach(function(x){x.classList.toggle('on',x===b);});
-  $('jWhyW').hidden=JO!=='SL';if(JO==='BE'){$('jR').value=0;$('jR').disabled=true;}else{$('jR').disabled=false;if(!+$('jR').value)$('jR').value=Math.round(riskUsd1()*(JO==='TP'?2:1));}jRcalc();});});
+  $('jWhyW').hidden=JO!=='SL';if(JO==='BE'){$('jR').value=0;$('jR').disabled=true;}else{$('jR').disabled=false;if(!+$('jR').value)$('jR').value=Math.round(riskUsd1()*(JO==='TP'?3:1));}jRcalc();});});
 function outOf(d){if(d.out)return d.out;var r=+d.r;return r>0.05?'TP':r<-0.05?'SL':'BE';}
 function addTrade(o,cb){if(!col){cb(false,'Журнал работает только на опубликованной странице.');return;}col.add(o).then(function(ref){cb(true,null,ref&&ref.id);}).catch(function(e){cb(false,'Не сохранилось: '+(e&&e.code||'ошибка'));});}
 var SHOTS={};
@@ -822,8 +767,8 @@ $('fPer').addEventListener('change',function(){var c=this.value==='custom';$('fF
 var SRC='robot';
 function srcDocs(){
   if(SRC==='mine')return DOCS.map(function(x){return x.d;});
-  return (typeof HIST==='undefined'?[]:(HIST||[])).filter(function(h){return /→ (TP|SL)/.test(h.result||'');}).map(function(h){var tp=/→ TP/.test(h.result);
-    return {symbol:h.symbol,type:h.type,side:h.side,date:h.date,out:tp?'TP':'SL',r:tp?2:-1,note:h.result||'',why:h.autopsy||'',ts:0};});
+  return (typeof HIST==='undefined'?[]:(HIST||[])).filter(function(h){return /→ (TP|SL)|закрыта в 22:00/.test(h.result||'');}).map(function(h){var res=h.result||'',tp=/→ TP/.test(res),t22=/закрыта в 22:00/.test(res),m=res.match(/([+\-−]\d+(?:[.,]\d+)?)R/),rv=m?parseFloat(m[1].replace('−','-').replace(',','.')):null,r=t22?(rv===null?0:rv):(tp?(rv>0?rv:2):-1);
+    return {symbol:h.symbol,type:h.type,side:h.side,date:h.date,out:r>0.05?'TP':(r<-0.05?'SL':'BE'),r:r,note:res,why:h.autopsy||'',ts:0};});
 }
 document.querySelectorAll('#jsSrc button').forEach(function(b){b.addEventListener('click',function(){SRC=b.dataset.w;document.querySelectorAll('#jsSrc button').forEach(function(x){x.classList.toggle('on',x===b);});
   $('jsTitle').textContent=SRC==='robot'?'Статистика · сигналы Пульта':'Статистика · мои сделки';renderStats();});});
@@ -897,7 +842,7 @@ function renderHist(){
     function row(k,v){g2.appendChild(el('span',null,k));var b=el('b');if(typeof v==='string'&&v.indexOf('<img ')===0)b.innerHTML=v;else b.textContent=v;g2.appendChild(b);}
     row('Дата',d.date);
     if(d.narr)row('Нарратив',d.narr);
-    if(d.entry)row('Вход / стоп / цель 2R',d.entry+' / '+(d.stop||'—')+' / '+(d.target||'—'));
+    if(d.entry)row('Вход / стоп / цель',d.entry+' / '+(d.stop||'—')+' / '+(d.target||'—'));
     if(d.risk)row('Риск',d.risk);
     if(d.result)row('Итог по правилам',d.result);
     if(d.mine)row('Моя отметка',d.mine);

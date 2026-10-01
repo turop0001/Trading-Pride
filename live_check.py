@@ -81,10 +81,13 @@ def riga_now():
     return now_utc + dt.timedelta(hours=off), off
 
 
+C_ENABLED = False   # 01.10.2026: Тип C на паузе (в отчётах/Telegram только Тип A)
+
+
 def window_now(riga_dt):
     mins = riga_dt.hour * 60 + riga_dt.minute
     if 600 <= mins < 840: return 'A'   # 10:00-14:00
-    if 990 <= mins < 1110: return 'C'  # 16:30-18:30
+    if C_ENABLED and 990 <= mins < 1110: return 'C'  # 16:30-18:30
     return None
 
 
@@ -292,7 +295,13 @@ def check_instrument(sym, ticker, window, prev=None):
     if ps and ps.get('src', 'Yahoo') != ('MT5' if is_mt5 else 'Yahoo'):
         d2 = fetch(ticker, ps.get('src', 'Yahoo'))   # ведём сделку по тому же источнику, что и вход
         if d2 is not None: d = d2
-    r = pult_rules.analyze(sym, d, window, dt.datetime.utcnow(), off, prev)
+    h1 = None
+    if window == 'A':
+        try:   # часовые бары (~40 суток) — для цепочки H1 (Тип A, S1)
+            h1 = fetch_ohlc(ticker, '60d', '60m')
+        except Exception as e:
+            print('H1 недоступен:', sym, str(e)[:100])
+    r = pult_rules.analyze(sym, d, window, dt.datetime.utcnow(), off, prev, h1)
     if r.get('signal') is not None and 'src' not in r['signal']:
         r['signal']['src'] = ps.get('src', 'MT5' if is_mt5 else 'Yahoo') if ps else ('MT5' if is_mt5 else 'Yahoo')
     if r.get('error'):
