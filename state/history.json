@@ -75,20 +75,5 @@
       "m5": "state/shots/2026-09-29_NAS100_A_m5.png",
       "h1": "state/shots/2026-09-29_NAS100_A_h1.png"
     }
-  },
-  {
-    "id": "2026-09-29_GBPUSD_C",
-    "date": "2026-09-29",
-    "symbol": "GBPUSD",
-    "type": "C",
-    "side": "long",
-    "entry": 1.3223,
-    "stop": 1.32174,
-    "target": 1.32341,
-    "result": "ВХОД → SL −1R",
-    "shots": {
-      "m5": "state/shots/2026-09-29_GBPUSD_C_m5.png",
-      "h1": "state/shots/2026-09-29_GBPUSD_C_h1.png"
-    }
   }
 ]
