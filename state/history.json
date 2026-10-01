@@ -13,21 +13,5 @@
       "m5": "state/shots/2026-09-28_EURUSD_C_m5.png",
       "h1": "state/shots/2026-09-28_EURUSD_C_h1.png"
     }
-  },
-  {
-    "id": "2026-09-29_NAS100_A",
-    "date": "2026-09-29",
-    "symbol": "NAS100",
-    "type": "A",
-    "side": "short",
-    "entry": 30582.2,
-    "stop": 30629.1,
-    "target": 30488.6,
-    "result": "ВХОД → SL −1R",
-    "autopsy": "шла в плюс до +0.9R, стоп через 2 ч 0 мин; после стопа цель не достигнута, цена ушла дальше против на 3.1R; D1 против входа",
-    "shots": {
-      "m5": "state/shots/2026-09-29_NAS100_A_m5.png",
-      "h1": "state/shots/2026-09-29_NAS100_A_h1.png"
-    }
   }
 ]
