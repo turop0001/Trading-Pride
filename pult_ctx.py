@@ -96,23 +96,24 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
 
 
 def struct_line(ctx, price, liq, fm):
+    """Короткий нарратив без цифр: части через ' | ' (Пульт рисует каждую отдельной строкой)."""
     sw, sb, rec = ctx['swing'], ctx['sub'], ctx['rec']
     up = sorted([x for x in liq if x['p'] > price], key=lambda x: x['p'])
     dn = sorted([x for x in liq if x['p'] < price], key=lambda x: -x['p'])
-    u = f' ↑ {fm(up[0]["p"])} ({up[0]["name"]})' if up else ''
-    dw = f' ↓ {fm(dn[0]["p"])} ({dn[0]["name"]})' if dn else ''
-    # где цена и куда вероятнее
-    ph = ''
+    parts = []
     hi, lo = sw.get('hi'), sw.get('lo')
     if hi and lo and hi > lo:
         f = (price - lo) / (hi - lo)
-        if sw['tr'] == 1: ph = 'откат внутри восходящего Swing' if f < 0.5 else 'импульс в восходящем Swing'
-        elif sw['tr'] == -1: ph = 'откат внутри нисходящего Swing' if f > 0.5 else 'импульс в нисходящем Swing'
-        else: ph = 'внутри диапазона Swing ' + fm(lo) + '–' + fm(hi)
-    where = {'LONG': 'вероятнее вверх', 'SHORT': 'вероятнее вниз', '50/50': 'направление неясно'}[rec]
-    brk = ' · ' + sw['brk'] if sw.get('brk') else ''
-    return (f'Swing {_arrow(sw["tr"])} {sw["txt"]}{brk}; Sub {_arrow(sb["tr"])} {sb["txt"]}'
-            + (f' · {ph}' if ph else '') + f' → {where}.' + (f' Ближайшая ликвидность:{u}{dw}' if (u or dw) else ''))
+        if sw['tr'] == 1: parts.append('откат внутри восходящего Swing' if f < 0.5 else 'импульс в восходящем Swing')
+        elif sw['tr'] == -1: parts.append('откат внутри нисходящего Swing' if f > 0.5 else 'импульс в нисходящем Swing')
+        else: parts.append('цена внутри диапазона Swing')
+    if sw.get('brk'): parts.append(sw['brk'])
+    parts.append({'LONG': 'вероятнее вверх', 'SHORT': 'вероятнее вниз', '50/50': 'направление неясно'}[rec])
+    liqs = []
+    if up: liqs.append('↑ ' + up[0]['name'])
+    if dn: liqs.append('↓ ' + dn[0]['name'])
+    if liqs: parts.append('Ликвидность: ' + ' · '.join(liqs))
+    return ' | '.join(parts)
 
 
 def prob_word(n_plus, n_worse):

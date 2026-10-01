@@ -122,6 +122,23 @@ tr.tot td{font-weight:700;background:var(--surface-2)} tr.cur td{background:var(
 .rule .no{color:var(--accent);margin-right:2px}
 .st.trade{background:#2f6fb5;color:#fff}.st.done{background:var(--surface-2);color:var(--text)}
 .st.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}.st.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700}.stchip.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}.stchip.rec.long,.stchip.prob-high{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip.rec.short,.stchip.prob-low{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}.stchip.rec.side,.stchip.prob-mid{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}.stchip.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}
+.prog2{margin:6px 0 8px}.prog2 .t{height:12px;background:var(--surface-2);border-radius:99px;overflow:hidden;border:1px solid var(--border)}.prog2 .f{height:100%;width:0;border-radius:99px;transition:width .25s,background .25s}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.pxp{display:flex;flex-wrap:wrap;gap:6px}
+.pl{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;border:1px solid var(--border);background:var(--surface-2);color:var(--text);white-space:nowrap}
+.pl i{font-style:normal;font-weight:500;opacity:.75;font-size:11.5px}.pl b{font-family:var(--mono)}.pl small{font-family:var(--mono);opacity:.7;font-size:11px}
+.pl.base{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}.pl.plus,.pl.long,.pl.prob-high{background:var(--long-bg);color:var(--long);border-color:var(--long)}
+.pl.minus,.pl.short,.pl.prob-low{background:var(--short-bg);color:var(--short);border-color:var(--short)}.pl.side,.pl.prob-mid{background:var(--side-bg);color:var(--side);border-color:var(--side)}
+.pl.rec{font-weight:700}.pl.prob-high,.pl.prob-mid,.pl.prob-low{font-size:13.5px;padding:4px 14px}.pl.prob-high::before,.pl.prob-mid::before,.pl.prob-low::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pxn{display:flex;flex-direction:column;gap:5px}.pxn .nl{display:block;font-size:13.5px;font-weight:500;padding:3px 10px;border-left:3px solid var(--border);background:var(--surface-2);border-radius:0 8px 8px 0}
+.pxn .nl.long{border-left-color:var(--long);color:var(--long);font-weight:700}.pxn .nl.short{border-left-color:var(--short);color:var(--short);font-weight:700}.pxn .nl.side{border-left-color:var(--side);color:var(--side);font-weight:700}.pxn .nl.liq{color:var(--muted);border-left-color:var(--blue)}
+details.pxc{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:6px 10px;width:100%}details.pxc>summary{cursor:pointer;list-style:none;display:block}details.pxc>summary::-webkit-details-marker{display:none}
+.pxh{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700}.pxh em{font-style:normal;font-family:var(--mono);font-weight:600}
+.pxc.k-base .pxh{color:var(--blue)}.pxc.k-plus .pxh{color:var(--long)}.pxc.k-minus .pxh{color:var(--short)}
+.pxbar{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:5px 0}.pxbar i{display:block;height:100%;border-radius:99px}
+.pxchips{display:flex;flex-wrap:wrap;gap:4px}.pxchips .ch{min-width:26px;text-align:center;padding:1px 7px;border-radius:7px;font-size:12px;font-family:var(--mono);border:1px solid var(--border);color:var(--muted)}
+.pxc.k-base .ch.on{background:var(--blue);border-color:var(--blue);color:#fff}.pxc.k-plus .ch.on{background:var(--long);border-color:var(--long);color:#fff}.pxc.k-minus .ch.on{background:var(--short);border-color:var(--short);color:#fff}
+.pxd{margin-top:8px;display:flex;flex-direction:column;gap:3px}.pxd div{font-size:12.5px;font-weight:400;color:var(--muted)}.pxd div.on{color:var(--text);font-weight:600}
+
 .st.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}
 .rgrid{display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:17px;line-height:1.45}
 @media (max-width:560px){.rgrid{grid-template-columns:1fr;gap:2px}.rgrid span{margin-top:8px;font-size:15px}}
@@ -321,44 +338,85 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
     <div class="card">
       <h2>Мои бектесты · Тип A и Тип C</h2>
       <div class="kpis">
-        <div class="kpi"><small>Тип A · сделок</small><b>451</b></div>
-        <div class="kpi"><small>Тип A · WR</small><b>78%</b></div>
-        <div class="kpi"><small>Тип A · ΣR (1:2)</small><b class="pos">+602R</b></div>
+        <div class="kpi"><small>Тип A · сделок (7 инстр.)</small><b>391</b></div>
+        <div class="kpi"><small>Тип A · WR</small><b>77%</b></div>
+        <div class="kpi"><small>Тип A · ΣR (1:2)</small><b class="pos">+509R</b></div>
         <div class="kpi"><small>Тип C · сделок</small><b>44</b></div>
         <div class="kpi"><small>Тип C · WR</small><b>84%</b></div>
         <div class="kpi"><small>Тип C · ΣR (1:2)</small><b class="pos">+67R</b></div>
       </div>
-      <p class="note" style="margin-top:10px">Источник — журналы бектестов в Notion (Backtest Journal: Азия 2022/23, 2024/25, 2026 LO для Типа A; «Тип C – NY» для Типа C). Это ручные бэктесты по скринам, цель 1:2, SL = −1R, TP = +2R. Автоматические правила Пульта считаются отдельно и в эти цифры не входят: на механике WR заметно ниже, преимущество ручного выбора дня подтверждается только форвардом.</p>
+      <p class="note" style="margin-top:10px">Источник — журналы бектестов в Notion (Backtest Journal: Азия 2022/23, 2024/25, 2026 LO для Типа A; «Тип C – NY» для Типа C). Это ручные бэктесты по скринам, цель 1:2, SL = −1R, TP = +2R. Автоматические правила Пульта считаются отдельно и в эти цифры не входят (ниже в разделе «Прогон Пульта на истории»). Тип A — только 7 основных инструментов (без EU50, Brent, UK100, BTC, SILVER, EURGBP, GBPJPY). На механике WR заметно ниже, преимущество ручного выбора дня подтверждается только форвардом.</p>
     </div>
-    <div class="card"><h2>Тип A · по инструментам (2022 – апрель 2026)</h2><div class="tw"><table><thead><tr><th>Инструмент</th><th>Сделок</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR (1:2)</th><th>R / сделка</th></tr></thead><tbody>
+    <div class="card"><h2>Тип A · по инструментам (7 основных, 2022 – апрель 2026)</h2><div class="tw"><table><thead><tr><th>Инструмент</th><th>Сделок</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR (1:2)</th><th>R / сделка</th></tr></thead><tbody>
 <tr><td>GOLD (XAUUSD)</td><td>74</td><td>55</td><td>19</td><td>74%</td><td class="pos">+91R</td><td>+1.23R</td></tr>
 <tr><td>US100 (NAS100)</td><td>65</td><td>48</td><td>17</td><td>74%</td><td class="pos">+79R</td><td>+1.22R</td></tr>
-<tr><td>US500</td><td>64</td><td>49</td><td>15</td><td>77%</td><td class="pos">+83R</td><td>+1.30R</td></tr>
+<tr><td>US500</td><td>65</td><td>50</td><td>15</td><td>77%</td><td class="pos">+85R</td><td>+1.31R</td></tr>
 <tr><td>GER40</td><td>58</td><td>46</td><td>12</td><td>79%</td><td class="pos">+80R</td><td>+1.38R</td></tr>
 <tr><td>US30</td><td>51</td><td>38</td><td>13</td><td>75%</td><td class="pos">+63R</td><td>+1.24R</td></tr>
 <tr><td>GBPUSD</td><td>50</td><td>42</td><td>8</td><td>84%</td><td class="pos">+76R</td><td>+1.52R</td></tr>
-<tr><td>EU50</td><td>38</td><td>30</td><td>8</td><td>79%</td><td class="pos">+52R</td><td>+1.37R</td></tr>
 <tr><td>EURUSD</td><td>28</td><td>21</td><td>7</td><td>75%</td><td class="pos">+35R</td><td>+1.25R</td></tr>
-<tr><td>Brent</td><td>10</td><td>10</td><td>0</td><td>100%</td><td class="pos">+20R</td><td>+2.00R</td></tr>
-<tr><td>UK100</td><td>4</td><td>4</td><td>0</td><td>100%</td><td class="pos">+8R</td><td>+2.00R</td></tr>
-<tr><td>BTC</td><td>3</td><td>3</td><td>0</td><td>100%</td><td class="pos">+6R</td><td>+2.00R</td></tr>
-<tr><td>SILVER</td><td>3</td><td>2</td><td>1</td><td>67%</td><td class="pos">+3R</td><td>+1.00R</td></tr>
-<tr><td>EURGBP</td><td>2</td><td>2</td><td>0</td><td>100%</td><td class="pos">+4R</td><td>+2.00R</td></tr>
-<tr><td>GBPJPY</td><td>1</td><td>1</td><td>0</td><td>100%</td><td class="pos">+2R</td><td>+2.00R</td></tr>
-<tr class="tot"><td><b>Итого</b></td><td>451</td><td>351</td><td>100</td><td>78%</td><td class="pos">+602R</td><td>+1.33R</td></tr>
+<tr class="tot"><td><b>Итого</b></td><td>391</td><td>300</td><td>91</td><td>77%</td><td class="pos">+509R</td><td>+1.30R</td></tr>
 </tbody></table></div></div>
     <div class="card"><h2>Тип A · по годам</h2><div class="tw"><table><thead><tr><th>Год</th><th>Сделок</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR (1:2)</th><th>R / сделка</th></tr></thead><tbody>
-<tr><td>2022</td><td>69</td><td>53</td><td>16</td><td>77%</td><td class="pos">+90R</td><td>+1.30R</td></tr>
+<tr><td>2022</td><td>58</td><td>45</td><td>13</td><td>78%</td><td class="pos">+77R</td><td>+1.33R</td></tr>
 <tr><td>2023</td><td>63</td><td>48</td><td>15</td><td>76%</td><td class="pos">+81R</td><td>+1.29R</td></tr>
-<tr><td>2024</td><td>142</td><td>107</td><td>35</td><td>75%</td><td class="pos">+179R</td><td>+1.26R</td></tr>
-<tr><td>2025</td><td>120</td><td>96</td><td>24</td><td>80%</td><td class="pos">+168R</td><td>+1.40R</td></tr>
-<tr><td>2026 (янв–апр)</td><td>57</td><td>47</td><td>10</td><td>82%</td><td class="pos">+84R</td><td>+1.47R</td></tr>
-<tr class="tot"><td><b>Итого</b></td><td>451</td><td>351</td><td>100</td><td>78%</td><td class="pos">+602R</td><td>+1.33R</td></tr>
+<tr><td>2024</td><td>113</td><td>83</td><td>30</td><td>73%</td><td class="pos">+136R</td><td>+1.20R</td></tr>
+<tr><td>2025</td><td>110</td><td>87</td><td>23</td><td>79%</td><td class="pos">+151R</td><td>+1.37R</td></tr>
+<tr><td>2026 (янв–апр)</td><td>47</td><td>37</td><td>10</td><td>79%</td><td class="pos">+64R</td><td>+1.36R</td></tr>
+<tr class="tot"><td><b>Итого</b></td><td>391</td><td>300</td><td>91</td><td>77%</td><td class="pos">+509R</td><td>+1.30R</td></tr>
 </tbody></table></div></div>
-    <div class="card"><h2>Тип A · направление</h2><div class="tw"><table><thead><tr><th>Сторона</th><th>Сделок</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR (1:2)</th><th>R / сделка</th></tr></thead><tbody>
-<tr><td>Лонг</td><td>424</td><td>332</td><td>92</td><td>78%</td><td class="pos">+572R</td><td>+1.35R</td></tr>
-<tr><td>Шорт</td><td>27</td><td>19</td><td>8</td><td>70%</td><td class="pos">+30R</td><td>+1.11R</td></tr>
-<tr class="tot"><td><b>Итого</b></td><td>451</td><td>351</td><td>100</td><td>78%</td><td class="pos">+602R</td><td>+1.33R</td></tr>
+    <div class="card"><h2>Тип A · просадка</h2><div class="kpis"><div class="kpi"><small>Макс. просадка (всё время)</small><b class="neg">−4R</b></div><div class="kpi"><small>То же при риске 1%</small><b class="neg">−4%</b></div><div class="kpi"><small>Период просадки</small><b>05.09 – 20.11.2023</b></div><div class="kpi"><small>Макс. серия SL подряд</small><b>4</b></div><div class="kpi"><small>Худший месяц</small><b class="neg">Окт 2023: −2R</b></div><div class="kpi"><small>Убыточных месяцев</small><b>2 из 50</b></div></div><p class="note" style="margin-top:10px">Просадка считается по порядку записей в журнале бектестов (пик → дно накопленных R, TP = +2R, SL = −1R). Месяцы без записей (окт–дек 2025, с мая 2026) в расчёт не входят. «% при риске 1%» — просадка в процентах от счёта при риске 1% на сделку; при 0.5% — вдвое меньше, при 0.25% — в четыре раза меньше.</p></div>
+    <div class="card"><h2>Тип A · просадка по месяцам</h2><div class="tw"><table><thead><tr><th>Месяц</th><th>Сделок</th><th>SL</th><th>ΣR за месяц</th><th>Просадка внутри месяца</th><th>% при риске 1%</th></tr></thead><tbody>
+<tr><td>Янв 2022</td><td>4</td><td>0</td><td class="pos">+8R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Фев 2022</td><td>7</td><td>1</td><td class="pos">+11R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Мар 2022</td><td>11</td><td>1</td><td class="pos">+19R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Апр 2022</td><td>1</td><td>0</td><td class="pos">+2R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Май 2022</td><td>4</td><td>3</td><td class="neg">−1R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Июн 2022</td><td>9</td><td>1</td><td class="pos">+15R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Июл 2022</td><td>5</td><td>1</td><td class="pos">+7R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Авг 2022</td><td>2</td><td>1</td><td class="pos">+1R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Сен 2022</td><td>1</td><td>0</td><td class="pos">+2R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Окт 2022</td><td>5</td><td>3</td><td class="pos">+1R</td><td class="neg">−3R</td><td>−3%</td></tr>
+<tr><td>Ноя 2022</td><td>6</td><td>1</td><td class="pos">+9R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Дек 2022</td><td>3</td><td>1</td><td class="pos">+3R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Янв 2023</td><td>11</td><td>1</td><td class="pos">+19R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Фев 2023</td><td>6</td><td>1</td><td class="pos">+9R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Мар 2023</td><td>11</td><td>2</td><td class="pos">+16R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Апр 2023</td><td>7</td><td>0</td><td class="pos">+14R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Май 2023</td><td>5</td><td>2</td><td class="pos">+4R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Июн 2023</td><td>5</td><td>2</td><td class="pos">+4R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Июл 2023</td><td>6</td><td>2</td><td class="pos">+6R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Авг 2023</td><td>4</td><td>1</td><td class="pos">+5R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Сен 2023</td><td>2</td><td>1</td><td class="pos">+1R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Окт 2023</td><td>2</td><td>2</td><td class="neg">−2R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Ноя 2023</td><td>2</td><td>1</td><td class="pos">+1R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Дек 2023</td><td>2</td><td>0</td><td class="pos">+4R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Янв 2024</td><td>11</td><td>3</td><td class="pos">+13R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Фев 2024</td><td>4</td><td>2</td><td class="pos">+2R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Мар 2024</td><td>11</td><td>4</td><td class="pos">+10R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Апр 2024</td><td>3</td><td>0</td><td class="pos">+6R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Май 2024</td><td>10</td><td>2</td><td class="pos">+14R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Июн 2024</td><td>3</td><td>0</td><td class="pos">+6R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Июл 2024</td><td>9</td><td>3</td><td class="pos">+9R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Авг 2024</td><td>7</td><td>1</td><td class="pos">+11R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Сен 2024</td><td>19</td><td>3</td><td class="pos">+29R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Окт 2024</td><td>16</td><td>6</td><td class="pos">+14R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Ноя 2024</td><td>8</td><td>0</td><td class="pos">+16R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Дек 2024</td><td>12</td><td>6</td><td class="pos">+6R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Янв 2025</td><td>21</td><td>3</td><td class="pos">+33R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Фев 2025</td><td>13</td><td>2</td><td class="pos">+20R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Мар 2025</td><td>14</td><td>3</td><td class="pos">+19R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Апр 2025</td><td>5</td><td>1</td><td class="pos">+7R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Май 2025</td><td>14</td><td>3</td><td class="pos">+19R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Июн 2025</td><td>7</td><td>0</td><td class="pos">+14R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Июл 2025</td><td>16</td><td>5</td><td class="pos">+17R</td><td class="neg">−3R</td><td>−3%</td></tr>
+<tr><td>Авг 2025</td><td>10</td><td>5</td><td class="pos">+5R</td><td class="neg">−3R</td><td>−3%</td></tr>
+<tr><td>Сен 2025</td><td>9</td><td>1</td><td class="pos">+15R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Окт 2025</td><td>1</td><td>0</td><td class="pos">+2R</td><td class="">—</td><td>—</td></tr>
+<tr><td>Янв 2026</td><td>17</td><td>1</td><td class="pos">+31R</td><td class="">−1R</td><td>−1%</td></tr>
+<tr><td>Фев 2026</td><td>16</td><td>3</td><td class="pos">+23R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Мар 2026</td><td>9</td><td>3</td><td class="pos">+9R</td><td class="">−2R</td><td>−2%</td></tr>
+<tr><td>Апр 2026</td><td>5</td><td>3</td><td class="pos">+1R</td><td class="neg">−3R</td><td>−3%</td></tr>
 </tbody></table></div></div>
     <div class="card"><h2>Тип C (NY) · по инструментам (20.07 – 29.09.2026)</h2><div class="tw"><table><thead><tr><th>Инструмент</th><th>Сделок</th><th>TP</th><th>SL</th><th>WR</th><th>ΣR (1:2)</th><th>R / сделка</th></tr></thead><tbody>
 <tr><td>GOLD (XAUUSD)</td><td>21</td><td>19</td><td>2</td><td>90%</td><td class="pos">+36R</td><td>+1.71R</td></tr>
@@ -377,6 +435,32 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 <tr><td>Шорт</td><td>26</td><td>22</td><td>4</td><td>85%</td><td class="pos">+40R</td><td>+1.54R</td></tr>
 <tr class="tot"><td><b>Итого</b></td><td>44</td><td>37</td><td>7</td><td>84%</td><td class="pos">+67R</td><td>+1.52R</td></tr>
 </tbody></table></div></div>
+      <div class="card"><h2>Тип C · просадка</h2><div class="kpis"><div class="kpi"><small>Макс. просадка</small><b class="neg">−1R</b></div><div class="kpi"><small>Макс. серия SL подряд</small><b>1</b></div><div class="kpi"><small>Убыточных месяцев</small><b>0 из 3</b></div></div><p class="note" style="margin-top:10px">Всего 44 сделки за 3 месяца — выборка маленькая, просадка в 1R не гарантия на будущее.</p><div class="tw"><table><thead><tr><th>Месяц</th><th>Сделок</th><th>SL</th><th>ΣR за месяц</th><th>Просадка внутри месяца</th><th>% при риске 1%</th></tr></thead><tbody>
+<tr><td>Июл 2026</td><td>6</td><td>1</td><td class="pos">+9R</td><td>−1R</td><td>−1%</td></tr>
+<tr><td>Авг 2026</td><td>18</td><td>3</td><td class="pos">+27R</td><td>−1R</td><td>−1%</td></tr>
+<tr><td>Сен 2026</td><td>20</td><td>3</td><td class="pos">+31R</td><td>−1R</td><td>−1%</td></tr>
+</tbody></table></div></div>
+    <div class="card"><h2>Прогон Пульта на истории · Тип A (7 инструментов)</h2><p class="note">Прогон правил Пульта (код движка) на истории Dukascopy, 01.12.2025 – 28.09.2026, механически, без спреда и комиссий, вход по уровню, цель 2R. Это не ваши ручные бектесты: цифры заметно ниже ручных (WR 47% против 78%).</p><div class="tw"><table><thead><tr><th>Инструмент</th><th>Сделок</th><th>TP</th><th>SL</th><th>БУ</th><th>WR</th><th>ΣR</th><th>R / сделка</th><th>Макс. просадка</th></tr></thead><tbody>
+<tr><td>EURUSD</td><td>35</td><td>16</td><td>19</td><td>0</td><td>46%</td><td class="pos">+11.6R</td><td>+0.33R</td><td>−9R</td></tr>
+<tr><td>GBPUSD</td><td>37</td><td>12</td><td>25</td><td>0</td><td>32%</td><td class="neg">−1R</td><td>-0.03R</td><td>−10R</td></tr>
+<tr><td>GER40</td><td>29</td><td>17</td><td>12</td><td>0</td><td>59%</td><td class="pos">+20.7R</td><td>+0.71R</td><td>−2R</td></tr>
+<tr><td>NAS100</td><td>19</td><td>7</td><td>12</td><td>0</td><td>37%</td><td class="pos">+2R</td><td>+0.11R</td><td>−4R</td></tr>
+<tr><td>US30</td><td>40</td><td>21</td><td>19</td><td>0</td><td>52%</td><td class="pos">+23R</td><td>+0.57R</td><td>−4R</td></tr>
+<tr><td>US500</td><td>32</td><td>14</td><td>18</td><td>0</td><td>44%</td><td class="pos">+8.8R</td><td>+0.27R</td><td>−4R</td></tr>
+<tr><td>XAUUSD</td><td>19</td><td>12</td><td>7</td><td>0</td><td>63%</td><td class="pos">+17R</td><td>+0.89R</td><td>−2R</td></tr>
+<tr class="tot"><td>Итого</td><td>211</td><td>99</td><td>112</td><td>0</td><td>47%</td><td class="pos">+82R</td><td>+0.39R</td><td>−13.2R</td></tr>
+</tbody></table></div></div>
+    <div class="card"><h2>Прогон Пульта на истории · Тип C (7 инструментов)</h2><p class="note">Тип C: боевая версия работает на 3 инструментах (XAUUSD, EURUSD, GBPUSD) — по ним 319 сделок, WR 55%, ΣR +255R. Включены сделки с БУ на 70% пути. Механический результат оптимистичнее реального: вход берётся по уровню отката и не учитывает проскальзывание и спред.</p><div class="tw"><table><thead><tr><th>Инструмент</th><th>Сделок</th><th>TP</th><th>SL</th><th>БУ</th><th>WR</th><th>ΣR</th><th>R / сделка</th><th>Макс. просадка</th></tr></thead><tbody>
+<tr><td>EURUSD</td><td>102</td><td>50</td><td>35</td><td>17</td><td>49%</td><td class="pos">+64.8R</td><td>+0.63R</td><td>−5R</td></tr>
+<tr><td>GBPUSD</td><td>107</td><td>56</td><td>36</td><td>15</td><td>52%</td><td class="pos">+76.8R</td><td>+0.72R</td><td>−3.2R</td></tr>
+<tr><td>GER40</td><td>96</td><td>52</td><td>34</td><td>10</td><td>54%</td><td class="pos">+70.7R</td><td>+0.74R</td><td>−5R</td></tr>
+<tr><td>NAS100</td><td>92</td><td>64</td><td>23</td><td>5</td><td>70%</td><td class="pos">+105R</td><td>+1.14R</td><td>−3R</td></tr>
+<tr><td>US30</td><td>82</td><td>52</td><td>20</td><td>10</td><td>63%</td><td class="pos">+82.9R</td><td>+1.01R</td><td>−3R</td></tr>
+<tr><td>US500</td><td>104</td><td>66</td><td>33</td><td>5</td><td>63%</td><td class="pos">+100R</td><td>+0.96R</td><td>−3R</td></tr>
+<tr><td>XAUUSD</td><td>110</td><td>71</td><td>27</td><td>12</td><td>65%</td><td class="pos">+113.6R</td><td>+1.03R</td><td>−3R</td></tr>
+<tr class="tot"><td>Итого (7 инстр.)</td><td>693</td><td>411</td><td>208</td><td>74</td><td>59%</td><td class="pos">+613.6R</td><td>+0.89R</td><td>−5R</td></tr>
+</tbody></table></div></div>
+    <div class="card"><h2>Прогон Пульта · вероятность low / mid / high</h2><p class="note">Для Типа A «высокая» чуть лучше «средней» (WR 55% против 47%), но выборка 20 сделок. Для Типа C группы почти не различаются (WR 58–62%), поэтому вероятность — подсказка, а не фильтр.</p><div class="tw"><table><thead><tr><th>Вероятность</th><th>Тип A: сделок</th><th>WR</th><th>ΣR</th><th>Тип C: сделок</th><th>WR</th><th>ΣR</th></tr></thead><tbody><tr><td>низкая</td><td>4</td><td>25%</td><td class="neg">−1R</td><td>69</td><td>62%</td><td class="pos">+64R</td></tr><tr><td>средняя</td><td>187</td><td>47%</td><td class="pos">+70R</td><td>391</td><td>58%</td><td class="pos">+332R</td></tr><tr><td>высокая</td><td>20</td><td>55%</td><td class="pos">+13R</td><td>233</td><td>61%</td><td class="pos">+218R</td></tr></tbody></table></div></div>
   </section>
 </div>
 
@@ -529,7 +613,7 @@ function buildCK(t){
   var g=CK[t],box=$('ck'+t);box.innerHTML='';
   var h=el('div','chead');h.appendChild(el('h3',null,g.title));h.appendChild(el('span','when',g.when));
   var rb=el('button','btn sm','Сбросить');h.appendChild(rb);box.appendChild(h);
-  var pr=el('div','prog');var tt=el('div','t'),ff=el('div','f');ff.id='bf'+t;tt.appendChild(ff);pr.appendChild(tt);var nn=el('span','n');nn.id='bn'+t;pr.appendChild(nn);box.appendChild(pr);
+  var pr=el('div','prog2');var tt=el('div','t'),ff=el('div','f');ff.id='bf'+t;tt.appendChild(ff);pr.appendChild(tt);box.appendChild(pr);var nn=el('div','pills');nn.id='bn'+t;box.appendChild(nn);
   g.items.forEach(function(r,ix){
     var l=el('label','rule');var c=el('input');c.type='checkbox';c.id='r'+t+ix;l.appendChild(c);
     var tx=el('div','tx');tx.appendChild(el('b','no',(ix+1)+'. '));tx.appendChild(document.createTextNode(r[1]));if(r[2])tx.appendChild(el('small',null,r[2]));l.appendChild(tx);
@@ -547,8 +631,8 @@ function verdict(t){
     if(c)n++;else(r[0]==='base'?base:r[0]==='skip'?skip:half).push(r[1]);});
   var NN=g.items.filter(function(r){return r[0]!=='plus'&&r[0]!=='minus';}).length,p=n/NN;
   var sc=np-nw,prob=sc>=2?'высокая':sc>=0?'средняя':'низкая',pp=sc>=2?.9:sc>=0?.5:.1;
-  $('bn'+t).textContent='Основные '+n+'/'+NN+' · усилители '+np+'/'+PP+(MM?' · ухудшители '+nw:'')+' · вероятность: '+prob;
-  $('bf'+t).style.width=(p*100)+'%';$('bf'+t).style.background=pcol(pp);
+  $('bn'+t).innerHTML='<span class="pl base"><i>Основные</i> <b>'+n+'/'+NN+'</b></span><span class="pl plus"><i>Усилители</i> <b>'+np+'/'+PP+'</b></span>'+(MM?'<span class="pl minus"><i>Ухудшители</i> <b>'+nw+'</b></span>':'')+'<span class="pl prob-'+(sc>=2?'high':sc>=0?'mid':'low')+'">Вероятность · '+prob+'</span>';
+  $('bf'+t).style.width=(p*100)+'%';$('bf'+t).style.background=pcol(p);
   var v=$('v'+t),r=riskNow(),c,bg,hd,sb;
   if(!n){v.style.borderColor='var(--border)';v.style.background='var(--surface-2)';v.innerHTML='<div class="vh" style="color:var(--muted)">Отмечай условия по мере выполнения: галочка = условие благоприятно</div>';return;}
   if(base.length){c='var(--off)';bg='var(--off-bg)';hd='НЕТ СЕТАПА';sb='Не отмечено: '+base.join(', ');}
@@ -622,6 +706,22 @@ function rigaMinutesNow(){
   catch(e){return 0;}
 }
 function winRank(w){var cFirst=rigaMinutesNow()>=840;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
+function escA(t){return String(t||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function trPill(lbl,v){v=String(v||'—');var up=/▲/.test(v),dn=/▼/.test(v),cls=up?'long':dn?'short':'side';
+  var w=up?'рост':dn?'падение':/сжат/.test(v)?'сжатие':/расшир/.test(v)?'расширение':v.replace(/[◆▲▼]\s*/,'');
+  var code=(v.match(/HH\/HL|LH\/LL/)||[''])[0];
+  return '<span class="pl '+cls+'"><i>'+lbl+'</i> '+(up?'▲':dn?'▼':'◆')+' '+w+(code?' <small>'+code+'</small>':'')+'</span>';}
+function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<2)return null;
+  return '<div class="pxn">'+p.map(function(t){var c=/^слом/i.test(t)?'short':/вероятнее вверх/i.test(t)?'long':/вероятнее вниз/i.test(t)?'short':/неясно/i.test(t)?'side':/^Ликвидность/i.test(t)?'liq':'';
+    return '<span class="nl '+c+'">'+t.charAt(0).toUpperCase()+t.slice(1)+'</span>';}).join('')+'</div>';}
+function ckBlock(kind,title,nums,cgi,pick){
+  var items=[];cgi.forEach(function(r,i){if(pick(r))items.push([i+1,r[1]]);});
+  var tot=items.length,n=0;items.forEach(function(it){if(nums.indexOf(it[0])>=0)n++;});
+  var p=tot?n/tot:0,col=kind==='base'?pcol(p):kind==='plus'?'var(--long)':'var(--short)';
+  var head=kind==='minus'?(n?n+' из '+tot+' · условие не выполнено':'нет · всё в порядке'):kind==='plus'?(n+' из '+tot+(n?'':' · не сработали')):(n+' из '+tot+(n?'':' · пока ничего'));
+  var chips=items.map(function(it){return '<span class="ch'+(nums.indexOf(it[0])>=0?' on':'')+'" title="'+escA(it[1])+'">'+it[0]+'</span>';}).join('');
+  var det=items.map(function(it){var on=nums.indexOf(it[0])>=0;return '<div class="'+(on?'on':'')+'">'+(on?(kind==='minus'?'✕ ':'✓ '):'○ ')+it[0]+'. '+escA(it[1])+'</div>';}).join('');
+  return '<div class="pxw"><details class="pxc k-'+kind+'"><summary><div class="pxh"><span>'+(kind==='base'?'Условия входа':kind==='plus'?'Что усиливает':'Что ухудшает')+'</span><em>'+head+'</em></div><div class="pxbar"><i style="width:'+Math.round((kind==='minus'?(tot?n/tot:0):p)*100)+'%;background:'+col+'"></i></div><div class="pxchips">'+chips+'</div></summary><div class="pxd">'+det+'</div></details></div>';}
 function liveCard(x){
   var dir=String(x.direction||''),es=/SHORT/.test(dir)?'short':/LONG/.test(dir)?'long':null;
   var m=STMAP[x.status]||['watch','Наблюдаем'];
@@ -632,20 +732,19 @@ function liveCard(x){
   rows.push(['Статус',stn]);
   /* структура: Swing (главная) и Sub (внутренняя) + рекомендация; только контекст, не правило входа */
   if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
-    rows.push(['Структура · Swing / Sub',(x.struct.swing||'—')+'   /   '+(x.struct.sub||'—')]);
-    rows.push(['Рекомендация','<span class="stchip rec '+rcls+'">'+(rc==='50/50'?'50/50':rc)+'</span>']);
-    if(x.struct.line)rows.push(['Нарратив',x.struct.line]);}
-  if(x.pos)rows.push(['Цена / Бокс '+(x.window==='C'?'Лондона':'Азии'),x.pos]);
+    rows.push(['Структура','<div class="pxp">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+rc+'</span></div>']);
+    if(x.struct.line){var nh=narrHTML(x.struct.line);rows.push(['Где цена',nh||String(x.struct.line)]);}}
+  if(x.pos)rows.push(['Цена / Бокс '+(x.window==='C'?'Лондона':'Азии'),'<div class="pxp"><span class="pl side">'+x.pos+'</span></div>']);
   if(x.prob){var pc=x.prob==='высокая'?'high':x.prob==='низкая'?'low':'mid';
-    rows.push(['Вероятность закрытия цели','<span class="stchip prob-'+pc+'">'+x.prob+'</span>']);}
+    rows.push(['Вероятность цели','<div class="pxp"><span class="pl prob-'+pc+'">'+x.prob+'</span></div>']);}
   if(x.ck&&x.ck.length||x.ckf&&x.ckf.length||x.worse&&x.worse.length){
-    var bs=[],pl=[],nb=0,npl=0;
-    cgi.forEach(function(r){if(r[0]==='plus')npl++;else if(r[0]!=='minus')nb++;});
+    var bs=[],pl=[],nb=0,npl=0,nmin=0;
+    cgi.forEach(function(r){if(r[0]==='plus')npl++;else if(r[0]==='minus')nmin++;else nb++;});
     (x.ck||[]).slice().sort(function(a,b){return a-b;}).forEach(function(n){var it=cgi[n-1];if(it&&it[0]==='plus')pl.push(n);else if(it&&it[0]!=='minus')bs.push(n);});
-    rows.push(['Чек-лист · основные',(bs.length?bs.join(' · ')+'  ('+bs.length+' из '+nb+')':'пока нет')]);
-    rows.push(['Чек-лист · усилители',(pl.length?pl.join(' · ')+'  ('+pl.length+' из '+npl+')':'пока нет из '+npl)]);
-    if(x.worse&&x.worse.length)rows.push(['Чек-лист · ухудшители','№ '+x.worse.join(', ')+' (условие не выполнено)']);
-    if(x.ckf&&x.ckf.length)rows.push(['Чек-лист · сработал скип','№ '+x.ckf.join(', ')]);}
+    rows.push(['Основные',ckBlock('base','Основные условия',bs,cgi,function(it){return it[0]!=='plus'&&it[0]!=='minus';})]);
+    if(npl)rows.push(['Усилители',ckBlock('plus','Усилители',pl,cgi,function(it){return it[0]==='plus';})]);
+    if(nmin)rows.push(['Ухудшители',ckBlock('minus','Ухудшители',x.worse||[],cgi,function(it){return it[0]==='minus';})]);
+    if(x.ckf&&x.ckf.length)rows.push(['Сработал скип','<div class="pxp">'+x.ckf.map(function(n){return '<span class="pl minus" title="'+escA(cgi[n-1]?cgi[n-1][1]:'')+'">№'+n+'</span>';}).join('')+'</div>']);}
   if(x.why&&x.why.length)rows.push(['Все причины',x.why.join('; ')]);
   if(x.sl_why)rows.push(['Разбор SL',x.sl_why]);
   var curR=null;
@@ -683,7 +782,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(c.curR&&(stc==='signal'||stc==='trade'))stt+=' · '+c.curR;if(my&&my.open){stc='trade';stt='В сделке'+(c.curR?' · '+c.curR:'');}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<div class="px')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }
