@@ -83,15 +83,26 @@ def _xticks(ax, d, off, fmt, n=8):
 
 
 def _levels(ax, n, sig, dec, ie=None):
-    for y, c, t in ((sig['entry'], C_ENTRY, 'ВХОД'), (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК %gR' % float(sig.get('rr') or 2))):
-        ax.axhline(y, color=c, linewidth=1.4 if t != 'ВХОД' else 1.0, linestyle='-' if t != 'ВХОД' else '--', zorder=4)
-        if t == 'ВХОД' and ie is not None:
-            x, ha = min(ie + max(6, int(n * 0.07)), n - 1), 'left'      # правее точки входа, чтобы не закрывать её
-        else:
-            x, ha = n - 1, 'right'
-        ax.annotate(f'{t} {y:.{dec}f}', (x, y), xytext=(0, 4), textcoords='offset points', ha=ha, va='bottom',
-                    color=c, fontsize=10, fontweight='bold', zorder=7,
-                    bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=c, lw=0.8, alpha=0.95))
+    """Линии на всю ширину; подписи — в пустом правом поле графика (не закрывают свечи и точку входа)."""
+    ax.set_xlim(ax.get_xlim()[0], n - 1 + max(8, n * 0.17))
+    items = [(sig['entry'], C_ENTRY, 'ВХОД' + (f" {sig['time']}" if sig.get('time') else '')),
+             (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК %gR' % float(sig.get('rr') or 2))]
+    for y, c, t in items:
+        ax.axhline(y, color=c, linewidth=1.4 if t[:4] != 'ВХОД' else 1.0, linestyle='-' if t[:4] != 'ВХОД' else '--', zorder=4)
+    y0, y1 = ax.get_ylim(); gap = (y1 - y0) * 0.06
+    pos = sorted([[y, c, t] for y, c, t in items], key=lambda a: a[0])
+    for k in range(1, len(pos)):
+        if pos[k][0] - pos[k - 1][0] < gap: pos[k].append(pos[k - 1][0] + gap)
+    xl = n - 1 + max(1, n * 0.01)
+    last = None
+    for p in pos:
+        yt = p[3] if len(p) > 3 else p[0]
+        if last is not None and yt - last < gap: yt = last + gap
+        last = yt
+        ax.annotate(f'{p[2]} {p[0]:.{dec}f}', (xl, p[0]), xytext=(xl, yt), textcoords='data', ha='left', va='center',
+                    color=p[1], fontsize=10, fontweight='bold', zorder=7, annotation_clip=False,
+                    bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=p[1], lw=0.8, alpha=0.95),
+                    arrowprops=dict(arrowstyle='-', color=p[1], lw=0.8))
 
 
 def _foot(fig, r):
@@ -157,14 +168,12 @@ def make_shots(sym, window, r, off, date_str):
             ax.text(0, r['prevH'], ' вчерашний бокс', fontsize=8, color=C_PREV, va='bottom')
         ie = int((m.index <= t_in).sum()) - 1
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
-        ax.annotate(f"вход {sig['time']}", (ie, sig['entry']), textcoords='offset points', xytext=(14, -20 if side == 'LONG' else 16),
-                    fontsize=9, color=C_ENTRY, fontweight='bold')
         _levels(ax, len(m), sig, dec, ie)
         _xticks(ax, m, off, '%H:%M')
         if window == 'C' and r.get('boxH') is not None:
             for y_ in (r['boxL'], r['boxH']): ax.axhline(y_, color='#2f5f9e', linestyle=':', linewidth=1, zorder=1)
             ax.text(0, r['boxH'], ' бокс Лондона', fontsize=8, color='#2f5f9e', va='bottom')
-        if sig.get('be_at'): ax.axhline(sig['be_at'], color='#f9a825', linestyle='--', linewidth=1, zorder=4); ax.annotate(f"БУ при {sig['be_at']:.{dec}f}", (len(m) - 1, sig['be_at']), ha='right', fontsize=9, color='#f9a825')
+        if sig.get('be_at'): ax.axhline(sig['be_at'], color='#f9a825', linestyle='--', linewidth=1, zorder=4); ax.annotate(f"БУ {sig['be_at']:.{dec}f}", (1, sig['be_at']), ha='left', va='bottom', fontsize=8, color='#f9a825', annotation_clip=False)
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", f"M5 · {pd.Timestamp(date_str).strftime('%d.%m.%Y')} · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
         _foot(fig, r)
         p = os.path.join(SHOT_DIR, base + '_m5.png'); fig.savefig(p); plt.close(fig)

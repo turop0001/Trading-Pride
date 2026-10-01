@@ -760,8 +760,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         if g <= ge: continue
         # вынос ОДНОЙ свечой (любой — телом или тенью за границу бокса) → вход только на её поглощении
         # (закрытие выше хая свечи выноса); иначе — выкуп 30% длины выноса (от экстремума к границе бокса)
-        ns_now = sum(1 for k in range(g0, ge + 1) if L[k] < lowB)
-        if ns_now == 1:
+        if ge == g0:
             ok = C[g] > H[ge] and C[g] > O[g]; mode = 'engulf'
         else:
             ok = H[g] >= lvl; mode = 'pb30'
@@ -771,7 +770,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     nsw = 0
     for g in range(g0, ge + 1):
         rg = H[g] - L[g]
-        if L[g] < lowB and not (rg > 0 and abs(C[g] - O[g]) <= 0.25 * rg): nsw += 1
+        if not (rg > 0 and abs(C[g] - O[g]) <= 0.25 * rg): nsw += 1
     res['extreme'] = round(sd * ext, dec)
     if nsw > 4:
         res['ckf'] = [4]; res['reasons'] = [f'свечей выноса {nsw} (>4)']; _why(res, f'Скип: свечей выноса {nsw}, допустимо ≤4', [4])

@@ -326,6 +326,12 @@ def main(send=True):
     if wd < 5:
         for w, close_m, rng, nxt in (('A', 840, '10:00–14:00', ('C', '16:30') if lc.C_ENABLED else (None, None)), ('C', 1110, '16:30–18:30', (None, None))):
             if m >= close_m and flags.get('open' + w) and not flags.get('close' + w):
+                # окно закрыто: НАБЛЮДАЕМ/ВЫНОС без сделки → СКИП (в state, чтобы карточки на сайте не висели)
+                for s_ in syms_of(w):
+                    c_ = state.get(f'{s_}_{w}', {})
+                    if c_.get('date') == today and not c_.get('signal') and c_.get('line_status') in ('watch', 'prep'):
+                        c_['line_status'] = 'skip'; c_['note'] = f'СКИП (вход не случился до {rng[-5:]})'
+                        c_['tg_note'] = 'СКИП'; c_['ckf'] = []
                 res = {s: state.get(f'{s}_{w}', {}) for s in syms_of(w) if state.get(f'{s}_{w}', {}).get('date') == today}
                 n, pct = result_of(res)
                 lines = lines_for(w, res, closed=True) if res else []
