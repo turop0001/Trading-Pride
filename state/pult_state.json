@@ -305,6 +305,13 @@
         "🟡 EURUSD (—) — НАБЛЮДАЕМ",
         "🟡 GBPUSD (—) — НАБЛЮДАЕМ"
       ]
+    },
+    {
+      "date": "2026-10-01",
+      "time": "16:38",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -376,11 +383,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4171.34,
+    "price": 4167.99,
     "boxH": 4187.78,
     "boxL": 4149.2,
     "reasons": [],
-    "checked_at": "16:30",
+    "checked_at": "16:38",
     "ck": [
       1,
       2
@@ -417,11 +424,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.12843,
+    "price": 1.12887,
     "boxH": 1.13118,
     "boxL": 1.12654,
     "reasons": [],
-    "checked_at": "16:30",
+    "checked_at": "16:38",
     "ck": [
       1,
       2
@@ -458,11 +465,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.32182,
+    "price": 1.32266,
     "boxH": 1.32494,
     "boxL": 1.3193,
     "reasons": [],
-    "checked_at": "16:30",
+    "checked_at": "16:38",
     "ck": [
       1,
       2
