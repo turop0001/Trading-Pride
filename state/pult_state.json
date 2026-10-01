@@ -287,11 +287,19 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-10-01",
+      "time": "14:02",
+      "window": "—",
+      "text": "окно A закрыто, отчёт отправлен",
+      "lines": []
     }
   ],
   "_flags": {
     "date": "2026-10-01",
-    "openA": true
+    "openA": true,
+    "closeA": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
