@@ -81,7 +81,7 @@ def riga_now():
     return now_utc + dt.timedelta(hours=off), off
 
 
-C_ENABLED = False   # 01.10.2026: Тип C на паузе (в отчётах/Telegram только Тип A)
+C_ENABLED = True    # 01.10.2026: Тип C снова включён (новые правила, бокс Лондона 11:00–16:25, вход 16:30–18:30)
 
 
 def window_now(riga_dt):
@@ -296,11 +296,10 @@ def check_instrument(sym, ticker, window, prev=None):
         d2 = fetch(ticker, ps.get('src', 'Yahoo'))   # ведём сделку по тому же источнику, что и вход
         if d2 is not None: d = d2
     h1 = None
-    if window == 'A':
-        try:   # часовые бары (~40 суток) — для цепочки H1 (Тип A, S1)
-            h1 = fetch_ohlc(ticker, '60d', '60m')
-        except Exception as e:
-            print('H1 недоступен:', sym, str(e)[:100])
+    try:   # часовые бары (~40 суток) — структура Swing/Sub, ликвидность H1/D1, H1 FVG (типы A и C)
+        h1 = fetch_ohlc(ticker, '60d', '60m')
+    except Exception as e:
+        print('H1 недоступен:', sym, str(e)[:100])
     r = pult_rules.analyze(sym, d, window, dt.datetime.utcnow(), off, prev, h1)
     if r.get('signal') is not None and 'src' not in r['signal']:
         r['signal']['src'] = ps.get('src', 'MT5' if is_mt5 else 'Yahoo') if ps else ('MT5' if is_mt5 else 'Yahoo')

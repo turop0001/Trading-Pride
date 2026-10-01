@@ -101,14 +101,14 @@ def analyze_window(state, window, today):
         # 29.09.2026: скриншоты M5 и H1 в карточку — один раз, когда сделка закрылась (TP/SL)
         if prev.get('shots'):
             r['shots'] = prev['shots']
-        elif r.get('signal') and any(x in (r.get('note') or '') for x in ('→ TP', '→ SL')):
+        elif r.get('signal') and any(x in (r.get('note') or '') for x in ('→ TP', '→ SL', '→ БУ')):
             try:
                 import shots as _sh
                 sh = _sh.make_shots(sym, window, r, lc.riga_now()[1], today)
                 if sh:
                     r['shots'] = sh
                     _hist_add(None, {'id': f"{today}_{sym}_{window}", 'date': today, 'symbol': sym, 'type': window,
-                                     'result': r.get('note'), 'autopsy': r.get('autopsy'), 'shots': sh})
+                                     'result': r.get('note'), 'autopsy': r.get('autopsy'), 'sl_why': r.get('sl_why'), 'shots': sh})
             except Exception as e:
                 print('shots failed:', sym, e)
         narr = _trend_cached(state, sym, today)
@@ -216,13 +216,15 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             tr = _pr._track({}, _pr._completed(d, dt.datetime.utcnow(), 5), sig, sd_, r.get('direction', ''), str)
             nt = str(tr.get('note', ''))
             if nt.startswith('В СДЕЛКЕ'): continue
-            out = 'TP' if '→ TP' in nt else ('SL' if '→ SL' in nt else 'T22')
+            out = 'TP' if '→ TP' in nt else ('SL' if '→ SL' in nt else ('BE' if '→ БУ' in nt else 'T22'))
             if out == 'T22' and not final: continue
             r['note'] = nt
             r['tg_note'] = tr.get('tg_note') or ('ЗАКРЫТА - ' + out)
             if tr.get('exit_r') is not None: r['exit_r'] = tr['exit_r']
             if out == 'SL':
                 r['autopsy'] = tr.get('autopsy') or _pr.autopsy(sig, sd_, d, r)
+            for k_ in ('why', 'sl_why', 'prob'):
+                if tr.get(k_) is not None: r[k_] = tr[k_]
             r['line_status'] = 'skip' if out == 'SL' else 'entry'
             r['status_key'] = r['note']
             try:
@@ -232,7 +234,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             except Exception as e:
                 print('final shots failed:', s, e)
             try:
-                _hist_add(None, {'id': f"{today}_{s}_{w}", 'result': r['note'], 'autopsy': r.get('autopsy'), **({'shots': r['shots']} if r.get('shots') else {})})
+                _hist_add(None, {'id': f"{today}_{s}_{w}", 'result': r['note'], 'autopsy': r.get('autopsy'), 'sl_why': r.get('sl_why'), **({'shots': r['shots']} if r.get('shots') else {})})
             except Exception as e:
                 print('final history failed:', e)
             state[f'{s}_{w}'] = r
@@ -243,6 +245,8 @@ def final_check(state, today, dstr, off, tg, did, final=True):
                 xr = float(r.get('exit_r') or 0)
                 upd.append(f"{EMO_TP if xr > 0 else EMO_SL} {s} ({r['direction']}) — закрыта в 22:00 Рига "
                            f"({xr:+.1f}% депозита)")
+            elif out == 'BE':
+                upd.append(f"\U0001F7E1 {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} Рига (0% депозита)")
             else:
                 upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
                            f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
@@ -358,7 +362,7 @@ def main(send=True):
 
     # ДОБАВЛЕНО 29.09.2026: сделки, оставшиеся открытыми после закрытия своего окна (A → в окне C),
     # проверяем каждые 5 минут, чтобы SL/TP появлялся в карточке и Telegram сразу, а не в 22:00.
-    if wd < 5 and window != 'A' and 840 <= m < 1320:
+    if wd < 5 and 600 <= m < 1320:
         try:
             if final_check(state, today, dstr, off, tg, did, final=False):
                 text = text or 'закрыта сделка окна A — карточка обновлена'

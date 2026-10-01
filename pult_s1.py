@@ -14,7 +14,7 @@ ASIA = (180, 600)      # 03:00–10:00 Рига
 WIN = (600, 840)       # окно входа 10:00–14:00 Рига
 END_M = 1320           # 22:00 Рига — закрытие сделки
 BUF = 0.3              # буфер стопа, ATR(M5, 14)
-RR = 3.0               # цель, R
+RR = 2.0               # цель, R (с 01.10.2026: 1:2)
 
 
 def struct(Hh, Lh, Ch):
@@ -112,7 +112,7 @@ def analyze_day(d, today, off, sd, h1=None):
         f7 = (strong >= 3) or (ret >= 0.3)
         trd, chn = chain_at(g)
         out['last_chain'] = chn
-        if f2 and f4 and f7 and chn >= 2:
+        if f2 and f4 and f7:   # цепочка H1 как правило убрана 01.10.2026 (структура — только контекст)
             e = O[g + 1] if g + 1 < n else None
             out['cand'] = dict(g=int(g), ge=int(ge), start=int(start), ext_f=float(ext), atr=float(atr[g]),
                                strong=strong, ret=float(ret), nsw=nsw, chain=chn, t_g=d.index[g])

@@ -83,7 +83,7 @@ def _xticks(ax, d, off, fmt, n=8):
 
 
 def _levels(ax, n, sig, dec, ie=None):
-    for y, c, t in ((sig['entry'], C_ENTRY, 'ВХОД'), (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК 2R')):
+    for y, c, t in ((sig['entry'], C_ENTRY, 'ВХОД'), (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК %gR' % float(sig.get('rr') or 2))):
         ax.axhline(y, color=c, linewidth=1.4 if t != 'ВХОД' else 1.0, linestyle='-' if t != 'ВХОД' else '--', zorder=4)
         if t == 'ВХОД' and ie is not None:
             x, ha = min(ie + max(6, int(n * 0.07)), n - 1), 'left'      # правее точки входа, чтобы не закрывать её
@@ -94,6 +94,22 @@ def _levels(ax, n, sig, dec, ie=None):
                     bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=c, lw=0.8, alpha=0.95))
 
 
+def _foot(fig, r):
+    """Подпись под графиком: вероятность, выполненные пункты, ухудшители, разбор SL (01.10.2026)."""
+    sg = r.get('signal') or {}
+    parts = []
+    if sg.get('prob'): parts.append('Вероятность: ' + sg['prob'])
+    if sg.get('ck'): parts.append('выполнено пунктов: ' + ', '.join(str(x) for x in sg['ck']))
+    if sg.get('plus'): parts.append('усилители №' + ', '.join(str(x) for x in sg['plus']))
+    if sg.get('worse'): parts.append('ухудшитель №' + ', '.join(str(x) for x in sg['worse']))
+    st = (r.get('struct') or {})
+    if st.get('rec'): parts.append('структура: ' + st['rec'] + f" (Swing {st.get('swing', '')}, Sub {st.get('sub', '')})")
+    txt = ' · '.join(parts)
+    if r.get('sl_why'): txt += '\n' + r['sl_why']
+    if txt:
+        fig.text(0.01, 0.005, txt, fontsize=8.5, color='#b71c1c' if r.get('sl_why') else '#444', va='bottom', wrap=True)
+
+
 def _style(fig, ax, title, subtitle):
     ax.set_title(title, fontsize=12, fontweight='bold', loc='left', pad=18)
     ax.text(0, 1.015, subtitle, transform=ax.transAxes, fontsize=9, color='#555')
@@ -101,7 +117,7 @@ def _style(fig, ax, title, subtitle):
     for s in ('top', 'right'):
         ax.spines[s].set_visible(False)
     ax.yaxis.tick_right()
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
 
 
 def make_shots(sym, window, r, off, date_str):
@@ -122,7 +138,8 @@ def make_shots(sym, window, r, off, date_str):
         d.index = d.index.tz_localize('UTC')
     day = pd.Timestamp(date_str).tz_localize('UTC')
     side = 'LONG' if sig.get('side') == 'long' or sig['tp'] > sig['entry'] else 'SHORT'
-    res = 'TP' if 'TP' in (r.get('note') or '') else 'SL'
+    nt_ = r.get('note') or ''
+    res = 'TP' if 'TP' in nt_ else ('БУ' if 'БУ' in nt_ else ('22:00' if '22:00' in nt_ else 'SL'))
     os.makedirs(SHOT_DIR, exist_ok=True)
     base = f"{date_str}_{sym}_{window}"
     out = {}
@@ -144,7 +161,12 @@ def make_shots(sym, window, r, off, date_str):
                     fontsize=9, color=C_ENTRY, fontweight='bold')
         _levels(ax, len(m), sig, dec, ie)
         _xticks(ax, m, off, '%H:%M')
+        if window == 'C' and r.get('boxH') is not None:
+            for y_ in (r['boxL'], r['boxH']): ax.axhline(y_, color='#2f5f9e', linestyle=':', linewidth=1, zorder=1)
+            ax.text(0, r['boxH'], ' бокс Лондона', fontsize=8, color='#2f5f9e', va='bottom')
+        if sig.get('be_at'): ax.axhline(sig['be_at'], color='#f9a825', linestyle='--', linewidth=1, zorder=4); ax.annotate(f"БУ при {sig['be_at']:.{dec}f}", (len(m) - 1, sig['be_at']), ha='right', fontsize=9, color='#f9a825')
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", f"M5 · {pd.Timestamp(date_str).strftime('%d.%m.%Y')} · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
+        _foot(fig, r)
         p = os.path.join(SHOT_DIR, base + '_m5.png'); fig.savefig(p); plt.close(fig)
         out['m5'] = 'state/shots/' + base + '_m5.png'
 
@@ -161,6 +183,7 @@ def make_shots(sym, window, r, off, date_str):
         _levels(ax, len(h), sig, dec, ie)
         _xticks(ax, h, off, '%d.%m %H:%M', n=10)
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", "H1 · 5 дней до входа · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
+        _foot(fig, r)
         p = os.path.join(SHOT_DIR, base + '_h1.png'); fig.savefig(p); plt.close(fig)
         out['h1'] = 'state/shots/' + base + '_h1.png'
     return out or None
