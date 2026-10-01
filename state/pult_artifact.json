@@ -10,7 +10,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4162.85,
+   "price": 4154.25,
    "boxH": 4187.78,
    "boxL": 4149.2,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -1.14,
     "pct": -2.22
    },
-   "checked": "18:05"
+   "checked": "18:06"
   }
  },
  {
@@ -36,11 +36,11 @@
    "date": "2026-10-01",
    "sym": "EURUSD",
    "window": "C",
-   "status": "entry",
+   "status": "skip",
    "direction": "▲ LONG",
-   "note": "В СДЕЛКЕ",
+   "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.12661,
+   "price": 1.12612,
    "boxH": 1.13118,
    "boxL": 1.12654,
    "prevH": null,
@@ -88,7 +88,7 @@
     "ratio": -3.2,
     "pct": -1.32
    },
-   "checked": "18:05"
+   "checked": "18:06"
   }
  },
  {
@@ -102,7 +102,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.32115,
+   "price": 1.32072,
    "boxH": 1.32494,
    "boxL": 1.3193,
    "prevH": null,
@@ -118,7 +118,7 @@
     "ratio": -1.98,
     "pct": -0.97
    },
-   "checked": "18:05"
+   "checked": "18:06"
   }
  },
  {
@@ -127,17 +127,12 @@
   "data": {
    "date": "2026-10-01",
    "window": "C",
-   "time": "18:05",
-   "text": "без изменений",
-   "changed": [],
+   "time": "18:06",
+   "text": "изменилось: EURUSD",
+   "changed": [
+    "EURUSD"
+   ],
    "log": [
-    {
-     "date": "2026-10-01",
-     "time": "17:26",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-01",
      "time": "17:27",
@@ -414,6 +409,15 @@
      "window": "C",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-10-01",
+     "time": "18:06",
+     "window": "C",
+     "text": "изменилось: EURUSD",
+     "lines": [
+      "🔴 EURUSD (▲ LONG) — ЗАКРЫТА - SL в 18:00"
+     ]
     }
    ]
   }
