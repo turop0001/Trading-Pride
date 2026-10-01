@@ -219,13 +219,6 @@
   "_log": [
     {
       "date": "2026-10-01",
-      "time": "17:11",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-01",
       "time": "17:12",
       "window": "C",
       "text": "без изменений",
@@ -782,6 +775,13 @@
       "window": "—",
       "text": "окно C закрыто, отчёт отправлен",
       "lines": []
+    },
+    {
+      "date": "2026-10-01",
+      "time": "19:00",
+      "window": "—",
+      "text": "отчёт дня отправлен",
+      "lines": []
     }
   ],
   "_flags": {
@@ -789,7 +789,8 @@
     "openA": true,
     "closeA": true,
     "openC": true,
-    "closeC": true
+    "closeC": true,
+    "summary": true
   },
   "GER40_A_tv": {
     "sym": "GER40",
@@ -1134,26 +1135,26 @@
     }
   },
   "_daily_summary": {
-    "date": "30.09.2026",
+    "date": "01.10.2026",
     "sections": [
       [
         "A",
         [
-          "⚪ XAUUSD (▲ LONG) — СКИП",
-          "🔴 EURUSD (🔻 SHORT) — ЗАКРЫТА - SL в 13:00",
-          "⚪ GBPUSD (—) — СКИП",
-          "⚪ US500 (▲ LONG) — СКИП",
+          "⚪ XAUUSD (🔻 SHORT) — СКИП",
+          "⚪ EURUSD (🔻 SHORT) — СКИП",
+          "⚪ GBPUSD (▲ LONG) — СКИП",
+          "⚪ US500 (—) — СКИП",
           "⚪ NAS100 (▲ LONG) — СКИП",
-          "⚪ US30 (▲ LONG) — СКИП",
-          "⚪ GER40 (▲ LONG) — СКИП"
+          "⚪ US30 (🔻 SHORT) — СКИП",
+          "⚪ GER40 (🔻 SHORT) — СКИП"
         ],
         []
       ],
       [
         "C",
         [
-          "⚪ XAUUSD (▲ LONG) — СКИП",
-          "⚪ EURUSD (—) — СКИП",
+          "⚪ XAUUSD (—) — СКИП",
+          "🔴 EURUSD (▲ LONG) — ЗАКРЫТА - SL в 18:00",
           "⚪ GBPUSD (—) — СКИП"
         ],
         []
