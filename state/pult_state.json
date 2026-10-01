@@ -2,11 +2,11 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4160.09,
+    "price": 4161.59,
     "boxH": 4192.9,
     "boxL": 4139.22,
     "reasons": [],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1,
       2
@@ -37,11 +37,11 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.12978,
+    "price": 1.12913,
     "boxH": 1.13368,
     "boxL": 1.13067,
     "reasons": [],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1,
       2
@@ -72,13 +72,13 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32239,
+    "price": 1.32194,
     "boxH": 1.32726,
     "boxL": 1.3245,
     "reasons": [
       "цепочка H1 = 0 (нужно ≥2)"
     ],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1,
       2,
@@ -113,11 +113,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7667.3,
+    "price": 7670.1,
     "boxH": 7707.9,
     "boxL": 7670.6,
     "reasons": [],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1
     ],
@@ -148,11 +148,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30597.4,
+    "price": 30588.7,
     "boxH": 30878.4,
     "boxL": 30453.8,
     "reasons": [],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1,
       2
@@ -183,11 +183,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 50749.0,
+    "price": 50810.0,
     "boxH": 51154.0,
     "boxL": 50934.0,
     "reasons": [],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1,
       2
@@ -258,6 +258,13 @@
       "window": "A",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-10-01",
+      "time": "12:46",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
     }
   ],
   "_flags": {
@@ -292,11 +299,11 @@
   "GER40_A": {
     "sym": "GER40",
     "window": "A",
-    "price": 24974.6,
+    "price": 25014.6,
     "boxH": 25190.7,
     "boxL": 24997.6,
     "reasons": [],
-    "checked_at": "12:24",
+    "checked_at": "12:46",
     "ck": [
       1,
       2
