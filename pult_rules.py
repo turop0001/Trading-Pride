@@ -757,7 +757,18 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         leg = lowB - ext
         if leg <= 0: continue
         lvl = ext + 0.3 * leg
-        if H[g] >= lvl and g > ge:
+        if g <= ge: continue
+        # вынос только одной свечой → вход на поглощении последней свечи выноса (закрытие выше её хая);
+        # иначе — выкуп 30% длины выноса ЗАКРЫТИЕМ свечи (касание тенью не считается)
+        ns_now = 0
+        for k in range(g0, ge + 1):
+            rk = H[k] - L[k]
+            if L[k] < lowB and not (rk > 0 and abs(C[k] - O[k]) <= 0.25 * rk): ns_now += 1
+        if ns_now <= 1:
+            ok = C[g] > H[ge] and C[g] > O[g]
+        else:
+            ok = C[g] >= lvl
+        if ok:
             entry_g = g; break
     # свечи выноса: от g0 до экстремума, доджи (тело ≤25% диапазона) не считаем
     nsw = 0
@@ -793,7 +804,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         res['ckf'] = [5]; res['reasons'] = ['откат 30% после 18:30']; _why(res, 'Скип: откат ≥30% позже 18:30', [5])
         return _out(res, 'skip', dirc, 'СКИП (вход позже 18:30)')
     lvl = ext + 0.3 * leg
-    entry = max(lvl, float(O[entry_g]))      # гэп через уровень — вход по открытию
+    entry = float(C[entry_g])                # вход по рынку на закрытии свечи выкупа/поглощения
     stop_f = ext - 0.1 * (entry - ext)
     R = entry - stop_f
     tp_f = entry + 2 * R
@@ -813,10 +824,10 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:2'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8])
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
-    t_in = d.index[entry_g]
+    t_in = d.index[entry_g]      # свеча входа (вход по её закрытию, трекинг — со следующей свечи)
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
-    sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off)).strftime('%H:%M'), t_utc=str(t_in),
+    sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=5)).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
                side='long' if sd == 1 else 'short', rr=2.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[],
                prob=res['prob'], struct=res['struct']['rec'])
