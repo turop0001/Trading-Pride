@@ -81,7 +81,8 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
                 j = ext[0] + 1 + int(np.argmax(H[ext[0] + 1:i + 1]) if up else np.argmin(L[ext[0] + 1:i + 1]))
                 ext = (j, H[j] if up else L[j])
             rng = max(abs(ext[1] - anc[1]), 1e-9)
-            dep = ((ext[1] - L[i]) if up else (H[i] - ext[1])) / rng
+            # глубина отката — по самому глубокому откатному экстремуму после последней точки (а не только текущей свече)
+            dep = ((ext[1] - L[ext[0] + 1:i + 1].min()) if up else (H[ext[0] + 1:i + 1].max() - ext[1])) / rng if i > ext[0] else 0.0
             if i - ext[0] >= 3 and (dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS)):
                 pend = ext; piv.append((ext[0], ext[1], 'H' if up else 'L')); sb = i; soft = None
         else:
