@@ -584,16 +584,10 @@
     "openA": true,
     "closeA": true,
     "openC": true,
-    "closeC": true
+    "closeC": true,
+    "summary": true
   },
   "_log": [
-    {
-      "date": "2026-10-02",
-      "time": "17:11",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-10-02",
       "time": "17:12",
@@ -1157,10 +1151,42 @@
       "window": "—",
       "text": "окно C закрыто, отчёт отправлен",
       "lines": []
+    },
+    {
+      "date": "2026-10-02",
+      "time": "19:00",
+      "window": "—",
+      "text": "отчёт дня отправлен",
+      "lines": []
     }
   ],
   "_daily_summary": {
-    "total_pct": -1.0
+    "date": "02.10.2026",
+    "sections": [
+      [
+        "A",
+        [
+          "⚪ XAUUSD (—) — СКИП",
+          "⚪ EURUSD (🔻 SHORT) — СКИП",
+          "⚪ GBPUSD (🔻 SHORT) — СКИП",
+          "🔴 US500 (🔻 SHORT) — ЗАКРЫТА - SL в 14:20",
+          "⚪ NAS100 (—) — СКИП",
+          "⚪ US30 (🔻 SHORT) — СКИП",
+          "⚪ GER40 (🔻 SHORT) — СКИП"
+        ],
+        []
+      ],
+      [
+        "C",
+        [
+          "⚪ XAUUSD (▲ LONG) — СКИП",
+          "🟢 EURUSD (🔻 SHORT) — ЗАКРЫТА - TP в 18:00",
+          "🔴 GBPUSD (🔻 SHORT) — ЗАКРЫТА - SL в 17:25"
+        ],
+        []
+      ]
+    ],
+    "total_pct": 0.0
   },
   "XAUUSD_C": {
     "sym": "XAUUSD",
