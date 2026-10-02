@@ -44,11 +44,12 @@ def _atr(df, n=14):
     return tr.rolling(n).mean().bfill().values
 
 
-def _dyn(df, start=0, k=1.0):
+def _dyn(df, start=0, k=1.0, soft_on=None):
     """Динамический подход к структуре (видео «Динамический подход» + уточнения 01.10.2026).
     Диапазон коррекции — от HL (LH) до экстремума. Откат >=35% диапазона создаёт HH (LL); при затяжном билдинге
     ликвидности/консолидации достаточно >=25% за 12 свечей. Свежий LH/HL (откатный экстремум, подтверждённый возвратом >=20%) — якорь раннего CHoCH (закрытие телом за ним). HL (LH) рождается только после закрепления ТЕЛОМ за HH (LL)
     не менее чем на 0.25 ATR. Слом — закрытие телом за HL (LH). Откат >70% — структура под вопросом."""
+    sf = SOFT if soft_on is None else soft_on
     H, L, C = (df[c].values.astype(float) for c in ('High', 'Low', 'Close'))
     A = _atr(df) * k
     n = len(df)
@@ -65,7 +66,7 @@ def _dyn(df, start=0, k=1.0):
     pend = None; sb = None; soft = None
     for i in range(i0, n):
         up = tr == 1
-        softbrk = SOFT and pend is not None and soft is not None and ((C[i] < soft[1] - BUF * A[i]) if up else (C[i] > soft[1] + BUF * A[i]))
+        softbrk = sf and pend is not None and soft is not None and ((C[i] < soft[1] - BUF * A[i]) if up else (C[i] > soft[1] + BUF * A[i]))
         if softbrk or ((C[i] < anc[1] - BUF * A[i]) if up else (C[i] > anc[1] + BUF * A[i])):
             if softbrk: piv.append((soft[0], soft[1], 'L' if up else 'H'))
             ev.append((i, 'CHoCH↓' if up else 'CHoCH↑'))
@@ -84,7 +85,7 @@ def _dyn(df, start=0, k=1.0):
             if i - ext[0] >= 3 and (dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS)):
                 pend = ext; piv.append((ext[0], ext[1], 'H' if up else 'L')); sb = i; soft = None
         else:
-            if SOFT:
+            if sf:
                 if soft is None and ((L[i] < L[sb]) if up else (H[i] > H[sb])): sb = i
                 elif soft is None and sb is not None:
                     pr = (pend[1] - L[sb]) if up else (H[sb] - pend[1])
@@ -103,8 +104,8 @@ def _dyn(df, start=0, k=1.0):
     return dict(tr=tr, anc=anc, ext=e, pend=pend is not None, dep=dep, deep=deep or dep > MAXPB, ev=ev, piv=piv, n=n)
 
 
-def _trend_dyn(df, start=0, k=1.0):
-    r = _dyn(df, start, k)
+def _trend_dyn(df, start=0, k=1.0, soft_on=None):
+    r = _dyn(df, start, k, soft_on)
     if r is None: return dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
     tr = r['tr']; a, e = r['anc'][1], r['ext'][1]
     hi, lo = (e, a) if tr == 1 else (a, e)
@@ -174,7 +175,7 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
         # Swing — структура H1 за последние 7 дней; Sub — структура M15 внутри коридора последней ноги Swing
         h1w = h1c[h1c.index > h1c.index[-1] - pd.Timedelta(days=7)]
         try:
-            sw = _trend_dyn(h1w)
+            sw = _trend_dyn(h1w, 0, 1.0, False)   # 02.10.2026: Swing H1 — слом только за настоящим LH/HL (без «раннего» якоря); новый LH/HL рождается после BOS за последним LL/HH
             t0 = h1w.index[0]
             if sw.get('piv') and len(sw['piv']) >= 2:
                 t0 = h1w.index[min(sw['piv'][-2][0], len(h1w) - 1)]
