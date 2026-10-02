@@ -10,7 +10,7 @@
    "direction": "▲ LONG",
    "note": "ВЫНОС (лоя бокса, ждём откат 30%)",
    "reasons": [],
-   "price": 4159.05,
+   "price": 4151.84,
    "boxH": 4226.62,
    "boxL": 4166.21,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -1.98,
     "pct": -3.55
    },
-   "checked": "18:02"
+   "checked": "18:06"
   }
  },
  {
@@ -38,9 +38,9 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "В СДЕЛКЕ",
+   "note": "ВХОД → TP 🎯 +2R",
    "reasons": [],
-   "price": 1.1279,
+   "price": 1.12711,
    "boxH": 1.12695,
    "boxL": 1.1221,
    "prevH": null,
@@ -90,7 +90,7 @@
     "ratio": -3.94,
     "pct": -1.86
    },
-   "checked": "18:02"
+   "checked": "18:06"
   }
  },
  {
@@ -104,7 +104,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.32487,
+   "price": 1.324,
    "boxH": 1.32437,
    "boxL": 1.31961,
    "prevH": null,
@@ -151,7 +151,7 @@
     "ratio": -2.03,
     "pct": -1.02
    },
-   "checked": "18:02"
+   "checked": "18:06"
   }
  },
  {
@@ -160,38 +160,12 @@
   "data": {
    "date": "2026-10-02",
    "window": "C",
-   "time": "18:02",
-   "text": "без изменений",
-   "changed": [],
+   "time": "18:06",
+   "text": "изменилось: EURUSD",
+   "changed": [
+    "EURUSD"
+   ],
    "log": [
-    {
-     "date": "2026-10-02",
-     "time": "17:23",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-02",
-     "time": "17:24",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-02",
-     "time": "17:25",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-02",
-     "time": "17:26",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-02",
      "time": "17:27",
@@ -447,6 +421,36 @@
      "window": "C",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "18:03",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "18:04",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "18:05",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "18:06",
+     "window": "C",
+     "text": "изменилось: EURUSD",
+     "lines": [
+      "🟢 EURUSD (🔻 SHORT) — ЗАКРЫТА - TP в 18:00"
+     ]
     }
    ]
   }

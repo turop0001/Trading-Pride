@@ -24,7 +24,11 @@
     "entry": 1.12804,
     "stop": 1.12857,
     "target": 1.12698,
-    "result": "сигнал Пульта в 17:10 Рига"
+    "result": "ВХОД → TP 🎯 +2R",
+    "shots": {
+      "m5": "state/shots/2026-10-02_EURUSD_C_m5.png",
+      "h1": "state/shots/2026-10-02_EURUSD_C_h1.png"
+    }
   },
   {
     "id": "2026-10-02_GBPUSD_C",
