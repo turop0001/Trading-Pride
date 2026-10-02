@@ -84,7 +84,7 @@ def _xticks(ax, d, off, fmt, n=8):
 
 def _levels(ax, n, sig, dec, ie=None):
     """Линии на всю ширину; подписи — в пустом правом поле графика (не закрывают свечи и точку входа)."""
-    ax.set_xlim(ax.get_xlim()[0], n - 1 + max(8, n * 0.17))
+    ax.set_xlim(ax.get_xlim()[0], n - 1 + max(10, n * 0.23))
     items = [(sig['entry'], C_ENTRY, 'ВХОД' + (f" {sig['time']}" if sig.get('time') else '')),
              (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК %gR' % float(sig.get('rr') or 2))]
     for y, c, t in items:

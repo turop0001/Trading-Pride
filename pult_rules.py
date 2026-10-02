@@ -511,7 +511,7 @@ def _hdr(res, d, h1, now_utc, off, today, price, boxH, boxL, fm, end_m):
     liq = X.liquidity(ctx['h1c'], d, today, off, price)
     sw, sb = ctx['swing'], ctx['sub']
     res['struct'] = dict(swing=f"{X._arrow(sw['tr'])} {sw['txt']}" + (f" ({sw['brk']})" if sw.get('brk') else ''),
-                         sub=f"{X._arrow(sb['tr'])} {sb['txt']}", rec=ctx['rec'],
+                         sub=f"{X._arrow(sb['tr'])} {sb['txt']}", rec=ctx['rec'], conf=ctx['conf'], score=ctx['score'],
                          line=X.struct_line(ctx, price, liq, fm))
     res['pos'] = X.box_pos(d, today, price, boxH, boxL, end_m)
     return ctx, liq
@@ -652,7 +652,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     sig = dict(date=str(today), window='A', time=(t_in + pd.Timedelta(hours=off)).strftime('%H:%M'),
                t_utc=str(t_in), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
                rr=S1.RR, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=list(worse), prob=res['prob'],
-               strong=int(c['strong']), struct=res['struct']['rec'])
+               strong=int(c['strong']), struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'))
     res['signal'] = sig
     res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
@@ -743,7 +743,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     # усилители C: 10 батут (H1 FVG, от которого пошёл выкуп), 11 тренд / боковик
     F1, atr1 = _h1_fvgs(ctx['h1c'])
     plus = []
-    if ctx['rec'] in (('LONG' if sd == 1 else 'SHORT'), '50/50'): plus.append(12)
+    if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(12)
     ext = L[g0]; ge = g0
     res['ck'] = sorted(set(res['ck'] + [3]))
     _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} лондонского бокса в {(d.index[g0] + pd.Timedelta(hours=off)).strftime("%H:%M")} → {"лонг" if sd == 1 else "шорт"}', [3])
@@ -826,7 +826,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=(5 if mode == 'engulf' else 0))).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
                side='long' if sd == 1 else 'short', rr=2.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[],
-               prob=res['prob'], struct=res['struct']['rec'])
+               prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'))
     res['signal'] = sig; res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry_r)})')
@@ -839,7 +839,7 @@ def _prob_set_C(res, F1, atr1, sd, ext, plus):
     for f in F1:
         if f['dir'] == sd and f['inv_t'] is None and f['lo'] - tol <= ext_r <= f['hi'] + tol:
             plus.append(11); _why(res, f'батут: H1 FVG {f["lo"]:.5g}–{f["hi"]:.5g}, от него пошёл выкуп', [11]); break
-    if 12 in plus: _why(res, 'тренд не против (по тренду или боковик, структура Swing+Sub)', [12])
+    if 12 in plus: _why(res, 'по тренду (структура Swing H1 + Sub M15 совпадает со стороной входа)', [12])
     res['ck'] = sorted(set(res['ck'] + plus))
     _prob_set(res, plus, [], 'C')
 

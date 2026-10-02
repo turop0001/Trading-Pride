@@ -72,10 +72,13 @@ def _dyn(df, start=0, k=1.0):
             anc = (hp[0], hp[1]); ext = (j, L[j] if up else H[j]); tr = -tr; pend = None; deep = False
             continue
         if pend is None:
-            if (H[i] > ext[1]) if up else (L[i] < ext[1]): ext = (i, H[i] if up else L[i])
+            # новый экстремум фиксируется только закрытием ТЕЛОМ за прежним (тень без закрытия — снятие ликвидности)
+            if (C[i] > ext[1]) if up else (C[i] < ext[1]):
+                j = ext[0] + 1 + int(np.argmax(H[ext[0] + 1:i + 1]) if up else np.argmin(L[ext[0] + 1:i + 1]))
+                ext = (j, H[j] if up else L[j])
             rng = max(abs(ext[1] - anc[1]), 1e-9)
             dep = ((ext[1] - L[i]) if up else (H[i] - ext[1])) / rng
-            if dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS):
+            if i - ext[0] >= 3 and (dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS)):
                 pend = ext; piv.append((ext[0], ext[1], 'H' if up else 'L'))
         else:
             if (C[i] > pend[1] + BUF * A[i]) if up else (C[i] < pend[1] - BUF * A[i]):
@@ -160,21 +163,30 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
     ctx = dict(h1c=h1c)
     sw = dict(tr=0, txt='мало данных', hi=None, lo=None, brk=''); sb = dict(sw)
     if len(h1c) >= 60:
-        h4 = h4_from_h1(h1c).iloc[-300:]
+        # Swing — структура H1 за последние 7 дней; Sub — структура M15 внутри коридора последней ноги Swing
+        h1w = h1c[h1c.index > h1c.index[-1] - pd.Timedelta(days=7)]
         try:
-            sw = _trend_dyn(h4)
-            # Sub — структура H1 внутри текущей ноги Swing (от предпоследней точки Swing)
-            s0 = 0
+            sw = _trend_dyn(h1w)
+            t0 = h1w.index[0]
             if sw.get('piv') and len(sw['piv']) >= 2:
-                t0 = h4.index[min(sw['piv'][-2][0], len(h4) - 1)]
-                s0 = int(h1c.index.searchsorted(t0))
-            h1w = h1c.iloc[-400:]
-            s0 = max(0, s0 - (len(h1c) - len(h1w)))
-            sb = _trend_dyn(h1w, s0, 0.6)
+                t0 = h1w.index[min(sw['piv'][-2][0], len(h1w) - 1)]
+            m15 = d[['Open', 'High', 'Low', 'Close']].resample('15min', label='left', closed='left').agg(
+                {'Open': 'first', 'High': 'max', 'Low': 'min', 'Close': 'last'}).dropna()
+            m15 = m15[m15.index >= t0 - pd.Timedelta(hours=1)]
+            sb = _trend_dyn(m15, 0, 0.6) if len(m15) > 40 else dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
         except Exception:
-            sw = _trend(h4_from_h1(h1c).iloc[-120:], 2); sb = _trend(h1c.iloc[-300:], 3)
-    if sw['tr'] == sb['tr'] and sw['tr'] != 0: rec = 'LONG' if sw['tr'] == 1 else 'SHORT'
-    else: rec = '50/50'
+            sw = _trend(h1c.iloc[-168:], 3); sb = _trend(h1c.iloc[-120:], 2)
+    # направление по Swing H1; Sub против Swing = откат внутри тренда (видео «Динамический подход», пример EURUSD)
+    sc = 2.0 * sw['tr']
+    if sw['tr'] != 0:
+        sc += sb['tr'] * 1.0                      # Sub по тренду усиливает, против — ослабляет (откат внутри тренда)
+        if sw.get('brk'): sc *= 0.5                # свежий слом структуры — доверие ниже
+        if sw.get('deep'): sc -= 0.5 * sw['tr']     # откат глубже 70% — структура под вопросом
+    else:
+        sc = 0.5 * sb['tr']
+    rec = 'LONG' if sc >= 1 else 'SHORT' if sc <= -1 else '50/50'
+    conf = 'высокая' if abs(sc) >= 3 else 'средняя' if abs(sc) >= 1.5 else 'слабая' if abs(sc) >= 1 else 'нет'
+    ctx['score'] = sc; ctx['conf'] = conf
     ctx.update(swing=sw, sub=sb, rec=rec)
     return ctx
 
@@ -193,7 +205,13 @@ def struct_line(ctx, price, liq, fm):
         else: parts.append('цена внутри диапазона Swing')
     if sw.get('brk'): parts.append(sw['brk'])
     if sw.get('deep'): parts.append('откат глубже 70% — структура под вопросом')
-    parts.append({'LONG': 'вероятнее вверх', 'SHORT': 'вероятнее вниз', '50/50': 'направление неясно'}[rec])
+    if sw['tr'] != 0 and sb['tr'] == -sw['tr']:
+        parts.append('Sub M15 против Swing — откат внутри тренда')
+    elif sw['tr'] != 0 and sb['tr'] == sw['tr']:
+        parts.append('Sub M15 по тренду Swing')
+    cf = ctx.get('conf')
+    parts.append({'LONG': 'вероятнее вверх (' + str(cf) + ')', 'SHORT': 'вероятнее вниз (' + str(cf) + ')',
+                  '50/50': 'нет преимущества по структуре — осторожно / скип'}[rec])
     liqs = []
     if up: liqs.append('↑ ' + up[0]['name'])
     if dn: liqs.append('↓ ' + dn[0]['name'])

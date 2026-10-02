@@ -266,7 +266,7 @@ var CK={
   ['skip','Стоп не меньше 0,25 ATR(M5) — исполнимо со спредом','моя защита: при микростопе спред съедает сделку; в ваши правила не входило.'],
   ['skip','Это первый вход по инструменту за день','после SL/TP/БУ повторного входа нет.'],
   ['plus','Батут: H1 FVG, от которого отреагировали свечи выноса и пошёл выкуп','экстремум выноса внутри/рядом с H1 FVG в сторону сделки.'],
-  ['plus','Тренд не против: по тренду или боковик (структура Swing + Sub)','тренд правилом не является — только усилитель.']],
+  ['plus','По тренду: сторона входа совпадает с направлением Swing H1 (за 7 дней); Sub M15 против = откат внутри тренда','тренд правилом не является — только усилитель.']],
   mng:'<b>После входа:</b> цель 2R, на 70% пути стоп переносим в безубыток. Структура и ликвидность — только контекст в карточке. Мои бэктесты Типа C (44 сделки, 07–09.2026): WR 84%, +67R — см. вкладку «Аналитика».'}
 };
 (function(){var o={base:0,skip:1,plus:2,minus:3,half:4};['A','C'].forEach(function(t){
@@ -299,7 +299,7 @@ function liveCard(x){
   rows.push(['Статус',stn]);
   /* структура: Swing (главная) и Sub (внутренняя) + рекомендация; только контекст, не правило входа */
   if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
-    rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+rc+'</span></div>']);
+    rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+(rc==='50/50'?'НЕТ ПРЕИМУЩЕСТВА · скип/осторожно':rc+(x.struct.conf?' · '+x.struct.conf:''))+'</span></div>']);
     if(x.struct.line){var nh=narrHTML(x.struct.line);rows.push(['Где цена',nh||String(x.struct.line)]);}}
   if(x.window==='C'){if(x.boxH!=null&&x.boxL!=null)rows.push(['Бокс Лондона','хай '+x.boxH+' · лой '+x.boxL]);}
   else if(x.pos)rows.push(['Цена / Бокс Азии','<div class="pxp"><span class="pl side">'+x.pos+'</span></div>']);
