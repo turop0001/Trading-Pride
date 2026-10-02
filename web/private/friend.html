@@ -333,9 +333,9 @@ function mt5Check(){
     var e=document.getElementById('mt5St');if(!e)return;
     var age=Math.round(Date.now()/1000-(j.upd||0)),ok=j.upd&&age<=180;
     var mx=0;try{var v=j.lastM5||{};Object.keys(v).forEach(function(k){if(v[k]>mx)mx=v[k];});}catch(x){}
-    e.textContent=ok?' · MT5 работает корректно (данные '+age+' с назад)':' · MT5 не отвечает'+(j.upd?' ('+Math.round(age/60)+' мин) — данные Yahoo':' — данные Yahoo');
-    e.style.color=ok?'#2fb36b':'#e5484d';
-  }).catch(function(){var e=document.getElementById('mt5St');if(e){e.textContent=' · MT5: статус недоступен';e.style.color='#e5484d';}});
+    e.textContent=' '+(ok?'MT5 работает корректно (данные '+age+' с назад)':'MT5 не отвечает'+(j.upd?' ('+Math.round(age/60)+' мин)':'')+' — данные Yahoo');
+    var c=ok?'#2fb36b':'#e5484d';e.style.color=c;var dot=document.createElement('span');dot.style.cssText='display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 4px 0 10px;vertical-align:middle;background:'+c+';box-shadow:0 0 0 3px '+c+'33';e.insertBefore(dot,e.firstChild);
+  }).catch(function(){var e=document.getElementById('mt5St');if(e){e.textContent=' MT5: статус недоступен';e.style.color='#e5484d';}});
 }
 function renderLive(m){
   if(!m){return;}
@@ -345,7 +345,7 @@ function renderLive(m){
   ln.appendChild(document.createTextNode((today?'Окно '+m.window+' · проверено в '+m.time+' Рига — ':'Последняя проверка '+m.date+' '+m.time+' — ')));
   var t=el('span',m.text==='без изменений'?null:'chg',m.text||'');ln.appendChild(t);
   ln.appendChild(el('small',null,'обновляется каждую минуту в окнах A/C'));
-  var mt=el('small',null,' · MT5: проверяю…');mt.id='mt5St';ln.appendChild(mt);mt5Check();
+  var mt=el('small',null,'MT5: проверяю…');mt.id='mt5St';ln.appendChild(mt);mt5Check();
   $('repNote').textContent=(today?'Окно '+m.window+' — проверено в '+m.time+' Рига: ':'Последняя проверка '+m.date+' '+m.time+': ')+(m.text||'');
 }
 var DW={long:'LONG',short:'SHORT',side:'БОКОВИК'};
