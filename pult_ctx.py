@@ -225,13 +225,13 @@ def struct_line(ctx, price, liq, fm):
             if r <= 0.1: l1 = 'Swing ▲: импульс вверх, цена у HH (последний хай) %s' % nf(hi)
             else: l1 = 'Swing ▲: откат %d%% вниз от HH (хай) %s к HL (лой) %s%s' % (round(r * 100), nf(hi), nf(lo), deep)
             l2 = 'Дальше: выше HL — вверх к HH; закрытие телом ниже HL %s = слом' % nf(lo)
-        parts += [l1 + sub, (sw['brk'] + '. ' if sw.get('brk') else '') + l2]
+        parts += [l1 + sub] + ([sw['brk']] if sw.get('brk') else [])
     else:
         parts.append('Swing: чёткого тренда нет, цена в диапазоне')
     liqs = []
     if up: liqs.append('↑ %s (%s)' % (nf(up[0]['p']), up[0]['name']))
     if dn: liqs.append('↓ %s (%s)' % (nf(dn[0]['p']), dn[0]['name']))
-    if liqs: parts.append('Ликвидность (куда может сходить цена за стопами): ' + ' · '.join(liqs))
+    if liqs: parts.append('Ликвидность: ' + ' · '.join(liqs))
     return ' | '.join(parts)
 
 
