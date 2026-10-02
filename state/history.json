@@ -14,5 +14,27 @@
       "m5": "state/shots/2026-10-02_US500_A_m5.png",
       "h1": "state/shots/2026-10-02_US500_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-02_EURUSD_C",
+    "date": "2026-10-02",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 1.12804,
+    "stop": 1.12857,
+    "target": 1.12698,
+    "result": "сигнал Пульта в 17:10 Рига"
+  },
+  {
+    "id": "2026-10-02_GBPUSD_C",
+    "date": "2026-10-02",
+    "symbol": "GBPUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 1.32405,
+    "stop": 1.32485,
+    "target": 1.32244,
+    "result": "сигнал Пульта в 17:10 Рига"
   }
 ]
