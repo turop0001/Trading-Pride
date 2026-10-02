@@ -5,7 +5,7 @@ import { readJson } from '../../lib/gh';
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   try {
-    const { data } = await readJson('state/pult_state.json', {});
+    const { data } = await readJson('state/pult_state.json', {}, 'state');
     const now = Date.now();
     const lines = [];
     Object.keys(data || {}).forEach((k) => {

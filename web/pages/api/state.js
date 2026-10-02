@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const r = await fetch(`https://api.github.com/repos/${repo}/contents/state/pult_state.json`, {
+    const r = await fetch(`https://api.github.com/repos/${repo}/contents/state/pult_state.json?ref=state`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.github+json',

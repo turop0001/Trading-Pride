@@ -843,7 +843,7 @@ document.querySelectorAll('#jOut button').forEach(function(b){b.addEventListener
 function outOf(d){if(d.out)return d.out;var r=+d.r;return r>0.05?'TP':r<-0.05?'SL':'BE';}
 function addTrade(o,cb){if(!col){cb(false,'Журнал работает только на опубликованной странице.');return;}col.add(o).then(function(ref){cb(true,null,ref&&ref.id);}).catch(function(e){cb(false,'Не сохранилось: '+(e&&e.code||'ошибка'));});}
 var SHOTS={};
-function shotsHtml(sh){return '<span class="shots">'+['m5','h1'].filter(function(k){return sh[k];}).map(function(k){var u='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/'+sh[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</span>';}
+function shotsHtml(sh){return '<span class="shots">'+['m5','h1'].filter(function(k){return sh[k];}).map(function(k){var u='https://raw.githubusercontent.com/turop0001/Trading-Pride/state/'+sh[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</span>';}
 var UNDO=null,UNDOT=null;
 function undoBar(msg,fn){var b=$('undoBar');if(!b){b=el('div');b.id='undoBar';document.body.appendChild(b);}b.innerHTML='';b.appendChild(el('span',null,msg));var u=el('button',null,'Отменить');u.addEventListener('click',function(){clearTimeout(UNDOT);b.hidden=true;try{fn();}catch(e){}});b.appendChild(u);b.hidden=false;clearTimeout(UNDOT);UNDOT=setTimeout(function(){b.hidden=true;},12000);}
 function delJ(id,d){if(!col)return;var copy=JSON.parse(JSON.stringify(d||{}));delete copy.id;col.doc(id).delete().then(function(){undoBar('Сделка удалена',function(){col.add(copy,function(){});});}).catch(function(){});}
@@ -956,7 +956,7 @@ function renderHist(){
     if(d.risk)row('Риск',d.risk);
     if(d.result)row('Итог по правилам',d.result);
     if(d.mine)row('Моя отметка',d.mine);
-    if(d.shots&&(d.shots.m5||d.shots.h1)){var hs=['m5','h1'].filter(function(k){return d.shots[k];}).map(function(k){var u='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/'+d.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('');g2.appendChild(el('span',null,'Графики сделки'));var hb=el('b');hb.innerHTML='<span class="shots">'+hs+'</span>';g2.appendChild(hb);}
+    if(d.shots&&(d.shots.m5||d.shots.h1)){var hs=['m5','h1'].filter(function(k){return d.shots[k];}).map(function(k){var u='https://raw.githubusercontent.com/turop0001/Trading-Pride/state/'+d.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('');g2.appendChild(el('span',null,'Графики сделки'));var hb=el('b');hb.innerHTML='<span class="shots">'+hs+'</span>';g2.appendChild(hb);}
     if(d.assetId)row('M5-скрин','<img src="/_blob/'+d.assetId+'" class="shotthumb" alt="M5-скрин · нажмите, чтобы увеличить">');
     card.appendChild(g2);g.appendChild(card);
   });
@@ -977,7 +977,7 @@ renderHist();
     return '<span class="narI"><small>'+lbl+'</small> <span class="nchip '+d+'">'+(d==='long'?'▲ LONG':d==='short'?'▼ SHORT':'◆ БОКОВИК')+(p?' <i>'+p+'</i>':'')+'</span></span>';}
   function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
     return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
-  var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/';
+  var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/state/';
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:r.ck,ckf:r.ckf,fx:r.fx,

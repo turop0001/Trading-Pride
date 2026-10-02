@@ -1,3 +1,4 @@
 __pycache__/
 *.pyc
 tg_config.json
+_st/

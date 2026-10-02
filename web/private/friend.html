@@ -373,7 +373,7 @@ function renderRep(){
     return '<span class="narI"><small>'+lbl+'</small> <span class="nchip '+d+'">'+(d==='long'?'▲ LONG':d==='short'?'▼ SHORT':'◆ БОКОВИК')+(p?' <i>'+p+'</i>':'')+'</span></span>';}
   function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
     return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
-  var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/main/';
+  var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/state/';
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:r.ck,ckf:r.ckf,fx:r.fx,
