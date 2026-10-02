@@ -96,24 +96,33 @@ def window_now(riga_dt):
 # ratio = net/средний_суточный_диапазон, лонг ≥+1.0/+1.5, шорт ≤−1.0/−1.5, иначе флэт),
 # теперь то же самое считается прямо на облачных данных yfinance — не зависит от браузера.
 # Только справочный контекст (усилитель из чек-листа "Тренд 5 дней"), не фильтр входа.
+def _fill_asia_gap(m, ticker, period):
+    """02.10.2026: Yahoo подмешиваем ТОЛЬКО если в MT5 не хватает свечей бокса Азии сегодня (<60 из ~84) —
+    например, терминал был выключен ночью. Обычная часовая пауза индексов дыру не создаёт и ничего не подмешивает:
+    иначе уровни фьючерса Yahoo смешиваются с ценами CFD брокера (ложные/запоздалые сигналы)."""
+    import pandas as pd
+    if m is None or str(ticker).startswith('MT5:'): return m
+    try:
+        riga, off = riga_now()
+        if riga.hour * 60 + riga.minute < 600 or riga.weekday() >= 5: return m   # бокс Азии ещё идёт / выходной
+        loc = m.index + pd.Timedelta(hours=off)
+        today = riga.date()
+        n = int(sum(1 for x in loc if x.date() == today and 180 <= x.hour * 60 + x.minute < 600))
+        if n >= 60: return m
+        import yfinance as yf
+        y = yf.download(ticker, period=period, interval='5m', progress=False, auto_adjust=False)
+        if y is None or len(y) == 0: return m
+        if isinstance(y.columns, pd.MultiIndex): y.columns = y.columns.get_level_values(0)
+        y = y.tz_localize('UTC') if y.index.tz is None else y.tz_convert('UTC')
+        return m.combine_first(y[['Open', 'High', 'Low', 'Close']]).sort_index()
+    except Exception:
+        return m
+
+
 def fetch_ohlc(ticker, period, interval):
     m = mt5_frame(ticker, {'60m': 'H1', '1d': 'D1'}.get(interval, 'M5'), max_age_h={'60m': 2, '1d': 72}.get(interval, 72))   # 02.10.2026: H1 из фида не старше ~3 ч (раньше 72 ч → при выключенном MT5 H1 отставал на сутки, а M5 шёл из Yahoo)
     if m is not None and len(m) >= 10 and interval not in ('60m', '1d'):
-        # 02.10.2026: у индексов/золота в фиде MT5 бывают дыры (терминал был выключен, история не догружена) —
-        # бокс Азии получался пустым → 'нет данных'. Дыры закрываем Yahoo, свечи MT5 в приоритете.
-        tail = m.index[m.index > m.index[-1] - __import__('pandas').Timedelta(hours=30)]
-        if len(tail) > 1 and (tail[1:] - tail[:-1]).max() > __import__('pandas').Timedelta(minutes=40) and not str(ticker).startswith('MT5:'):
-            try:
-                import yfinance as yf
-                y = yf.download(ticker, period=period, interval=interval, progress=False, auto_adjust=False)
-                if y is not None and len(y):
-                    import pandas as pd
-                    if isinstance(y.columns, pd.MultiIndex): y.columns = y.columns.get_level_values(0)
-                    y = y.tz_localize('UTC') if y.index.tz is None else y.tz_convert('UTC')
-                    y = y[['Open', 'High', 'Low', 'Close']]
-                    m = m.combine_first(y).sort_index()
-            except Exception:
-                pass
+        m = _fill_asia_gap(m, ticker, period)
     if m is not None and len(m) >= 10: return m
     if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
@@ -155,20 +164,7 @@ def fetch(ticker, src=None):
     # src='Yahoo' — принудительно Yahoo (сигнал был посчитан по Yahoo: уровни фьючерса ≠ цены CFD)
     m = None if src == 'Yahoo' else mt5_frame(ticker, 'M5')
     if m is not None:
-        # 02.10.2026: дыры в истории MT5 (терминал был выключен) закрываем Yahoo, иначе бокс Азии пустой → «нет данных»
-        import pandas as pd
-        tail = m.index[m.index > m.index[-1] - pd.Timedelta(hours=30)]
-        if len(tail) > 1 and (tail[1:] - tail[:-1]).max() > pd.Timedelta(minutes=40) and not str(ticker).startswith('MT5:'):
-            try:
-                import yfinance as yf
-                y = yf.download(ticker, period='10d', interval='5m', progress=False, auto_adjust=False)
-                if y is not None and len(y):
-                    if isinstance(y.columns, pd.MultiIndex): y.columns = y.columns.get_level_values(0)
-                    y = y.tz_localize('UTC') if y.index.tz is None else y.tz_convert('UTC')
-                    m = m.combine_first(y[['Open', 'High', 'Low', 'Close']]).sort_index()
-            except Exception:
-                pass
-        return m
+        return _fill_asia_gap(m, ticker, '10d')
     if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
     import pandas as pd
