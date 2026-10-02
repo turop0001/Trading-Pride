@@ -828,6 +828,12 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     res['ck'] = sorted(set(res['ck'] + [3]))
     _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} лондонского бокса в {(d.index[g0] + pd.Timedelta(hours=off)).strftime("%H:%M")} → {"лонг" if sd == 1 else "шорт"}', [3])
     lim = min(n, idx.get(win.index[-1], n - 1) + 1) if len(win) else n
+    def _nsw(a_, b_):
+        k = 0
+        for q in range(a_, b_ + 1):
+            rg = H[q] - L[q]
+            if not (rg > 0 and abs(C[q] - O[q]) <= 0.25 * rg): k += 1
+        return k
     entry_g = None; mode = 'pb30'
     for g in range(g0, n):
         if d['rdate'].iloc[g] != today: continue
@@ -840,8 +846,8 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         if g <= ge: continue
         # вынос ОДНОЙ свечой (любой — телом или тенью за границу бокса) → вход только на её поглощении
         # (закрытие выше хая свечи выноса); иначе — выкуп 30% длины выноса (от экстремума к границе бокса)
-        if ge == g0:
-            ok = C[g] > H[ge] and C[g] > O[g]; mode = 'engulf'
+        if _nsw(g0, ge) == 1:   # одна свеча выноса (доджи не считаются; новый экстремум доджем/тенью — всё ещё «одна свеча»)
+            ok = C[g] > H[g0:ge + 1].max() and C[g] > O[g]; mode = 'engulf'
         else:
             ok = H[g] >= lvl; mode = 'pb30'
         if ok:
@@ -872,11 +878,11 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     leg = lowB - ext
     if entry_g is None or leg <= 0:
         if nowm >= 1110:
-            _w = 'поглощение свечи выноса' if ge == g0 else 'откат 30%'
+            _w = 'поглощение свечи выноса' if _nsw(g0, ge) == 1 else 'откат 30%'
             res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
             return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
-        if ge == g0:
+        if _nsw(g0, ge) == 1:
             return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса одной свечой, ждём поглощение: закрытие {"выше хая" if sd == 1 else "ниже лоя"} свечи выноса)')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 30%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
