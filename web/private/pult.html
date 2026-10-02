@@ -745,6 +745,15 @@ function liveCard(x){
   rows.push(['Проверено',(x.price!=null?x.price+' · ':'')+(x.checked||'—')]);
   return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:curR};
 }
+function mt5Check(){
+  fetch('/api/feed',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    var e=document.getElementById('mt5St');if(!e)return;
+    var age=Math.round(Date.now()/1000-(j.upd||0)),ok=j.upd&&age<=180;
+    var mx=0;try{var v=j.lastM5||{};Object.keys(v).forEach(function(k){if(v[k]>mx)mx=v[k];});}catch(x){}
+    e.textContent=ok?' · MT5 работает корректно (данные '+age+' с назад)':' · MT5 не отвечает'+(j.upd?' ('+Math.round(age/60)+' мин) — данные Yahoo':' — данные Yahoo');
+    e.style.color=ok?'#2fb36b':'#e5484d';
+  }).catch(function(){var e=document.getElementById('mt5St');if(e){e.textContent=' · MT5: статус недоступен';e.style.color='#e5484d';}});
+}
 function renderLive(m){
   if(!m){return;}
   var today=m.date===REPDAY;
@@ -753,6 +762,7 @@ function renderLive(m){
   ln.appendChild(document.createTextNode((today?'Окно '+m.window+' · проверено в '+m.time+' Рига — ':'Последняя проверка '+m.date+' '+m.time+' — ')));
   var t=el('span',m.text==='без изменений'?null:'chg',m.text||'');ln.appendChild(t);
   ln.appendChild(el('small',null,'обновляется каждую минуту в окнах A/C'));
+  var mt=el('small',null,' · MT5: проверяю…');mt.id='mt5St';ln.appendChild(mt);mt5Check();
   $('repNote').textContent=(today?'Окно '+m.window+' — проверено в '+m.time+' Рига: ':'Последняя проверка '+m.date+' '+m.time+': ')+(m.text||'');
   var lg=$('liveLog');lg.innerHTML='';
   (m.log||[]).slice().reverse().forEach(function(r){var d=el('div');d.appendChild(el('b',null,r.time));var sp=el('span',r.text==='без изменений'?null:'chg','окно '+r.window+' — '+r.text);d.appendChild(sp);lg.appendChild(d);});
