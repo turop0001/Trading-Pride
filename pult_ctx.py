@@ -34,7 +34,8 @@ def _trend(df, n):
     return dict(tr=tr, txt=txt, hi=h2, lo=l2, brk=brk)
 
 
-PCT, MAXPB, BUF, BUILD_BARS, BUILD_PCT = 0.30, 0.70, 0.25, 8, 0.15
+PCT, MAXPB, BUF, BUILD_BARS, BUILD_PCT = 0.35, 0.70, 0.25, 12, 0.25
+SOFT = True; SOFTPCT = 0.2
 
 
 def _atr(df, n=14):
@@ -45,8 +46,8 @@ def _atr(df, n=14):
 
 def _dyn(df, start=0, k=1.0):
     """Динамический подход к структуре (видео «Динамический подход» + уточнения 01.10.2026).
-    Диапазон коррекции — от HL (LH) до экстремума. Откат >=30% диапазона создаёт HH (LL); при затяжном билдинге
-    ликвидности/консолидации достаточно >=15%. HL (LH) рождается только после закрепления ТЕЛОМ за HH (LL)
+    Диапазон коррекции — от HL (LH) до экстремума. Откат >=35% диапазона создаёт HH (LL); при затяжном билдинге
+    ликвидности/консолидации достаточно >=25% за 12 свечей. Свежий LH/HL (откатный экстремум, подтверждённый возвратом >=20%) — якорь раннего CHoCH (закрытие телом за ним). HL (LH) рождается только после закрепления ТЕЛОМ за HH (LL)
     не менее чем на 0.25 ATR. Слом — закрытие телом за HL (LH). Откат >70% — структура под вопросом."""
     H, L, C = (df[c].values.astype(float) for c in ('High', 'Low', 'Close'))
     A = _atr(df) * k
@@ -61,10 +62,12 @@ def _dyn(df, start=0, k=1.0):
     piv = []; ev = []; deep = False
     if tr == 1: anc = (lo, L[lo]); ext = (hi, H[hi]); piv.append((lo, L[lo], 'L'))
     else: anc = (hi, H[hi]); ext = (lo, L[lo]); piv.append((hi, H[hi], 'H'))
-    pend = None
+    pend = None; sb = None; soft = None
     for i in range(i0, n):
         up = tr == 1
-        if (C[i] < anc[1] - BUF * A[i]) if up else (C[i] > anc[1] + BUF * A[i]):
+        softbrk = SOFT and pend is not None and soft is not None and ((C[i] < soft[1] - BUF * A[i]) if up else (C[i] > soft[1] + BUF * A[i]))
+        if softbrk or ((C[i] < anc[1] - BUF * A[i]) if up else (C[i] > anc[1] + BUF * A[i])):
+            if softbrk: piv.append((soft[0], soft[1], 'L' if up else 'H'))
             ev.append((i, 'CHoCH↓' if up else 'CHoCH↑'))
             hp = pend if pend else ext
             if not pend: piv.append((ext[0], ext[1], 'H' if up else 'L'))
@@ -79,8 +82,13 @@ def _dyn(df, start=0, k=1.0):
             rng = max(abs(ext[1] - anc[1]), 1e-9)
             dep = ((ext[1] - L[i]) if up else (H[i] - ext[1])) / rng
             if i - ext[0] >= 3 and (dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS)):
-                pend = ext; piv.append((ext[0], ext[1], 'H' if up else 'L'))
+                pend = ext; piv.append((ext[0], ext[1], 'H' if up else 'L')); sb = i; soft = None
         else:
+            if SOFT:
+                if soft is None and ((L[i] < L[sb]) if up else (H[i] > H[sb])): sb = i
+                elif soft is None and sb is not None:
+                    pr = (pend[1] - L[sb]) if up else (H[sb] - pend[1])
+                    if ((H[i] - L[sb]) if up else (H[sb] - L[i])) >= SOFTPCT * max(pr, 1e-9) and i > sb: soft = (sb, L[sb] if up else H[sb])
             if (C[i] > pend[1] + BUF * A[i]) if up else (C[i] < pend[1] - BUF * A[i]):
                 j = pend[0] + int(np.argmin(L[pend[0]:i + 1]) if up else np.argmax(H[pend[0]:i + 1]))
                 piv.append((j, L[j] if up else H[j], 'L' if up else 'H'))
