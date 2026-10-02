@@ -202,28 +202,52 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
 
 
 def struct_line(ctx, price, liq, fm):
-    """Короткий нарратив без цифр: части через ' | ' (Пульт рисует каждую отдельной строкой)."""
-    sw, sb, rec = ctx['swing'], ctx['sub'], ctx['rec']
+    """«Где цена»: части через ' | ' (Пульт рисует каждую отдельной строкой). Переделано 02.10.2026."""
+    sw, sb = ctx['swing'], ctx['sub']
+    nf = lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v)
     up = sorted([x for x in liq if x['p'] > price], key=lambda x: x['p'])
     dn = sorted([x for x in liq if x['p'] < price], key=lambda x: -x['p'])
     parts = []
     hi, lo = sw.get('hi'), sw.get('lo')
-    if hi and lo and hi > lo:
-        f = (price - lo) / (hi - lo)
-        if sw['tr'] == 1: parts.append('откат внутри восходящего Swing' if f < 0.5 else 'импульс в восходящем Swing')
-        elif sw['tr'] == -1: parts.append('откат внутри нисходящего Swing' if f > 0.5 else 'импульс в нисходящем Swing')
-        else: parts.append('цена внутри диапазона Swing')
-    if sw.get('brk'): parts.append(sw['brk'])
-    if sw.get('deep'): parts.append('откат глубже 70% — структура под вопросом')
-    if sw['tr'] != 0 and sb['tr'] == -sw['tr']:
-        parts.append('Sub M15 против Swing — откат внутри тренда')
-    elif sw['tr'] != 0 and sb['tr'] == sw['tr']:
-        parts.append('Sub M15 по тренду Swing')
-    # строка «вероятнее вверх/вниз» убрана 02.10.2026: дублирует «Рекомендацию» выше
+    tr = sw['tr']
+    if hi and lo and hi > lo and tr != 0:
+        rng = hi - lo
+        if tr == -1:
+            r = (price - lo) / rng          # откат вверх от LL к LH
+            if r <= 0.1:
+                parts.append('Swing вниз: цена у LL %s — идёт импульс вниз, лои обновляются' % nf(lo))
+            elif r < 1:
+                parts.append('Swing вниз: откат вверх на %d%% от LL %s к LH %s' % (round(r * 100), nf(lo), nf(hi)))
+            else:
+                parts.append('Swing вниз: цена выше LH %s — тренд под угрозой' % nf(hi))
+            nxt = ('пока цена ниже LH %s — ждём продолжения вниз (обновление LL %s). Закрытие телом выше LH — слом вниз-тренда' % (nf(hi), nf(lo))) if r < 1 else 'закрепление выше LH = слом вниз-тренда, ищем рост'
+        else:
+            r = (hi - price) / rng          # откат вниз от HH к HL
+            if r <= 0.1:
+                parts.append('Swing вверх: цена у HH %s — идёт импульс вверх, хаи обновляются' % nf(hi))
+            elif r < 1:
+                parts.append('Swing вверх: откат вниз на %d%% от HH %s к HL %s' % (round(r * 100), nf(hi), nf(lo)))
+            else:
+                parts.append('Swing вверх: цена ниже HL %s — тренд под угрозой' % nf(lo))
+            nxt = ('пока цена выше HL %s — ждём продолжения вверх (обновление HH %s). Закрытие телом ниже HL — слом вверх-тренда' % (nf(lo), nf(hi))) if r < 1 else 'закрепление ниже HL = слом вверх-тренда, ищем падение'
+        if sw.get('deep'): parts[-1] += ' (глубже 70% — структура под вопросом)'
+    else:
+        parts.append('Swing без чёткого тренда — цена в боковом диапазоне')
+        nxt = 'преимущества по структуре нет'
+    if sw.get('brk'):
+        parts.append(sw['brk'])
+    if tr != 0 and sb['tr'] == -tr:
+        parts.append('Sub M15 %s — это движение против Swing, т.е. откат внутри тренда' % ('растёт' if sb['tr'] == 1 else 'падает'))
+    elif tr != 0 and sb['tr'] == tr:
+        parts.append('Sub M15 идёт по тренду Swing (импульс)')
+    elif sb['tr'] != 0:
+        parts.append('Sub M15 %s' % ('растёт' if sb['tr'] == 1 else 'падает'))
+    parts.append('Дальше: ' + nxt)
     liqs = []
-    if up: liqs.append('↑ ' + up[0]['name'])
-    if dn: liqs.append('↓ ' + dn[0]['name'])
-    if liqs: parts.append('Ликвидность: ' + ' · '.join(liqs))
+    if up: liqs.append('сверху %s (%s)' % (up[0]['name'], nf(up[0]['p'])))
+    if dn: liqs.append('снизу %s (%s)' % (dn[0]['name'], nf(dn[0]['p'])))
+    if liqs: parts.append('Ликвидность — ближайшие нетронутые уровни, куда может потянуть цену: ' + '; '.join(liqs))
+    parts.append('Обозначения: HH — высокий хай, LL — низкий лой, LH — хай ниже предыдущего (тренд вниз), HL — лой выше предыдущего (тренд вверх)')
     return ' | '.join(parts)
 
 
