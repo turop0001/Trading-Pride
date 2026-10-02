@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "jmuqt5uyvyp1h",
+    "symbol": "EURUSD",
+    "type": "A",
+    "side": "short",
+    "date": "2026-10-02",
+    "out": "TP",
+    "r": 1.5,
+    "usd": 91,
+    "note": "",
+    "why": "",
+    "ts": 1790936182590
+  }
+]
