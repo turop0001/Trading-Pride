@@ -202,52 +202,36 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
 
 
 def struct_line(ctx, price, liq, fm):
-    """«Где цена»: части через ' | ' (Пульт рисует каждую отдельной строкой). Переделано 02.10.2026."""
+    """«Где цена»: 3 короткие строки через ' | ' (Пульт рисует каждую отдельной строкой). Сжато 02.10.2026."""
     sw, sb = ctx['swing'], ctx['sub']
     nf = lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v)
     up = sorted([x for x in liq if x['p'] > price], key=lambda x: x['p'])
     dn = sorted([x for x in liq if x['p'] < price], key=lambda x: -x['p'])
+    hi, lo, tr = sw.get('hi'), sw.get('lo'), sw['tr']
     parts = []
-    hi, lo = sw.get('hi'), sw.get('lo')
-    tr = sw['tr']
     if hi and lo and hi > lo and tr != 0:
         rng = hi - lo
+        sub = ''
+        if sb['tr'] == -tr: sub = ' · Sub M15 %s — откат внутри тренда' % ('▲' if sb['tr'] == 1 else '▼')
+        elif sb['tr'] == tr: sub = ' · Sub M15 %s по тренду' % ('▲' if sb['tr'] == 1 else '▼')
+        deep = ' (глубже 70%!)' if sw.get('deep') else ''
         if tr == -1:
-            r = (price - lo) / rng          # откат вверх от LL к LH
-            if r <= 0.1:
-                parts.append('Swing вниз: цена у LL %s — идёт импульс вниз, лои обновляются' % nf(lo))
-            elif r < 1:
-                parts.append('Swing вниз: откат вверх на %d%% от LL %s к LH %s' % (round(r * 100), nf(lo), nf(hi)))
-            else:
-                parts.append('Swing вниз: цена выше LH %s — тренд под угрозой' % nf(hi))
-            nxt = ('пока цена ниже LH %s — ждём продолжения вниз (обновление LL %s). Закрытие телом выше LH — слом вниз-тренда' % (nf(hi), nf(lo))) if r < 1 else 'закрепление выше LH = слом вниз-тренда, ищем рост'
+            r = (price - lo) / rng
+            if r <= 0.1: l1 = 'Swing ▼: импульс вниз, цена у LL (последний лой) %s' % nf(lo)
+            else: l1 = 'Swing ▼: откат %d%% вверх от LL (лой) %s к LH (хай) %s%s' % (round(r * 100), nf(lo), nf(hi), deep)
+            l2 = 'Дальше: ниже LH — вниз к LL; закрытие телом выше LH %s = слом' % nf(hi)
         else:
-            r = (hi - price) / rng          # откат вниз от HH к HL
-            if r <= 0.1:
-                parts.append('Swing вверх: цена у HH %s — идёт импульс вверх, хаи обновляются' % nf(hi))
-            elif r < 1:
-                parts.append('Swing вверх: откат вниз на %d%% от HH %s к HL %s' % (round(r * 100), nf(hi), nf(lo)))
-            else:
-                parts.append('Swing вверх: цена ниже HL %s — тренд под угрозой' % nf(lo))
-            nxt = ('пока цена выше HL %s — ждём продолжения вверх (обновление HH %s). Закрытие телом ниже HL — слом вверх-тренда' % (nf(lo), nf(hi))) if r < 1 else 'закрепление ниже HL = слом вверх-тренда, ищем падение'
-        if sw.get('deep'): parts[-1] += ' (глубже 70% — структура под вопросом)'
+            r = (hi - price) / rng
+            if r <= 0.1: l1 = 'Swing ▲: импульс вверх, цена у HH (последний хай) %s' % nf(hi)
+            else: l1 = 'Swing ▲: откат %d%% вниз от HH (хай) %s к HL (лой) %s%s' % (round(r * 100), nf(hi), nf(lo), deep)
+            l2 = 'Дальше: выше HL — вверх к HH; закрытие телом ниже HL %s = слом' % nf(lo)
+        parts += [l1 + sub, (sw['brk'] + '. ' if sw.get('brk') else '') + l2]
     else:
-        parts.append('Swing без чёткого тренда — цена в боковом диапазоне')
-        nxt = 'преимущества по структуре нет'
-    if sw.get('brk'):
-        parts.append(sw['brk'])
-    if tr != 0 and sb['tr'] == -tr:
-        parts.append('Sub M15 %s — это движение против Swing, т.е. откат внутри тренда' % ('растёт' if sb['tr'] == 1 else 'падает'))
-    elif tr != 0 and sb['tr'] == tr:
-        parts.append('Sub M15 идёт по тренду Swing (импульс)')
-    elif sb['tr'] != 0:
-        parts.append('Sub M15 %s' % ('растёт' if sb['tr'] == 1 else 'падает'))
-    parts.append('Дальше: ' + nxt)
+        parts.append('Swing: чёткого тренда нет, цена в диапазоне')
     liqs = []
-    if up: liqs.append('сверху %s (%s)' % (up[0]['name'], nf(up[0]['p'])))
-    if dn: liqs.append('снизу %s (%s)' % (dn[0]['name'], nf(dn[0]['p'])))
-    if liqs: parts.append('Ликвидность — ближайшие нетронутые уровни, куда может потянуть цену: ' + '; '.join(liqs))
-    parts.append('Обозначения: HH — высокий хай, LL — низкий лой, LH — хай ниже предыдущего (тренд вниз), HL — лой выше предыдущего (тренд вверх)')
+    if up: liqs.append('↑ %s (%s)' % (nf(up[0]['p']), up[0]['name']))
+    if dn: liqs.append('↓ %s (%s)' % (nf(dn[0]['p']), dn[0]['name']))
+    if liqs: parts.append('Ликвидность (куда может сходить цена за стопами): ' + ' · '.join(liqs))
     return ' | '.join(parts)
 
 
