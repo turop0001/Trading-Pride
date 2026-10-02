@@ -6,15 +6,15 @@
    "date": "2026-10-02",
    "sym": "XAUUSD",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных у источника)",
+   "status": "watch",
+   "direction": "▲ LONG",
+   "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 4194.03,
+   "boxH": 4198.19,
+   "boxL": 4148.5,
+   "prevH": 4192.9,
+   "prevL": 4139.22,
    "signal": null,
    "trendH1": {
     "tr": "шорт",
@@ -26,7 +26,7 @@
     "ratio": -1.98,
     "pct": -3.55
    },
-   "checked": null
+   "checked": "11:13"
   }
  },
  {
@@ -42,7 +42,7 @@
    "reasons": [
     "встречный H1 FVG 1.12371–1.12440 внутри цели 1:2"
    ],
-   "price": 1.12611,
+   "price": 1.12683,
    "boxH": 1.12619,
    "boxL": 1.12318,
    "prevH": 1.13368,
@@ -58,7 +58,7 @@
     "ratio": -3.94,
     "pct": -1.86
    },
-   "checked": "11:09"
+   "checked": "11:13"
   }
  },
  {
@@ -68,15 +68,15 @@
    "date": "2026-10-02",
    "sym": "GBPUSD",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных у источника)",
+   "status": "prep",
+   "direction": "🔻 SHORT",
+   "note": "ВЫНОС (хая в 11:05, ждём вход)",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 1.32193,
+   "boxH": 1.32195,
+   "boxL": 1.31824,
+   "prevH": 1.32726,
+   "prevL": 1.3245,
    "signal": null,
    "trendH1": {
     "tr": "боковик",
@@ -88,7 +88,7 @@
     "ratio": -2.03,
     "pct": -1.02
    },
-   "checked": null
+   "checked": "11:13"
   }
  },
  {
@@ -98,15 +98,15 @@
    "date": "2026-10-02",
    "sym": "US500",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных у источника)",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (лоя в 10:20, ждём вход)",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 7704.6,
+   "boxH": 7754.2,
+   "boxL": 7725.8,
+   "prevH": 7707.9,
+   "prevL": 7670.6,
    "signal": null,
    "trendH1": {
     "tr": "боковик",
@@ -118,7 +118,7 @@
     "ratio": 0.87,
     "pct": 0.83
    },
-   "checked": null
+   "checked": "11:13"
   }
  },
  {
@@ -128,15 +128,15 @@
    "date": "2026-10-02",
    "sym": "NAS100",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных у источника)",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (лоя в 10:20, ждём вход)",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 30741.2,
+   "boxH": 30935.8,
+   "boxL": 30791.5,
+   "prevH": 30878.4,
+   "prevL": 30453.8,
    "signal": null,
    "trendH1": {
     "tr": "боковик",
@@ -148,7 +148,7 @@
     "ratio": 2.78,
     "pct": 4.35
    },
-   "checked": null
+   "checked": "11:13"
   }
  },
  {
@@ -158,15 +158,15 @@
    "date": "2026-10-02",
    "sym": "US30",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных у источника)",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (лоя в 10:20, ждём вход)",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 51200.0,
+   "boxH": 51454.0,
+   "boxL": 51208.0,
+   "prevH": 51154.0,
+   "prevL": 50934.0,
    "signal": null,
    "trendH1": {
     "tr": "боковик",
@@ -178,7 +178,7 @@
     "ratio": -1.19,
     "pct": -1.24
    },
-   "checked": null
+   "checked": "11:13"
   }
  },
  {
@@ -230,8 +230,14 @@
    "date": "2026-10-02",
    "window": "A",
    "time": "11:13",
-   "text": "без изменений",
-   "changed": [],
+   "text": "изменилось: XAUUSD, GBPUSD, US500, NAS100, US30",
+   "changed": [
+    "XAUUSD",
+    "GBPUSD",
+    "US500",
+    "NAS100",
+    "US30"
+   ],
    "log": [
     {
      "date": "2026-10-02",
@@ -254,6 +260,19 @@
      "window": "A",
      "text": "все инструменты — СКИП, ждём закрытия окна",
      "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "11:13",
+     "window": "A",
+     "text": "изменилось: XAUUSD, GBPUSD, US500, NAS100, US30",
+     "lines": [
+      "🟡 XAUUSD (▲ LONG) — НАБЛЮДАЕМ",
+      "⚠️ GBPUSD (🔻 SHORT) — ВЫНОС",
+      "⚠️ US500 (▲ LONG) — ВЫНОС",
+      "⚠️ NAS100 (▲ LONG) — ВЫНОС",
+      "⚠️ US30 (▲ LONG) — ВЫНОС"
+     ]
     }
    ]
   }
