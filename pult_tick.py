@@ -320,7 +320,7 @@ def main(send=True):
         flags['open' + window] = True
         # все инструменты окна — СКИП (без временных сбоев данных) → проверки до закрытия окна не нужны
         cur = [state.get(f'{s}_{window}', {}) for s in syms_of(window)]
-        if cur and all(c.get('line_status') == 'skip' and c.get('status_key') != 'stale' and not c.get('signal') for c in cur):
+        if cur and all(c.get('line_status') == 'skip' and c.get('status_key') not in ('stale', 'nodata') and not c.get('signal') and c.get('note') != 'СКИП (нет данных у источника)' for c in cur):
             flags['allskip' + window] = True
             text = (text + '; ' if text and text != 'без изменений' else '') + 'все инструменты — СКИП, ждём закрытия окна'
     if wd < 5:
