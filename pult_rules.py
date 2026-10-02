@@ -633,6 +633,15 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     res['ck'] = sorted(set(res['ck'] + [4, 5, 6]))
     _why(res, 'V-разворот ≤5 свечей, M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [4, 5, 6])
     if g + 1 >= len(d):
+        # предварительная проверка №11 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
+        e0 = float(d['Close'].iloc[-1]); s0 = ext - sd * S1.BUF * c['atr']; R0 = (e0 - s0) * sd
+        if R0 > 0:
+            cf0 = _counter_fvg(F1, sd, e0, e0 + sd * S1.RR * R0)
+            if cf0 is not None:
+                res['ckf'] = [11]
+                t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} внутри цели 1:2 (по текущей цене {fmtp(e0)})'
+                res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
+                return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
         return _out(res, 'prep', dirc, 'ВЫНОС (условия входа выполнены, ждём свечу входа)')
     entry = float(d['Open'].iloc[g + 1])
     stop = ext - sd * S1.BUF * c['atr']
