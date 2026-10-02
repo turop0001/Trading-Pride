@@ -802,7 +802,8 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
             try:
                 import pult_ctx as _X
                 cut = pd.Timestamp(sg['t_utc']) + pd.Timedelta(minutes=5)
-                c0 = _X.build(d[d.index < cut], h1, cut, off, today, float(sg['entry']), _completed, lambda x: _resample(x, '1h'))
+                cut_n = cut.tz_convert('UTC').tz_localize(None).to_pydatetime() if cut.tzinfo else cut.to_pydatetime()
+                c0 = _X.build(d[d.index < cut], h1, cut_n, off, today, float(sg['entry']), _completed, lambda x: _resample(x, '1h'))
                 pl = [x for x in (sg.get('plus') or []) if x != 12]
                 if c0['rec'] == ('LONG' if sd == 1 else 'SHORT'): pl.append(12)
                 sg['plus'] = sorted(pl); sg['struct'] = c0['rec']; sg['sconf'] = c0['conf']; sg['sscore'] = c0['score']
