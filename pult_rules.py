@@ -608,6 +608,10 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
 
     # сделка уже есть — только ведём (TP 2R / SL / закрытие в 22:00)
     if prev.get('signal') and prev['signal'].get('date') == str(today) and prev['signal'].get('window') == 'A':
+        _pw = prev['signal'].get('why')
+        if not _pw:
+            _pw = [f'Вынос {"лоя" if sd == 1 else "хая"} Азии, V-разворот, M5 FVG и триггер выполнены — вход в {prev["signal"].get("time", "")} (пункты ' + _nums(prev['signal'].get('ck') or []) + ')']
+        res['why'] = list(_pw) + [w for w in (res.get('why') or []) if w not in _pw]
         r_ = _track(res, d, prev['signal'], sd, dirc, fmtp)
         return _close_why(r_)
 
@@ -665,6 +669,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     res['signal'] = sig
     res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
+    sig['why'] = list(res.get('why') or [])
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
 
 
