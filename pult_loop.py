@@ -25,6 +25,25 @@ def git_push():
         time.sleep(5)
 
 
+# 02.10.2026: цикл живёт часами — после пуша нового кода он продолжал работать на старом.
+# Теперь каждую минуту подтягиваем main и, если поменялся код, перезагружаем модули.
+_HEAD = [None]
+def _hot_reload():
+    import importlib
+    sh = lambda *a: subprocess.run(list(a), capture_output=True, text=True)
+    sh('git', 'stash', '-q'); sh('git', 'pull', '-q', '--rebase', 'origin', 'main'); sh('git', 'stash', 'pop', '-q')
+    head = sh('git', 'log', '-1', '--format=%H', '--', '*.py').stdout.strip()
+    if _HEAD[0] is None:
+        _HEAD[0] = head; return
+    if head != _HEAD[0]:
+        _HEAD[0] = head
+        import pult_ctx, pult_s1, pult_rules
+        for mod in (pult_ctx, pult_s1, pult_rules, lc, pult_tick):
+            try: importlib.reload(mod)
+            except Exception as e: print('reload failed', mod.__name__, e)
+        print('code reloaded', head[:7])
+
+
 r0, _ = lc.riga_now()
 m0 = r0.hour * 60 + r0.minute
 START, END = (595, 845) if m0 < 900 else (985, 1145)   # окно A или окно C (+5 мин на отчёт закрытия)
@@ -37,6 +56,7 @@ while True:
         time.sleep(30); continue
     try:
         open(HB, 'w').write(str(int(time.time())))
+        _hot_reload()
         pult_tick.main()
         git_push()
     except Exception as e:
