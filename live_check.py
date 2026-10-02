@@ -98,6 +98,22 @@ def window_now(riga_dt):
 # Только справочный контекст (усилитель из чек-листа "Тренд 5 дней"), не фильтр входа.
 def fetch_ohlc(ticker, period, interval):
     m = mt5_frame(ticker, {'60m': 'H1', '1d': 'D1'}.get(interval, 'M5'), max_age_h={'60m': 2, '1d': 72}.get(interval, 72))   # 02.10.2026: H1 из фида не старше ~3 ч (раньше 72 ч → при выключенном MT5 H1 отставал на сутки, а M5 шёл из Yahoo)
+    if m is not None and len(m) >= 10 and interval not in ('60m', '1d'):
+        # 02.10.2026: у индексов/золота в фиде MT5 бывают дыры (терминал был выключен, история не догружена) —
+        # бокс Азии получался пустым → 'нет данных'. Дыры закрываем Yahoo, свечи MT5 в приоритете.
+        tail = m.index[m.index > m.index[-1] - __import__('pandas').Timedelta(hours=30)]
+        if len(tail) > 1 and (tail[1:] - tail[:-1]).max() > __import__('pandas').Timedelta(minutes=40) and not str(ticker).startswith('MT5:'):
+            try:
+                import yfinance as yf
+                y = yf.download(ticker, period=period, interval=interval, progress=False, auto_adjust=False)
+                if y is not None and len(y):
+                    import pandas as pd
+                    if isinstance(y.columns, pd.MultiIndex): y.columns = y.columns.get_level_values(0)
+                    y = y.tz_localize('UTC') if y.index.tz is None else y.tz_convert('UTC')
+                    y = y[['Open', 'High', 'Low', 'Close']]
+                    m = m.combine_first(y).sort_index()
+            except Exception:
+                pass
     if m is not None and len(m) >= 10: return m
     if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
@@ -138,7 +154,21 @@ def trend_narrative(ticker):
 def fetch(ticker, src=None):
     # src='Yahoo' — принудительно Yahoo (сигнал был посчитан по Yahoo: уровни фьючерса ≠ цены CFD)
     m = None if src == 'Yahoo' else mt5_frame(ticker, 'M5')
-    if m is not None: return m
+    if m is not None:
+        # 02.10.2026: дыры в истории MT5 (терминал был выключен) закрываем Yahoo, иначе бокс Азии пустой → «нет данных»
+        import pandas as pd
+        tail = m.index[m.index > m.index[-1] - pd.Timedelta(hours=30)]
+        if len(tail) > 1 and (tail[1:] - tail[:-1]).max() > pd.Timedelta(minutes=40) and not str(ticker).startswith('MT5:'):
+            try:
+                import yfinance as yf
+                y = yf.download(ticker, period='10d', interval='5m', progress=False, auto_adjust=False)
+                if y is not None and len(y):
+                    if isinstance(y.columns, pd.MultiIndex): y.columns = y.columns.get_level_values(0)
+                    y = y.tz_localize('UTC') if y.index.tz is None else y.tz_convert('UTC')
+                    m = m.combine_first(y[['Open', 'High', 'Low', 'Close']]).sort_index()
+            except Exception:
+                pass
+        return m
     if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
     import pandas as pd
