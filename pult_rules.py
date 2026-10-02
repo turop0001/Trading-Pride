@@ -638,7 +638,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         if R0 > 0:
             cf0 = _counter_fvg(F1, sd, e0, e0 + sd * S1.RR * R0)
             if cf0 is not None:
-                res['ckf'] = [11]
+                res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [7, 8, 9, 10, 12]))   # пройдены все, кроме №11
                 t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} внутри цели 1:2 (по текущей цене {fmtp(e0)})'
                 res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
                 return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
@@ -651,7 +651,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     tp = entry + sd * S1.RR * R
     cf = _counter_fvg(F1, sd, entry, tp)
     if cf is not None:
-        res['ckf'] = [11]
+        res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [7, 8, 9, 10, 12]))
         t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:2'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
