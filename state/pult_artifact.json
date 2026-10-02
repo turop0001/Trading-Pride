@@ -6,13 +6,15 @@
    "date": "2026-10-02",
    "sym": "XAUUSD",
    "window": "A",
-   "status": "watch",
-   "direction": "▲ LONG",
-   "note": "НАБЛЮДАЕМ",
-   "reasons": [],
+   "status": "skip",
+   "direction": "—",
+   "note": "СКИП (бокс шире вчерашнего с обеих сторон)",
+   "reasons": [
+    "бокс Азии шире вчерашнего с обеих сторон"
+   ],
    "price": 4183.61,
-   "boxH": 4198.19,
-   "boxL": 4148.5,
+   "boxH": 4196.82,
+   "boxL": 4133.75,
    "prevH": 4192.9,
    "prevL": 4139.22,
    "signal": null,
@@ -26,7 +28,7 @@
     "ratio": -1.98,
     "pct": -3.55
    },
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -58,7 +60,7 @@
     "ratio": -3.94,
     "pct": -1.86
    },
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -75,8 +77,8 @@
     "встречный H1 FVG 1.31892–1.31991 внутри цели 1:2"
    ],
    "price": 1.32062,
-   "boxH": 1.32195,
-   "boxL": 1.31824,
+   "boxH": 1.32191,
+   "boxL": 1.31817,
    "prevH": 1.32726,
    "prevL": 1.3245,
    "signal": null,
@@ -90,7 +92,7 @@
     "ratio": -2.03,
     "pct": -1.02
    },
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -100,16 +102,47 @@
    "date": "2026-10-02",
    "sym": "US500",
    "window": "A",
-   "status": "prep",
-   "direction": "▲ LONG",
-   "note": "ВЫНОС (лоя в 10:20, ждём вход)",
+   "status": "entry",
+   "direction": "🔻 SHORT",
+   "note": "ВХОД (11:25, 7697.4)",
    "reasons": [],
    "price": 7704.9,
-   "boxH": 7754.2,
-   "boxL": 7725.8,
+   "boxH": 7693.6,
+   "boxL": 7667.6,
    "prevH": 7707.9,
    "prevL": 7670.6,
-   "signal": null,
+   "signal": {
+    "date": "2026-10-02",
+    "window": "A",
+    "time": "11:25",
+    "t_utc": "2026-10-02 08:25:00+00:00",
+    "entry": 7697.4,
+    "stop": 7707.1,
+    "tp": 7678.0,
+    "side": "short",
+    "rr": 2.0,
+    "end_utc": "2026-10-02 19:00:00+00:00",
+    "ck": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "plus": [],
+    "worse": [],
+    "prob": "средняя",
+    "strong": 1,
+    "struct": "LONG",
+    "sconf": "средняя",
+    "sscore": 1.5,
+    "src": "MT5"
+   },
    "trendH1": {
     "tr": "боковик",
     "ratio": -0.27,
@@ -120,7 +153,7 @@
     "ratio": 0.87,
     "pct": 0.83
    },
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -130,13 +163,15 @@
    "date": "2026-10-02",
    "sym": "NAS100",
    "window": "A",
-   "status": "prep",
-   "direction": "▲ LONG",
-   "note": "ВЫНОС (лоя в 10:20, ждём вход)",
-   "reasons": [],
+   "status": "skip",
+   "direction": "—",
+   "note": "СКИП (внутренний день)",
+   "reasons": [
+    "Азия внутри вчерашней (внутренний день)"
+   ],
    "price": 30752.2,
-   "boxH": 30935.8,
-   "boxL": 30791.5,
+   "boxH": 30667.6,
+   "boxL": 30524.1,
    "prevH": 30878.4,
    "prevL": 30453.8,
    "signal": null,
@@ -150,7 +185,7 @@
     "ratio": 2.78,
     "pct": 4.35
    },
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -160,13 +195,15 @@
    "date": "2026-10-02",
    "sym": "US30",
    "window": "A",
-   "status": "prep",
-   "direction": "▲ LONG",
-   "note": "ВЫНОС (лоя в 10:20, ждём вход)",
-   "reasons": [],
+   "status": "skip",
+   "direction": "🔻 SHORT",
+   "note": "СКИП (встречный H1 FVG внутри цели 1:2)",
+   "reasons": [
+    "встречный H1 FVG 51008–51026 внутри цели 1:2"
+   ],
    "price": 51179.0,
-   "boxH": 51454.0,
-   "boxL": 51208.0,
+   "boxH": 51127.0,
+   "boxL": 50883.0,
    "prevH": 51154.0,
    "prevL": 50934.0,
    "signal": null,
@@ -180,7 +217,7 @@
     "ratio": -1.19,
     "pct": -1.24
    },
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -190,19 +227,27 @@
    "date": "2026-10-02",
    "sym": "GER40",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных TradingView — смотреть вручную)",
+   "status": "prep",
+   "direction": "🔻 SHORT",
+   "note": "ВЫНОС (хая в 10:45, ждём вход)",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 25219.7,
+   "boxH": 25055.6,
+   "boxL": 24926.6,
+   "prevH": 25190.7,
+   "prevL": 24997.6,
    "signal": null,
-   "trendH1": null,
-   "trendD1": null,
-   "checked": null
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -1.06,
+    "pct": -1.2
+   },
+   "trendD1": {
+    "tr": "боковик",
+    "ratio": -1.5,
+    "pct": -2.1
+   },
+   "checked": "11:59"
   }
  },
  {
@@ -212,17 +257,17 @@
    "date": "2026-10-02",
    "sym": "GER40",
    "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (нет данных TradingView — смотреть вручную)",
+   "status": "prep",
+   "direction": "🔻 SHORT",
+   "note": "ВЫНОС (хая в 10:45, ждём вход)",
    "reasons": [],
-   "price": null,
-   "boxH": null,
-   "boxL": null,
-   "prevH": null,
-   "prevL": null,
+   "price": 25219.7,
+   "boxH": 25055.6,
+   "boxL": 24926.6,
+   "prevH": 25190.7,
+   "prevL": 24997.6,
    "signal": null,
-   "checked": "11:58"
+   "checked": "11:59"
   }
  },
  {
@@ -231,17 +276,16 @@
   "data": {
    "date": "2026-10-02",
    "window": "A",
-   "time": "11:58",
-   "text": "без изменений",
-   "changed": [],
+   "time": "11:59",
+   "text": "изменилось: XAUUSD, US500, NAS100, US30, GER40",
+   "changed": [
+    "XAUUSD",
+    "US500",
+    "NAS100",
+    "US30",
+    "GER40"
+   ],
    "log": [
-    {
-     "date": "2026-10-02",
-     "time": "11:19",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-02",
      "time": "11:20",
@@ -514,6 +558,19 @@
      "window": "A",
      "text": "без изменений",
      "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "11:59",
+     "window": "A",
+     "text": "изменилось: XAUUSD, US500, NAS100, US30, GER40",
+     "lines": [
+      "⚪ XAUUSD (—) — СКИП",
+      "🟢 US500 (🔻 SHORT) — ВХОД в 11:25",
+      "⚪ NAS100 (—) — СКИП",
+      "⚪ US30 (🔻 SHORT) — СКИП",
+      "⚠️ GER40 (🔻 SHORT) — ВЫНОС"
+     ]
     }
    ]
   }
