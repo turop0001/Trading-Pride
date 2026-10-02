@@ -1,22 +1,20 @@
 [
  {
   "collection": "pult",
-  "doc_id": "XAUUSD_A",
+  "doc_id": "XAUUSD_C",
   "data": {
    "date": "2026-10-02",
    "sym": "XAUUSD",
-   "window": "A",
-   "status": "skip",
+   "window": "C",
+   "status": "watch",
    "direction": "—",
-   "note": "СКИП (бокс шире вчерашнего с обеих сторон)",
-   "reasons": [
-    "бокс Азии шире вчерашнего с обеих сторон"
-   ],
-   "price": 4180.91,
-   "boxH": 4196.82,
-   "boxL": 4133.75,
-   "prevH": 4192.9,
-   "prevL": 4139.22,
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 4195.24,
+   "boxH": 4226.62,
+   "boxL": 4166.21,
+   "prevH": null,
+   "prevL": null,
    "signal": null,
    "trendH1": {
     "tr": "шорт",
@@ -28,27 +26,25 @@
     "ratio": -1.98,
     "pct": -3.55
    },
-   "checked": "13:59"
+   "checked": "16:39"
   }
  },
  {
   "collection": "pult",
-  "doc_id": "EURUSD_A",
+  "doc_id": "EURUSD_C",
   "data": {
    "date": "2026-10-02",
    "sym": "EURUSD",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (встречный H1 FVG внутри цели 1:2)",
-   "reasons": [
-    "встречный H1 FVG 1.12371–1.12440 внутри цели 1:2"
-   ],
-   "price": 1.12357,
-   "boxH": 1.12619,
-   "boxL": 1.12318,
-   "prevH": 1.13368,
-   "prevL": 1.13067,
+   "window": "C",
+   "status": "watch",
+   "direction": "—",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 1.12467,
+   "boxH": 1.12695,
+   "boxL": 1.1221,
+   "prevH": null,
+   "prevL": null,
    "signal": null,
    "trendH1": {
     "tr": "шорт",
@@ -60,27 +56,25 @@
     "ratio": -3.94,
     "pct": -1.86
    },
-   "checked": "13:59"
+   "checked": "16:39"
   }
  },
  {
   "collection": "pult",
-  "doc_id": "GBPUSD_A",
+  "doc_id": "GBPUSD_C",
   "data": {
    "date": "2026-10-02",
    "sym": "GBPUSD",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (встречный H1 FVG внутри цели 1:2)",
-   "reasons": [
-    "встречный H1 FVG 1.31892–1.31991 внутри цели 1:2"
-   ],
-   "price": 1.32094,
-   "boxH": 1.32191,
-   "boxL": 1.31817,
-   "prevH": 1.32726,
-   "prevL": 1.3245,
+   "window": "C",
+   "status": "watch",
+   "direction": "—",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 1.32211,
+   "boxH": 1.32437,
+   "boxL": 1.31961,
+   "prevH": null,
+   "prevL": null,
    "signal": null,
    "trendH1": {
     "tr": "боковик",
@@ -92,186 +86,7 @@
     "ratio": -2.03,
     "pct": -1.02
    },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "US500_A",
-  "data": {
-   "date": "2026-10-02",
-   "sym": "US500",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "ВХОД → SL −1R",
-   "reasons": [],
-   "price": 7703.1,
-   "boxH": 7693.6,
-   "boxL": 7667.6,
-   "prevH": 7707.9,
-   "prevL": 7670.6,
-   "signal": {
-    "date": "2026-10-02",
-    "window": "A",
-    "time": "11:25",
-    "t_utc": "2026-10-02 08:25:00+00:00",
-    "entry": 7697.4,
-    "stop": 7707.1,
-    "tp": 7678.0,
-    "side": "short",
-    "rr": 2.0,
-    "end_utc": "2026-10-02 19:00:00+00:00",
-    "ck": [
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     9,
-     10
-    ],
-    "plus": [],
-    "worse": [],
-    "prob": "средняя",
-    "strong": 1,
-    "struct": "LONG",
-    "sconf": "средняя",
-    "sscore": 1.5,
-    "src": "MT5"
-   },
-   "trendH1": {
-    "tr": "боковик",
-    "ratio": -0.27,
-    "pct": -0.2
-   },
-   "trendD1": {
-    "tr": "боковик",
-    "ratio": 0.87,
-    "pct": 0.83
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "NAS100_A",
-  "data": {
-   "date": "2026-10-02",
-   "sym": "NAS100",
-   "window": "A",
-   "status": "skip",
-   "direction": "—",
-   "note": "СКИП (внутренний день)",
-   "reasons": [
-    "Азия внутри вчерашней (внутренний день)"
-   ],
-   "price": 30717.1,
-   "boxH": 30667.6,
-   "boxL": 30524.1,
-   "prevH": 30878.4,
-   "prevL": 30453.8,
-   "signal": null,
-   "trendH1": {
-    "tr": "боковик",
-    "ratio": 0.33,
-    "pct": 0.39
-   },
-   "trendD1": {
-    "tr": "лонг",
-    "ratio": 2.78,
-    "pct": 4.35
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "US30_A",
-  "data": {
-   "date": "2026-10-02",
-   "sym": "US30",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (встречный H1 FVG внутри цели 1:2)",
-   "reasons": [
-    "встречный H1 FVG 51008–51026 внутри цели 1:2"
-   ],
-   "price": 51190.0,
-   "boxH": 51127.0,
-   "boxL": 50883.0,
-   "prevH": 51154.0,
-   "prevL": 50934.0,
-   "signal": null,
-   "trendH1": {
-    "tr": "боковик",
-    "ratio": -0.58,
-    "pct": -0.55
-   },
-   "trendD1": {
-    "tr": "боковик",
-    "ratio": -1.19,
-    "pct": -1.24
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "GER40_A",
-  "data": {
-   "date": "2026-10-02",
-   "sym": "GER40",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (встречный H1 FVG внутри цели 1:2)",
-   "reasons": [
-    "встречный H1 FVG 24972.6–24988.6 внутри цели 1:2"
-   ],
-   "price": 25214.7,
-   "boxH": 25055.6,
-   "boxL": 24926.6,
-   "prevH": 25190.7,
-   "prevL": 24997.6,
-   "signal": null,
-   "trendH1": {
-    "tr": "шорт",
-    "ratio": -1.06,
-    "pct": -1.2
-   },
-   "trendD1": {
-    "tr": "боковик",
-    "ratio": -1.5,
-    "pct": -2.1
-   },
-   "checked": "13:59"
-  }
- },
- {
-  "collection": "pult",
-  "doc_id": "GER40_A",
-  "data": {
-   "date": "2026-10-02",
-   "sym": "GER40",
-   "window": "A",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (встречный H1 FVG внутри цели 1:2)",
-   "reasons": [
-    "встречный H1 FVG 24972.6–24988.6 внутри цели 1:2"
-   ],
-   "price": 25214.7,
-   "boxH": 25055.6,
-   "boxL": 24926.6,
-   "prevH": 25190.7,
-   "prevL": 24997.6,
-   "signal": null,
-   "checked": "13:59"
+   "checked": "16:39"
   }
  },
  {
@@ -279,32 +94,11 @@
   "doc_id": "last",
   "data": {
    "date": "2026-10-02",
-   "window": "A",
-   "time": "14:36",
-   "text": "закрыта сделка окна A — карточка обновлена",
+   "window": "C",
+   "time": "16:39",
+   "text": "без изменений",
    "changed": [],
    "log": [
-    {
-     "date": "2026-10-02",
-     "time": "13:22",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-02",
-     "time": "13:23",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-02",
-     "time": "13:24",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-02",
      "time": "13:25",
@@ -562,6 +356,31 @@
      "time": "14:36",
      "window": "—",
      "text": "закрыта сделка окна A — карточка обновлена",
+     "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "16:37",
+     "window": "C",
+     "text": "отчёт открытия окна отправлен",
+     "lines": [
+      "🟡 XAUUSD (—) — НАБЛЮДАЕМ",
+      "🟡 EURUSD (—) — НАБЛЮДАЕМ",
+      "🟡 GBPUSD (—) — НАБЛЮДАЕМ"
+     ]
+    },
+    {
+     "date": "2026-10-02",
+     "time": "16:38",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-02",
+     "time": "16:39",
+     "window": "C",
+     "text": "без изменений",
      "lines": []
     }
    ]
