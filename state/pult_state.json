@@ -367,11 +367,11 @@
       "sscore": 1.5,
       "src": "MT5"
     },
-    "line_status": "entry",
+    "line_status": "skip",
     "direction": "🔻 SHORT",
-    "note": "В СДЕЛКЕ",
-    "status_key": "В СДЕЛКЕ",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-10-02",
     "trend_h1": {
@@ -383,7 +383,13 @@
       "tr": "боковик",
       "ratio": 0.87,
       "pct": 0.83
-    }
+    },
+    "autopsy": "шла в плюс до +0.7R, стоп через 3 ч 0 мин; после стопа данных пока мало",
+    "shots": {
+      "m5": "state/shots/2026-10-02_US500_A_m5.png",
+      "h1": "state/shots/2026-10-02_US500_A_h1.png"
+    },
+    "exit_time": "14:20"
   },
   "NAS100_A": {
     "sym": "NAS100",
@@ -579,13 +585,6 @@
     "closeA": true
   },
   "_log": [
-    {
-      "date": "2026-10-02",
-      "time": "12:41",
-      "window": "A",
-      "text": "без изменений",
-      "lines": []
-    },
     {
       "date": "2026-10-02",
       "time": "12:42",
@@ -1138,6 +1137,16 @@
       "window": "—",
       "text": "окно A закрыто, отчёт отправлен",
       "lines": []
+    },
+    {
+      "date": "2026-10-02",
+      "time": "14:36",
+      "window": "—",
+      "text": "закрыта сделка окна A — карточка обновлена",
+      "lines": []
     }
-  ]
+  ],
+  "_daily_summary": {
+    "total_pct": -1.0
+  }
 }
