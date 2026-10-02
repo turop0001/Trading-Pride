@@ -231,7 +231,6 @@ def struct_line(ctx, price, liq, fm):
     liqs = []
     if up: liqs.append('↑ %s (%s)' % (nf(up[0]['p']), up[0]['name']))
     if dn: liqs.append('↓ %s (%s)' % (nf(dn[0]['p']), dn[0]['name']))
-    if liqs: parts.append('Ликвидность: ' + ' · '.join(liqs))
     return ' | '.join(parts)
 
 
