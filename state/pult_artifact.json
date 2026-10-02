@@ -220,7 +220,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "11:10"
+   "checked": "11:11"
   }
  },
  {
@@ -229,7 +229,7 @@
   "data": {
    "date": "2026-10-02",
    "window": "A",
-   "time": "11:10",
+   "time": "11:11",
    "text": "без изменений",
    "changed": [],
    "log": [
