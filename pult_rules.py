@@ -307,6 +307,61 @@ def _analyze_C(sym, d, now_utc, off, prev):
     return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём свечу-поглощение {way})')
 
 
+_AMP_NAMES = {'A': {11: 'батут (H1 FVG)', 12: 'ликвидность на пути', 13: 'по тренду'}, 'C': {11: 'батут (H1 FVG)', 12: 'тренд не против'}}
+
+
+def finalize_why(res):
+    """«Все причины» по итогу (02.10.2026): скип — только причина скипа; в сделке — основание входа;
+    TP — коротко; SL — разбор стопа (структура против, нет усилителей, ликвидность за стопом, затяжной боковик)."""
+    if not isinstance(res, dict) or res.get('error'): return res
+    sig = res.get('signal') or {}
+    st, note, why = res.get('line_status'), str(res.get('note') or ''), list(res.get('why') or [])
+    if not sig:
+        if st == 'skip':
+            sk = [w for w in why if w.startswith('Скип')]
+            if sk: res['why'] = sk
+        return res
+    win = sig.get('window') or 'A'
+    names = _AMP_NAMES.get(win, _AMP_NAMES['A'])
+    pl = [names[n] for n in (sig.get('plus') or []) if n in names]
+    wr = sig.get('worse') or []
+    side = 'LONG' if sig.get('side') in ('long', 'LONG') else 'SHORT'
+    rec, conf = sig.get('struct'), sig.get('sconf')
+    cf = f', {conf}' if conf else ''
+    if rec == side: stx = f'структура {rec}{cf}: по тренду'
+    elif rec and rec != '50/50': stx = f'структура {rec}{cf}: вход против структуры'
+    else: stx = 'структура без преимущества'
+    amp = ('усилители: ' + ', '.join(pl)) if pl else 'усилителей не было'
+    if wr: amp += '; ухудшитель №' + _nums(wr)
+    inn = f'вход {sig.get("time", "")} по {sig.get("entry", "")}, вероятность {sig.get("prob", "—")}; {amp}; {stx}'
+    xt = res.get('exit_time') or ''
+    if '→ TP' in note:
+        res['why'] = [f'Цель {sig.get("rr", 2):g}R достигнута{(" в " + xt) if xt else ""}: {inn}.']
+        res.pop('sl_why', None)
+    elif '→ SL' in note:
+        miss = []
+        if rec and rec not in (side, '50/50'): miss.append(f'вход против структуры (рекомендация {rec}{cf})')
+        if not pl: miss.append('усилителей не было')
+        if wr: miss.append('был ухудшитель №' + _nums(wr) + ' (ликвидность у стороны выноса)')
+        if sig.get('prob') in ('низкая', 'средняя'): miss.append(f'вероятность была {sig.get("prob")}')
+        lx = sig.get('liqx')
+        if lx: miss.append(f'неснятая ликвидность {lx["name"]} {lx["p"]} всего в {lx["dR"]:.1f}R за стопом — цена пошла её снимать')
+        if (sig.get('swn') or 0) > 20: miss.append(f'затяжной боковик после выноса: {sig["swn"]} свечей до триггера')
+        txt = f'Стоп{(" в " + xt) if xt else ""} (вход {sig.get("time", "")} по {sig.get("entry", "")}). Причины: ' + ('; '.join(miss) if miss else 'все условия были выполнены — стоп в рамках статистики') + '.'
+        if res.get('autopsy'): txt += ' Ход сделки: ' + str(res['autopsy']).rstrip('.') + '.'
+        res['why'] = [txt]; res.pop('sl_why', None)
+    elif '→ БУ' in note:
+        res['why'] = [f'Закрыта в безубыток после 70% пути: {inn}.']
+        res.pop('sl_why', None)
+    elif 'закрыта в 22:00' in note:
+        res['why'] = [f'Закрыта по времени в 22:00 ({note.split("(")[-1].rstrip(")")}): {inn}.']
+        res.pop('sl_why', None)
+    else:
+        res['why'] = [f'В сделке: {inn}.']
+    return res
+
+
+
 LEGACY_A = False   # True — старая логика Типа A (v77, 2R); с 01.10.2026 по умолчанию S1
 
 
@@ -315,9 +370,9 @@ def analyze(sym, d, window, now_utc, off, prev=None, h1=None):
     h1 — часовые бары (UTC, ~40 суток) для цепочки H1 (Тип A, S1). Возвращает dict со статусом в формате Пульта."""
     prev = prev or {}
     if window == 'C':
-        return _analyze_C2(sym, d, now_utc, off, prev, h1)
+        return finalize_why(_analyze_C2(sym, d, now_utc, off, prev, h1))
     if window == 'A' and not LEGACY_A:
-        return _analyze_A_s1(sym, d, now_utc, off, prev, h1)
+        return finalize_why(_analyze_A_s1(sym, d, now_utc, off, prev, h1))
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
     d = _completed(d, now_utc, 5).copy()
@@ -662,10 +717,21 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     t_in = d.index[g + 1]
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(S1.END_M // 60, S1.END_M % 60)) - dt.timedelta(hours=off), tz='UTC')
     res['ck'] = sorted(set(res['ck'] + [7, 8, 9, 10]))
+    liqx = None   # 02.10.2026: ближайшая неснятая ликвидность стороны выноса ЗА стопом (для разбора SL)
+    try:
+        cl = [x for x in liq if x['kind'] == ('lo' if sd == 1 else 'hi') and (x['p'] - stop) * sd < 0]
+        if cl:
+            x_ = max(cl, key=lambda z: z['p']) if sd == 1 else min(cl, key=lambda z: z['p'])
+            dR = abs(x_['p'] - stop) / R
+            if dR <= 1.5: liqx = dict(name=x_['name'], p=round(x_['p'], dec), dR=round(dR, 2))
+    except Exception:
+        liqx = None
+    swn = int(g - r['start'] + 1)   # свечей от начала выноса до триггера
     sig = dict(date=str(today), window='A', time=(t_in + pd.Timedelta(hours=off)).strftime('%H:%M'),
                t_utc=str(t_in), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
                rr=S1.RR, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=list(worse), prob=res['prob'],
-               strong=int(c['strong']), struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'))
+               strong=int(c['strong']), struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'),
+               liqx=liqx, swn=swn)
     res['signal'] = sig
     res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
