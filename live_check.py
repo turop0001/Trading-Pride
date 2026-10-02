@@ -97,7 +97,7 @@ def window_now(riga_dt):
 # теперь то же самое считается прямо на облачных данных yfinance — не зависит от браузера.
 # Только справочный контекст (усилитель из чек-листа "Тренд 5 дней"), не фильтр входа.
 def fetch_ohlc(ticker, period, interval):
-    m = mt5_frame(ticker, {'60m': 'H1', '1d': 'D1'}.get(interval, 'M5'), max_age_h=72)
+    m = mt5_frame(ticker, {'60m': 'H1', '1d': 'D1'}.get(interval, 'M5'), max_age_h={'60m': 2, '1d': 72}.get(interval, 72))   # 02.10.2026: H1 из фида не старше ~3 ч (раньше 72 ч → при выключенном MT5 H1 отставал на сутки, а M5 шёл из Yahoo)
     if m is not None and len(m) >= 10: return m
     if str(ticker).startswith('MT5:'): return None
     import yfinance as yf
