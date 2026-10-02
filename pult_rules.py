@@ -796,6 +796,22 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         sg = prev['signal']
         sd = 1 if sg.get('side') == 'long' else -1
         dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
+        if sg.get('sv') != 2:
+            # 02.10.2026: сигналы, выданные до исправления структуры Swing (ложный «слом вверх»), пересчитываем по
+            # структуре НА МОМЕНТ ВХОДА: сторона против структуры → по структуре даёт усилитель №12, меняется вероятность
+            try:
+                import pult_ctx as _X
+                cut = pd.Timestamp(sg['t_utc']) + pd.Timedelta(minutes=5)
+                c0 = _X.build(d[d.index < cut], h1, cut, off, today, float(sg['entry']), _completed, lambda x: _resample(x, '1h'))
+                pl = [x for x in (sg.get('plus') or []) if x != 12]
+                if c0['rec'] == ('LONG' if sd == 1 else 'SHORT'): pl.append(12)
+                sg['plus'] = sorted(pl); sg['struct'] = c0['rec']; sg['sconf'] = c0['conf']; sg['sscore'] = c0['score']
+                sg['prob'] = 'высокая' if len(pl) >= 2 else 'средняя' if len(pl) == 1 else 'низкая'
+                if 12 in pl: sg['ck'] = sorted(set((sg.get('ck') or []) + [12]))
+                else: sg['ck'] = [x for x in (sg.get('ck') or []) if x != 12]
+                sg['sv'] = 2
+            except Exception as e:
+                print('struct fix failed', sym, e)
         _prob_set(res, sg.get('plus') or [], [], 'C')
         return _close_why(_track(res, d, sg, sd, dirc, fmtp))
     day = d[d['rdate'] == today]
@@ -915,7 +931,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=(5 if mode == 'engulf' else 0))).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
                side='long' if sd == 1 else 'short', rr=2.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[],
-               prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'))
+               prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'), sv=2)
     res['signal'] = sig; res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry_r)})')
