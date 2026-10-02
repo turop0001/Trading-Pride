@@ -217,9 +217,7 @@ def struct_line(ctx, price, liq, fm):
         parts.append('Sub M15 против Swing — откат внутри тренда')
     elif sw['tr'] != 0 and sb['tr'] == sw['tr']:
         parts.append('Sub M15 по тренду Swing')
-    cf = ctx.get('conf')
-    parts.append({'LONG': 'вероятнее вверх (' + str(cf) + ')', 'SHORT': 'вероятнее вниз (' + str(cf) + ')',
-                  '50/50': 'нет преимущества по структуре — осторожно / скип'}[rec])
+    # строка «вероятнее вверх/вниз» убрана 02.10.2026: дублирует «Рекомендацию» выше
     liqs = []
     if up: liqs.append('↑ ' + up[0]['name'])
     if dn: liqs.append('↓ ' + dn[0]['name'])
