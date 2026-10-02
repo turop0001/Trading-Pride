@@ -107,11 +107,11 @@
   "XAUUSD_A": {
     "sym": "XAUUSD",
     "window": "A",
-    "price": 4182.06,
+    "price": 4183.63,
     "boxH": 4198.19,
     "boxL": 4148.5,
     "reasons": [],
-    "checked_at": "11:40",
+    "checked_at": "11:41",
     "ck": [
       1,
       2
@@ -159,13 +159,13 @@
   "EURUSD_A": {
     "sym": "EURUSD",
     "window": "A",
-    "price": 1.12539,
+    "price": 1.12527,
     "boxH": 1.12619,
     "boxL": 1.12318,
     "reasons": [
       "встречный H1 FVG 1.12371–1.12440 внутри цели 1:2"
     ],
-    "checked_at": "11:40",
+    "checked_at": "11:41",
     "ck": [
       1,
       2,
@@ -232,13 +232,13 @@
   "GBPUSD_A": {
     "sym": "GBPUSD",
     "window": "A",
-    "price": 1.32084,
+    "price": 1.32114,
     "boxH": 1.32195,
     "boxL": 1.31824,
     "reasons": [
       "встречный H1 FVG 1.31892–1.31991 внутри цели 1:2"
     ],
-    "checked_at": "11:40",
+    "checked_at": "11:41",
     "ck": [
       1,
       2,
@@ -305,11 +305,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7697.4,
+    "price": 7700.8,
     "boxH": 7754.2,
     "boxL": 7725.8,
     "reasons": [],
-    "checked_at": "11:40",
+    "checked_at": "11:41",
     "ck": [
       1,
       2,
@@ -361,11 +361,11 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30716.9,
+    "price": 30737.5,
     "boxH": 30935.8,
     "boxL": 30791.5,
     "reasons": [],
-    "checked_at": "11:40",
+    "checked_at": "11:41",
     "ck": [
       1,
       2,
@@ -417,11 +417,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51142.0,
+    "price": 51156.0,
     "boxH": 51454.0,
     "boxL": 51208.0,
     "reasons": [],
-    "checked_at": "11:40",
+    "checked_at": "11:41",
     "ck": [
       1,
       2,
@@ -708,6 +708,13 @@
     {
       "date": "2026-10-02",
       "time": "11:40",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-02",
+      "time": "11:41",
       "window": "A",
       "text": "без изменений",
       "lines": []
