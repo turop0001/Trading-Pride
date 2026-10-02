@@ -872,9 +872,12 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     leg = lowB - ext
     if entry_g is None or leg <= 0:
         if nowm >= 1110:
-            res['ckf'] = [5]; res['reasons'] = ['откат 30% не случился до 18:30']; _why(res, 'Скип: откат ≥30% не случился до 18:30', [5])
-            return _out(res, 'skip', dirc, 'СКИП (откат 30% не случился до 18:30)')
+            _w = 'поглощение свечи выноса' if ge == g0 else 'откат 30%'
+            res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
+            return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
+        if ge == g0:
+            return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса одной свечой, ждём поглощение: закрытие {"выше хая" if sd == 1 else "ниже лоя"} свечи выноса)')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 30%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
         res['ckf'] = [5]; res['reasons'] = ['откат 30% после 18:30']; _why(res, 'Скип: откат ≥30% позже 18:30', [5])
