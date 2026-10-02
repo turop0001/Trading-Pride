@@ -225,7 +225,10 @@ def struct_line(ctx, price, liq, fm):
             if r <= 0.1: l1 = 'Swing ▲: импульс вверх, цена у HH (последний хай) %s' % nf(hi)
             else: l1 = 'Swing ▲: откат %d%% вниз от HH (хай) %s к HL (лой) %s%s' % (round(r * 100), nf(hi), nf(lo), deep)
             l2 = 'Дальше: выше HL — вверх к HH; закрытие телом ниже HL %s = слом' % nf(lo)
-        parts += [l1 + sub] + ([sw['brk']] if sw.get('brk') else [])
+        parts.append(l1 + sub)
+        for nm, t in (('Swing', sw), ('Sub M15', sb)):
+            if t.get('brk'):
+                parts.append('CHoCH %s: %s' % (nm, t['brk'].replace('закрытие телом за', 'телом за')))
     else:
         parts.append('Swing: чёткого тренда нет, цена в диапазоне')
     liqs = []
