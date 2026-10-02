@@ -220,7 +220,7 @@
    "prevH": null,
    "prevL": null,
    "signal": null,
-   "checked": "11:03"
+   "checked": "11:04"
   }
  },
  {
@@ -229,17 +229,9 @@
   "data": {
    "date": "2026-10-02",
    "window": "A",
-   "time": "11:03",
-   "text": "отчёт открытия окна отправлен; все инструменты — СКИП, ждём закрытия окна",
-   "changed": [
-    "XAUUSD",
-    "EURUSD",
-    "GBPUSD",
-    "US500",
-    "NAS100",
-    "US30",
-    "GER40"
-   ],
+   "time": "11:04",
+   "text": "без изменений",
+   "changed": [],
    "log": [
     {
      "date": "2026-10-02",
