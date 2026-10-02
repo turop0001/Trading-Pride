@@ -6,7 +6,7 @@
     "boxH": 4198.19,
     "boxL": 4148.5,
     "reasons": [],
-    "checked_at": "10:49",
+    "checked_at": "10:50",
     "ck": [
       1,
       2
@@ -58,7 +58,7 @@
     "boxH": 1.12651,
     "boxL": 1.12347,
     "reasons": [],
-    "checked_at": "10:49",
+    "checked_at": "10:50",
     "ck": [
       1,
       2,
@@ -121,7 +121,7 @@
     "boxH": 1.32195,
     "boxL": 1.31824,
     "reasons": [],
-    "checked_at": "10:49",
+    "checked_at": "10:50",
     "ck": [
       1,
       2,
@@ -170,11 +170,11 @@
   "US500_A": {
     "sym": "US500",
     "window": "A",
-    "price": 7746.0,
+    "price": 7746.5,
     "boxH": 7754.2,
     "boxL": 7725.8,
     "reasons": [],
-    "checked_at": "10:49",
+    "checked_at": "10:50",
     "ck": [
       1,
       2,
@@ -226,13 +226,13 @@
   "NAS100_A": {
     "sym": "NAS100",
     "window": "A",
-    "price": 30916.2,
+    "price": 30919.0,
     "boxH": 30935.8,
     "boxL": 30791.5,
     "reasons": [
       "Азия внутри вчерашней (внутренний день)"
     ],
-    "checked_at": "10:49",
+    "checked_at": "10:50",
     "ck": [
       1
     ],
@@ -275,11 +275,11 @@
   "US30_A": {
     "sym": "US30",
     "window": "A",
-    "price": 51391.0,
+    "price": 51396.0,
     "boxH": 51454.0,
     "boxL": 51208.0,
     "reasons": [],
-    "checked_at": "10:49",
+    "checked_at": "10:50",
     "ck": [
       1,
       2,
@@ -664,6 +664,13 @@
     {
       "date": "2026-10-02",
       "time": "10:49",
+      "window": "A",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-02",
+      "time": "10:50",
       "window": "A",
       "text": "без изменений",
       "lines": []
