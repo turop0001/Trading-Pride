@@ -585,7 +585,8 @@
     "closeA": true,
     "openC": true,
     "closeC": true,
-    "summary": true
+    "summary": true,
+    "final": true
   },
   "_log": [
     {
