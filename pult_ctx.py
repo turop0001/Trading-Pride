@@ -201,39 +201,57 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
     return ctx
 
 
+def _liq_w(name):
+    return 2.0 if 'D1' in name else 1.5 if ('вчера' in name or 'Лондон' in name) else 1.0
+
+
 def struct_line(ctx, price, liq, fm):
-    """«Где цена»: 3 короткие строки через ' | ' (Пульт рисует каждую отдельной строкой). Сжато 02.10.2026."""
+    """«Где цена» (04.10.2026): Swing + откат % + Sub; до слома (<70% рано / >=70% близко); CHoCH если был; цель-ликвидность.
+    Рекомендацию и вероятность не дублируем — они в блоке «Рекомендация»."""
     sw, sb = ctx['swing'], ctx['sub']
     nf = lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v)
-    up = sorted([x for x in liq if x['p'] > price], key=lambda x: x['p'])
-    dn = sorted([x for x in liq if x['p'] < price], key=lambda x: -x['p'])
     hi, lo, tr = sw.get('hi'), sw.get('lo'), sw['tr']
     parts = []
+    r = None
     if hi and lo and hi > lo and tr != 0:
         rng = hi - lo
-        sub = ''
-        if sb['tr'] == -tr: sub = ' · Sub M15 %s — откат внутри тренда' % ('▲' if sb['tr'] == 1 else '▼')
-        elif sb['tr'] == tr: sub = ' · Sub M15 %s по тренду' % ('▲' if sb['tr'] == 1 else '▼')
-        deep = ' (глубже 70%!)' if sw.get('deep') else ''
+        arrow = lambda t: '▲' if t == 1 else '▼'
         if tr == -1:
             r = (price - lo) / rng
-            if r <= 0.1: l1 = 'Swing ▼: импульс вниз, цена у LL (последний лой) %s' % nf(lo)
-            else: l1 = 'Swing ▼: откат %d%% вверх от LL (лой) %s к LH (хай) %s%s' % (round(r * 100), nf(lo), nf(hi), deep)
-            l2 = 'Дальше: ниже LH — вниз к LL; закрытие телом выше LH %s = слом' % nf(hi)
+            base = ('Swing ▼: импульс вниз, цена у LL %s' % nf(lo)) if r <= 0.1 else \
+                   ('Swing ▼: откат %d%% вверх от LL %s к LH %s' % (round(r * 100), nf(lo), nf(hi)))
+            brk_lvl = 'выше LH %s' % nf(hi)
         else:
             r = (hi - price) / rng
-            if r <= 0.1: l1 = 'Swing ▲: импульс вверх, цена у HH (последний хай) %s' % nf(hi)
-            else: l1 = 'Swing ▲: откат %d%% вниз от HH (хай) %s к HL (лой) %s%s' % (round(r * 100), nf(hi), nf(lo), deep)
-            l2 = 'Дальше: выше HL — вверх к HH; закрытие телом ниже HL %s = слом' % nf(lo)
-        parts.append(l1 + sub)
+            base = ('Swing ▲: импульс вверх, цена у HH %s' % nf(hi)) if r <= 0.1 else \
+                   ('Swing ▲: откат %d%% вниз от HH %s к HL %s' % (round(r * 100), nf(hi), nf(lo)))
+            brk_lvl = 'ниже HL %s' % nf(lo)
+        if sb['tr'] == -tr: base += ' · Sub M15 %s против Swing' % arrow(sb['tr'])
+        elif sb['tr'] == tr: base += ' · Sub M15 %s по тренду' % arrow(sb['tr'])
+        parts.append(base)
+        if sb['tr'] == -tr or r > 0.1:
+            if r >= 0.7 or sw.get('deep'): parts.append('Откат 70%%+: слом близко, смотрим закрытие телом %s' % brk_lvl)
+            elif sb['tr'] == -tr: parts.append('Откат меньше 70%%: о сломе рано, слом = закрытие телом %s' % brk_lvl)
         for nm, t in (('Swing', sw), ('Sub M15', sb)):
             if t.get('brk'):
                 parts.append('CHoCH %s: %s' % (nm, t['brk'].replace('закрытие телом за', 'телом за')))
     else:
         parts.append('Swing: чёткого тренда нет, цена в диапазоне')
-    liqs = []
-    if up: liqs.append('↑ %s (%s)' % (nf(up[0]['p']), up[0]['name']))
-    if dn: liqs.append('↓ %s (%s)' % (nf(dn[0]['p']), dn[0]['name']))
+    # цель-ликвидность: ближайший неснятый уровень (расстояние в длинах ноги Swing / вес силы уровня)
+    if liq:
+        rng = max((hi - lo) if (hi and lo and hi > lo) else price * 0.005, 1e-9)
+        cand = []
+        for x in liq:
+            d = abs(x['p'] - price) / rng
+            if d > 2.5: continue
+            against = tr != 0 and ((x['p'] > price and tr == -1) or (x['p'] < price and tr == 1)) and sb['tr'] == -tr
+            cand.append((d / (_liq_w(x['name']) * (1.5 if against else 1.0)), x, d))
+        cand.sort(key=lambda c: c[0])
+        if cand:
+            def fmtl(c): return '%s %s %s' % ('↑' if c[1]['p'] > price else '↓', nf(c[1]['p']), c[1]['name'])
+            txt = 'Цель-ликвидность: ' + fmtl(cand[0]) + ' (%.1f ноги)' % cand[0][2]
+            if len(cand) > 1: txt += ' · следом ' + fmtl(cand[1])
+            parts.append(txt)
     return ' | '.join(parts)
 
 
