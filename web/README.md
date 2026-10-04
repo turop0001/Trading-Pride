@@ -29,3 +29,5 @@ cd web
 npm install
 GH_TOKEN=... GH_REPO=turop0001/Trading-Pride npm run dev
 ```
+
+<!-- deploy 04.10.2026: сборка актуальной версии (карточки, CHoCH, Где цена) -->
