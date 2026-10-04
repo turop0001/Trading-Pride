@@ -18,7 +18,7 @@ WT = os.path.join(ROOT, '_st')
 BR = 'state'
 FILES = ['pult_state.json', 'pult_artifact.json', 'loop_heartbeat.txt', 'mirror.json']
 DIRS = ['pult_docs', 'shots']
-MIRROR_SEC = 900   # 0 = зеркало в main выключено
+MIRROR_SEC = 0     # 0 = зеркало в main выключено (с 04.10.2026: новый сайт читает ветку state)
 
 
 def sh(*a, cwd=ROOT, **k):
