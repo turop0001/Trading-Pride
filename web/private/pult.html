@@ -268,7 +268,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   <!-- REPORT -->
   <section id="tab-report" hidden>
     <div class="card" style="margin-bottom:16px">
-      <h2 id="repTitle">Отчёт дня</h2>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:12px"><h2 id="repTitle" style="margin:0">Отчёт дня</h2><div id="repSum" style="display:none;align-items:center;gap:6px;flex-wrap:wrap"></div></div>
       <p class="note" style="margin:0" id="repNote"></p>
     </div>
     <div class="repGrid" id="rep"></div>
@@ -874,6 +874,18 @@ document.querySelectorAll('#fView button').forEach(function(b){b.addEventListene
 $('fPer').addEventListener('change',function(){var c=this.value==='custom';$('fFromW').hidden=!c;$('fToW').hidden=!c;renderStats();});
 ['fFrom','fTo','fType','fSym','fOut'].forEach(function(k){$(k).addEventListener('change',renderStats);});
 var SRC='robot';
+function repSum(){var el=$('repSum');if(!el)return;var day=(typeof DAY!=='undefined'&&DAY)||REPDAY;
+  var L=(typeof HIST==='undefined'?[]:(HIST||[])).filter(function(h){return h.date===day&&/→ (TP|SL|БУ)|закрыта в 22:00/.test(h.result||'');});
+  if(!L.length){el.style.display='none';return;}
+  var tp=0,sl=0,be=0,sum=0;L.forEach(function(h){var res=h.result||'',m=res.match(/([+\-−]\d+(?:[.,]\d+)?)R/),rv=m?parseFloat(m[1].replace('−','-').replace(',','.')):null,r;
+    if(/→ БУ/.test(res))r=0;else if(/закрыта в 22:00/.test(res))r=rv===null?0:rv;else if(/→ TP/.test(res))r=rv>0?rv:2;else r=-1;
+    if(r>0.05)tp++;else if(r<-0.05)sl++;else be++;sum+=r;});
+  var n=L.length,rn=(typeof riskNow==='function')?riskNow():null,pct=rn?sum*rn.pct:null;
+  function chip(t,c){return '<span style="padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;background:rgba(0,0,0,.06);color:'+(c||'var(--text)')+'">'+t+'</span>';}
+  var up=sum>=0,col=up?'var(--pos,#2e7d32)':'var(--neg,#c62828)';
+  el.innerHTML=chip(n+' '+(n===1?'сделка':(n<5?'сделки':'сделок')))+chip(tp+' TP','var(--pos,#2e7d32)')+chip(sl+' SL','var(--neg,#c62828)')+(be?chip(be+' БУ'):'')+
+    chip((up?'+':'−')+Math.abs(Math.round(sum*10)/10)+'R'+(pct!==null&&isFinite(pct)?' · '+(up?'+':'−')+Math.abs(Math.round(pct*100)/100)+'%':''),col);
+  el.style.display='flex';}
 function srcDocs(){
   if(SRC==='mine')return DOCS.map(function(x){return Object.assign({},x.d,{id:x.id});});
   return (typeof HIST==='undefined'?[]:(HIST||[])).filter(function(h){return /→ (TP|SL|БУ)|закрыта в 22:00/.test(h.result||'');}).map(function(h){var res=h.result||'',tp=/→ TP/.test(res),t22=/закрыта в 22:00/.test(res),be=/→ БУ/.test(res),m=res.match(/([+\-−]\d+(?:[.,]\d+)?)R/),rv=m?parseFloat(m[1].replace('−','-').replace(',','.')):null,r=be?0:t22?(rv===null?0:rv):(tp?(rv>0?rv:2):-1);
@@ -1001,7 +1013,7 @@ renderHist();
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
     var nS=0;all.forEach(function(k){var q=S[k];if(q.shots){var id=q.date+'_'+(q.sym||k.split('_')[0])+'_'+(q.window||k.split('_')[1]);if(!SHOTS[id]){SHOTS[id]=q.shots;nS++;}}});if(nS)redraw();
     REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if(a._e!==b._e)return a._e-b._e;var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
-    if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else if(!repBusy())renderRep();
+    repSum();if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else if(!repBusy())renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];
     if(last){renderLive({date:last.date,time:last.time,window:last.window,text:last.text,log:log.filter(function(r){return r.date===last.date;})});}
@@ -1034,9 +1046,11 @@ renderHist();
   loadJ();setInterval(loadJ,60000);
 
   /* история сигналов: state/history.json в репозитории (если есть) */
-  fetch('/api/history',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+  function loadH(){fetch('/api/history',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
     HIST=(j&&j.items)||[];HIST.forEach(function(h){if(h.shots&&h.id&&!SHOTS[h.id])SHOTS[h.id]=h.shots;});redraw();$('hMsg').textContent='Загружено записей: '+HIST.length+'.'+(HIST.length?'':' В архив попадают все сигналы Пульта со статусом «Вход».');renderHist();
-  }).catch(function(){$('hMsg').textContent='История недоступна.';});
+    repSum();renderStats();
+  }).catch(function(){$('hMsg').textContent='История недоступна.';});}
+  loadH();setInterval(loadH,60000);
 })();
 pcalc();
 })();
