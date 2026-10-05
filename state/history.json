@@ -45,5 +45,16 @@
       "m5": "state/shots/2026-10-02_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-10-02_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-05_GER40_A",
+    "date": "2026-10-05",
+    "symbol": "GER40",
+    "type": "A",
+    "side": "long",
+    "entry": 25202.4,
+    "stop": 25143.9,
+    "target": 25319.4,
+    "result": "сигнал Пульта в 10:45 Рига"
   }
 ]
