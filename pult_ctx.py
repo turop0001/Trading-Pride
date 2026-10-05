@@ -60,7 +60,7 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
         if H[hi] - L[lo] >= 3 * A[i]:
             tr = 1 if lo < hi else -1; i0 = i + 1; break
     if tr == 0: return None
-    piv = []; ev = []; deep = False
+    piv = []; ev = []; evlv = []; deep = False
     if tr == 1: anc = (lo, L[lo]); ext = (hi, H[hi]); piv.append((lo, L[lo], 'L'))
     else: anc = (hi, H[hi]); ext = (lo, L[lo]); piv.append((hi, H[hi], 'H'))
     pend = None; sb = None; soft = None
@@ -69,6 +69,7 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
         softbrk = sf and pend is not None and soft is not None and ((C[i] < soft[1] - BUF * A[i]) if up else (C[i] > soft[1] + BUF * A[i]))
         if softbrk or ((C[i] < anc[1] - BUF * A[i]) if up else (C[i] > anc[1] + BUF * A[i])):
             if softbrk: piv.append((soft[0], soft[1], 'L' if up else 'H'))
+            evlv.append(soft[1] if softbrk else anc[1])
             ev.append((i, 'CHoCH↓' if up else 'CHoCH↑'))
             hp = pend if pend else ext
             if not pend: piv.append((ext[0], ext[1], 'H' if up else 'L'))
@@ -102,7 +103,7 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
     cur = C[-1]
     rng = max(abs(e[1] - anc[1]), 1e-9)
     dep = ((e[1] - cur) if tr == 1 else (cur - e[1])) / rng
-    return dict(tr=tr, anc=anc, ext=e, pend=pend is not None, dep=dep, deep=deep or dep > MAXPB, ev=ev, piv=piv, n=n)
+    return dict(tr=tr, anc=anc, ext=e, pend=pend is not None, dep=dep, deep=deep or dep > MAXPB, ev=ev, piv=piv, n=n, evlv=evlv)
 
 
 def _trend_dyn(df, start=0, k=1.0, soft_on=None):
@@ -113,6 +114,15 @@ def _trend_dyn(df, start=0, k=1.0, soft_on=None):
     brk = ''
     if r['ev'] and r['ev'][-1][0] >= r['n'] - 6 and r['ev'][-1][1].startswith('CHoCH'):
         brk = 'слом вниз (закрытие телом за HL)' if r['ev'][-1][1].endswith('↓') else 'слом вверх (закрытие телом за LH)'
+        try:
+            bi = r['ev'][-1][0]; lv = r['evlv'][-1] if r.get('evlv') else None
+            ts = df.index[bi]; step = pd.Timedelta(minutes=60) if (len(df) > 1 and (df.index[1] - df.index[0]) >= pd.Timedelta(minutes=60)) else pd.Timedelta(minutes=15)
+            te = ts + step   # время закрытия свечи слома
+            te = te.tz_convert('Europe/Riga') if te.tzinfo else te.tz_localize('UTC').tz_convert('Europe/Riga')
+            cl = float(df['Close'].values[bi]); fm = (lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v))
+            brk += ' · %s Рига, закрытие %s' % (te.strftime('%d.%m %H:%M'), fm(cl)) + (' (уровень %s)' % fm(lv) if lv is not None else '')
+        except Exception:
+            pass
     txt = 'HH/HL' if tr == 1 else 'LH/LL'
     if r['dep'] > MAXPB: txt += ', откат глубже 70%'
     return dict(tr=tr, txt=txt, hi=hi, lo=lo, brk=brk, dep=r['dep'], deep=r['dep'] > MAXPB, piv=r['piv'])
