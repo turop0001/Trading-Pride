@@ -86,7 +86,7 @@ h2{font-size:16px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted
 .k{font-size:13px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;margin-top:2px;background:var(--off-bg);color:var(--off);opacity:.5}
 .rule:has(input:not(:checked)) .k.skip{background:var(--short-bg);color:var(--short);opacity:1}
 .rule:has(input:not(:checked)) .k.half{background:var(--side-bg);color:var(--side);opacity:1}
-.k.base{opacity:.8}
+.k.base{background:var(--short-bg);color:var(--short);opacity:1}
 .k.plus{background:var(--long-bg);color:var(--long);opacity:.9}
 .mng{margin:10px 0 6px;padding:11px 14px;border-left:3px solid var(--long);background:var(--surface-2);border-radius:0 8px 8px 0;font-size:16px;color:var(--muted)}
 .mng b{color:var(--text)}
@@ -128,16 +128,16 @@ tr.tot td{font-weight:700;background:var(--surface-2)} tr.cur td{background:var(
 .tag.typ{background:none;border:1px solid var(--border);color:var(--muted);font-weight:600}
 .st{margin-left:auto;font-size:17px;font-weight:700;padding:6px 15px;border-radius:99px;white-space:nowrap}
 .st.skip{background:var(--off-bg);color:var(--off)}.st.watch{background:var(--side-bg);color:var(--side)}.st.prep{background:#e3ecfb;color:#2f5f9e;border:1px solid #2f5f9e}.st.signal{background:var(--long-bg);color:var(--long)}
-.st.prep{background:#fbe3c7;color:#a8480c;border:1px solid #d9822b}
-:root[data-theme="dark"] .st.prep{background:#3a2412;color:#f0a35c;border-color:#b86a2a}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .st.prep{background:#3a2412;color:#f0a35c;border-color:#b86a2a}}
+.st.prep{background:var(--blue-bg);color:var(--blue);border:1px solid transparent}
+:root[data-theme="dark"] .st.prep{background:var(--blue-bg);color:var(--blue);border-color:transparent}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .st.prep{background:var(--blue-bg);color:var(--blue);border-color:transparent}}
 .liveBar{display:flex;flex-direction:column;gap:6px;padding:12px 16px}
 .liveBar .ln{font-size:17px;font-weight:600}.liveBar .ln small{font-weight:400;color:var(--muted);margin-left:8px}
 .liveBar details summary{cursor:pointer;color:var(--muted);font-size:15px}
 .liveBar .lg{display:grid;gap:4px;margin-top:6px;font-size:15px;max-height:260px;overflow:auto}
 .liveBar .lg div{display:flex;gap:10px;border-bottom:1px dashed var(--border);padding-bottom:3px}.liveBar .lg b{font-family:var(--mono);min-width:48px}
 .liveBar .chg{color:var(--accent);font-weight:600}
-.st.trade{background:var(--blue-bg);color:var(--blue)}.st.done{background:var(--surface-2);color:var(--text)}
+.st.trade{background:#2f6fb5;color:#fff}.st.done{background:var(--surface-2);color:var(--text)}
 .st.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}.st.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700}.stchip.tp{background:var(--long-bg);color:var(--long);border:1px solid var(--long)}.stchip.sl{background:var(--short-bg);color:var(--short);border:1px solid var(--short)}
 .st.be{background:var(--side-bg);color:var(--side);border:1px solid var(--side)}
 .rgrid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 14px;font-size:17px;line-height:1.45}
@@ -384,7 +384,7 @@ function renderRep(){
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||''),isBE=/→ БУ/.test(x.note||'');
     if(isTP||isSL||isBE){c.res=isTP?'TP':isBE?'BE':'SL';c.stT=isTP?'Закрыта · TP':isBE?'Закрыта · БУ':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':isBE?'be':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0;});
-    c._sig=r.signal||null;c._e=(r.signal&&!(isTP||isSL||isBE))?0:1;
+    c._sig=r.signal||null;c._e=(r.signal&&!(isTP||isSL||isBE))?0:(x.status==='prep'&&!(isTP||isSL||isBE))?1:2;
     var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
@@ -395,7 +395,7 @@ function renderRep(){
     var DAY=all.some(function(k){return S[k].date===REPDAY;})?REPDAY:all.map(function(k){return S[k].date;}).sort().pop();
     var keys=all.filter(function(k){return S[k].date===DAY;});
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
-    REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if((a._e===0?0:1)!==(b._e===0?0:1))return (a._e===0?0:1)-(b._e===0?0:1);var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
+    REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if(a._e!==b._e)return a._e-b._e;var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
     if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];

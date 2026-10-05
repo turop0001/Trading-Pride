@@ -988,7 +988,7 @@ renderHist();
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||''),isBE=/→ БУ/.test(x.note||'');
     if(isTP||isSL||isBE){c.res=isTP?'TP':isBE?'BE':'SL';c.stT=isTP?'Закрыта · TP':isBE?'Закрыта · БУ':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':isBE?'be':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0;});
-    c._sig=r.signal||null;c._e=(r.signal&&!(isTP||isSL||isBE))?0:1;
+    c._sig=r.signal||null;c._e=(r.signal&&!(isTP||isSL||isBE))?0:(x.status==='prep'&&!(isTP||isSL||isBE))?1:2;
     var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
@@ -1000,7 +1000,7 @@ renderHist();
     var keys=all.filter(function(k){return S[k].date===DAY;});
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
     var nS=0;all.forEach(function(k){var q=S[k];if(q.shots){var id=q.date+'_'+(q.sym||k.split('_')[0])+'_'+(q.window||k.split('_')[1]);if(!SHOTS[id]){SHOTS[id]=q.shots;nS++;}}});if(nS)redraw();
-    REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if((a._e===0?0:1)!==(b._e===0?0:1))return (a._e===0?0:1)-(b._e===0?0:1);var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
+    REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if(a._e!==b._e)return a._e-b._e;var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
     if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else if(!repBusy())renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];
