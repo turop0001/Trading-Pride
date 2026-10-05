@@ -71,6 +71,10 @@
     "entry": 4165.89,
     "stop": 4171.72,
     "target": 4154.24,
-    "result": "сигнал Пульта в 11:30 Рига"
+    "result": "ВХОД → TP 🎯 +2R",
+    "shots": {
+      "m5": "state/shots/2026-10-05_XAUUSD_A_m5.png",
+      "h1": "state/shots/2026-10-05_XAUUSD_A_h1.png"
+    }
   }
 ]
