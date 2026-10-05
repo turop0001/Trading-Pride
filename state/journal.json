@@ -37,5 +37,18 @@
     "note": "",
     "why": "",
     "ts": 1791187869458
+  },
+  {
+    "id": "jmuuze3cpvio8",
+    "symbol": "GER40",
+    "type": "A",
+    "side": "long",
+    "date": "2026-10-05",
+    "out": "TP",
+    "r": 1,
+    "usd": 44,
+    "note": "",
+    "why": "",
+    "ts": 1791188509239
   }
 ]
