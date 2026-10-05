@@ -324,7 +324,10 @@ function liveCard(x){
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
   rows.push(['Проверено',(x.price!=null?x.price+' · ':'')+(x.checked||'—')]);
-  return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:curR};
+  var stK=m[0],stTx=m[1];
+  /* 05.10.2026: пока сделка открыта (вход есть, TP/SL/БУ/22:00 ещё не было) — плашка «В сделке», а не «Вход» */
+  if(x.signal&&x.status==='entry'&&!/→ (TP|SL|БУ)|закрыта в 22:00/.test(x.note||'')){stK='trade';stTx='В сделке'+(curR?' · '+curR:'');}
+  return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:stK,stT:stTx,rows:rows,c:false,curR:curR};
 }
 function mt5Check(){
   fetch('/api/feed',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){

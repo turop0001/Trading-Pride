@@ -776,7 +776,7 @@ function renderRep(){
     var top=el('div','rtop');top.appendChild(el('span','sym',c.s));
     if(c.eside){top.appendChild(el('span','tag '+c.eside,c.eside==='long'?'LONG':'SHORT'));}
     var ty=my?my.t:c.t;top.appendChild(el('span','tag typ','тип '+ty));
-    var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(c.curR&&(stc==='signal'||stc==='trade'))stt+=' · '+c.curR;if(my&&my.open){stc='trade';stt='В сделке'+(c.curR?' · '+c.curR:'');}if(my&&my.closed){stc=my.out.toLowerCase();stt='Закрыта · '+(my.out==='BE'?'БУ':my.out)+(my.out==='TP'?' ✅':'');}
+    var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(c.curR&&(stc==='signal'||stc==='trade'))stt+=' · '+c.curR;if(my&&my.open){stc='trade';stt='В сделке'+(c.curR?' · '+c.curR:'');}/* 05.10.2026: «Закрыл» только пишет в журнал; плашка возвращается к статусу Пульта (MT5) — «Закрыта · TP/SL» только по MT5 */
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
       if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<div class="px')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
