@@ -92,5 +92,16 @@
       "m5": "state/shots/2026-10-05_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-10-05_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-05_XAUUSD_C",
+    "date": "2026-10-05",
+    "symbol": "XAUUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 4139.06,
+    "stop": 4130.74,
+    "target": 4155.69,
+    "result": "сигнал Пульта в 16:50 Рига"
   }
 ]
