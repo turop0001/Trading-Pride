@@ -239,6 +239,7 @@ var CK={
  A:{title:'Тип A',when:WA+' Рига',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40)','правило одно для всех 7; по тесту сильнее всех индексы США.'],
   ['base','Азия вышла за вчерашний бокс только с одной стороны — есть сторона сделки','лонг: хай Азии выше вчерашнего, а лой не ниже; шорт — зеркально.'],
+  ['base','Противоположная сторона Азии ещё не снята первой — ни тенью, ни телом (лонг: хай Азии, шорт: лой)','если до нужного выноса в окне 10:00–14:00 снята противоположная сторона бокса — скип дня по инструменту (тест 5 лет: такие входы WR 40% против 50%).'],
   ['base','Вынос границы Азии тенью в окне 10:00–14:00 в сторону сделки','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая Азии. Экстремум выноса — самая дальняя точка.'],
   ['base','V-разворот: свеча входа не позже 5 свечей M5 после экстремума выноса','затяжной разворот (позже 5 свечей) не берём.'],
   ['base','M5 FVG выноса перекрыт закрытиями (или его нет)','пока закрытие свечи выкупа не вышло за дальнюю границу FVG — входа нет.'],
@@ -374,10 +375,12 @@ function renderRep(){
   function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
     return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
   var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/state/';
+  /* 06.10.2026: в Типе A добавлен обязательный пункт №3 — записи без ckv (старая нумерация 1–14) переводим в новую (1–15) */
+  function ckm(k,r,a){if(!a||r.ckv||(r.window||k.split('_')[1])!=='A')return a;return a.map(function(n){return n>=3?n+1:n;});}
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
-      note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:r.ck,ckf:r.ckf,fx:r.fx,
-      struct:r.struct,pos:r.pos,prob:r.prob,plus:r.plus,worse:r.worse,why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
+      note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:ckm(k,r,r.ck),ckf:ckm(k,r,r.ckf),fx:r.fx,
+      struct:r.struct,pos:r.pos,prob:r.prob,plus:ckm(k,r,r.plus),worse:ckm(k,r,r.worse),why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
     var wcl=x.window==='A'?840:1110;
     if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'14:00':'18:30')+')';x.ckf=[];}
     var c=liveCard(x);
