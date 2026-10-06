@@ -16,7 +16,7 @@ import sys, os, json, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import live_check as lc
 from notify import (send_telegram, fmt_line, build_window_open, build_window_closed,
-                    build_update, build_signal, build_daily_summary)
+                    build_update, build_signal, build_daily_summary, build_weekly)
 
 EVENTS = [(600, 'openA'), (840, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary'), (1320, 'final')]
 ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40']
@@ -379,6 +379,21 @@ def main(send=True):
         flags['final'] = True
         if final_check(state, today, dstr, off, tg, did):
             text = text or 'итог сделок после отчёта дня отправлен'
+
+    # ДОБАВЛЕНО 06.10.2026 (утверждено пользователем): недельный отчёт в Telegram — пятница 22:00 Рига, после итога сделок дня.
+    # TP/SL, WR, итог в R и в % депозита (риск 1% на сделку), отдельно Тип A и Тип C. Данные — state/history.json.
+    try:
+        if wd == 4 and 1320 <= m < 1440:
+            mon_ = riga.date() - dt.timedelta(days=4)
+            if (state.get('_weekly') or {}).get('week') != str(mon_):
+                hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
+                try: items_ = json.load(open(hp, encoding='utf-8'))
+                except Exception: items_ = []
+                tg(build_weekly(mon_, riga.date(), items_))
+                state['_weekly'] = {'week': str(mon_), 'sent': t}
+                did.append('weekly'); text = text or 'недельный отчёт отправлен'
+    except Exception as e:
+        print('weekly report failed:', e)
 
     state['_flags'] = flags
     if text:

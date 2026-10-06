@@ -126,6 +126,68 @@ def build_daily_summary(date, sections, total_pct):
     out.append(f"{E_TARGET} Итог дня: {sign}{abs(total_pct):.1f}% депозита")
     return "\n".join(out)
 
+# --- Недельный отчёт (утверждён пользователем 06.10.2026): пятница 22:00 Рига, риск 1% на сделку, отдельно Тип A и C ---
+import re as _re
+
+def _weekly_parse(item):
+    """Закрытая сделка из state/history.json → (out, r) или None. out: TP / SL / BE; r — результат в R (1R = 1% депозита)."""
+    res = str(item.get('result') or '')
+    if 'ВХОД' not in res and 'ЗАКРЫТА' not in res: return None
+    m = _re.search(r'([+\u2212\-]\d+(?:[.,]\d+)?)\s*R', res)
+    val = float(m.group(1).replace('\u2212', '-').replace(',', '.')) if m else None
+    if 'TP' in res: return 'TP', (val if val is not None else 2.0)
+    if 'SL' in res: return 'SL', -1.0
+    if 'БУ' in res: return 'BE', 0.0
+    if '22:00' in res and val is not None:
+        return ('TP' if val > 0 else 'SL' if val < 0 else 'BE'), val
+    return None
+
+
+def _fmt_r(x):
+    return ('+' if x > 0 else '\u2212' if x < 0 else '') + f"{abs(x):.1f}"
+
+
+def build_weekly(mon, fri, items):
+    """mon/fri — datetime.date (понедельник и пятница недели); items — записи state/history.json."""
+    rows = {'A': [], 'C': []}
+    for it in sorted(items, key=lambda x: (x.get('date') or '', x.get('symbol') or '')):
+        d = it.get('date') or ''
+        if not (str(mon) <= d <= str(fri)): continue
+        t = it.get('type')
+        if t not in rows: continue
+        p = _weekly_parse(it)
+        if not p: continue
+        rows[t].append((d, it.get('symbol'), it.get('side'), p[0], p[1]))
+    out = [f"{E_CHART} Недельный отчёт · {mon.strftime('%d.%m')} \u2013 {fri.strftime('%d.%m.%Y')}",
+           "(пятница, 22:00 Рига · риск 1% на сделку)", ""]
+    tot_n = tot_tp = tot_sl = tot_be = 0
+    tot_r = 0.0
+    for t in ('A', 'C'):
+        r = rows[t]
+        out.append(f"Тип {t}:")
+        if not r:
+            out.append("Сделок не было")
+            out.append(f"{E_TARGET} Тип {t}: 0.0R · 0.0% депозита")
+            out.append("")
+            continue
+        for d, sym, side, o, x in r:
+            emo = E_ENTRY if o == 'TP' else E_STOP if o == 'SL' else E_WATCH
+            dirr = DIR_LONG if side == 'long' else DIR_SHORT
+            word = 'TP' if o == 'TP' else 'SL' if o == 'SL' else '\u0411\u0423'
+            out.append(f"{emo} {d[8:10]}.{d[5:7]} {sym} ({dirr}) \u2014 {word} {_fmt_r(x)}%")
+        n = len(r); tp = sum(1 for x in r if x[3] == 'TP'); sl = sum(1 for x in r if x[3] == 'SL'); be = n - tp - sl
+        rr = sum(x[4] for x in r)
+        out.append("")
+        out.append(f"\u0421\u0434\u0435\u043b\u043e\u043a {n} \u00b7 {E_ENTRY} TP {tp} \u00b7 {E_STOP} SL {sl}" + (f" \u00b7 {E_WATCH} \u0411\u0423 {be}" if be else "") + f" \u00b7 WR {round(tp / n * 100)}%")
+        out.append(f"{E_TARGET} \u0422\u0438\u043f {t}: {_fmt_r(rr)}R \u00b7 {_fmt_r(rr)}% \u0434\u0435\u043f\u043e\u0437\u0438\u0442\u0430")
+        out.append("")
+        tot_n += n; tot_tp += tp; tot_sl += sl; tot_be += be; tot_r += rr
+    wr = round(tot_tp / tot_n * 100) if tot_n else 0
+    out.append(f"{E_CHART} \u0418\u0442\u043e\u0433\u043e \u0437\u0430 \u043d\u0435\u0434\u0435\u043b\u044e: {tot_n} \u0441\u0434\u0435\u043b\u043e\u043a \u00b7 {E_ENTRY} TP {tot_tp} \u00b7 {E_STOP} SL {tot_sl}" + (f" \u00b7 {E_WATCH} \u0411\u0423 {tot_be}" if tot_be else "") + f" \u00b7 WR {wr}%")
+    out.append(f"{E_TARGET} \u0418\u0442\u043e\u0433 \u043d\u0435\u0434\u0435\u043b\u0438: {_fmt_r(tot_r)}R \u00b7 {_fmt_r(tot_r)}% \u0434\u0435\u043f\u043e\u0437\u0438\u0442\u0430")
+    return "\n".join(out)
+
+
 
 def send_telegram(text: str) -> bool:
     tok = os.environ.get('TG_BOT_TOKEN', '')

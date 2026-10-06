@@ -305,7 +305,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
         <div class="field"><label>Тип</label><select id="fType"><option value="">A и C</option><option>A</option><option>C</option></select></div>
         <div class="field"><label>Инструмент</label><select id="fSym"><option value="">Все</option><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option></select></div>
         <div class="field"><label>Итог</label><select id="fOut"><option value="">Все</option><option value="TP">TP</option><option value="SL">SL</option><option value="BE">БУ</option></select></div>
-        <div class="field"><label>Вид</label><div class="seg" id="fView"><button type="button" data-w="line" class="on">График</button><button type="button" data-w="pie">Круг</button></div></div>
+        <div class="field"><label>Вид</label><div class="seg" id="fView"><button type="button" data-w="pie" class="on">Круг</button><button type="button" data-w="line">График</button></div></div>
       </div>
       <div class="kpis" id="sKpi"></div>
       <div class="chartWrap">
@@ -870,7 +870,7 @@ $('jAdd').addEventListener('click',function(){
 });
 
 /* trade stats */
-var VIEW='line';
+var VIEW='pie';
 document.querySelectorAll('#fView button').forEach(function(b){b.addEventListener('click',function(){VIEW=b.dataset.w;document.querySelectorAll('#fView button').forEach(function(x){x.classList.toggle('on',x===b);});renderStats();});});
 $('fPer').addEventListener('change',function(){var c=this.value==='custom';$('fFromW').hidden=!c;$('fToW').hidden=!c;renderStats();});
 ['fFrom','fTo','fType','fSym','fOut'].forEach(function(k){$(k).addEventListener('change',renderStats);});
@@ -920,11 +920,16 @@ function renderStats(){
     var dots=L.map(function(d,i){var o=outOf(d),c=o==='TP'?'var(--long)':o==='SL'?'var(--short)':'var(--side)';return '<circle cx="'+X(i+1)+'" cy="'+Y(pts[i+1])+'" r="4" fill="'+c+'"/>';}).join('');
     ch.innerHTML='<h2>Кривая результата, R</h2><svg viewBox="0 0 '+W+' '+H+'" width="100%"><line x1="'+P+'" x2="'+(W-10)+'" y1="'+Y(0)+'" y2="'+Y(0)+'" stroke="var(--border)" stroke-dasharray="4 4"/><text x="2" y="'+(Y(mx)+4)+'">'+Math.round(mx*10)/10+'</text><text x="2" y="'+(Y(mn)+4)+'">'+Math.round(mn*10)/10+'</text><path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5"/>'+dots+'</svg>';
   } else {
-    var parts=[[tp,'var(--long)','TP'],[be,'var(--side)','БУ'],[sl,'var(--short)','SL']],a0=-Math.PI/2,s='';
-    parts.forEach(function(p){if(!p[0])return;var a1=a0+p[0]/n*2*Math.PI;if(p[0]===n){s+='<circle cx="110" cy="110" r="80" fill="none" stroke="'+p[1]+'" stroke-width="36"/>';}else{var lg=a1-a0>Math.PI?1:0;
-      s+='<path d="M'+(110+80*Math.cos(a0))+' '+(110+80*Math.sin(a0))+' A80 80 0 '+lg+' 1 '+(110+80*Math.cos(a1))+' '+(110+80*Math.sin(a1))+'" fill="none" stroke="'+p[1]+'" stroke-width="36"/>';}a0=a1;});
-    ch.innerHTML='<h2>TP / БУ / SL</h2><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><svg viewBox="0 0 220 220" width="200">'+s+'<text x="110" y="116" text-anchor="middle" style="font-size:22px;fill:var(--text)">'+Math.round(tp/n*100)+'%</text></svg><div class="list">'+
-      parts.map(function(p){return '<div class="li"><span style="color:'+p[1]+';font-weight:700">'+p[2]+'</span><b>'+p[0]+' ('+Math.round(p[0]/n*100)+'%)</b></div>';}).join('')+'</div></div>';
+    var parts=[[tp,'var(--long)','TP'],[be,'var(--side)','БУ'],[sl,'var(--short)','SL']],a0=-Math.PI/2,s='',R=84,CX=110,nz=parts.filter(function(p){return p[0];}).length,gap=nz>1?0.09:0,wr=Math.round(tp/n*100);
+    s+='<circle cx="'+CX+'" cy="'+CX+'" r="'+R+'" fill="none" stroke="var(--surface-2)" stroke-width="22"/>';
+    parts.forEach(function(p){if(!p[0])return;var sw=p[0]/n*2*Math.PI,a1=a0+sw;
+      if(p[0]===n){s+='<circle cx="'+CX+'" cy="'+CX+'" r="'+R+'" fill="none" stroke="'+p[1]+'" stroke-width="22"/>';}
+      else{var b0=a0+gap/2,b1=a1-gap/2;if(b1>b0){var lg=b1-b0>Math.PI?1:0;
+        s+='<path d="M'+(CX+R*Math.cos(b0))+' '+(CX+R*Math.sin(b0))+' A'+R+' '+R+' 0 '+lg+' 1 '+(CX+R*Math.cos(b1))+' '+(CX+R*Math.sin(b1))+'" fill="none" stroke="'+p[1]+'" stroke-width="22" stroke-linecap="round"/>';}}
+      a0=a1;});
+    ch.innerHTML='<h2>Итоги сделок</h2><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap"><svg viewBox="0 0 220 220" width="210" style="flex:none"><g>'+s+'</g><text x="110" y="104" text-anchor="middle" style="font-size:15px;font-weight:700;letter-spacing:1.5px;fill:var(--muted)">WR</text><text x="110" y="136" text-anchor="middle" style="font-size:38px;font-weight:700;font-family:var(--mono);fill:var(--text)">'+wr+'%</text></svg>'+
+      '<div style="flex:1;min-width:210px;display:flex;flex-direction:column;gap:12px">'+parts.map(function(p){var pc=Math.round(p[0]/n*100);return '<div><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:17px"><span style="display:flex;align-items:center;gap:8px;font-weight:700;color:'+p[1]+'"><i style="width:10px;height:10px;border-radius:50%;background:'+p[1]+';display:inline-block"></i>'+p[2]+'</span><b style="font-family:var(--mono)">'+p[0]+' <span style="font-weight:400;color:var(--muted)">· '+pc+'%</span></b></div><div style="height:6px;border-radius:3px;background:var(--surface-2);margin-top:5px;overflow:hidden"><div style="height:100%;width:'+pc+'%;background:'+p[1]+';border-radius:3px"></div></div></div>';}).join('')+
+      '<div style="font-size:15px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px">Всего сделок: <b style="color:var(--text)">'+n+'</b> · WR = TP / все сделки</div></div></div>';
   }
   var by={};L.forEach(function(d){var q=by[d.symbol]||(by[d.symbol]={n:0,tp:0,r:0});q.n++;if(outOf(d)==='TP')q.tp++;q.r+=+d.r||0;});
   var tb=$('sBySym');tb.innerHTML='';Object.keys(by).forEach(function(k){var q=by[k],tr=el('tr');tr.appendChild(el('td',null,k));tr.appendChild(el('td',null,q.n));tr.appendChild(el('td',null,Math.round(q.tp/q.n*100)+'%'));tr.appendChild(el('td',q.r>=0?'pos':'neg',sg(q.r)+Math.abs(Math.round(q.r*10)/10)));tb.appendChild(tr);});
