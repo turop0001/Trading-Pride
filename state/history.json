@@ -108,5 +108,16 @@
       "m5": "state/shots/2026-10-05_XAUUSD_C_m5.png",
       "h1": "state/shots/2026-10-05_XAUUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-06_XAUUSD_A",
+    "date": "2026-10-06",
+    "symbol": "XAUUSD",
+    "type": "A",
+    "side": "short",
+    "entry": 4152.12,
+    "stop": 4157.9,
+    "target": 4140.55,
+    "result": "сигнал Пульта в 12:10 Рига"
   }
 ]
