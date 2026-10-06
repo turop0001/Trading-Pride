@@ -34,7 +34,7 @@ def _trend(df, n):
     return dict(tr=tr, txt=txt, hi=h2, lo=l2, brk=brk)
 
 
-PCT, MAXPB, BUF, BUILD_BARS, BUILD_PCT = 0.35, 0.70, 0.25, 12, 0.25
+PCT, MAXPB, BUF, BUILD_BARS, BUILD_PCT = 0.30, 0.70, 0.25, 10, 0.20   # 06.10.2026: откат 30% импульса (20% при затяжной проторговке от 10 свечей H1)
 SOFT = True; SOFTPCT = 0.2
 
 
@@ -44,7 +44,7 @@ def _atr(df, n=14):
     return tr.rolling(n).mean().bfill().values
 
 
-def _dyn(df, start=0, k=1.0, soft_on=None):
+def _dyn(df, start=0, k=1.0, soft_on=None, choch0=False):
     """Динамический подход к структуре (видео «Динамический подход» + уточнения 01.10.2026).
     Диапазон коррекции — от HL (LH) до экстремума. Откат >=35% диапазона создаёт HH (LL); при затяжном билдинге
     ликвидности/консолидации достаточно >=25% за 12 свечей. Свежий LH/HL (откатный экстремум, подтверждённый возвратом >=20%) — якорь раннего CHoCH (закрытие телом за ним). HL (LH) рождается только после закрепления ТЕЛОМ за HH (LL)
@@ -63,7 +63,7 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
     piv = []; ev = []; evlv = []; deep = False
     if tr == 1: anc = (lo, L[lo]); ext = (hi, H[hi]); piv.append((lo, L[lo], 'L'))
     else: anc = (hi, H[hi]); ext = (lo, L[lo]); piv.append((hi, H[hi], 'H'))
-    pend = None; sb = None; soft = None
+    pend = None; sb = None; soft = None; did0 = False
     for i in range(i0, n):
         up = tr == 1
         softbrk = sf and pend is not None and soft is not None and ((C[i] < soft[1] - BUF * A[i]) if up else (C[i] > soft[1] + BUF * A[i]))
@@ -93,6 +93,12 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
                     pr = (pend[1] - L[sb]) if up else (H[sb] - pend[1])
                     if ((H[i] - L[sb]) if up else (H[sb] - L[i])) >= SOFTPCT * max(pr, 1e-9) and i > sb: soft = (sb, L[sb] if up else H[sb])
             if (C[i] > pend[1] + BUF * A[i]) if up else (C[i] < pend[1] - BUF * A[i]):
+                if choch0 and not did0:
+                    # 06.10.2026: первый пробой откатного LH (HL) после LL (HH) — это CHoCH; HL (LH) ещё не валиден,
+                    # база отката остаётся от LL (HH), пик пробоя станет валидным HH (LL) только после отката
+                    did0 = True; ev.append((i, 'CHoCH↑' if up else 'CHoCH↓')); evlv.append(pend[1])
+                    ext = (i, H[i] if up else L[i]); pend = None
+                    continue
                 j = pend[0] + int(np.argmin(L[pend[0]:i + 1]) if up else np.argmax(H[pend[0]:i + 1]))
                 piv.append((j, L[j] if up else H[j], 'L' if up else 'H'))
                 dp = ((pend[1] - L[j]) if up else (H[j] - pend[1])) / max(abs(pend[1] - anc[1]), 1e-9)
@@ -106,7 +112,7 @@ def _dyn(df, start=0, k=1.0, soft_on=None):
     return dict(tr=tr, anc=anc, ext=e, pend=pend is not None, dep=dep, deep=deep or dep > MAXPB, ev=ev, piv=piv, n=n, evlv=evlv)
 
 
-def _trend_dyn(df, start=0, k=1.0, soft_on=None):
+def _trend_dyn_old(df, start=0, k=1.0, soft_on=None):
     r = _dyn(df, start, k, soft_on)
     if r is None: return dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
     tr = r['tr']; a, e = r['anc'][1], r['ext'][1]
@@ -123,9 +129,154 @@ def _trend_dyn(df, start=0, k=1.0, soft_on=None):
             brk += ' · %s Рига, закрытие %s' % (te.strftime('%d.%m %H:%M'), fm(cl)) + (' (уровень %s)' % fm(lv) if lv is not None else '')
         except Exception:
             pass
+    dep, piv, flip = r['dep'], r['piv'], ''
+    # 06.10.2026 (правило трейдера): Swing разворачивается и БЕЗ пробоя старого LH/HL, если после последнего LL/HH
+    # сложились две новые точки другого направления: HH (LL) на откате и BOS телом, затем HL (LH).
+    try:
+        if tr != 0 and r['ext'][0] < r['n'] - 6 and len(df) - r['ext'][0] > 12:
+            s0 = r['ext'][0]
+            q = _dyn(df.iloc[s0:], 0, k, soft_on, True)
+            if q and q['tr'] == -tr:
+                up = q['tr'] == 1
+                Hs = [x[1] for x in q['piv'] if x[2] == 'H']; Ls = [x[1] for x in q['piv'] if x[2] == 'L']
+                mv = (lambda a, b: a > b) if up else (lambda a, b: a < b)
+                # HH (LL) выше (ниже) откатного LH (HL) после слома и HL (LH) последним, не пробивающим LL (HH) разворота
+                kx = max(range(len(q['piv'])), key=lambda j: q['piv'][j][1] * (1 if up else -1) if q['piv'][j][2] == 'H' else -1e18) if Hs else -1
+                if len(Hs) >= 2 and len(Ls) >= 2 and mv(Hs[-1], Hs[0]) and all(mv(v, Ls[0]) for v in Ls[1:]) and \
+                        any(x[2] == 'L' for x in q['piv'][kx + 1:]) and \
+                        any(e[1] == ('BOS↑' if up else 'BOS↓') for e in q['ev']):
+                    old = r['anc'][1]
+                    tr = q['tr']; hi, lo = (q['ext'][1], q['anc'][1]) if up else (q['anc'][1], q['ext'][1])
+                    dep = q['dep']; piv = [(s0 + x[0], x[1], x[2]) for x in q['piv']]
+                    fm = (lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v))
+                    flip = ('развернулся без пробоя %s %s: %s %s и %s %s (BOS телом)' %
+                            ('LH' if up else 'HL', fm(old), 'HH' if up else 'LL', fm(Hs[-1] if up else Ls[-1]),
+                             'HL' if up else 'LH', fm(Ls[-1] if up else Hs[-1])))
+    except Exception:
+        flip = ''
     txt = 'HH/HL' if tr == 1 else 'LH/LL'
-    if r['dep'] > MAXPB: txt += ', откат глубже 70%'
-    return dict(tr=tr, txt=txt, hi=hi, lo=lo, brk=brk, dep=r['dep'], deep=r['dep'] > MAXPB, piv=r['piv'])
+    if dep > MAXPB: txt += ', откат глубже 70%'
+    return dict(tr=tr, txt=txt, hi=hi, lo=lo, brk=brk, dep=dep, deep=dep > MAXPB, piv=piv, flip=flip)
+
+
+SOFTPCT2 = 0.20   # локальная откатная точка (кандидат LH/HL) фиксируется, когда цена от неё отошла на >=20% хода
+
+
+def _struct2(df, k=1.0):
+    """Структура по определениям трейдера (06.10.2026), H1/M15, всё по закрытию ТЕЛОМ:
+    - новая точка/слом признаются только если свеча закрылась за уровнем с запасом BUF·ATR и следующая свеча удержала уровень
+      (фитиль без закрепления = снятие ликвидности);
+    - HH (LL) валиден только после отката >=30% импульса (20% при проторговке >=10 свечей); пока отката нет, новый хай продолжает тот же пик;
+    - BOS = закрепление за валидным HH (LL): тогда валидной становится HL (LH) — экстремум отката;
+    - CHoCH = закрепление за локальной откатной точкой (кандидат HL/LH). Это только кандидат разворота: если цена затем закрепилась
+      за прежним пиком, CHoCH ложный (снятие ликвидности), иначе разворот подтверждается, когда новый LL (HH) отработал откат и его обновил BOS."""
+    H, L, C = (df[c].values.astype(float) for c in ('High', 'Low', 'Close'))
+    A = _atr(df) * k
+    n = len(df)
+    hi = lo = 0; s = 0; i0 = 1
+    for i in range(1, n):
+        if H[i] > H[hi]: hi = i
+        if L[i] < L[lo]: lo = i
+        if H[hi] - L[lo] >= 3 * A[i]:
+            s = 1 if lo < hi else -1; i0 = i + 1; break
+    if s == 0: return None
+    peak = lambda i, s: H[i] if s == 1 else L[i]      # экстремум в сторону тренда
+    troug = lambda i, s: L[i] if s == 1 else H[i]     # экстремум отката
+    def brk(i, lvl, d, buf):                          # закрепление телом за уровнем в направлении d, с удержанием следующей свечой
+        if C[i] * d <= lvl * d + buf: return False
+        return True
+    base = (lo, L[lo]) if s == 1 else (hi, H[hi]); ext = (hi, H[hi]) if s == 1 else (lo, L[lo])
+    vp = None; cb = None; cbl = False; pend = None; tr_conf = s
+    ev = []; pts = [(base[0], base[1], 'L' if s == 1 else 'H', False)]
+    def name(kind, s): return {('H', 1): 'HH', ('L', 1): 'HL', ('L', -1): 'LL', ('H', -1): 'LH'}[(kind, s)]
+    for i in range(i0, n):
+        buf = BUF * A[i]
+        if vp is not None:
+            px = troug(i, s)
+            if not cbl and (cb is None or (px - cb[1]) * s < 0): cb = (i, px)
+            if cb is not None and not cbl and i > cb[0] and (peak(i, s) - cb[1]) * s >= SOFTPCT2 * max(abs(vp[1] - cb[1]), 1e-9):
+                cbl = True; pts.append((cb[0], cb[1], 'L' if s == 1 else 'H', True))
+        if pend is None:
+            lvl, oi = base[1], base[0]
+            if brk(i, lvl, -s, buf):
+                tp = max(range(base[0], i), key=lambda j: peak(j, s) * s)
+                tpx = (tp, peak(tp, s))
+                ev.append(dict(i=i, nm='CHoCH' + ('↓' if s == 1 else '↑'), oi=oi, op=lvl, fake=False, prov=i == n - 1))
+                pend = dict(top=tpx, topvalid=vp is not None, ei=len(ev) - 1, s_old=s)
+                s = -s
+                j2 = max(range(tpx[0], i + 1), key=lambda j: peak(j, s) * s)
+                base = tpx; ext = (j2, peak(j2, s)); vp = None; cb = None; cbl = False
+                continue
+        else:
+            if brk(i, base[1], -s, buf):                  # закрепление за прежним пиком: CHoCH был ложным
+                ev[pend['ei']]['fake'] = True
+                s = -s; tp = pend['top']
+                low = min(range(tp[0], i + 1), key=lambda j: troug(j, s) * s)
+                if pend['topvalid']:
+                    ev.append(dict(i=i, nm='BOS' + ('↑' if s == 1 else '↓'), oi=tp[0], op=tp[1], fake=False, prov=i == n - 1))
+                    base = (low, troug(low, s)); pts.append((base[0], base[1], 'L' if s == 1 else 'H', False))
+                    ext = (i, peak(i, s)); vp = None
+                else:
+                    j = max(range(tp[0], i + 1), key=lambda j: peak(j, s) * s)
+                    ext = (j, peak(j, s)); base = (low, troug(low, s)); vp = None
+                cb = None; cbl = False; pend = None; tr_conf = s
+                continue
+        if vp is not None and brk(i, vp[1], s, buf):      # BOS
+            ev.append(dict(i=i, nm='BOS' + ('↑' if s == 1 else '↓'), oi=vp[0], op=vp[1], fake=False, prov=i == n - 1))
+            low = min(range(vp[0], i + 1), key=lambda j: troug(j, s) * s)
+            base = (low, troug(low, s)); pts.append((base[0], base[1], 'L' if s == 1 else 'H', False))
+            ext = (i, peak(i, s)); vp = None; cb = None; cbl = False
+            if pend is not None: pend = None
+            tr_conf = s
+            continue
+        if vp is None:
+            if C[i] * s > ext[1] * s and i > ext[0]:
+                j = ext[0] + 1 + max(range(i - ext[0]), key=lambda t: peak(ext[0] + 1 + t, s) * s)
+                if peak(j, s) * s > ext[1] * s: ext = (j, peak(j, s))
+            rng = max(abs(ext[1] - base[1]), 1e-9)
+            lowp = min(troug(j, s) * s for j in range(ext[0] + 1, i + 1)) * s if i > ext[0] else ext[1]
+            dep = abs(ext[1] - lowp) / rng if i > ext[0] else 0.0
+            if i - ext[0] >= 3 and (dep >= PCT or (dep >= BUILD_PCT and i - ext[0] >= BUILD_BARS)):
+                vp = ext; pts.append((vp[0], vp[1], 'H' if s == 1 else 'L', False)); cb = None; cbl = False
+    cur = C[-1]
+    e = vp if vp is not None else ext
+    rng = max(abs(e[1] - base[1]), 1e-9)
+    dep = ((e[1] - cur) * s) / rng
+    return dict(tr=tr_conf, s=s, base=base, ext=e, vp=vp, cb=cb if cbl else None, pend=pend, dep=dep, ev=ev, pts=pts, n=n)
+
+
+def _trend_dyn(df, start=0, k=1.0, soft_on=None):
+    """06.10.2026: структура по определениям трейдера (_struct2); при ошибке — прежний алгоритм."""
+    try:
+        r = _struct2(df, k)
+        if r is None: return dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
+        n = r['n']; s = r['s']; tr = r['tr']
+        hi, lo = (r['ext'][1], r['base'][1]) if s == 1 else (r['base'][1], r['ext'][1])
+        fm = (lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v))
+        brk = ''
+        real = [e for e in r['ev'] if e['nm'].startswith('CHoCH') and not e['fake']]
+        if real and real[-1]['i'] >= n - 6 and r['pend'] is not None:
+            e = real[-1]; bi = e['i']
+            brk = 'слом вниз (закрытие телом за HL)' if e['nm'].endswith('↓') else 'слом вверх (закрытие телом за LH)'
+            try:
+                step = pd.Timedelta(minutes=60) if (len(df) > 1 and (df.index[1] - df.index[0]) >= pd.Timedelta(minutes=60)) else pd.Timedelta(minutes=15)
+                te = df.index[bi] + step
+                te = te.tz_convert('Europe/Riga') if te.tzinfo else te.tz_localize('UTC').tz_convert('Europe/Riga')
+                brk += ' · %s Рига, закрытие %s (уровень %s)' % (te.strftime('%d.%m %H:%M'), fm(float(df['Close'].values[bi])), fm(e['op']))
+            except Exception:
+                pass
+        flip = ''
+        if r['pend'] is not None:
+            flip = 'кандидат разворота: слом %s за %s (подтверждение — новый %s и BOS)' % (
+                'HL' if r['pend']['s_old'] == 1 else 'LH', fm(r['base'][1]) if False else fm(r['ev'][r['pend']['ei']]['op']),
+                'LL' if r['pend']['s_old'] == 1 else 'HH')
+        piv = [(p[0], p[1], p[2]) for p in r['pts'] if not p[3]]
+        dep = r['dep']
+        txt = 'HH/HL' if tr == 1 else 'LH/LL'
+        if dep > MAXPB: txt += ', откат глубже 70%'
+        return dict(tr=tr, txt=txt, hi=hi, lo=lo, brk=brk, dep=dep, deep=dep > MAXPB, piv=piv, flip=flip)
+    except Exception:
+        return _trend_dyn_old(df, start, k, soft_on)
 
 
 def _arrow(t):
@@ -239,6 +390,7 @@ def struct_line(ctx, price, liq, fm):
         if sb['tr'] == -tr: base += ' · Sub M15 %s против Swing' % arrow(sb['tr'])
         elif sb['tr'] == tr: base += ' · Sub M15 %s по тренду' % arrow(sb['tr'])
         parts.append(base)
+        if sw.get('flip'): parts.append('Swing %s: %s' % (arrow(tr), sw['flip']))
         if sb['tr'] == -tr or r > 0.1:
             if r >= 0.7 or sw.get('deep'): parts.append('Откат 70%%+: слом близко, смотрим закрытие телом %s' % brk_lvl)
             elif sb['tr'] == -tr: parts.append('Откат меньше 70%%: о сломе рано, слом = закрытие телом %s' % brk_lvl)
