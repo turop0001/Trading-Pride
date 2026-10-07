@@ -15,6 +15,9 @@ WIN = (600, 840)       # окно входа 10:00–14:00 Рига
 END_M = 1320           # 22:00 Рига — закрытие сделки
 BUF = 0.3              # буфер стопа, ATR(M5, 14)
 RR = 2.0               # цель, R (с 01.10.2026: 1:2)
+VBARS = 7              # 07.10.2026: V-разворот — не позже 7 значимых свечей после экстремума
+DOJI = 0.25            # доджи: тело <=25% диапазона, в счёт свечей V-разворота не идут
+MINSW = 0.5            # 07.10.2026: минимальный вынос за границу Азии, в ATR(M5, 14)
 
 
 def struct(Hh, Lh, Ch):
@@ -102,7 +105,11 @@ def analyze_day(d, today, off, sd, h1=None):
         rel = slice(ge + 1, g + 1)
         cl, op, hh, ll = C[rel], O[rel], H[rel], L[rel]
         strong = int(((cl > op) & ((cl - op) >= 0.6 * (hh - ll) + 1e-12)).sum())
-        f2 = (g - ge) <= 5
+        # 07.10.2026: V-разворот — свеча входа не позже 7 значимых свечей после экстремума выноса (доджи с телом <=25% диапазона не считаются)
+        nbars = sum(1 for j in range(ge + 1, g + 1) if (H[j] - L[j]) > 0 and abs(C[j] - O[j]) > DOJI * (H[j] - L[j]))
+        f2 = nbars <= VBARS
+        # 07.10.2026: вынос не меньше 0,5 ATR(M5, 14) за границу Азии — иначе откат 30% от мелкого выноса считается шумом
+        f2 = f2 and (aL - ext) >= MINSW * atr[g]
         fv5 = None
         for c_ in range(ge, max(start - 3, 2), -1):
             a_ = c_ - 2
@@ -114,12 +121,13 @@ def analyze_day(d, today, off, sd, h1=None):
         out['last_chain'] = chn
         if f2 and f4 and f7:   # цепочка H1 как правило убрана 01.10.2026 (структура — только контекст)
             e = O[g + 1] if g + 1 < n else None
-            out['cand'] = dict(g=int(g), ge=int(ge), start=int(start), ext_f=float(ext), atr=float(atr[g]),
+            out['cand'] = dict(g=int(g), ge=int(ge), start=int(start), ext_f=float(ext), atr=float(atr[g]), nbars=int(nbars), sw_atr=float((aL - ext) / atr[g]),
                                strong=strong, ret=float(ret), nsw=nsw, chain=chn, t_g=d.index[g])
             out['start'] = start
             return out
     out['start'] = start
     out['last_ext_f'] = None if ext is None else float(ext)
+    out['last_sw_atr'] = None if ext is None or not atr[n - 1] > 0 else float((aL - ext) / atr[n - 1])
     if start is not None and out['last_chain'] is None:
         out['last_chain'] = chain_at(n - 1)[1]
     return out

@@ -307,7 +307,7 @@ def _analyze_C(sym, d, now_utc, off, prev):
     return _out(res, 'prep', dirc, f'ВЫНОС (в {sweep_t}, ждём свечу-поглощение {way})')
 
 
-_AMP_NAMES = {'A': {12: 'батут (H1 FVG)', 13: 'ликвидность на пути', 14: 'по тренду'}, 'C': {11: 'батут (H1 FVG)', 12: 'тренд не против'}}
+_AMP_NAMES = {'A': {13: 'батут (H1 FVG)', 14: 'ликвидность на пути', 15: 'по тренду'}, 'C': {11: 'батут (H1 FVG)', 12: 'тренд не против'}}
 
 
 def finalize_why(res):
@@ -588,17 +588,17 @@ def _amps_A(res, ctx, liq, sd, boxH, boxL, win_start_utc):
     for f in F1:
         if f['dir'] != sd or f['inv_t'] is not None or f['t'] >= win_start_utc: continue
         if f['touch_t'] is not None and f['touch_t'] < win_start_utc: continue
-        if sd == 1 and f['hi'] <= boxL and boxL - f['hi'] <= 0.5 * rngA: plus.append(12); notes.append(f'батут: нетронутый H1 FVG под лоем Азии ({f["lo"]:.5g}–{f["hi"]:.5g})'); break
-        if sd == -1 and f['lo'] >= boxH and f['lo'] - boxH <= 0.5 * rngA: plus.append(12); notes.append(f'батут: нетронутый H1 FVG над хаем Азии ({f["lo"]:.5g}–{f["hi"]:.5g})'); break
+        if sd == 1 and f['hi'] <= boxL and boxL - f['hi'] <= 0.5 * rngA: plus.append(13); notes.append(f'батут: нетронутый H1 FVG под лоем Азии ({f["lo"]:.5g}–{f["hi"]:.5g})'); break
+        if sd == -1 and f['lo'] >= boxH and f['lo'] - boxH <= 0.5 * rngA: plus.append(13); notes.append(f'батут: нетронутый H1 FVG над хаем Азии ({f["lo"]:.5g}–{f["hi"]:.5g})'); break
     if sd == 1:
         path = [x for x in liq if x['kind'] == 'hi' and 0 < x['p'] - boxH <= 0.3 * rngA]
         sidew = [x for x in liq if x['kind'] == 'lo' and 0 < boxL - x['p'] <= 0.3 * rngA]
     else:
         path = [x for x in liq if x['kind'] == 'lo' and 0 < boxL - x['p'] <= 0.3 * rngA]
         sidew = [x for x in liq if x['kind'] == 'hi' and 0 < x['p'] - boxH <= 0.3 * rngA]
-    if path: plus.append(13); notes.append(f'ликвидность на пути в пределах 30% Азии: {path[0]["name"]} {path[0]["p"]:.5g}')
-    if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(14); notes.append('сторона по тренду (структура Swing+Sub)')
-    if sidew: worse.append(15); notes.append(f'ухудшитель: несобранная ликвидность у стороны выноса в пределах 30% Азии: {sidew[0]["name"]} {sidew[0]["p"]:.5g}')
+    if path: plus.append(14); notes.append(f'ликвидность на пути в пределах 30% Азии: {path[0]["name"]} {path[0]["p"]:.5g}')
+    if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(15); notes.append('сторона по тренду (структура Swing+Sub)')
+    if sidew: worse.append(16); notes.append(f'ухудшитель: несобранная ликвидность у стороны выноса в пределах 30% Азии: {sidew[0]["name"]} {sidew[0]["p"]:.5g}')
     return plus, worse, notes, F1
 
 
@@ -612,7 +612,7 @@ def _prob_set(res, plus, worse, typ='A'):
 def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     """Тип A (S1, правка 01.10.2026): без цепочки H1, цель 2R, встречный H1 FVG внутри 1:2 = СКИП,
     усилители (батут, ликвидность на пути ≤30% Азии, по тренду) и ухудшитель (ликвидность у стороны выноса).
-    Нумерация пунктов — вкладка «Чек-лист» Типа A: основные 1–8 (№3 — противоположная сторона бокса Азии не снята раньше нужного выноса), условия входа 9–11, усилители 12–14, ухудшитель 15."""
+    Нумерация пунктов — вкладка «Чек-лист» Типа A: основные 1–9 (№3 — противоположная сторона бокса Азии не снята раньше нужного выноса; №5 — вынос ≥0,5 ATR M5, с 07.10.2026; №6 — V-разворот ≤7 значимых свечей), условия входа 10–12, усилители 13–15, ухудшитель 16."""
     import pult_s1 as S1
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
@@ -632,7 +632,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     boxH, boxL = float(box['High'].max()), float(box['Low'].min())
     price = float(d['Close'].iloc[-1])
     res = dict(sym=sym, window='A', price=round(price, dec), boxH=round(boxH, dec), boxL=round(boxL, dec),
-               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'), ck=[1], ckf=[], why=[], ckv=2)
+               reasons=[], checked_at=(now_utc + dt.timedelta(hours=off)).strftime('%H:%M'), ck=[1], ckf=[], why=[], ckv=3)
     ctx, liq = _hdr(res, d, h1, now_utc, off, today, price, boxH, boxL, fmtp, bb)
     bias = None
     if len(pbox) >= 10:
@@ -664,9 +664,10 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     # сделка уже есть — только ведём (TP 2R / SL / закрытие в 22:00)
     if prev.get('signal') and prev['signal'].get('date') == str(today) and prev['signal'].get('window') == 'A':
         _sg = prev['signal']
-        if not _sg.get('ckv'):   # сигнал записан до 06.10.2026 (нумерация 1–14) → переводим в новую (1–15)
-            _mv = lambda nn: [(n + 1 if n >= 3 else n) for n in (nn or [])]
-            _sg['ck'] = _mv(_sg.get('ck')); _sg['plus'] = _mv(_sg.get('plus')); _sg['worse'] = _mv(_sg.get('worse')); _sg['ckv'] = 2
+        _v = _sg.get('ckv') or 1
+        if _v < 3:   # сигнал записан старой нумерацией: v1 (до 06.10, 1–14), v2 (06.10, 1–15) → v3 (с 07.10, 1–16)
+            _mv = lambda nn: [(lambda x: x + 1 if x >= 5 else x)(n + 1 if (_v < 2 and n >= 3) else n) for n in (nn or [])]
+            _sg['ck'] = _mv(_sg.get('ck')); _sg['plus'] = _mv(_sg.get('plus')); _sg['worse'] = _mv(_sg.get('worse')); _sg['ckv'] = 3
         _pw = prev['signal'].get('why')
         if not _pw:
             _pw = [f'Вынос {"лоя" if sd == 1 else "хая"} Азии, V-разворот, M5 FVG и триггер выполнены — вход в {prev["signal"].get("time", "")} (пункты ' + _nums(prev['signal'].get('ck') or []) + ')']
@@ -693,7 +694,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     r = S1.analyze_day(d, today, off, sd, h1)
     if r['start'] is None:
         if nowm >= 840:
-            res['ckf'] = [9]; res['reasons'] = ['вынос не случился до 14:00']; _why(res, 'Скип: вынос не случился до 14:00', [9])
+            res['ckf'] = [10]; res['reasons'] = ['вынос не случился до 14:00']; _why(res, 'Скип: вынос не случился до 14:00', [10])
             return _out(res, 'skip', dirc, 'СКИП (вынос не случился до 14:00)')
         return _out(res, 'watch', dirc, 'НАБЛЮДАЕМ')
     sweep_t = (d.index[r['start']] + pd.Timedelta(hours=off)).strftime('%H:%M')
@@ -702,24 +703,30 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     c = r['cand']
     if c is None:
         res['extreme'] = round(sd * (r['last_ext_f'] if r.get('last_ext_f') is not None else 0), dec)
+        _sa = r.get('last_sw_atr')
+        if _sa is not None:
+            if _sa >= S1.MINSW:
+                res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSW:g} ATR', [5])
+            else:
+                _why(res, f'Вынос пока {_sa:.2f} ATR — меньше {S1.MINSW:g} ATR: откат от такого выноса — шум, ждём углубления', [5])
         if nowm >= 840:
-            res['ckf'] = [9]; res['reasons'] = ['вход не случился до 14:00']; _why(res, 'Скип: условия входа не выполнены до 14:00', [9])
+            res['ckf'] = [10]; res['reasons'] = ['вход не случился до 14:00']; _why(res, 'Скип: условия входа не выполнены до 14:00', [10])
             return _out(res, 'skip', dirc, 'СКИП (вход не случился до 14:00)')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} в {sweep_t}, ждём вход)')
     g = c['g']
     ext = sd * c['ext_f']
     res['extreme'] = round(ext, dec)
-    res['ck'] = sorted(set(res['ck'] + [5, 6, 7]))
-    _why(res, 'V-разворот ≤5 свечей, M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7])
+    res['ck'] = sorted(set(res['ck'] + [5, 6, 7, 8]))
+    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR (≥{S1.MINSW:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7, 8])
     if g + 1 >= len(d):
-        # предварительная проверка №10 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
+        # предварительная проверка №11 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
         e0 = float(d['Close'].iloc[-1]); s0 = ext - sd * S1.BUF * c['atr']; R0 = (e0 - s0) * sd
         if R0 > 0:
             cf0 = _counter_fvg(F1, sd, e0, e0 + sd * S1.RR * R0)
             if cf0 is not None:
-                res['ckf'] = [10]; res['ck'] = sorted(set(res['ck'] + [8, 9, 11]))   # пройдены все, кроме №10
+                res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))   # пройдены все, кроме №11
                 t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} внутри цели 1:2 (по текущей цене {fmtp(e0)})'
-                res['reasons'] = [t]; _why(res, 'Скип: ' + t, [10])
+                res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
                 return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
         return _out(res, 'prep', dirc, 'ВЫНОС (условия входа выполнены, ждём свечу входа)')
     entry = float(d['Open'].iloc[g + 1])
@@ -730,13 +737,13 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     tp = entry + sd * S1.RR * R
     cf = _counter_fvg(F1, sd, entry, tp)
     if cf is not None:
-        res['ckf'] = [10]; res['ck'] = sorted(set(res['ck'] + [8, 9, 11]))
+        res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))
         t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:2'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [10])
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
     t_in = d.index[g + 1]
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(S1.END_M // 60, S1.END_M % 60)) - dt.timedelta(hours=off), tz='UTC')
-    res['ck'] = sorted(set(res['ck'] + [8, 9, 10, 11]))
+    res['ck'] = sorted(set(res['ck'] + [9, 10, 11, 12]))
     liqx = None   # 02.10.2026: ближайшая неснятая ликвидность стороны выноса ЗА стопом (для разбора SL)
     try:
         cl = [x for x in liq if x['kind'] == ('lo' if sd == 1 else 'hi') and (x['p'] - stop) * sd < 0]
@@ -751,7 +758,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
                t_utc=str(t_in), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
                rr=S1.RR, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=list(worse), prob=res['prob'],
                strong=int(c['strong']), struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'),
-               liqx=liqx, swn=swn, ckv=2)
+               liqx=liqx, swn=swn, ckv=3)
     res['signal'] = sig
     res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
@@ -770,7 +777,7 @@ def _close_why(res):
     res.setdefault('why', []).append(f'{tg.replace("ЗАКРЫТА - ", "Итог ")}: {base}')
     if 'SL' in tg:
         miss = []
-        amps_all = [12, 13, 14] if sig.get('window') == 'A' else [11, 12]
+        amps_all = [13, 14, 15] if sig.get('window') == 'A' else [11, 12]
         no_amp = [n for n in amps_all if n not in pl]
         if wr: miss.append(f'не избежали ухудшителя №{_nums(wr)}')
         if no_amp: miss.append(f'не было усилителей №{_nums(no_amp)}')
