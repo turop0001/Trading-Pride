@@ -177,6 +177,10 @@
     "entry": 51424.0,
     "stop": 51387.0,
     "target": 51498.0,
-    "result": "сигнал Пульта в 10:45 Рига"
+    "result": "ВХОД → TP 🎯 +2R",
+    "shots": {
+      "m5": "state/shots/2026-10-07_US30_A_m5.png",
+      "h1": "state/shots/2026-10-07_US30_A_h1.png"
+    }
   }
 ]
