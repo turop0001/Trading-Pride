@@ -124,5 +124,16 @@
       "m5": "state/shots/2026-10-06_XAUUSD_A_m5.png",
       "h1": "state/shots/2026-10-06_XAUUSD_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-07_US500_A",
+    "date": "2026-10-07",
+    "symbol": "US500",
+    "type": "A",
+    "side": "long",
+    "entry": 7819.7,
+    "stop": 7816.6,
+    "target": 7825.9,
+    "result": "сигнал Пульта в 10:45 Рига"
   }
 ]
