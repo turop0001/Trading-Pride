@@ -37,5 +37,18 @@
     "note": "",
     "why": "",
     "ts": 1791188509239
+  },
+  {
+    "id": "jmuy6vq2rkkca",
+    "symbol": "US30",
+    "type": "A",
+    "side": "long",
+    "date": "2026-10-07",
+    "out": "TP",
+    "r": 1,
+    "usd": 50,
+    "note": "",
+    "why": "",
+    "ts": 1791382487654
   }
 ]
