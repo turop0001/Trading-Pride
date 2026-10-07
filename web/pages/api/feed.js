@@ -28,6 +28,26 @@ function parse(txt) {
   return out;
 }
 
+
+// Сторожок цикла (07.10.2026): GitHub-расписание бывает пропущено целиком, а MT5 шлёт свечи раз в минуту и от Claude не зависит.
+// В окнах A (09:50–14:00) и C (16:20–18:30 Рига) по будням: если минутный цикл loop.yml не идёт (ни in_progress, ни queued) — запускаем его.
+async function watchdog() {
+  const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Riga', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+  const g = (k) => (t.find((x) => x.type === k) || {}).value;
+  if (['Sat', 'Sun'].includes(g('weekday'))) return 'off';
+  const m = (+g('hour') % 24) * 60 + +g('minute');
+  if (!((m >= 590 && m <= 840) || (m >= 980 && m <= 1110))) return 'off';
+  const repo = process.env.GH_REPO || 'turop0001/Trading-Pride';
+  const h = { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  for (const st of ['in_progress', 'queued']) {
+    const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/loop.yml/runs?status=${st}&per_page=3`, { headers: h, cache: 'no-store' });
+    if (!r.ok) return 'api' + r.status;
+    if (((await r.json()).workflow_runs || []).length) return 'running';
+  }
+  const d = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/loop.yml/dispatches`, { method: 'POST', headers: { ...h, 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main' }) });
+  return d.status === 204 ? 'dispatched' : 'dispatch' + d.status;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'GET') {
@@ -57,7 +77,9 @@ export default async function handler(req, res) {
       });
       data.upd = Math.floor(Date.now() / 1000);
       await writeJson(PATH, data, cur.sha, full ? 'feed: история MT5' : 'feed: свечи MT5', BR, true);
-      return res.status(200).send('OK ' + Object.keys(inc).join(','));
+      let wd = '';
+      if (!full) { try { wd = await Promise.race([watchdog(), new Promise((r) => setTimeout(() => r('timeout'), 4000))]); } catch (e) { wd = 'err'; } }
+      return res.status(200).send('OK ' + Object.keys(inc).join(',') + (wd && wd !== 'off' ? ' wd:' + wd : ''));
     } catch (e) {
       if (e.status !== 409 && e.status !== 422) return res.status(500).send('ERR ' + String(e.message || e));
     }

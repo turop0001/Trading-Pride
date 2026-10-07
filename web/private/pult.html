@@ -280,7 +280,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
       <h2>История сигналов</h2>
       <p class="note" style="margin:0 0 12px">Архив карточек СИГНАЛ по дням со скринами — сохраняется отдельно от «Отчёта дня» и не пропадает при следующем обновлении. «Мой вход» подтягивается из журнала автоматически по дате/инструменту/типу.</p>
       <div class="filters">
-        <div class="field"><label>Период</label><select id="hPer"><option value="all">Всё время</option><option value="30">30 дней</option><option value="90">90 дней</option><option value="custom">Свой период</option></select></div>
+        <div class="field"><label>Период</label><select id="hPer"><option value="today">Сегодня</option><option value="all">Всё время</option><option value="30">30 дней</option><option value="90">90 дней</option><option value="custom">Свой период</option></select></div>
         <div class="field" id="hFromW" hidden><label>С</label><input id="hFrom" type="date"></div>
         <div class="field" id="hToW" hidden><label>По</label><input id="hTo" type="date"></div>
         <div class="field"><label>Тип</label><select id="hType"><option value="">A и C</option><option>A</option><option>C</option></select></div>
@@ -299,7 +299,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
       <p class="note" style="margin:0 0 10px" id="jsNote">Все сигналы робота со статусом «Вход», закрытые по TP (+2R), БУ (0R), SL (−1R) или по времени в 22:00: так же считали бэктест — WR, итог в R, просадка, серия стопов. Ваши личные входы — во втором режиме.</p>
       <div class="seg" id="jsSrc" style="margin-bottom:12px"><button type="button" data-w="robot" class="on">Сигналы Пульта</button><button type="button" data-w="mine">Мои сделки</button></div>
       <div class="filters">
-        <div class="field"><label>Период</label><select id="fPer"><option value="all">Всё время</option><option value="7">7 дней</option><option value="30">30 дней</option><option value="custom">Свой период</option></select></div>
+        <div class="field"><label>Период</label><select id="fPer"><option value="all">Всё время</option><option value="today">Сегодня</option><option value="7">7 дней</option><option value="30">30 дней</option><option value="custom">Свой период</option></select></div>
         <div class="field" id="fFromW" hidden><label>С</label><input id="fFrom" type="date"></div>
         <div class="field" id="fToW" hidden><label>По</label><input id="fTo" type="date"></div>
         <div class="field"><label>Тип</label><select id="fType"><option value="">A и C</option><option>A</option><option>C</option></select></div>
@@ -897,6 +897,7 @@ document.querySelectorAll('#jsSrc button').forEach(function(b){b.addEventListene
   $('jsTitle').textContent=SRC==='robot'?'Статистика · сигналы Пульта':'Статистика · мои сделки';renderStats();});});
 function filt(){
   var p=$('fPer').value,from=null,to=null,now=new Date();
+  if(p==='today'){from=to=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Riga'});}
   if(p==='7'||p==='30'){var d=new Date(now);d.setDate(d.getDate()-(+p));from=d.toISOString().slice(0,10);}
   if(p==='custom'){from=$('fFrom').value||null;to=$('fTo').value||null;}
   return srcDocs().filter(function(d){
@@ -944,6 +945,7 @@ renderStats();
 var HIST=[],hcol=null;
 function hFilt(){
   var p=$('hPer').value,from=null,to=null,now=new Date();
+  if(p==='today'){from=to=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Riga'});}
   if(p==='30'||p==='90'){var d=new Date(now);d.setDate(d.getDate()-(+p));from=d.toISOString().slice(0,10);}
   if(p==='custom'){from=$('hFrom').value||null;to=$('hTo').value||null;}
   var ty=$('hType').value,sy=$('hSym').value,en=$('hEnt').value;

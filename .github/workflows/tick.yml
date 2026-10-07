@@ -4,11 +4,13 @@ on:
   schedule:
     # Проверки возвращены к настройкам до паузы + ведение сделок каждые 5 минут до закрытия сделки или 22:00 Рига.
     # Окна A (10:00-14:00) и C (16:30-18:30) на минутном цикле (loop.yml); эти запуски — страховка и ведение сделки.
-    - cron: '*/5 7-19 * * 1-5'
+    - cron: '*/5 6-19 * * 1-5'
+    - cron: '2-57/5 6-19 * * 1-5'
   workflow_dispatch: {}
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: pult-tick
@@ -27,6 +29,14 @@ jobs:
           cache: 'pip'
 
       - run: pip install -r requirements.txt
+
+      - name: Сторожок цикла (перезапуск, если минутный цикл не работает)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_THREAD_ID: ${{ secrets.TG_THREAD_ID }}
+        run: python watchdog.py
 
       - name: Get state
         run: python -c "import state_sync; state_sync.pull()"
