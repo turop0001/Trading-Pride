@@ -72,7 +72,8 @@ def month_data(year, month, items):
         wk_end = min(d + dt.timedelta(days=6 - d.weekday()), last)
         days = [str(d + dt.timedelta(days=i)) for i in range((wk_end - d).days + 1)]
         if d.weekday() < 5:
-            lab = f"{d.strftime('%d')}\u2013{wk_end.strftime('%d.%m')}" if d != wk_end else d.strftime('%d.%m')
+            fe = min(wk_end, d + dt.timedelta(days=4 - d.weekday()))   # конец подписи — последний будний день
+            lab = f"{d.strftime('%d')}\u2013{fe.strftime('%d.%m')}" if d != fe else d.strftime('%d.%m')
             rows.append(_row(f'Нед {k}', lab, days, tr)); k += 1
         d = wk_end + dt.timedelta(days=1)
     data = {'small': 'MONTHLY REPORT', 'h1': 'Итоги месяца', 'sec': 'По неделям', 'col': 'Итог недели',
