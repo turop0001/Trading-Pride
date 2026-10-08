@@ -719,8 +719,8 @@ function lotFor(sym,entry,stop,prop){
 function lotsRow(sym,entry,stop){
   var e=parseFloat(entry),s=parseFloat(stop);if(!isFinite(e)||!isFinite(s))return null;
   var a=lotFor(sym,e,s,'fp'),b=lotFor(sym,e,s,'ftmo');if(!a||!b)return null;
-  var chip=function(n,r){return '<span class="pl" style="font-size:15px;padding:5px 14px"><i style="font-style:normal;color:var(--muted)">'+n+'</i> <b style="font-size:20px;color:var(--accent)">'+r.lot.toFixed(2)+'</b></span>';};
-  return '<div class="pxp">'+chip('FP',a)+chip('FTMO',b)+'<span class="pl" style="border-style:dashed">риск $'+fm(a.risk)+' · '+a.pct.toFixed(2)+'%</span></div>';
+  var chip=function(n,r,c){return '<span class="pl '+c+'" style="font-size:14px;padding:5px 14px;gap:8px;border-width:2px"><i style="font-weight:800;font-size:13px;opacity:1;letter-spacing:.03em">'+n+'</i> <b style="font-size:19px">'+r.lot.toFixed(2)+'</b></span>';};
+  return '<div class="pxp">'+chip('FP',a,'base')+chip('FTMO',b,'warn')+'<span class="pl" style="border-style:dashed">риск $'+fm(a.risk)+' · '+a.pct.toFixed(2)+'%</span></div>';
 }
 function liveCard(x){
   var dir=String(x.direction||''),es=/SHORT/.test(dir)?'short':/LONG/.test(dir)?'long':null;
