@@ -435,6 +435,10 @@ def main(send=True):
     except Exception as e:
         print('monthly report failed:', e)
 
+    try:
+        import news as _news; _news.refresh(state, today)
+    except Exception as e:
+        print('news hook failed:', e)
     state['_flags'] = flags
     if text:
         log = state.get('_log', [])

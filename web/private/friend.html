@@ -196,7 +196,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   <section id="tab-report">
     <div class="card" style="margin-bottom:16px">
       <h2 id="repTitle">Отчёт дня</h2>
-      <p class="note" style="margin:0" id="repNote"></p>
+      <div id="repNews" style="display:none;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px"></div><p class="note" style="margin:0" id="repNote"></p>
     </div>
     <div class="repGrid" id="rep"></div>
   </section>
@@ -394,8 +394,12 @@ function renderRep(){
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
   }
+  function renderNews(N){var el=$('repNews');if(!el)return;if(!N||N.err&&!(N.items||[]).length){el.style.display='none';return;}
+    var it=N.items||[];el.style.display='flex';
+    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (Рига)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
   function applyState(S){
     if(!S||S.error){$('repNote').textContent='Ошибка загрузки данных: '+((S&&S.error)||'нет ответа');return;}
+    try{renderNews(S._news);}catch(e){console.log('news',e);}
     try{if(window.pultNotify)pultNotify(S);}catch(e){console.log('notify',e);}
     var all=Object.keys(S).filter(function(k){return /_(A|C)$/.test(k)&&S[k]&&S[k].date;});
     var DAY=all.some(function(k){return S[k].date===REPDAY;})?REPDAY:all.map(function(k){return S[k].date;}).sort().pop();
