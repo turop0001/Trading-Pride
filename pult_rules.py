@@ -717,7 +717,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     ext = sd * c['ext_f']
     res['extreme'] = round(ext, dec)
     res['ck'] = sorted(set(res['ck'] + [5, 6, 7, 8]))
-    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR (≥{S1.MINSW:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7, 8])
+    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR (≥{S1.MINSW:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа ({"≥2 сильных свечи (вынос ≤1,5 ATR)" if c.get("sw_atr", 0) <= S1.SWTRG else "≥3 сильных или откат ≥30% (вынос больше 1,5 ATR)"})', [5, 6, 7, 8])
     if g + 1 >= len(d):
         # предварительная проверка №11 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
         e0 = float(d['Close'].iloc[-1]); s0 = ext - sd * S1.BUF * c['atr']; R0 = (e0 - s0) * sd
