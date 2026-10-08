@@ -18,7 +18,7 @@ CFG_PATH = os.environ.get('TG_CONFIG_PATH', 'tg_config.json')
 E_ENTRY = '\U0001F7E2'    # 🟢 вход / подтверждено / вынос в сторону сделки
 E_SKIP  = '⚪'        # ⚪ скип (в стиле присланного образца)
 E_STOP  = '\U0001F534'    # 🔴 стоп/отмена (используется отдельно, не для рутинного скипа)
-E_BE    = '⚪'        # ⚪ закрыта в БУ / в 22:00 (серый; зелёный только TP)
+E_BE    = '\U0001F7E4'    # 🟤 закрыта в БУ / в 22:00 (коричневый; зелёный только TP)
 E_WATCH = '\U0001F7E1'    # 🟡 наблюдаем / внутри бокса, вынос ещё не подтверждён
 E_NEWS  = '⚠️'  # ⚠️ новости / риск
 E_BELL  = '\U0001F6CE️'  # 🛎️ заголовок отчёта/сигнала
@@ -50,7 +50,7 @@ def fmt_line(status, symbol, direction, note):
     if 'ЗАКРЫТА - SL' in str(note):
         emo = E_STOP  # 🔴 стоп; ⚪ только для СКИП
     elif 'ЗАКРЫТА - БУ' in str(note) or 'ЗАКРЫТА - 22:00' in str(note):
-        emo = E_BE    # 08.10.2026: серый кружок; зелёный — только TP
+        emo = E_BE    # 🟤 коричневый; зелёный — только TP
     return f"{emo} {symbol} ({direction}) — {note}"
 
 
@@ -285,7 +285,7 @@ def build_monthly(year, month, items):
             continue
         n = len(r); tp = sum(1 for x in r if x[1] == 'TP'); sl = sum(1 for x in r if x[1] == 'SL'); be = n - tp - sl
         rr = sum(x[2] for x in r)
-        out.append(f"Тип {t}: сделок {n} · {E_ENTRY} TP {tp} · {E_STOP} SL {sl}" + (f" · {E_WATCH} БУ {be}" if be else "") + f" · WR {round(tp / n * 100)}%")
+        out.append(f"Тип {t}: сделок {n} · {E_ENTRY} TP {tp} · {E_STOP} SL {sl}" + (f" · {E_BE} БУ {be}" if be else "") + f" · WR {round(tp / n * 100)}%")
         out += [f"{E_TARGET} Тип {t}: {_fmt_r(rr)}R · {_fmt_r(rr)}% депозита", ""]
         tot_n += n; tot_tp += tp; tot_sl += sl; tot_be += be; tot_r += rr
     wk = {}
@@ -299,6 +299,6 @@ def build_monthly(year, month, items):
             out.append(f"Нед {i} (с {max(mon, _dt.date(year, month, 1)).strftime('%d.%m')}): {_fmt_r(wk[mon])}%")
         out.append("")
     wr = round(tot_tp / tot_n * 100) if tot_n else 0
-    out.append(f"{E_CHART} Итого за месяц: {tot_n} сделок · {E_ENTRY} TP {tot_tp} · {E_STOP} SL {tot_sl}" + (f" · {E_WATCH} БУ {tot_be}" if tot_be else "") + f" · WR {wr}%")
+    out.append(f"{E_CHART} Итого за месяц: {tot_n} сделок · {E_ENTRY} TP {tot_tp} · {E_STOP} SL {tot_sl}" + (f" · {E_BE} БУ {tot_be}" if tot_be else "") + f" · WR {wr}%")
     out.append(f"{E_TARGET} Итог месяца: {_fmt_r(tot_r)}R · {_fmt_r(tot_r)}% депозита")
     return "\n".join(out)

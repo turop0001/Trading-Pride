@@ -252,10 +252,10 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             rr_ = float(sig.get('rr') or 2)
             if out == 'T22':
                 xr = float(r.get('exit_r') or 0)
-                upd.append(f"{EMO_TP if xr > 0 else EMO_SL} {s} ({r['direction']}) — закрыта в 22:00 Рига "
+                upd.append(f"\U0001F7E4 {s} ({r['direction']}) — закрыта в 22:00 Рига "
                            f"({xr:+.1f}% депозита)")
             elif out == 'BE':
-                upd.append(f"⚪ {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} Рига (0% депозита)")
+                upd.append(f"\U0001F7E4 {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} Рига (0% депозита)")
             else:
                 upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
                            f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
