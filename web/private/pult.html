@@ -702,7 +702,7 @@ function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<2)return
   p=p.filter(function(t){return !/^Цель-ликвидность/i.test(t);}).map(function(t){return t.replace(/\s*·\s*Sub M15[^|]*/i,'');});
   return '<div class="pxn">'+p.map(function(t){var imp=/^(Swing|Sub)/i.test(t)||/слом|^Откат/i.test(t);
     var c=/^(слом|CHoCH).*вверх/i.test(t)?'long':/^(слом|CHoCH)/i.test(t)?'short':/вероятнее вверх/i.test(t)?'long':/вероятнее вниз/i.test(t)?'short':/неясно/i.test(t)?'side':/^Swing ▲/.test(t)?'long':/^Swing ▼/.test(t)?'short':/слом|^Откат/i.test(t)?'side':/^(Ликвидность|Обозначения)/i.test(t)?'liq':'';
-    var h=t.charAt(0).toUpperCase()+t.slice(1);if(imp)h=h.replace(/(откат \d+%)/i,'<u class="pcb">$1</u>').replace(/(слом[^.;·]*)/i,'<u class="pcb">$1</u>');
+    var h=t.charAt(0).toUpperCase()+t.slice(1);if(imp)h=h.replace(/(откат \d+%)/i,'<u class="pcb">$1</u>').replace(/(слом[^;·|]*)/i,'<u class="pcb">$1</u>');
     return '<span class="nl '+c+(imp?' imp':'')+'">'+h+'</span>';}).join('')+'</div>';}
 function ckBlock(kind,title,nums,cgi,pick){
   var items=[];cgi.forEach(function(r,i){if(pick(r))items.push([i+1,r[1]]);});
