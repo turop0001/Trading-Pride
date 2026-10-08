@@ -45,7 +45,10 @@ async function watchdog() {
     if (((await r.json()).workflow_runs || []).length) return 'running';
   }
   const d = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/loop.yml/dispatches`, { method: 'POST', headers: { ...h, 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main' }) });
-  return d.status === 204 ? 'dispatched' : 'dispatch' + d.status;
+  if (d.status === 204) return 'dispatched';
+  // запасной путь (08.10.2026): если у токена нет права запускать workflow — repository_dispatch (нужно только право Contents: write)
+  const r2 = await fetch(`https://api.github.com/repos/${repo}/dispatches`, { method: 'POST', headers: { ...h, 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: 'pult-loop' }) });
+  return 'dispatch' + d.status + (r2.status === 204 ? '+repo-ok' : '+repo' + r2.status);
 }
 
 export default async function handler(req, res) {
@@ -63,6 +66,8 @@ export default async function handler(req, res) {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const full = Object.values(inc).some((o) => (o.M5 || []).length > 200);
+      let wd = '';
+      if (!full && attempt === 0) { try { wd = await Promise.race([watchdog(), new Promise((r) => setTimeout(() => r('timeout'), 4000))]); } catch (e) { wd = 'err'; } }
       const PATH = full ? HIST : LIVE, keep = full ? KEEP : KEEP_LIVE;
       let cur = await readBig(PATH, { syms: {} }, BR);
       if (cur.missingRef) await ensureBranch(BR);
@@ -76,9 +81,8 @@ export default async function handler(req, res) {
         });
       });
       data.upd = Math.floor(Date.now() / 1000);
+      if (!full && wd) data.wd = { r: wd, t: data.upd };
       await writeJson(PATH, data, cur.sha, full ? 'feed: история MT5' : 'feed: свечи MT5', BR, true);
-      let wd = '';
-      if (!full) { try { wd = await Promise.race([watchdog(), new Promise((r) => setTimeout(() => r('timeout'), 4000))]); } catch (e) { wd = 'err'; } }
       return res.status(200).send('OK ' + Object.keys(inc).join(',') + (wd && wd !== 'off' ? ' wd:' + wd : ''));
     } catch (e) {
       if (e.status !== 409 && e.status !== 422) return res.status(500).send('ERR ' + String(e.message || e));

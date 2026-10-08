@@ -14,6 +14,8 @@ on:
     - cron: '15 13 * * 1-5'
     - cron: '30 13 * * 1-5'
   workflow_dispatch: {}
+  repository_dispatch:
+    types: [pult-loop]   # запасной запуск от сторожка на Vercel (/api/feed), если право запускать workflow у токена недоступно
 
 permissions:
   contents: write
