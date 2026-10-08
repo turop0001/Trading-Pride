@@ -1079,8 +1079,10 @@ renderHist();
     prev=cur;
   };
   /* кнопка */
-  var btn=document.createElement('button');btn.className='btn';btn.style.cssText='position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:99998;font-size:14px;padding:6px 10px;opacity:.92';
-  function lab(){btn.textContent=on?'🔔 Сигналы включены':'🔕 Включить сигналы';}
+  function dotBtn(emoji,bottom,title){var b=document.createElement('button');b.className='btn';b.style.cssText='position:fixed;right:10px;bottom:calc('+bottom+'px + env(safe-area-inset-bottom,0px));z-index:99998;width:34px;height:34px;padding:0;border-radius:50%;font-size:16px;line-height:1;opacity:.92;display:flex;align-items:center;justify-content:center';b.title=title;b.setAttribute('aria-label',title);b.textContent=emoji;var d=document.createElement('span');d.style.cssText='position:absolute;top:1px;right:1px;width:10px;height:10px;border-radius:50%;border:2px solid #fff;background:#e8892b';b.appendChild(d);b._d=d;return b;}
+  function setDot(b,v,t1,t0){b._d.style.background=v?'#2e9e5b':'#e8892b';b.title=v?t1:t0;b.setAttribute('aria-label',b.title);}
+  var btn=dotBtn('🔔',10,'Сигналы');
+  function lab(){setDot(btn,on,'Сигналы включены: звук и окна при смене статуса (нажми, чтобы выключить)','Сигналы выключены (нажми, чтобы включить звук и окна)');}
   btn.onclick=function(){on=!on;ls('pultNtf',on?'1':'0');lab();if(on){ctx();beep('in');try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){}if(KEY)pushBox();}};
   lab();document.body.appendChild(btn);
   document.addEventListener('click',function(){if(on)ctx();},{once:true});
@@ -1091,8 +1093,8 @@ renderHist();
     if(pb||!KEY||!('serviceWorker' in navigator)||!('PushManager' in window)){
       if(!pb&&KEY&&/iPhone|iPad/.test(navigator.userAgent)&&!window.navigator.standalone){toast('Для push на iPhone: Поделиться → «На экран Домой», открыть Пульт оттуда','prep');}
       return;}
-    pb=document.createElement('button');pb.className='btn';pb.style.cssText='position:fixed;right:10px;bottom:calc(52px + env(safe-area-inset-bottom,0px));z-index:99998;font-size:14px;padding:6px 10px;opacity:.92';
-    function plab(s){pb.textContent=s?'📲 Push на телефон: вкл':'📲 Push на телефон: включить';}
+    pb=dotBtn('📲',52,'Push');
+    function plab(s){setDot(pb,s,'Push включён: уведомления приходят и при закрытой странице (нажми, чтобы выключить)','Push выключен (нажми, чтобы включить уведомления при закрытой странице)');}
     navigator.serviceWorker.register('/sw.js').then(function(reg){return reg.pushManager.getSubscription().then(function(sub){plab(!!sub);
       pb.onclick=function(){
         Notification.requestPermission().then(function(p){
