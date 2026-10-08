@@ -1,0 +1,111 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Carlito;font-weight:400;src:url("{{ASSETS}}/Carlito-Regular.ttf")}
+@font-face{font-family:Carlito;font-weight:700;src:url("{{ASSETS}}/Carlito-Bold.ttf")}
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--A:#6cb4ff;--C:#b69cff;--bg:#06080c;--card:#0d1118;--card2:#121823;--line:#1e2735;--silver:#e9edf3;--mut:#8b96a8;--g:#17d6a0;--r:#ff4d5e;--gold:#c9d3e3}
+body{width:1080px;height:1350px;background:radial-gradient(900px 500px at 15% -5%,#16202e 0%,transparent 60%),radial-gradient(800px 500px at 100% 100%,#0f2a25 0%,transparent 55%),var(--bg);font-family:Carlito,'DejaVu Sans',sans-serif;color:var(--silver);padding:44px 52px;position:relative;overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;height:186px}
+.brand{width:300px;height:186px;display:flex;align-items:center}
+.brand img{width:280px;margin-left:-12px;}
+.ttl{text-align:right}
+.ttl small{display:block;font-size:20px;letter-spacing:6px;color:var(--mut);text-transform:uppercase}
+.ttl h1{font-size:64px;font-weight:700;letter-spacing:1px;line-height:1.05;background:linear-gradient(180deg,#fff,#aab4c6);-webkit-background-clip:text;color:transparent}
+.ttl .d{margin-top:6px;font-size:26px;color:var(--gold)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:10px}
+.k{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:14px 20px}
+.k small{display:block;font-size:19px;color:var(--mut);letter-spacing:.5px}
+.k b{display:block;font-size:56px;line-height:1.05;margin-top:2px;font-weight:700}
+.k.g b{color:var(--g)}.k.r b{color:var(--r)}
+.risk{margin-top:14px;font-size:21px;color:var(--mut);display:flex;align-items:center;gap:12px}
+.risk i{display:inline-block;width:10px;height:10px;border-radius:50%}
+.risk span b{color:var(--silver)}
+.ins{margin-top:10px;display:grid;grid-template-columns:1.9fr 1fr;gap:12px}
+.ig{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;border-radius:16px;padding:6px 10px}
+.ig.A{background:rgba(108,180,255,.07);border:1px solid rgba(108,180,255,.28)}
+.ig.C{background:rgba(182,156,255,.07);border:1px solid rgba(182,156,255,.28)}
+.ig b{font-size:17px;letter-spacing:1.5px;margin-right:4px;white-space:nowrap}.ig.A b{color:var(--A)}.ig.C b{color:var(--C)}
+.ig span{font-size:16px;font-weight:700;padding:3px 9px;border-radius:20px;color:var(--silver);white-space:nowrap}
+.ig.A span{background:rgba(108,180,255,.14);border:1px solid rgba(108,180,255,.4)}
+.ig.C span{background:rgba(182,156,255,.14);border:1px solid rgba(182,156,255,.4)}
+.sec{margin-top:12px;font-size:20px;letter-spacing:5px;color:var(--mut);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.hd,.row{display:grid;grid-template-columns:110px 1fr 1fr 200px;gap:12px;align-items:center}
+
+.hd{margin-top:8px;font-size:19px;color:var(--mut)}
+.hd .h{font-size:22px;font-weight:700;letter-spacing:2px;text-align:center;padding:7px 0;border-radius:14px;text-transform:uppercase}
+.hd .h small{font-size:18px;font-weight:400;letter-spacing:1px;color:var(--mut);margin-left:6px;text-transform:none}
+.hd .hA{color:var(--A);background:rgba(108,180,255,.1);border:1px solid rgba(108,180,255,.4)}
+.hd .hC{color:var(--C);background:rgba(182,156,255,.1);border:1px solid rgba(182,156,255,.4)}
+.row{background:linear-gradient(90deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:7px 14px;margin-top:8px;height:84px}
+.day b{font-size:30px;display:block;line-height:1}.day span{font-size:19px;color:var(--mut)}
+.cell{display:flex;flex-direction:column;gap:5px;justify-content:center;height:68px;border-radius:14px;padding:6px 12px}
+.cell.A{background:rgba(108,180,255,.07);border:1px solid rgba(108,180,255,.28)}
+.cell.C{background:rgba(182,156,255,.07);border:1px solid rgba(182,156,255,.28)}
+.cell .n{font-size:18px;color:var(--mut);line-height:1}.cell.A .n b{color:var(--A)}.cell.C .n b{color:var(--C)}
+.cell .ps{display:flex;gap:8px}
+.p{font-size:21px;font-weight:700;padding:4px 14px;border-radius:30px;letter-spacing:.5px}
+.p.tp{background:rgba(23,214,160,.14);color:var(--g);border:1px solid rgba(23,214,160,.5)}
+.p.sl{background:rgba(255,77,94,.14);color:var(--r);border:1px solid rgba(255,77,94,.5)}
+.p.no{color:#4b566a;border:1px dashed #2a3446;font-weight:400}
+.res{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.bar{width:80px;height:12px;background:#1a2230;border-radius:8px;position:relative;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;border-radius:8px}
+.res b{font-size:34px;min-width:78px;text-align:right}
+.pos{color:var(--g)}.neg{color:var(--r)}
+.sum{margin-top:16px;display:grid;grid-template-columns:490px 1fr;gap:16px}
+.rings{gap:0;background:linear-gradient(160deg,#10222e,#0d1118 75%);border:1px solid #1d3345;border-radius:28px;padding:12px;display:flex;align-items:center;justify-content:space-around;height:268px}
+.rg{display:flex;flex-direction:column;align-items:center;gap:10px}
+.ring{width:184px;height:184px;position:relative}
+.ring svg{position:absolute;inset:0}
+.ring div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring b{font-size:54px;line-height:1;font-weight:700}.ring small{font-size:19px;letter-spacing:5px;color:var(--mut);margin-top:2px}
+.rg .cap{font-size:19px;color:var(--mut)}
+.types{display:grid;grid-template-rows:1fr 1fr;gap:14px;height:268px}
+.ty{border-radius:26px;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;background:#0d1118}
+.ty.A{border:1px solid rgba(108,180,255,.45);background:linear-gradient(120deg,rgba(108,180,255,.12),#0d1118 70%)}
+.ty.C{border:1px solid rgba(182,156,255,.45);background:linear-gradient(120deg,rgba(182,156,255,.12),#0d1118 70%)}
+.ty .l small{display:block;font-size:22px;letter-spacing:3px;text-transform:uppercase;font-weight:700}
+.ty.A small{color:var(--A)}.ty.C small{color:var(--C)}
+.ty .l em{font-style:normal;font-size:21px;line-height:1.3;color:var(--mut)}
+.ty .v{font-size:76px;font-weight:700;line-height:1}
+.ty .v{text-align:center}.ty .v small.dep{color:#8b96a8 !important;text-transform:none;font-weight:400;letter-spacing:.5px}
+.dep{display:block;font-size:19px;font-weight:400;color:var(--mut);margin-top:2px;letter-spacing:.5px}
+.ty .r{text-align:right;font-size:26px;line-height:1.3;color:var(--silver);white-space:nowrap;min-width:150px}
+.ty .r b{font-size:38px}
+body.tight .row{height:70px;margin-top:6px}body.tight .cell{height:56px;padding:3px 12px;gap:3px}body.tight .p{font-size:19px;padding:2px 12px}body.tight .day b{font-size:27px}
+.foot{position:absolute;left:52px;right:52px;bottom:18px;display:flex;justify-content:space-between;font-size:18px;color:#5d687b}
+</style></head><body>
+<div class="top"><div class="brand"><img src="{{ASSETS}}/logo.png"></div>
+<div class="ttl"><small id="t_small"></small><h1 id="t_h1"></h1><div class="d" id="t_d"></div></div></div>
+<div class="kpis" id="kpis"></div>
+<div class="risk"><i style="background:#c9d3e3"></i><span>Риск <b>1% на сделку</b> · TP = <b class="pos">+2%</b> · SL = <b class="neg">−1%</b> от депозита</span></div>
+<div class="ins"><div class="ig A"><b>ТИП A</b><span>EURUSD</span><span>GBPUSD</span><span>GER40</span><span>NAS100</span><span>US30</span><span>US500</span><span>XAUUSD</span></div><div class="ig C"><b>ТИП C</b><span>XAUUSD</span><span>EURUSD</span><span>GBPUSD</span></div></div>
+<div class="sec"><span id="t_sec"></span></div>
+<div class="hd row" style="background:none;border:none;height:auto;padding:0 15px;margin-top:8px"><div></div><div class="h hA">Тип A<small>London</small></div><div class="h hC">Тип C<small>NY</small></div><div style="text-align:right;line-height:1.1"><span id="t_col"></span><br><span style="font-size:16px">% от депозита</span></div></div>
+<div id="rows"></div>
+
+<div class="sum"><div class="rings" id="rings"></div><div class="types" id="types"></div></div>
+<div class="foot"><span id="f_l"></span><span>Без спреда и комиссий · риск 1% на сделку</span></div>
+<script>
+const D=/*DATA*/null;
+const $=i=>document.getElementById(i);
+const pc=x=>{const a=Math.abs(x);const t=Math.abs(a-Math.round(a))<0.05?String(Math.round(a)):a.toFixed(1);return (x>0.04?'+':x<-0.04?'\u2212':'')+t+'%'};
+const cl=x=>x>=0.05?'pos':x<=-0.05?'neg':'';
+const w=n=>{const m=n%100,k=n%10;return (m>=11&&m<=14)?'сигналов':k===1?'сигнал':(k>=2&&k<=4?'сигнала':'сигналов')};
+$('t_small').textContent=D.small;$('t_h1').textContent=D.h1;$('t_d').textContent=D.dates;$('t_sec').textContent=D.sec;$('t_col').textContent=D.col;$('f_l').textContent='Trading Pride \u00b7 '+D.dates;
+const T=D.total;
+$('kpis').innerHTML=`<div class="k"><small>Всего сигналов</small><b>${T.n}</b></div><div class="k g"><small>Прибыльных (TP)</small><b>${T.tp}</b></div><div class="k r"><small>Стопов (SL)</small><b>${T.sl}</b></div><div class="k"><small>WR</small><b>${T.n?T.wr+'%':'\u2014'}</b></div>`;
+const pill=o=>o[0]==='TP'?`<span class="p tp">TP ${pc(o[1])}</span>`:o[0]==='SL'?`<span class="p sl">SL ${pc(o[1])}</span>`:`<span class="p no" style="border-style:solid">БУ 0%</span>`;
+const cell=(a,t)=>{if(!a.length)return `<div class="cell ${t}"><div class="n"><b>0</b> сигналов</div><div class="ps"><span class="p no">нет сигналов</span></div></div>`;
+let ps;if(!D.agg&&a.length<=3)ps=a.map(pill).join('');else{const tp=a.filter(x=>x[0]==='TP').length,sl=a.filter(x=>x[0]==='SL').length,be=a.length-tp-sl;ps=(tp?`<span class="p tp">TP ${tp}</span>`:'')+(sl?`<span class="p sl">SL ${sl}</span>`:'')+(be?`<span class="p no" style="border-style:solid">БУ ${be}</span>`:'')}
+return `<div class="cell ${t}"><div class="n"><b>${a.length}</b> ${w(a.length)}</div><div class="ps">${ps}</div></div>`};
+const mx=Math.max(4,...D.rows.map(d=>Math.abs(d.tot)));
+if(D.rows.length>5)document.body.classList.add('tight');
+$('rows').innerHTML=D.rows.map(d=>{const r=d.tot;const wd=Math.min(Math.abs(r),mx)/mx*46;
+return `<div class="row"><div class="day"><b>${d.l}</b><span>${d.s}</span></div>${cell(d.A,"A")}${cell(d.C,"C")}<div class="res"><div class="bar"><i style="left:50%;width:${wd}%;background:${r>=0?'var(--g)':'var(--r)'};${r<0?'left:'+(50-wd)+'%':''}"></i></div><b class="${cl(r)}">${pc(r)}</b></div></div>`}).join('');
+const ring=(frac,col,big,small,cap)=>`<div class="rg"><div class="ring"><svg viewBox="0 0 210 210" width="184" height="184"><circle cx="105" cy="105" r="90" fill="none" stroke="#1a2230" stroke-width="20"/>${frac>0?`<circle cx="105" cy="105" r="90" fill="none" stroke="${col}" stroke-width="20" stroke-linecap="round" stroke-dasharray="${(566*frac).toFixed(0)} 566" transform="rotate(-90 105 105)"/>`:''}</svg><div><b style="color:${col}">${big}</b><small>${small}</small></div></div><div class="cap">${cap}</div></div>`;
+const colT=T.r>=0?'#17d6a0':'#ff4d5e';
+$('rings').innerHTML=ring(T.n?T.wr/100:0,'#17d6a0',T.n?T.wr+'%':'\u2014','WR',T.n?`${T.tp} из ${T.n} в плюс`:'сигналов не было')+ring(1,colT,pc(T.r),D.per,'% от депозита');
+const ty=(t,nm,s)=>`<div class="ty ${t}"><div class="l"><small>Тип ${t}</small><em>${nm}<br>${s.n} ${w(s.n)}</em></div><div class="v ${cl(s.r)}">${pc(s.r)}<small class="dep">от депозита</small></div><div class="r"><b>WR ${s.n?s.wr+'%':'\u2014'}</b><br>TP ${s.tp} \u00b7 SL ${s.sl}${s.be?' \u00b7 БУ '+s.be:''}</div></div>`;
+$('types').innerHTML=ty('A','London',D.A)+ty('C','NY',D.C);
+</script></body></html>

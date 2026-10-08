@@ -389,11 +389,28 @@ def main(send=True):
                 hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
                 try: items_ = json.load(open(hp, encoding='utf-8'))
                 except Exception: items_ = []
-                tg(build_weekly(mon_, riga.date(), items_))
+                if send:   # 08.10.2026: картинка + текст ОДНИМ сообщением (при сбое картинки — обычный текст, как раньше)
+                    import report_image as _ri
+                    _ri.send_report(build_weekly(mon_, riga.date(), items_), _ri.week_data(mon_, riga.date(), items_), 'weekly')
+                else:
+                    print('[no-send]')
                 state['_weekly'] = {'week': str(mon_), 'sent': t}
                 did.append('weekly'); text = text or 'недельный отчёт отправлен'
     except Exception as e:
         print('weekly report failed:', e)
+
+    # ДОБАВЛЕНО 08.10.2026: итоги месяца — 1-го числа (с 10:00 Рига; если 1-е выпало на выходной — в первый будний запуск до 3-го).
+    # Картинка + текст одним сообщением; флаг state['_monthly']. В выходные 1-го числа отправляет monthly.yml.
+    try:
+        if m >= 600:
+            import report_image as _ri
+            hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
+            try: items_m = json.load(open(hp, encoding='utf-8'))
+            except Exception: items_m = []
+            if _ri.maybe_send_monthly(state, riga, items_m, send=send):
+                did.append('monthly'); text = text or 'итоги месяца отправлены'
+    except Exception as e:
+        print('monthly report failed:', e)
 
     state['_flags'] = flags
     if text:

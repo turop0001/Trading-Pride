@@ -223,3 +223,79 @@ if __name__ == '__main__':
     else:
         print('Использование: from notify import send_telegram, fmt_line, build_window_open, '
               'build_window_closed, build_update, build_signal, build_tp_hit, build_daily_summary')
+
+
+def send_telegram_photo(path: str, caption: str) -> bool:
+    """Картинка + подпись одним сообщением (sendPhoto, подпись ≤ 1024). Те же TG_* настройки."""
+    import uuid
+    tok = os.environ.get('TG_BOT_TOKEN', '')
+    chat = os.environ.get('TG_CHAT_ID', '')
+    thread_id = os.environ.get('TG_THREAD_ID') or None
+    if not tok or not chat:
+        if os.path.exists(CFG_PATH):
+            cfg = json.load(open(CFG_PATH))
+            tok, chat = cfg.get('bot_token', ''), str(cfg.get('chat_id', ''))
+            thread_id = cfg.get('message_thread_id')
+    if not tok or not chat:
+        print('НЕТ TG_BOT_TOKEN/TG_CHAT_ID — фото не отправлено')
+        return False
+    fields = {'chat_id': chat, 'caption': caption[:1024]}
+    if thread_id:
+        fields['message_thread_id'] = str(thread_id)
+    b = uuid.uuid4().hex
+    body = b''
+    for k, v in fields.items():
+        body += f'--{b}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode('utf-8')
+    body += (f'--{b}\r\nContent-Disposition: form-data; name="photo"; filename="report.png"\r\n'
+             f'Content-Type: image/png\r\n\r\n').encode() + open(path, 'rb').read() + f'\r\n--{b}--\r\n'.encode()
+    req = urllib.request.Request(f'https://api.telegram.org/bot{tok}/sendPhoto', body,
+                                 {'Content-Type': f'multipart/form-data; boundary={b}'})
+    try:
+        ok = json.load(urllib.request.urlopen(req, timeout=40)).get('ok', False)
+        print('telegram_photo_sent:', ok)
+        return ok
+    except Exception as e:
+        print('ошибка telegram photo:', str(e).replace(tok, '***'))
+        return False
+
+
+_MONTHS_RU = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+
+
+def build_monthly(year, month, items):
+    """Итоги месяца (1-го числа за прошлый месяц). Формат — как недельный, плюс итоги по неделям."""
+    import datetime as _dt
+    p0 = f"{year:04d}-{month:02d}-"
+    rows = {'A': [], 'C': []}
+    for it in sorted(items, key=lambda x: (x.get('date') or '', x.get('symbol') or '')):
+        d = it.get('date') or ''
+        if not d.startswith(p0) or it.get('type') not in rows: continue
+        p = _weekly_parse(it)
+        if p: rows[it['type']].append((d, p[0], p[1]))
+    out = [f"{E_CHART} Итоги месяца · {_MONTHS_RU[month - 1]} {year}", "(риск 1% на сделку)", ""]
+    tot_n = tot_tp = tot_sl = tot_be = 0
+    tot_r = 0.0
+    for t in ('A', 'C'):
+        r = rows[t]
+        if not r:
+            out += [f"Тип {t}: сделок не было", f"{E_TARGET} Тип {t}: 0.0R · 0.0% депозита", ""]
+            continue
+        n = len(r); tp = sum(1 for x in r if x[1] == 'TP'); sl = sum(1 for x in r if x[1] == 'SL'); be = n - tp - sl
+        rr = sum(x[2] for x in r)
+        out.append(f"Тип {t}: сделок {n} · {E_ENTRY} TP {tp} · {E_STOP} SL {sl}" + (f" · {E_WATCH} БУ {be}" if be else "") + f" · WR {round(tp / n * 100)}%")
+        out += [f"{E_TARGET} Тип {t}: {_fmt_r(rr)}R · {_fmt_r(rr)}% депозита", ""]
+        tot_n += n; tot_tp += tp; tot_sl += sl; tot_be += be; tot_r += rr
+    wk = {}
+    for t in rows:
+        for d, o, x in rows[t]:
+            dd = _dt.date.fromisoformat(d); mon = dd - _dt.timedelta(days=dd.weekday())
+            wk[mon] = wk.get(mon, 0.0) + x
+    if wk:
+        out.append("По неделям:")
+        for i, mon in enumerate(sorted(wk), 1):
+            out.append(f"Нед {i} (с {max(mon, _dt.date(year, month, 1)).strftime('%d.%m')}): {_fmt_r(wk[mon])}%")
+        out.append("")
+    wr = round(tot_tp / tot_n * 100) if tot_n else 0
+    out.append(f"{E_CHART} Итого за месяц: {tot_n} сделок · {E_ENTRY} TP {tot_tp} · {E_STOP} SL {tot_sl}" + (f" · {E_WATCH} БУ {tot_be}" if tot_be else "") + f" · WR {wr}%")
+    out.append(f"{E_TARGET} Итог месяца: {_fmt_r(tot_r)}R · {_fmt_r(tot_r)}% депозита")
+    return "\n".join(out)
