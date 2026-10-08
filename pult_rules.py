@@ -797,6 +797,8 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     Нумерация: основные 1–6, скипы 7–10, усилители 11–12."""
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
+    # 08.10.2026: вынос и вход ловим ВНУТРИ свечи — кроме закрытых баров берём ещё формирующийся (его High/Low уже пришли из MT5)
+    dall = d[d.index <= pd.Timestamp(now_utc, tz='UTC')].copy()
     d = _completed(d, now_utc, 5).copy()
     if len(d) < 50:
         return dict(error='no_data')
@@ -841,7 +843,13 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
             except Exception as e:
                 print('struct fix failed', sym, e)
         _prob_set(res, sg.get('plus') or [], [], 'C')
-        return _close_why(_track(res, d, sg, sd, dirc, fmtp))
+        return _close_why(_track(res, d, sg, sd, dirc, fmtp, live=dall))
+    if len(dall) > len(d):      # дальше (вынос, откат 20%) считаем по барам вместе с формирующимся
+        d = dall
+        loc = d.index + pd.Timedelta(hours=off)
+        d['rdate'] = [x.date() for x in loc]
+        d['rmin'] = [x.hour * 60 + x.minute for x in loc]
+        price = float(d['Close'].iloc[-1]); res['price'] = round(price, dec)
     day = d[d['rdate'] == today]
     win = day[(day['rmin'] >= wa) & (day['rmin'] < 1320)]
     idx = {t: i for i, t in enumerate(d.index)}
@@ -922,6 +930,16 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
             res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
             return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
+        # 08.10.2026: расчётный отложенный ордер для советника MT5 (stop-ордер на уровне 20%); не выдаём, если сделка заведомо будет скипнута
+        try:
+            if leg > 0 and nowm < 1110:
+                e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
+                atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
+                if R_ >= 0.25 * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_) is None:
+                    res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
+                                       tp=round(sd * t_, dec), be_at=round(sd * (e_ + 1.5 * R_), dec), ext=round(sd * ext, dec))
+        except Exception as e:
+            print('pend failed', sym, e)
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 20%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
         res['ckf'] = [5]; res['reasons'] = ['откат 20% после 18:30']; _why(res, 'Скип: откат ≥20% позже 18:30', [5])
@@ -1021,7 +1039,7 @@ def _bepct(sig):
         return 70
 
 
-def _track(res, d, sig, sd, dirc, fmtp):
+def _track(res, d, sig, sd, dirc, fmtp, live=None):
     """Ведём сделку по барам. Цель = sig['rr'] R (по умолчанию 2), у S1 — 3R и закрытие по времени в 22:00 Рига
     (sig['end_utc'] — момент закрытия; бары с этого времени уже не учитываются)."""
     res['signal'] = sig
@@ -1039,6 +1057,16 @@ def _track(res, d, sig, sd, dirc, fmtp):
         if (r['Low'] <= stp) if sd == 1 else (r['High'] >= stp): out = 'BE' if armed else 'SL'; xt = tt_; break
         if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): out = 'TP'; xt = tt_; break
         if be and not armed and ((r['High'] >= be) if sd == 1 else (r['Low'] <= be)): armed = True
+    # 08.10.2026: цена дошла до уровня БУ уже в формирующейся свече — сигнал «переноси стоп» без ожидания закрытия
+    if out is None and be and not armed and live is not None and len(live):
+        t0 = after.index[-1] if len(after) else pd.Timestamp(sig['t_utc'])
+        lv = live[live.index > t0]
+        if len(lv):
+            stp0 = sig['stop']
+            hit = bool((lv['High'] >= be).any()) if sd == 1 else bool((lv['Low'] <= be).any())
+            stp_hit = bool((lv['Low'] <= stp0).any()) if sd == 1 else bool((lv['High'] >= stp0).any())
+            if hit and not stp_hit: armed = True
+    if be: res['be_armed'] = bool(armed)
     if out is None and end_utc is not None and len(d) and d.index[-1] + pd.Timedelta(minutes=5) >= end_utc:
         # 22:00: ни цель, ни стоп — закрываем по рынку (последняя свеча до 22:00)
         px = float(after['Close'].iloc[-1]) if len(after) else float(sig['entry'])
