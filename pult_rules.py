@@ -351,7 +351,7 @@ def finalize_why(res):
         if res.get('autopsy'): txt += ' Ход сделки: ' + str(res['autopsy']).rstrip('.') + '.'
         res['why'] = [txt]; res.pop('sl_why', None)
     elif '→ БУ' in note:
-        res['why'] = [f'Закрыта в безубыток после 70% пути: {inn}.']
+        res['why'] = [f'Закрыта в безубыток после достижения уровня БУ: {inn}.']
         res.pop('sl_why', None)
     elif 'закрыта в 22:00' in note:
         res['why'] = [f'Закрыта по времени в 22:00 ({note.split("(")[-1].rstrip(")")}): {inn}.']
@@ -792,8 +792,8 @@ def _close_why(res):
 def _analyze_C2(sym, d, now_utc, off, prev, h1):
     """Тип C (новые правила 01.10.2026). Бокс Лондона 11:00–16:25, вход 16:30–18:30. Вынос телом или тенью:
     вниз → лонг, вверх → шорт (вчерашний Лондон не важен). ≤4 свечей выноса (доджи не считаются), широкий M5 FVG
-    (≥2× средней свечи Лондона) в 3 свечах перед экстремумом — СКИП; вход на откате 30% длины выноса,
-    стоп за экстремумом +0,1R, цель 2R, БУ на 70% пути, встречный H1 FVG внутри 1:2 — СКИП.
+    (≥2× средней свечи Лондона) в 3 свечах перед экстремумом — СКИП; вход ВСЕГДА на откате 20% длины выноса
+    (с 08.10.2026; поглощение свечи выноса отменено), стоп за экстремумом +0,1R, цель 3R, БУ на 50% пути, встречный H1 FVG внутри 1:3 — СКИП.
     Нумерация: основные 1–6, скипы 7–10, усилители 11–12."""
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
@@ -878,7 +878,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
             rg = H[q] - L[q]
             if not (rg > 0 and abs(C[q] - O[q]) <= 0.25 * rg): k += 1
         return k
-    entry_g = None; mode = 'pb30'
+    entry_g = None; mode = 'pb20'
     for g in range(g0, n):
         if d['rdate'].iloc[g] != today: continue
         if L[g] < ext:
@@ -886,14 +886,10 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         if g == g0: continue
         leg = lowB - ext
         if leg <= 0: continue
-        lvl = ext + 0.3 * leg
+        lvl = ext + 0.2 * leg
         if g <= ge: continue
-        # вынос ОДНОЙ свечой (любой — телом или тенью за границу бокса) → вход только на её поглощении
-        # (закрытие выше хая свечи выноса); иначе — выкуп 30% длины выноса (от экстремума к границе бокса)
-        if _nsw(g0, ge) == 1:   # одна свеча выноса (доджи не считаются; новый экстремум доджем/тенью — всё ещё «одна свеча»)
-            ok = C[g] > H[g0:ge + 1].max() and C[g] > O[g]; mode = 'engulf'
-        else:
-            ok = H[g] >= lvl; mode = 'pb30'
+        # 08.10.2026: вход ВСЕГДА на откате 20% длины выноса (вход по поглощению свечи выноса отменён)
+        ok = H[g] >= lvl; mode = 'pb20'
         if ok:
             entry_g = g; break
     # свечи выноса: от g0 до экстремума, доджи (тело ≤25% диапазона) не считаем
@@ -922,43 +918,41 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     leg = lowB - ext
     if entry_g is None or leg <= 0:
         if nowm >= 1110:
-            _w = 'поглощение свечи выноса' if _nsw(g0, ge) == 1 else 'откат 30%'
+            _w = 'откат 20%'
             res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
             return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
-        if _nsw(g0, ge) == 1:
-            return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса одной свечой, ждём поглощение: закрытие {"выше хая" if sd == 1 else "ниже лоя"} свечи выноса)')
-        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 30%)')
+        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 20%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
-        res['ckf'] = [5]; res['reasons'] = ['откат 30% после 18:30']; _why(res, 'Скип: откат ≥30% позже 18:30', [5])
+        res['ckf'] = [5]; res['reasons'] = ['откат 20% после 18:30']; _why(res, 'Скип: откат ≥20% позже 18:30', [5])
         return _out(res, 'skip', dirc, 'СКИП (вход позже 18:30)')
-    lvl = ext + 0.3 * leg
-    entry = float(C[entry_g]) if mode == 'engulf' else max(lvl, float(O[entry_g]))   # поглощение — по закрытию; выкуп 30% — по уровню
+    lvl = ext + 0.2 * leg
+    entry = max(lvl, float(O[entry_g]))   # вход по уровню отката 20%
     stop_f = ext - 0.1 * (entry - ext)
     R = entry - stop_f
-    tp_f = entry + 2 * R
+    tp_f = entry + 3 * R
     atr_m = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
     if R < 0.25 * atr_m:
         res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше 0,25 ATR(M5) — не исполнить со спредом'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
         return _out(res, 'skip', dirc, 'СКИП (стоп слишком мал)')
-    be_f = entry + 0.7 * (tp_f - entry)
+    be_f = entry + 0.5 * (tp_f - entry)
     entry_r, stop_r, tp_r, be_r = sd * entry, sd * stop_f, sd * tp_f, sd * be_f
     _prob_set_C(res, F1, atr1, sd, ext, plus)
     plus = res['plus']
     cf = _counter_fvg(F1, sd, entry_r, tp_r)
     res['ck'] = sorted(set(res['ck'] + [5]))
-    _why(res, 'Откат ≥30% длины выноса достигнут', [5])
+    _why(res, 'Откат ≥20% длины выноса достигнут', [5])
     if cf is not None:
-        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:2'
+        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:3'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8])
-        return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
+        return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:3)')
     t_in = d.index[entry_g]      # свеча входа (вход по её закрытию, трекинг — со следующей свечи)
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
-    sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=(5 if mode == 'engulf' else 0))).strftime('%H:%M'), t_utc=str(t_in),
+    sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=0)).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
-               side='long' if sd == 1 else 'short', rr=2.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[],
+               side='long' if sd == 1 else 'short', rr=3.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[],
                prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'), sv=2)
     res['signal'] = sig; res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
@@ -1020,6 +1014,13 @@ def autopsy(sig, sd, d, res=None):
         return ''
 
 
+def _bepct(sig):
+    try:
+        return int(round(100 * (sig['be_at'] - sig['entry']) / (sig['tp'] - sig['entry'])))
+    except Exception:
+        return 70
+
+
 def _track(res, d, sig, sd, dirc, fmtp):
     """Ведём сделку по барам. Цель = sig['rr'] R (по умолчанию 2), у S1 — 3R и закрытие по времени в 22:00 Рига
     (sig['end_utc'] — момент закрытия; бары с этого времени уже не учитываются)."""
@@ -1051,7 +1052,7 @@ def _track(res, d, sig, sd, dirc, fmtp):
     if out == 'TP':
         return _out(res, 'entry', dirc, f'ВХОД → TP 🎯 +{rtxt}', tg='ЗАКРЫТА - TP')
     if out == 'BE':
-        return _out(res, 'entry', dirc, 'ВХОД → БУ 0R (стоп в безубытке после 70% пути)', tg='ЗАКРЫТА - БУ')
+        return _out(res, 'entry', dirc, f'ВХОД → БУ 0R (стоп в безубытке после {_bepct(sig)}% пути)', tg='ЗАКРЫТА - БУ')
     if out == 'SL':
         res['autopsy'] = autopsy(sig, sd, d, res)
         return _out(res, 'skip', dirc, 'ВХОД → SL −1R', tg='ЗАКРЫТА - SL')
