@@ -267,9 +267,10 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 
   <!-- REPORT -->
   <section id="tab-report" hidden>
+    <div id="repNews" style="display:none;justify-content:flex-start;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;margin:0 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2,transparent)"></div>
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:12px"><h2 id="repTitle" style="margin:0">Отчёт дня</h2><div id="repSum" style="display:none;align-items:center;gap:6px;flex-wrap:wrap"></div></div>
-      <div id="repNews" style="display:none;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px"></div><p class="note" style="margin:0" id="repNote"></p>
+      <p class="note" style="margin:0" id="repNote"></p>
     </div>
     <div class="repGrid" id="rep"></div>
   </section>
@@ -707,6 +708,20 @@ function ckBlock(kind,title,nums,cgi,pick){
   var chips=items.map(function(it){return '<span class="ch'+(nums.indexOf(it[0])>=0?' on':'')+'" title="'+escA(it[1])+'">'+it[0]+'</span>';}).join('');
   var det=items.map(function(it){var on=nums.indexOf(it[0])>=0;return '<div class="'+(on?'on':'')+'">'+(on?(kind==='minus'?'✕ ':'✓ '):'○ ')+it[0]+'. '+escA(it[1])+'</div>';}).join('');
   return '<div class="pxw"><details class="pxc k-'+kind+'"><summary><div class="pxh"><span>'+(kind==='req'?'Обязательные':kind==='cond'?'Условия входа':kind==='plus'?'Что усиливает':'Что ухудшает')+'</span><em>'+head+'</em></div><div class="pxbar"><i style="width:'+Math.round((kind==='minus'?(tot?n/tot:0):p)*100)+'%;background:'+col+'"></i></div><div class="pxchips">'+chips+'</div></summary><div class="pxd">'+det+'</div></details></div>';}
+/* лот для карточки «Вход»: те же формулы и настройки, что в калькуляторе (депозит, риск, ½ риска) */
+var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1]};
+function lotFor(sym,entry,stop,prop){
+  try{var cs=LOTCS[sym];if(!cs)return null;cs=cs[prop==='ftmo'?1:0];
+    var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||25000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,d=Math.abs(entry-stop);
+    if(!(d>0)||!(risk>0))return {lot:0,risk:risk,pct:pct};
+    return {lot:Math.floor(risk/(d*cs)*100)/100,risk:risk,pct:pct};}catch(e){return null;}
+}
+function lotsRow(sym,entry,stop){
+  var e=parseFloat(entry),s=parseFloat(stop);if(!isFinite(e)||!isFinite(s))return null;
+  var a=lotFor(sym,e,s,'fp'),b=lotFor(sym,e,s,'ftmo');if(!a||!b)return null;
+  var chip=function(n,r){return '<span class="pl" style="font-size:15px;padding:5px 14px"><i style="font-style:normal;color:var(--muted)">'+n+'</i> <b style="font-size:20px;color:var(--accent)">'+r.lot.toFixed(2)+'</b></span>';};
+  return '<div class="pxp">'+chip('FP',a)+chip('FTMO',b)+'<span class="pl" style="border-style:dashed">риск $'+fm(a.risk)+' · '+a.pct.toFixed(2)+'%</span></div>';
+}
 function liveCard(x){
   var dir=String(x.direction||''),es=/SHORT/.test(dir)?'short':/LONG/.test(dir)?'long':null;
   var m=STMAP[x.status]||['watch','Наблюдаем'];
@@ -739,7 +754,7 @@ function liveCard(x){
   if(x.sl_why)rows.push(['Разбор SL',x.sl_why]);
   var curR=null;
   if(x.signal){var xt=x.exit_time?' · '+x.exit_time:'',isT=/→ TP/.test(x.note||''),isS=/→ SL/.test(x.note||'');
-    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);rows.push(['Цель '+(x.signal.rr||2)+'R',x.signal.tp+(isT?xt:'')]);
+    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);if(x.status==='entry'&&!isT&&!isS){var lr=lotsRow(x.sym,x.signal.entry,x.signal.stop);if(lr)rows.splice(2,0,['Лот на вход',lr]);}rows.push(['Цель '+(x.signal.rr||2)+'R',x.signal.tp+(isT?xt:'')]);
     if(x.signal.be_at)rows.push(['Стоп в БУ при',String(x.signal.be_at)+(function(){var e=parseFloat(x.signal.entry),t=parseFloat(x.signal.tp),b=parseFloat(x.signal.be_at);return (isFinite(e)&&isFinite(t)&&t!==e&&isFinite(b))?' ('+Math.round((b-e)/(t-e)*100)+'% пути)':'';})()]);
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
@@ -1020,7 +1035,7 @@ renderHist();
   }
   function renderNews(N){var el=$('repNews');if(!el)return;if(!N||N.err&&!(N.items||[]).length){el.style.display='none';return;}
     var it=N.items||[];el.style.display='flex';
-    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (Рига)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
+    el.innerHTML='<span style="flex:none;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (Рига)</span>'+(it.length?it.map(function(x){return '<span style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
   function applyState(S){
     if(!S||S.error){$('repNote').textContent='Ошибка загрузки данных: '+((S&&S.error)||'нет ответа');return;}
     try{renderNews(S._news);}catch(e){console.log('news',e);}

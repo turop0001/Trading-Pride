@@ -82,27 +82,52 @@ def _xticks(ax, d, off, fmt, n=8):
     ax.set_xticklabels([(d.index[i] + pd.Timedelta(hours=off)).strftime(fmt) for i in idx], rotation=35, ha='right', fontsize=8)
 
 
-def _levels(ax, n, sig, dec, ie=None):
-    """Линии на всю ширину; подписи — в пустом правом поле графика (не закрывают свечи и точку входа)."""
-    ax.set_xlim(ax.get_xlim()[0], n - 1 + max(10, n * 0.23))
-    items = [(sig['entry'], C_ENTRY, 'ВХОД' + (f" {sig['time']}" if sig.get('time') else '')),
-             (sig['stop'], C_STOP, 'СТОП'), (sig['tp'], C_TP, 'ТЕЙК %gR' % float(sig.get('rr') or 2))]
-    for y, c, t in items:
-        ax.axhline(y, color=c, linewidth=1.4 if t[:4] != 'ВХОД' else 1.0, linestyle='-' if t[:4] != 'ВХОД' else '--', zorder=4)
-    y0, y1 = ax.get_ylim(); gap = (y1 - y0) * 0.06
+def _exit_bar(d, ie, sig):
+    """Индекс свечи, где сделка закрылась по TP/SL (иначе последняя) — для ширины зон позиции."""
+    if d is None: return None
+    long_ = sig['tp'] > sig['entry']
+    hi, lo = d['High'].values, d['Low'].values
+    for i in range(max(ie, 0) + 1, len(d)):
+        if long_ and (lo[i] <= sig['stop'] or hi[i] >= sig['tp']): return i
+        if (not long_) and (hi[i] >= sig['stop'] or lo[i] <= sig['tp']): return i
+    return len(d) - 1
+
+
+C_BE = '#8d5a2b'
+
+
+def _levels(ax, n, sig, dec, ie=None, d=None):
+    """Стиль дашборда: зоны позиции (TP зелёная / SL красная), пунктир TP/SL/БУ, цветные плашки справа."""
+    ax.set_xlim(ax.get_xlim()[0], n - 1 + max(12, n * 0.25))
+    xr = n - 1 + max(10, n * 0.23)
+    if ie is None: ie = 0
+    xe = _exit_bar(d, ie, sig)
+    xe = max(ie + 6, xe if xe is not None else n - 1)
+    ent, stp, tp = sig['entry'], sig['stop'], sig['tp']
+    ax.add_patch(Rectangle((ie, min(ent, tp)), xe - ie, abs(tp - ent), facecolor=C_TP, alpha=0.32, edgecolor='none', zorder=1.5))
+    ax.add_patch(Rectangle((ie, min(ent, stp)), xe - ie, abs(ent - stp), facecolor=C_STOP, alpha=0.32, edgecolor='none', zorder=1.5))
+    ax.plot([ie, xr], [ent, ent], color=C_ENTRY, linewidth=1.8, zorder=4)
+    ax.plot([ie, xr], [tp, tp], color=C_TP, linewidth=2, linestyle=(0, (6, 3)), zorder=4)
+    ax.plot([ie, xr], [stp, stp], color=C_STOP, linewidth=2, linestyle=(0, (6, 3)), zorder=4)
+    items = [(ent, C_ENTRY, 'ВХОД' + (f" {sig['time']}" if sig.get('time') else '')),
+             (stp, C_STOP, 'СТОП'), (tp, C_TP, 'ТЕЙК %gR' % float(sig.get('rr') or 2))]
+    if sig.get('be_at'):
+        ax.plot([ie, xr], [sig['be_at']] * 2, color=C_BE, linewidth=2, linestyle=(0, (2, 2)), zorder=4)
+        items.append((sig['be_at'], C_BE, 'БУ'))
+    y0, y1 = ax.get_ylim(); gap = (y1 - y0) * 0.055
     pos = sorted([[y, c, t] for y, c, t in items], key=lambda a: a[0])
-    for k in range(1, len(pos)):
-        if pos[k][0] - pos[k - 1][0] < gap: pos[k].append(pos[k - 1][0] + gap)
-    xl = n - 1 + max(1, n * 0.01)
     last = None
     for p in pos:
-        yt = p[3] if len(p) > 3 else p[0]
+        yt = p[0]
         if last is not None and yt - last < gap: yt = last + gap
         last = yt
-        ax.annotate(f'{p[2]} {p[0]:.{dec}f}', (xl, p[0]), xytext=(xl, yt), textcoords='data', ha='left', va='center',
-                    color=p[1], fontsize=10, fontweight='bold', zorder=7, annotation_clip=False,
-                    bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=p[1], lw=0.8, alpha=0.95),
-                    arrowprops=dict(arrowstyle='-', color=p[1], lw=0.8))
+        p.append(yt)
+    xl = n - 1 + max(1, n * 0.012)
+    for y, c, t, yt in pos:
+        ax.annotate(f'{t} {y:.{dec}f}', (xl, y), xytext=(xl, yt), textcoords='data', ha='left', va='center',
+                    color='white', fontsize=10, fontweight='bold', zorder=7, annotation_clip=False,
+                    bbox=dict(boxstyle='round,pad=0.3', fc=c, ec=c, lw=0.8, alpha=0.96),
+                    arrowprops=dict(arrowstyle='-', color=c, lw=0.8))
 
 
 def _foot(fig, r):
@@ -165,15 +190,14 @@ def make_shots(sym, window, r, off, date_str):
         if window == 'A' and r.get('prevL') is not None:
             for y in (r['prevL'], r['prevH']):
                 ax.axhline(y, color=C_PREV, linestyle=':', linewidth=1, zorder=1)
-            ax.text(0, r['prevH'], ' вчерашний бокс', fontsize=8, color=C_PREV, va='bottom')
+            ax.text(0, r['prevH'], f" вчера хай {r['prevH']:.{dec}f}", fontsize=9, color=C_PREV, va='bottom', fontweight='bold'); ax.text(0, r['prevL'], f" вчера лой {r['prevL']:.{dec}f}", fontsize=9, color=C_PREV, va='top', fontweight='bold')
         ie = int((m.index <= t_in).sum()) - 1
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
-        _levels(ax, len(m), sig, dec, ie)
+        _levels(ax, len(m), sig, dec, ie, m)
         _xticks(ax, m, off, '%H:%M')
         if window == 'C' and r.get('boxH') is not None:
             for y_ in (r['boxL'], r['boxH']): ax.axhline(y_, color='#2f5f9e', linestyle=':', linewidth=1, zorder=1)
-            ax.text(0, r['boxH'], ' бокс Лондона', fontsize=8, color='#2f5f9e', va='bottom')
-        if sig.get('be_at'): ax.axhline(sig['be_at'], color='#f9a825', linestyle='--', linewidth=1, zorder=4); ax.annotate(f"БУ {sig['be_at']:.{dec}f}", (1, sig['be_at']), ha='left', va='bottom', fontsize=8, color='#f9a825', annotation_clip=False)
+            ax.text(0, r['boxH'], f" бокс хай {r['boxH']:.{dec}f}", fontsize=9, color='#2f5f9e', va='bottom', fontweight='bold'); ax.text(0, r['boxL'], f" бокс лой {r['boxL']:.{dec}f}", fontsize=9, color='#2f5f9e', va='top', fontweight='bold')
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", f"M5 · {pd.Timestamp(date_str).strftime('%d.%m.%Y')} · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
         _foot(fig, r)
         p = os.path.join(SHOT_DIR, base + '_m5.png'); fig.savefig(p); plt.close(fig)
@@ -189,7 +213,7 @@ def make_shots(sym, window, r, off, date_str):
         _fvg_liq(ax, h, t_in)
         ie = int((h.index <= t_in).sum()) - 1
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
-        _levels(ax, len(h), sig, dec, ie)
+        _levels(ax, len(h), sig, dec, ie, h)
         _xticks(ax, h, off, '%d.%m %H:%M', n=10)
         _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", "H1 · 5 дней до входа · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
         _foot(fig, r)
