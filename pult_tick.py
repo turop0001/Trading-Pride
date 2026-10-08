@@ -25,6 +25,15 @@ ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40']
 def mins(t): return t.hour * 60 + t.minute
 
 
+def push(title, body, tag=None, sticky=False):
+    """Push на телефон/компьютер (webpush_send.py); тихо ничего не делает, если ключа или подписок нет."""
+    try:
+        import webpush_send
+        webpush_send.notify(title, body, tag, sticky)
+    except Exception as e:
+        print('push failed:', str(e)[:100])
+
+
 def next_wake(riga, flags=None):
     m = mins(riga); wd = riga.weekday(); flags = flags or {}
     if wd < 5 and 600 <= m < 840:
@@ -246,7 +255,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
                 upd.append(f"{EMO_TP if xr > 0 else EMO_SL} {s} ({r['direction']}) — закрыта в 22:00 Рига "
                            f"({xr:+.1f}% депозита)")
             elif out == 'BE':
-                upd.append(f"\U0001F7E1 {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} Рига (0% депозита)")
+                upd.append(f"⚪ {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} Рига (0% депозита)")
             else:
                 upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} Рига "
                            f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
@@ -258,6 +267,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
         sign = '+' if total > 0 else ('-' if total < 0 else '')
         head = ("\U0001F4CA Итог сделок после отчёта дня · " + dstr + " (22:00 Рига)") if final else \
                ("\U0001F514 Обновление по сделкам · " + dstr)
+        for u_ in upd: push('Сделка закрыта', u_[:140])
         tg(head + "\n\n" + "\n".join(upd)
            + f"\n\n\U0001F3AF Итог дня: {sign}{abs(total):.1f}% депозита")
         ds = state.get('_daily_summary') or {}
@@ -288,9 +298,22 @@ def main(send=True):
             p_ls, p_tgnote = _tg(p)
             if (ls, r.get('direction'), tgnote) != (p_ls, p.get('direction'), p_tgnote):
                 changed.append(line); syms.append(s)
+                if not first and tgnote and not tgnote.startswith('НАБЛЮДАЕМ'):
+                    push(f"{s} · тип {win} — {tgnote}", str(r.get('direction') or ''), tag=f'{s}_{win}')
             else:
                 unchanged.append(line)
             if r.pop('new_signal', False): sigs.append(r)
+            # 08.10.2026: цена дошла до уровня БУ (по формирующейся свече MT5) — один раз шлём «переноси стоп»
+            if r.get('be_armed') and not p.get('be_armed') and str(r.get('note', '')).startswith('В СДЕЛКЕ') and (r.get('signal') or {}).get('be_at'):
+                sg_ = r['signal']
+                try:
+                    tg(f"\u26A0\uFE0F {s} ({r['direction']}) — цена дошла до БУ ({sg_['be_at']}). Переноси стоп на вход {sg_['entry']}.")
+                    push(f"{s} · цена дошла до БУ", f"Переноси стоп на вход {sg_['entry']}", tag=f'{s}_{win}_be', sticky=True)
+                    did.append('be_alert'); r['be_alert_at'] = t
+                except Exception as e:
+                    print('be alert failed:', e)
+            elif p.get('be_alert_at') and r.get('be_armed'):
+                r['be_alert_at'] = p['be_alert_at']
             state[f'{s}_{win}'] = r
         if first:
             nxt = ('C', '16:30') if (win == 'A' and lc.C_ENABLED) else (None, None)

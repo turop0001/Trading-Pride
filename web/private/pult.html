@@ -1012,6 +1012,7 @@ renderHist();
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||''),isBE=/→ БУ/.test(x.note||'');
     if(isTP||isSL||isBE){c.res=isTP?'TP':isBE?'BE':'SL';c.stT=isTP?'Закрыта · TP':isBE?'Закрыта · БУ':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':isBE?'be':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
     c.rows=c.rows.filter(function(z){return z[0].indexOf('Направление')!==0;});
+    if(r.be_armed&&r.signal&&!(isTP||isSL||isBE))c.rows.push(['Сейчас','<span class="stchip be">Цена дошла до БУ — переноси стоп на вход</span>']);
     c._sig=r.signal||null;c._e=(r.signal&&!(isTP||isSL||isBE))?0:(x.status==='prep'&&!(isTP||isSL||isBE))?1:(x.status==='watch'&&!(isTP||isSL||isBE))?2:3;
     var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
@@ -1019,6 +1020,7 @@ renderHist();
   }
   function applyState(S){
     if(!S||S.error){$('repNote').textContent='Ошибка загрузки данных: '+((S&&S.error)||'нет ответа');return;}
+    try{if(window.pultNotify)pultNotify(S);}catch(e){console.log('notify',e);}
     var all=Object.keys(S).filter(function(k){return /_(A|C)$/.test(k)&&S[k]&&S[k].date;});
     var DAY=all.some(function(k){return S[k].date===REPDAY;})?REPDAY:all.map(function(k){return S[k].date;}).sort().pop();
     var keys=all.filter(function(k){return S[k].date===DAY;});
@@ -1034,7 +1036,83 @@ renderHist();
   // не перерисовывать карточки, пока открыта форма «Закрыл» или курсор в поле карточки
   function repBusy(){var r=$('rep');if(!r)return false;if(r.querySelector('.closeBox.open'))return true;var a=document.activeElement;return !!(a&&a!==document.body&&r.contains(a)&&/INPUT|SELECT|TEXTAREA/.test(a.tagName));}
   function poll(){fetch('/api/state',{cache:'no-store'}).then(function(r){return r.json();}).then(applyState).catch(function(e){$('repNote').textContent='Ошибка загрузки данных: '+e;});}
-  poll();setInterval(poll,30000);
+  /* УВЕДОМЛЕНИЯ (08.10.2026): звук + окно + мигание вкладки при смене статуса (ВЫНОС / ВХОД / закрыта) и при «дошла до БУ»;
+   опрос раз в 10 с. Кнопка 🔔 включает звук/окна; для работы при закрытой странице — «Push на телефон». */
+(function(){
+  var KEY=(location.pathname.match(/^\/p\/([^\/?#]+)/)||[])[1]||'';
+  var PUB='BOjwyFC-rwsqpa0-vLE9qZZF5rxukKwD_mQF5yatdMdZ-d5z97Wa1gX_NLCBKSZH8hPYj1SW5S1_4c279N502AQ';
+  function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){}return null;}
+  var on=ls('pultNtf')==='1',ac=null,prev=null,flashT=null,base=document.title;
+  function ctx(){try{if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(C)ac=new C();}if(ac&&ac.state==='suspended')ac.resume();}catch(e){}return ac;}
+  function beep(kind){var a=ctx();if(!a)return;var seq=kind==='be'?[660,880,660,880]:kind==='sl'?[300,220]:kind==='tp'?[660,880,1100]:[880,1100];
+    seq.forEach(function(f,i){var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(a.destination);var t=a.currentTime+i*0.18;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);o.start(t);o.stop(t+0.17);});}
+  function flash(msg){clearInterval(flashT);var n=0;flashT=setInterval(function(){document.title=(n++%2)?base:'🔔 '+msg;if(!document.hidden&&n>8){clearInterval(flashT);document.title=base;}},900);}
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){clearInterval(flashT);document.title=base;}});
+  var tw=document.createElement('div');tw.style.cssText='position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:6px;max-width:92vw';document.body.appendChild(tw);
+  function toast(msg,kind){var d=document.createElement('div');d.textContent=msg;d.style.cssText='padding:10px 14px;border-radius:10px;font:600 15px -apple-system,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.25);color:#fff;background:'+(kind==='be'?'#8a5a2b':kind==='sl'?'#c0392b':kind==='tp'?'#1f8a4c':'#2b4c7e')+';cursor:pointer';d.onclick=function(){d.remove();};tw.appendChild(d);setTimeout(function(){d.remove();},kind==='be'?60000:15000);}
+  function fire(title,body,kind,tag){
+    if(!on)return;beep(kind);toast(title+(body?' — '+body:''),kind);if(document.hidden)flash(title);
+    try{if(window.Notification&&Notification.permission==='granted'&&document.hidden){new Notification(title,{body:body||'',tag:tag});}}catch(e){}
+  }
+  function stateOf(r){
+    if(!r)return null;var n=String(r.note||'');
+    if(r.signal){
+      if(/→ TP/.test(n))return ['ЗАКРЫТА · TP','tp'];if(/→ SL/.test(n))return ['ЗАКРЫТА · SL','sl'];if(/→ БУ/.test(n))return ['ЗАКРЫТА · БУ','be'];if(/закрыта в 22:00/.test(n))return ['ЗАКРЫТА · 22:00','x'];
+      if(r.be_armed&&r.signal.be_at)return ['ДОШЛА ДО БУ','be'];
+      return ['ВХОД','in'];
+    }
+    if(r.line_status==='prep')return ['ВЫНОС','prep'];
+    return null;
+  }
+  window.pultNotify=function(S){
+    var all=Object.keys(S).filter(function(k){return /_(A|C)$/.test(k)&&S[k]&&S[k].date;});
+    var day=all.map(function(k){return S[k].date;}).sort().pop();var cur={};
+    all.forEach(function(k){if(S[k].date!==day)return;var s=stateOf(S[k]);if(s)cur[k]=s;});
+    if(prev){Object.keys(cur).forEach(function(k){
+      var a=prev[k],b=cur[k];if(a&&a[0]===b[0])return;
+      var sym=S[k].sym||k.split('_')[0],w=S[k].window||k.split('_')[1],dir=String(S[k].direction||'').replace(/bias\s*/gi,'').trim();
+      if(b[0]==='ДОШЛА ДО БУ')fire(sym+' · цена дошла до БУ','переноси стоп на вход '+(S[k].signal||{}).entry,'be',k+b[0]);
+      else if(b[0]==='ВХОД')fire(sym+' · ВХОД (тип '+w+')',dir+' · '+((S[k].signal||{}).entry||''),'in',k+b[0]);
+      else if(b[0]==='ВЫНОС')fire(sym+' · ВЫНОС (тип '+w+')',dir,'prep',k+b[0]);
+      else fire(sym+' · '+b[0],dir,b[1],k+b[0]);
+    });}
+    prev=cur;
+  };
+  /* кнопка */
+  var btn=document.createElement('button');btn.className='btn';btn.style.cssText='position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:99998;font-size:14px;padding:6px 10px;opacity:.92';
+  function lab(){btn.textContent=on?'🔔 Сигналы включены':'🔕 Включить сигналы';}
+  btn.onclick=function(){on=!on;ls('pultNtf',on?'1':'0');lab();if(on){ctx();beep('in');try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){}if(KEY)pushBox();}};
+  lab();document.body.appendChild(btn);
+  document.addEventListener('click',function(){if(on)ctx();},{once:true});
+  /* Push при закрытой странице (только личный пульт) */
+  function u8(b){var p='='.repeat((4-b.length%4)%4),s=(b+p).replace(/-/g,'+').replace(/_/g,'/'),r=atob(s),o=new Uint8Array(r.length);for(var i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o;}
+  var pb=null;
+  function pushBox(){
+    if(pb||!KEY||!('serviceWorker' in navigator)||!('PushManager' in window)){
+      if(!pb&&KEY&&/iPhone|iPad/.test(navigator.userAgent)&&!window.navigator.standalone){toast('Для push на iPhone: Поделиться → «На экран Домой», открыть Пульт оттуда','prep');}
+      return;}
+    pb=document.createElement('button');pb.className='btn';pb.style.cssText='position:fixed;right:10px;bottom:calc(52px + env(safe-area-inset-bottom,0px));z-index:99998;font-size:14px;padding:6px 10px;opacity:.92';
+    function plab(s){pb.textContent=s?'📲 Push на телефон: вкл':'📲 Push на телефон: включить';}
+    navigator.serviceWorker.register('/sw.js').then(function(reg){return reg.pushManager.getSubscription().then(function(sub){plab(!!sub);
+      pb.onclick=function(){
+        Notification.requestPermission().then(function(p){
+          if(p!=='granted'){toast('Разрешение на уведомления не выдано','sl');return;}
+          reg.pushManager.getSubscription().then(function(sub){
+            if(sub){return fetch('/api/push?k='+KEY,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())}).then(function(){return sub.unsubscribe();}).then(function(){plab(false);toast('Push выключен','prep');});}
+            return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(PUB)}).then(function(ns){
+              return fetch('/api/push?k='+KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ns.toJSON())}).then(function(r){if(!r.ok)throw new Error(r.status);plab(true);toast('Push включён: уведомления придут и при закрытой странице','tp');});
+            });
+          }).catch(function(e){toast('Не получилось включить push: '+e,'sl');});
+        });
+      };
+      document.body.appendChild(pb);
+    });}).catch(function(){});
+  }
+  if(on&&KEY)pushBox();
+  if(KEY){var l=document.createElement('link');l.rel='manifest';l.href='/api/manifest?k='+KEY;document.head.appendChild(l);var m=document.createElement('meta');m.name='apple-mobile-web-app-capable';m.content='yes';document.head.appendChild(m);var t=document.createElement('link');t.rel='apple-touch-icon';t.href='/icon-180.png';document.head.appendChild(t);}
+})();
+
+  poll();setInterval(poll,10000);
 
   /* журнал: сервер + резерв в браузере */
   var LOCAL='p_journal_local';

@@ -190,7 +190,7 @@ SRC = {}   # sym -> 'MT5' | 'Yahoo' (для логов/карточек)
 
 def _feed():
     import time, urllib.request
-    if time.time() - _FEED['t'] < 40: return _FEED['data']
+    if time.time() - _FEED['t'] < 15: return _FEED['data']
     _FEED['t'] = time.time()
     try:
         h = {'Accept': 'application/vnd.github.raw', 'User-Agent': 'pult'}

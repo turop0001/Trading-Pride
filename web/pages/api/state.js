@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     const text = Buffer.from(data.content, data.encoding || 'base64').toString('utf-8');
     const state = JSON.parse(text);
 
-    res.setHeader('Cache-Control', 's-maxage=20, stale-while-revalidate=40');
+    res.setHeader('Cache-Control', 's-maxage=8, stale-while-revalidate=20');
     res.status(200).json(state);
   } catch (e) {
     res.status(500).json({ error: String(e) });

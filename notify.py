@@ -18,6 +18,7 @@ CFG_PATH = os.environ.get('TG_CONFIG_PATH', 'tg_config.json')
 E_ENTRY = '\U0001F7E2'    # 🟢 вход / подтверждено / вынос в сторону сделки
 E_SKIP  = '⚪'        # ⚪ скип (в стиле присланного образца)
 E_STOP  = '\U0001F534'    # 🔴 стоп/отмена (используется отдельно, не для рутинного скипа)
+E_BE    = '⚪'        # ⚪ закрыта в БУ / в 22:00 (серый; зелёный только TP)
 E_WATCH = '\U0001F7E1'    # 🟡 наблюдаем / внутри бокса, вынос ещё не подтверждён
 E_NEWS  = '⚠️'  # ⚠️ новости / риск
 E_BELL  = '\U0001F6CE️'  # 🛎️ заголовок отчёта/сигнала
@@ -48,6 +49,8 @@ def fmt_line(status, symbol, direction, note):
     emo = {'skip': E_SKIP, 'entry': E_ENTRY, 'watch': E_WATCH, 'prep': E_PREP}.get(status, E_WATCH)
     if 'ЗАКРЫТА - SL' in str(note):
         emo = E_STOP  # 🔴 стоп; ⚪ только для СКИП
+    elif 'ЗАКРЫТА - БУ' in str(note) or 'ЗАКРЫТА - 22:00' in str(note):
+        emo = E_BE    # 08.10.2026: серый кружок; зелёный — только TP
     return f"{emo} {symbol} ({direction}) — {note}"
 
 
@@ -171,19 +174,19 @@ def build_weekly(mon, fri, items):
             out.append("")
             continue
         for d, sym, side, o, x in r:
-            emo = E_ENTRY if o == 'TP' else E_STOP if o == 'SL' else E_WATCH
+            emo = E_ENTRY if o == 'TP' else E_STOP if o == 'SL' else E_BE
             dirr = DIR_LONG if side == 'long' else DIR_SHORT
             word = 'TP' if o == 'TP' else 'SL' if o == 'SL' else '\u0411\u0423'
             out.append(f"{emo} {d[8:10]}.{d[5:7]} {sym} ({dirr}) \u2014 {word} {_fmt_r(x)}%")
         n = len(r); tp = sum(1 for x in r if x[3] == 'TP'); sl = sum(1 for x in r if x[3] == 'SL'); be = n - tp - sl
         rr = sum(x[4] for x in r)
         out.append("")
-        out.append(f"\u0421\u0434\u0435\u043b\u043e\u043a {n} \u00b7 {E_ENTRY} TP {tp} \u00b7 {E_STOP} SL {sl}" + (f" \u00b7 {E_WATCH} \u0411\u0423 {be}" if be else "") + f" \u00b7 WR {round(tp / n * 100)}%")
+        out.append(f"\u0421\u0434\u0435\u043b\u043e\u043a {n} \u00b7 {E_ENTRY} TP {tp} \u00b7 {E_STOP} SL {sl}" + (f" \u00b7 {E_BE} \u0411\u0423 {be}" if be else "") + f" \u00b7 WR {round(tp / n * 100)}%")
         out.append(f"{E_TARGET} \u0422\u0438\u043f {t}: {_fmt_r(rr)}R \u00b7 {_fmt_r(rr)}% \u0434\u0435\u043f\u043e\u0437\u0438\u0442\u0430")
         out.append("")
         tot_n += n; tot_tp += tp; tot_sl += sl; tot_be += be; tot_r += rr
     wr = round(tot_tp / tot_n * 100) if tot_n else 0
-    out.append(f"{E_CHART} \u0418\u0442\u043e\u0433\u043e \u0437\u0430 \u043d\u0435\u0434\u0435\u043b\u044e: {tot_n} \u0441\u0434\u0435\u043b\u043e\u043a \u00b7 {E_ENTRY} TP {tot_tp} \u00b7 {E_STOP} SL {tot_sl}" + (f" \u00b7 {E_WATCH} \u0411\u0423 {tot_be}" if tot_be else "") + f" \u00b7 WR {wr}%")
+    out.append(f"{E_CHART} \u0418\u0442\u043e\u0433\u043e \u0437\u0430 \u043d\u0435\u0434\u0435\u043b\u044e: {tot_n} \u0441\u0434\u0435\u043b\u043e\u043a \u00b7 {E_ENTRY} TP {tot_tp} \u00b7 {E_STOP} SL {tot_sl}" + (f" \u00b7 {E_BE} \u0411\u0423 {tot_be}" if tot_be else "") + f" \u00b7 WR {wr}%")
     out.append(f"{E_TARGET} \u0418\u0442\u043e\u0433 \u043d\u0435\u0434\u0435\u043b\u0438: {_fmt_r(tot_r)}R \u00b7 {_fmt_r(tot_r)}% \u0434\u0435\u043f\u043e\u0437\u0438\u0442\u0430")
     return "\n".join(out)
 

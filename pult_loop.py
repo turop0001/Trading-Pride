@@ -58,4 +58,4 @@ while True:
         git_push()
     except Exception as e:
         print('tick error:', e)
-    time.sleep(60 - dt.datetime.utcnow().second)
+    time.sleep(20 - dt.datetime.utcnow().second % 20)   # 08.10.2026: тик каждые 20 с (раньше 60) — меньше задержка сигналов
