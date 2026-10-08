@@ -187,5 +187,16 @@
       "m5": "state/shots/2026-10-07_US30_A_m5.png",
       "h1": "state/shots/2026-10-07_US30_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-08_GBPUSD_C",
+    "date": "2026-10-08",
+    "symbol": "GBPUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 1.32126,
+    "stop": 1.32158,
+    "target": 1.3203,
+    "result": "сигнал Пульта в 16:35 Рига"
   }
 ]
