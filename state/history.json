@@ -197,6 +197,10 @@
     "entry": 1.32126,
     "stop": 1.32158,
     "target": 1.3203,
-    "result": "сигнал Пульта в 16:35 Рига"
+    "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+    "shots": {
+      "m5": "state/shots/2026-10-08_GBPUSD_C_m5.png",
+      "h1": "state/shots/2026-10-08_GBPUSD_C_h1.png"
+    }
   }
 ]
