@@ -1050,6 +1050,12 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
     end_utc = pd.Timestamp(sig['end_utc']) if sig.get('end_utc') else None
     if end_utc is not None: after = after[after.index < end_utc]
+    # 08.10.2026: вместе с закрытыми барами учитываем формирующийся — стоп/цель/БУ фиксируются в момент касания (как у брокера),
+    # иначе цена на карточке уходит за стоп (−2,6R), а статус «В СДЕЛКЕ» висит до закрытия свечи
+    if live is not None and len(live):
+        lv = live[live.index > (after.index[-1] if len(after) else pd.Timestamp(sig['t_utc']))]
+        if end_utc is not None: lv = lv[lv.index < end_utc]
+        if len(lv): after = pd.concat([after, lv])
     out = None; xt = None; armed = False; be = sig.get('be_at')
     for _, r in after.iterrows():
         stp = sig['entry'] if armed else sig['stop']
@@ -1057,15 +1063,6 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
         if (r['Low'] <= stp) if sd == 1 else (r['High'] >= stp): out = 'BE' if armed else 'SL'; xt = tt_; break
         if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): out = 'TP'; xt = tt_; break
         if be and not armed and ((r['High'] >= be) if sd == 1 else (r['Low'] <= be)): armed = True
-    # 08.10.2026: цена дошла до уровня БУ уже в формирующейся свече — сигнал «переноси стоп» без ожидания закрытия
-    if out is None and be and not armed and live is not None and len(live):
-        t0 = after.index[-1] if len(after) else pd.Timestamp(sig['t_utc'])
-        lv = live[live.index > t0]
-        if len(lv):
-            stp0 = sig['stop']
-            hit = bool((lv['High'] >= be).any()) if sd == 1 else bool((lv['Low'] <= be).any())
-            stp_hit = bool((lv['Low'] <= stp0).any()) if sd == 1 else bool((lv['High'] >= stp0).any())
-            if hit and not stp_hit: armed = True
     if be: res['be_armed'] = bool(armed)
     if out is None and end_utc is not None and len(d) and d.index[-1] + pd.Timedelta(minutes=5) >= end_utc:
         # 22:00: ни цель, ни стоп — закрываем по рынку (последняя свеча до 22:00)
