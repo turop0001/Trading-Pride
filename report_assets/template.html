@@ -42,7 +42,7 @@ body{width:1080px;height:1350px;background:radial-gradient(900px 500px at 15% -5
 .cell.A{background:rgba(108,180,255,.07);border:1px solid rgba(108,180,255,.28)}
 .cell.C{background:rgba(182,156,255,.07);border:1px solid rgba(182,156,255,.28)}
 .cell .n{font-size:18px;color:var(--mut);line-height:1}.cell.A .n b{color:var(--A)}.cell.C .n b{color:var(--C)}
-.cell .ps{display:flex;gap:8px}
+.cell .ps{display:flex;gap:8px}.p{white-space:nowrap}.cell{min-width:0}body.w3 .cell .ps{gap:6px}body.w3 .p{font-size:19px;padding:4px 11px;letter-spacing:0}
 .p{font-size:21px;font-weight:700;padding:4px 14px;border-radius:30px;letter-spacing:.5px}
 .p.tp{background:rgba(23,214,160,.14);color:var(--g);border:1px solid rgba(23,214,160,.5)}
 .p.sl{background:rgba(255,77,94,.14);color:var(--r);border:1px solid rgba(255,77,94,.5)}
@@ -99,6 +99,7 @@ const pill=o=>o[0]==='TP'?`<span class="p tp">TP ${pc(o[1])}</span>`:o[0]==='SL'
 const cell=(a,t)=>{if(!a.length)return `<div class="cell ${t}"><div class="n"><b>0</b> сигналов</div><div class="ps"><span class="p no">нет сигналов</span></div></div>`;
 let ps;if(!D.agg&&a.length<=3)ps=a.map(pill).join('');else{const tp=a.filter(x=>x[0]==='TP').length,sl=a.filter(x=>x[0]==='SL').length,be=a.length-tp-sl;ps=(tp?`<span class="p tp">TP ${tp}</span>`:'')+(sl?`<span class="p sl">SL ${sl}</span>`:'')+(be?`<span class="p no" style="border-style:solid">БУ ${be}</span>`:'')}
 return `<div class="cell ${t}"><div class="n"><b>${a.length}</b> ${w(a.length)}</div><div class="ps">${ps}</div></div>`};
+const cnt=k=>Math.max(0,...D.rows.map(d=>d[k].length));const nA=cnt('A'),nC=cnt('C');if(!D.agg&&(nA>=3||nC>=3)){document.body.classList.add('w3')}
 const mx=Math.max(4,...D.rows.map(d=>Math.abs(d.tot)));
 if(D.rows.length>5)document.body.classList.add('tight');
 $('rows').innerHTML=D.rows.map(d=>{const r=d.tot;const wd=Math.min(Math.abs(r),mx)/mx*46;
