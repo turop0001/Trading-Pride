@@ -699,7 +699,7 @@ function trPill(lbl,v){v=String(v||'—');var up=/▲/.test(v),dn=/▼/.test(v),
   var code=(v.match(/HH\/HL|LH\/LL/)||[''])[0];
   return '<span class="pl tr '+cls+'"><i>'+lbl+'</i> '+(up?'▲':dn?'▼':'◆')+' '+w+(code?' <small>'+code+'</small>':'')+'</span>';}
 function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<1||!p[0])return null;
-  p=p.filter(function(t){return /^(Swing|CHoCH)/i.test(t);});if(!p.length)return null;
+  p=p.filter(function(t){return /^(Swing [▲▼]: (откат|импульс)|Swing: чёткого|CHoCH)/i.test(t);}).map(function(t){return t.replace(/\s*·\s*Sub M15[^|]*/i,'');});if(!p.length)return null;
   function cl(c){return c==='long'?'var(--long)':c==='short'?'var(--short)':'var(--side)';}
   return '<div class="pxn">'+p.map(function(t){
     if(/^CHoCH/i.test(t)){var i=t.indexOf(':'),hd=i>0?t.slice(0,i):t,tl=i>0?t.slice(i+1):'';
