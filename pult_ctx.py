@@ -367,64 +367,31 @@ def _liq_w(name):
 
 
 def struct_line(ctx, price, liq, fm):
-    """«Где цена» (04.10.2026): Swing + откат % + Sub; до слома (<70% рано / >=70% близко); CHoCH если был; цель-ликвидность.
-    Рекомендацию и вероятность не дублируем — они в блоке «Рекомендация»."""
+    """«Где цена» (09.10.2026, по просьбе трейдера): только две вещи — откат Swing в % и уведомление о сломе CHoCH
+    (стрелка = направление структуры, текст слома — куда сломали). Остальное (Sub-откат, рекомендации «рано/близко»,
+    цель-ликвидность, разворот без пробоя) в строку больше не пишем."""
     sw, sb = ctx['swing'], ctx['sub']
     nf = lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v)
     hi, lo, tr = sw.get('hi'), sw.get('lo'), sw['tr']
+    arrow = lambda t: '▲' if t == 1 else ('▼' if t == -1 else '')
     parts = []
-    r = None
     if hi and lo and hi > lo and tr != 0:
         rng = hi - lo
-        arrow = lambda t: '▲' if t == 1 else '▼'
         if tr == -1:
             r = (price - lo) / rng
             base = ('Swing ▼: импульс вниз, цена у LL %s' % nf(lo)) if r <= 0.1 else \
                    ('Swing ▼: откат %d%% вверх от LL %s к LH %s' % (round(r * 100), nf(lo), nf(hi)))
-            brk_lvl = 'выше LH %s' % nf(hi)
         else:
             r = (hi - price) / rng
             base = ('Swing ▲: импульс вверх, цена у HH %s' % nf(hi)) if r <= 0.1 else \
                    ('Swing ▲: откат %d%% вниз от HH %s к HL %s' % (round(r * 100), nf(hi), nf(lo)))
-            brk_lvl = 'ниже HL %s' % nf(lo)
-        if sb['tr'] == -tr: base += ' · Sub M15 %s против Swing' % arrow(sb['tr'])
-        elif sb['tr'] == tr: base += ' · Sub M15 %s по тренду' % arrow(sb['tr'])
         parts.append(base)
-        if sw.get('flip'): parts.append('Swing %s: %s' % (arrow(tr), sw['flip']))
-        if sb['tr'] == -tr or r > 0.1:
-            if r >= 0.7 or sw.get('deep'): parts.append('Swing: откат 70%%+, слом близко, смотрим закрытие телом %s' % brk_lvl)
-            elif sb['tr'] == -tr: parts.append('Swing: откат меньше 70%%, о сломе рано, слом = закрытие телом %s' % brk_lvl)
-        shi, slo, st = sb.get('hi'), sb.get('lo'), sb['tr']
-        if shi and slo and shi > slo and st != 0:
-            sr = ((price - slo) if st == -1 else (shi - price)) / (shi - slo)
-            if st == -1:
-                sbl = 'выше LH %s' % nf(shi)
-                parts.append(('Sub M15 ▼: откат %d%% вверх от LL %s к LH %s' % (round(sr*100), nf(slo), nf(shi))) if sr > 0.1 else ('Sub M15 ▼: импульс вниз, цена у LL %s' % nf(slo)))
-            else:
-                sbl = 'ниже HL %s' % nf(slo)
-                parts.append(('Sub M15 ▲: откат %d%% вниз от HH %s к HL %s' % (round(sr*100), nf(shi), nf(slo))) if sr > 0.1 else ('Sub M15 ▲: импульс вверх, цена у HH %s' % nf(shi)))
-            if sr > 0.1:
-                parts.append('Sub M15: ' + ('откат 70%%+, слом близко, смотрим закрытие телом %s' % sbl if sr >= 0.7 else 'откат меньше 70%%, о сломе рано, слом = закрытие телом %s' % sbl))
-        for nm, t in (('Swing', sw), ('Sub M15', sb)):
-            if t.get('brk'):
-                parts.append('CHoCH %s: %s' % (nm, t['brk'].replace('закрытие телом за', 'телом за')))
     else:
         parts.append('Swing: чёткого тренда нет, цена в диапазоне')
-    # цель-ликвидность: ближайший неснятый уровень (расстояние в длинах ноги Swing / вес силы уровня)
-    if liq:
-        rng = max((hi - lo) if (hi and lo and hi > lo) else price * 0.005, 1e-9)
-        cand = []
-        for x in liq:
-            d = abs(x['p'] - price) / rng
-            if d > 2.5: continue
-            against = tr != 0 and ((x['p'] > price and tr == -1) or (x['p'] < price and tr == 1)) and sb['tr'] == -tr
-            cand.append((d / (_liq_w(x['name']) * (1.5 if against else 1.0)), x, d))
-        cand.sort(key=lambda c: c[0])
-        if cand:
-            def fmtl(c): return '%s %s %s' % ('↑' if c[1]['p'] > price else '↓', nf(c[1]['p']), c[1]['name'])
-            txt = 'Цель-ликвидность: ' + fmtl(cand[0]) + ' (%.1f ноги)' % cand[0][2]
-            if len(cand) > 1: txt += ' · следом ' + fmtl(cand[1])
-            parts.append(txt)
+    for nm, t in (('Swing', sw), ('Sub M15', sb)):
+        if t.get('brk'):
+            a = arrow(t['tr'])
+            parts.append('CHoCH %s%s: %s' % (nm, (' ' + a) if a else '', t['brk'].replace('закрытие телом за', 'телом за')))
     return ' | '.join(parts)
 
 

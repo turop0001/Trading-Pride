@@ -550,6 +550,16 @@ def _h1_fvgs(h1c):
     return _fvgs(h1c.iloc[-240:], 0.15 * atr1), atr1
 
 
+def _cfv(cf, sd, entry, tp, off, dec):
+    """Встречный H1 FVG на пути к цели — для карточки скипа (09.10.2026): границы, время H1-свечи, вход и цель."""
+    try:
+        t = (pd.Timestamp(cf['t']) + pd.Timedelta(hours=off)).strftime('%d.%m %H:%M')
+    except Exception:
+        t = ''
+    return dict(lo=round(float(cf['lo']), dec), hi=round(float(cf['hi']), dec), t=t, entry=round(float(entry), dec),
+                tp=round(float(tp), dec), side='long' if sd == 1 else 'short')
+
+
 def _counter_fvg(F1, sd, entry, tp):
     """Встречный неинвертированный H1 FVG внутри пути entry → tp (1:2)."""
     for f in F1:
@@ -726,7 +736,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
             if cf0 is not None:
                 res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))   # пройдены все, кроме №11
                 t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} внутри цели 1:2 (по текущей цене {fmtp(e0)})'
-                res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
+                res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11]); res['cfv'] = _cfv(cf0, sd, e0, e0 + sd * S1.RR * R0, off, dec)
                 return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
         return _out(res, 'prep', dirc, 'ВЫНОС (условия входа выполнены, ждём свечу входа)')
     entry = float(d['Open'].iloc[g + 1])
@@ -739,7 +749,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     if cf is not None:
         res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))
         t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:2'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11])
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11]); res['cfv'] = _cfv(cf, sd, entry, tp, off, dec)
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
     t_in = d.index[g + 1]
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(S1.END_M // 60, S1.END_M % 60)) - dt.timedelta(hours=off), tz='UTC')
@@ -963,7 +973,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     _why(res, 'Откат ≥20% длины выноса достигнут', [5])
     if cf is not None:
         res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} внутри цели 1:3'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8])
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8]); res['cfv'] = _cfv(cf, sd, entry_r, tp_r, off, dec)
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:3)')
     t_in = d.index[entry_g]      # свеча входа (вход по её закрытию, трекинг — со следующей свечи)
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')

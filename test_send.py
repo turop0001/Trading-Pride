@@ -26,7 +26,7 @@ for w in ('A', 'C'):
     sections.append((w, lines))
 
 out = [f"🧪 ТЕСТ ДОСТАВКИ (проверка GitHub Actions → Telegram, статусы посчитаны заново текущим кодом, без bias/лишних комментариев)\n"]
-out.append(f"📊 Живой срез · {today_str} ({riga.strftime('%H:%M')} Рига)\n")
+out.append(f"📊 Живой срез · {today_str} ({riga.strftime('%H:%M')} UTC+3)\n")
 for w, lines in sections:
     out.append(f"Тип {w}:")
     out.extend(lines)

@@ -187,7 +187,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 <div class="wrap">
   <div class="hdr">
     <div class="brand">Сигналы <span>дня</span></div>
-    <div class="clock"><small>Рига</small><b id="clk">--:--:--</b></div>
+    <div class="clock"><small>UTC+3</small><b id="clk">--:--:--</b></div>
     <div class="winbox"><span class="clock"><small>Окно</small></span><span class="wt" id="win">--</span><span class="tbadge" id="wbadge"></span></div>
     <span class="pill off" id="pill">…</span>
   </div>
@@ -237,7 +237,7 @@ function rigaMinutesNow(){
 }
 function winRank(w){var cFirst=rigaMinutesNow()>=840;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
 var CK={
- A:{title:'Тип A',when:WA+' Рига',items:[
+ A:{title:'Тип A',when:WA+' UTC+3',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40)','правило одно для всех 7; по тесту сильнее всех индексы США.'],
   ['base','Азия вышла за вчерашний бокс только с одной стороны — есть сторона сделки','лонг: хай Азии выше вчерашнего, а лой не ниже; шорт — зеркально.'],
   ['base','Противоположная сторона Азии ещё не снята первой — ни тенью, ни телом (лонг: хай Азии, шорт: лой)','если до нужного выноса в окне 10:00–14:00 снята противоположная сторона бокса — скип дня по инструменту (тест 5 лет: такие входы WR 40% против 50%).'],
@@ -246,18 +246,18 @@ var CK={
   ['base','V-разворот: свеча входа не позже 7 значимых свечей M5 после экстремума выноса (доджи не считаются)','доджи — свеча с телом ≤25% диапазона. Затяжной разворот (больше 7 значимых свечей) не берём.'],
   ['base','M5 FVG выноса (в последних 5 свечах выноса) перекрыт закрытиями (или его нет)','пока закрытие свечи выкупа не вышло за дальнюю границу FVG — входа нет.'],
   ['base','Триггер входа есть: если вынос ≤1,5 ATR(M5, 14) — ≥2 сильные свечи выкупа (тело ≥60% диапазона), откат 30% здесь не работает; если вынос больше 1,5 ATR — как раньше: ≥3 сильные свечи ИЛИ откат ≥30% пути от экстремума к границе Азии','вход по открытию следующей свечи после триггера.'],
-  ['base','Параметры сделки заданы: стоп = экстремум выноса − 0,3 ATR(M5, 14), цель 2R, закрытие не позже 22:00 Рига','стоп не переносим; не дошли ни до цели, ни до стопа — закрываем по рынку в 22:00.'],
-  ['skip','Вынос и вход случились до 14:00 Рига','свеча входа должна открыться до 14:00.'],
+  ['base','Параметры сделки заданы: стоп = экстремум выноса − 0,3 ATR(M5, 14), цель 2R, закрытие не позже 22:00','стоп не переносим; не дошли ни до цели, ни до стопа — закрываем по рынку в 22:00.'],
+  ['skip','Вынос и вход случились до 14:00','свеча входа должна открыться до 14:00.'],
   ['skip','Внутри цели 1:2 нет встречного H1 FVG','встречный непробитый H1 FVG между входом и целью 2R — скип.'],
   ['skip','Это первый вход по инструменту за день','после SL/TP повторного входа нет.'],
   ['plus','Батут: под лоем Азии (для шорта — над хаем) лежит нетронутый H1 FVG в сторону сделки','цена, снявшая лой, отталкивается от FVG; ищем ближе 50% длины Азии (параметр уточнён мной).'],
   ['plus','На пути к цели есть ликвидность в пределах 30% длины Азии от границы Азии','хай/лой H1 и D1, вчерашний день/Лондон: цена тянется забрать её.'],
   ['plus','По тренду: сторона сделки совпадает с рекомендацией структуры (Swing и Sub)','структура — только контекст, правилом входа не является.'],
   ['minus','У стороны выноса нет несобранной ликвидности в пределах 30% длины Азии','если она есть — цена захочет её снять, выкупа может не быть (ухудшитель).']],
-  mng:'<b>После входа:</b> цель 2R, стоп не переносим, в 22:00 Рига закрываем по рынку. Структура Swing/Sub, ликвидность и FVG H1 показываются в карточке и влияют на оценку вероятности, но вход определяют только пункты 1–12. Мои бэктесты (451 сделка, 2022–2026): WR 78%, +602R при 1:2 — см. вкладку «Аналитика».'},
- C:{title:'Тип C',when:WC+' Рига',items:[
+  mng:'<b>После входа:</b> цель 2R, стоп не переносим, в 22:00 закрываем по рынку. Структура Swing/Sub, ликвидность и FVG H1 показываются в карточке и влияют на оценку вероятности, но вход определяют только пункты 1–12. Мои бэктесты (451 сделка, 2022–2026): WR 78%, +602R при 1:2 — см. вкладку «Аналитика».'},
+ C:{title:'Тип C',when:WC+' UTC+3',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD)','только 3 инструмента, на которых тип протестирован.'],
-  ['base','Бокс Лондона 11:00–16:25 Рига сформирован','границы бокса — хай и лой 11:00–16:25.'],
+  ['base','Бокс Лондона 11:00–16:25 сформирован','границы бокса — хай и лой 11:00–16:25.'],
   ['base','Вынос границы бокса в окне 16:30–18:30 (закрытием тела или тенью): вниз → лонг, вверх → шорт','вчерашний Лондон не важен.'],
   ['base','Свечей выноса не больше 4 (доджи с коротким телом не считаются)','если дольше — скип.'],
   ['base','Вход: откат ≥20% длины выноса (от экстремума к границе бокса)','с 08.10.2026 вход всегда на откате: вход по уровню 20% длины выноса, вне зависимости от числа свечей выноса.'],
@@ -279,12 +279,21 @@ function trPill(lbl,v){v=String(v||'—');var up=/▲/.test(v),dn=/▼/.test(v),
   var w=up?'рост':dn?'падение':/сжат/.test(v)?'сжатие':/расшир/.test(v)?'расширение':v.replace(/[◆▲▼]\s*/,'');
   var code=(v.match(/HH\/HL|LH\/LL/)||[''])[0];
   return '<span class="pl tr '+cls+'"><i>'+lbl+'</i> '+(up?'▲':dn?'▼':'◆')+' '+w+(code?' <small>'+code+'</small>':'')+'</span>';}
-function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<2)return null;
-  p=p.filter(function(t){return !/^Цель-ликвидность/i.test(t);}).map(function(t){return t.replace(/\s*·\s*Sub M15[^|]*/i,'');});
-  return '<div class="pxn">'+p.map(function(t){var imp=/^(Swing|Sub)/i.test(t)||/слом|^Откат/i.test(t);
-    var c=/^(слом|CHoCH).*вверх/i.test(t)?'long':/^(слом|CHoCH)/i.test(t)?'short':/вероятнее вверх/i.test(t)?'long':/вероятнее вниз/i.test(t)?'short':/неясно/i.test(t)?'side':/^Swing ▲/.test(t)?'long':/^Swing ▼/.test(t)?'short':/слом|^Откат/i.test(t)?'side':/^(Ликвидность|Обозначения)/i.test(t)?'liq':'';
-    var h=t.charAt(0).toUpperCase()+t.slice(1);if(imp)h=h.replace(/(откат \d+%)/i,'<u class="pcb">$1</u>').replace(/(слом[^;·|]*)/i,'<u class="pcb">$1</u>');
-    return '<span class="nl '+c+(imp?' imp':'')+'">'+h+'</span>';}).join('')+'</div>';}
+function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<1||!p[0])return null;
+  p=p.filter(function(t){return /^(Swing|CHoCH)/i.test(t);});if(!p.length)return null;
+  function cl(c){return c==='long'?'var(--long)':c==='short'?'var(--short)':'var(--side)';}
+  return '<div class="pxn">'+p.map(function(t){
+    if(/^CHoCH/i.test(t)){var i=t.indexOf(':'),hd=i>0?t.slice(0,i):t,tl=i>0?t.slice(i+1):'';
+      var hc=/▲/.test(hd)?'long':/▼/.test(hd)?'short':'side',tc=/вверх/i.test(tl)?'long':/вниз/i.test(tl)?'short':'side';
+      return '<span class="nl imp" style="border-left-color:'+cl(tc)+'"><b style="color:'+cl(hc)+'">'+hd.replace(/</g,'&lt;')+':</b><span style="color:'+cl(tc)+'">'+tl.replace(/</g,'&lt;')+'</span></span>';}
+    var c=/^Swing ▲/.test(t)?'long':/^Swing ▼/.test(t)?'short':'side';
+    var h=t.replace(/</g,'&lt;').replace(/(откат \d+%)/i,'<u class="pcb">$1</u>');
+    return '<span class="nl imp '+c+'">'+h+'</span>';}).join('')+'</div>';}
+function cfvHTML(f){if(!f||f.lo==null)return null;var up=f.side==='long',e=+f.entry,t=+f.tp,lo=+f.lo,hi=+f.hi,a=Math.min(e,t),b=Math.max(e,t),w=b-a||1;
+  function pc(v){return Math.max(0,Math.min(100,(v-a)/w*100));}
+  var x1=pc(lo),x2=pc(hi),bar='<div style="position:relative;height:22px;margin:8px 0 2px;border-radius:6px;background:var(--surface-2);overflow:hidden"><i style="position:absolute;top:0;bottom:0;left:'+x1+'%;width:'+Math.max(2,x2-x1)+'%;background:color-mix(in srgb,var(--short) 35%,transparent);border-left:2px solid var(--short);border-right:2px solid var(--short)"></i></div>';
+  var ends=up?['вход '+f.entry,'цель '+f.tp]:['цель '+f.tp,'вход '+f.entry];
+  return '<div class="pxn"><span class="nl imp short" style="border-left-color:var(--short)"><b>'+(up?'▼ медвежий':'▲ бычий')+' H1 FVG '+f.lo+' – '+f.hi+'</b>'+(f.t?' · H1 свеча '+f.t:'')+'<br><span style="font-weight:500;font-size:13.5px">стоит на пути к цели 1:'+(f.rr||2)+(up?' выше входа':' ниже входа')+' — сделка пропущена</span>'+bar+'<span style="display:flex;justify-content:space-between;font-size:12px;font-weight:500;opacity:.8"><span>'+ends[0]+'</span><span>'+ends[1]+'</span></span></span></div>';}
 function ckBlock(kind,title,nums,cgi,pick){
   var items=[];cgi.forEach(function(r,i){if(pick(r))items.push([i+1,r[1]]);});
   var tot=items.length,n=0;items.forEach(function(it){if(nums.indexOf(it[0])>=0)n++;});
@@ -305,6 +314,7 @@ function liveCard(x){
   if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
     rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+(rc==='50/50'?'НЕТ ПРЕИМУЩЕСТВА · скип/осторожно':rc+(x.struct.conf?' · '+x.struct.conf:''))+'</span></div>']);
     if(x.struct.line){var nh=narrHTML(x.struct.line);rows.push(['Где цена',nh||String(x.struct.line)]);}}
+  if(x.status==='skip'&&x.cfv){var fh=cfvHTML(Object.assign({rr:x.window==='C'?3:2},x.cfv));if(fh)rows.push(['Встречный FVG',fh]);}
   if(x.window==='C'){if(x.boxH!=null&&x.boxL!=null)rows.push(['Бокс Лондона','хай '+x.boxH+' · лой '+x.boxL]);}
   else if(x.pos)rows.push(['Цена / Бокс Азии','<div class="pxp"><span class="pl side">'+x.pos+'</span></div>']);
   if(x.prob){var pc=x.prob==='высокая'?'high':x.prob==='низкая'?'low':'mid';
@@ -346,11 +356,11 @@ function renderLive(m){
   var today=m.date===REPDAY;
   $('liveLine').innerHTML='';
   var ln=$('liveLine');
-  ln.appendChild(document.createTextNode((today?'Окно '+m.window+' · проверено в '+m.time+' Рига — ':'Последняя проверка '+m.date+' '+m.time+' — ')));
+  ln.appendChild(document.createTextNode((today?'Окно '+m.window+' · проверено в '+m.time+' — ':'Последняя проверка '+m.date+' '+m.time+' — ')));
   var t=el('span',m.text==='без изменений'?null:'chg',m.text||'');ln.appendChild(t);
   ln.appendChild(el('small',null,'обновляется каждую минуту в окнах A/C'));
   var mt=el('small',null,'MT5: проверяю…');mt.id='mt5St';ln.appendChild(mt);mt5Check();
-  $('repNote').textContent=(today?'Окно '+m.window+' — проверено в '+m.time+' Рига: ':'Последняя проверка '+m.date+' '+m.time+': ')+(m.text||'');
+  $('repNote').textContent=(today?'Окно '+m.window+' — проверено в '+m.time+': ':'Последняя проверка '+m.date+' '+m.time+': ')+(m.text||'');
 }
 var DW={long:'LONG',short:'SHORT',side:'БОКОВИК'};
 function renderRep(){
@@ -369,7 +379,7 @@ function renderRep(){
       }
       else{bEl.textContent=r[1];}
       g.appendChild(bEl);});card.appendChild(g);
-    if(c.c){var nx=el('div','next');nx.innerHTML='Следующий шанс — <b>тип C</b>, окно '+WC+' Рига.';card.appendChild(nx);}
+    if(c.c){var nx=el('div','next');nx.innerHTML='Следующий шанс — <b>тип C</b>, окно '+WC+'.';card.appendChild(nx);}
     rg.appendChild(card);});
 }
   function stripBias(s){return String(s||'').replace(/bias\s*/gi,'').replace(/\s+/g,' ').trim();}
@@ -385,7 +395,7 @@ function renderRep(){
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:ckm(k,r,r.ck),ckf:ckm(k,r,r.ckf),fx:r.fx,
-      struct:r.struct,pos:r.pos,prob:r.prob,plus:ckm(k,r,r.plus),worse:ckm(k,r,r.worse),why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
+      struct:r.struct,cfv:r.cfv,pos:r.pos,prob:r.prob,plus:ckm(k,r,r.plus),worse:ckm(k,r,r.worse),why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
     var wcl=x.window==='A'?840:1110;
     if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'14:00':'18:30')+')';x.ckf=[];}
     var c=liveCard(x);
@@ -400,7 +410,7 @@ function renderRep(){
   }
   function renderNews(N){var el=$('repNews');if(!el)return;if(!N||N.err&&!(N.items||[]).length){el.style.display='none';return;}
     var it=N.items||[];el.style.display='flex';
-    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (Рига)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
+    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (UTC+3)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
   function applyState(S){
     if(!S||S.error){$('repNote').textContent='Ошибка загрузки данных: '+((S&&S.error)||'нет ответа');return;}
     try{renderNews(S._news);}catch(e){console.log('news',e);}
@@ -410,7 +420,7 @@ function renderRep(){
     var keys=all.filter(function(k){return S[k].date===DAY;});
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
     REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if(a._e!==b._e)return a._e-b._e;var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
-    if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00 Рига).</div>';else renderRep();
+    if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00).</div>';else renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];
     if(last){renderLive({date:last.date,time:last.time,window:last.window,text:last.text,log:log.filter(function(r){return r.date===last.date;})});}

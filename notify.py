@@ -62,29 +62,29 @@ def fmt_line(status, symbol, direction, note):
 # промпт report-задачи. "Итог дня" появляется только в build_daily_summary (после закрытия
 # ОБОИХ окон, вечером). Новости даём отдельной строкой только если сам пользователь просит.
 def build_window_open(date, window_label, window_range, lines, next_label=None, next_time=None):
-    head = f"{E_BELL} Отчёт· {date} · Окно {window_label} ({window_range} Рига) открыто {E_OPEN}\n\n"
+    head = f"{E_BELL} Отчёт· {date} · Окно {window_label} ({window_range} UTC+3) открыто {E_OPEN}\n\n"
     body = "\n".join(lines)
     tail = ""
     if next_label and next_time:
-        tail = f"\n\n{E_NEXT} Следующее окно — тип {next_label} (NY), старт {next_time} Рига."
+        tail = f"\n\n{E_NEXT} Следующее окно — тип {next_label} (NY), старт {next_time} UTC+3."
     return head + body + tail
 
 
 def build_window_closed(date, window_label, window_range, lines, next_label=None, next_time=None,
                          trades=0, pct=0.0, end_time=None):
     """Отчёт закрытия окна без сделок (или с ними — lines уже готовые строки по инструментам)."""
-    head = f"{E_BELL} Отчёт · {date} · Окно {window_label} ({window_range} Рига) закрыто {E_CLOSED}\n\n"
+    head = f"{E_BELL} Отчёт · {date} · Окно {window_label} ({window_range} UTC+3) закрыто {E_CLOSED}\n\n"
     sign = '+' if pct > 0 else ('-' if pct < 0 else '')
     head += f"{E_CHART} Итог окна {window_label}: {trades} сделок, {sign}{abs(pct):.1f}% депозита\n\n"
     if end_time:
-        head += f"{E_CLOCK} Окно {window_label} закрыто в {end_time} Рига.\n"
+        head += f"{E_CLOCK} Окно {window_label} закрыто в {end_time} UTC+3.\n"
     if trades == 0:
         head += f"{E_DOT} Сделок по типу {window_label} сегодня не было\n"
         head += f"{E_DOT} все {len(lines)} инструментов закрылись скипом:\n\n"
     body = "\n".join(lines)
     tail = ""
     if next_label and next_time:
-        tail = f"\n\n{E_NEXT} Следующее окно — (тип {next_label}), старт ({next_time} Рига)."
+        tail = f"\n\n{E_NEXT} Следующее окно — (тип {next_label}), старт ({next_time} UTC+3)."
     return head + body + tail
 
 
@@ -93,7 +93,7 @@ def build_update(date, window_label, time_str, changed_lines, unchanged_lines=No
     (это и есть сама суть "Обновления"). unchanged_lines — остальные, группой "Без изменений:"
     (испр. 28.09.2026: раньше заголовок группы был "Наблюдаем", хотя туда попадали и скип-строки —
     неточно; по образцу пользователя правильный заголовок именно "Без изменений:")."""
-    head = f"{E_CHART} Обновление · окно {window_label} · {date} ({time_str} Рига)\n\n"
+    head = f"{E_CHART} Обновление · окно {window_label} · {date} ({time_str} UTC+3)\n\n"
     body = "\n".join(changed_lines)
     tail = ""
     if unchanged_lines:
@@ -102,7 +102,7 @@ def build_update(date, window_label, time_str, changed_lines, unchanged_lines=No
 
 
 def build_signal(date, window_label, time_str, symbol, direction, entry, stop, target_2r, risk_pct, note='есть order flow', rr=2):
-    return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} Рига)\n\n"
+    return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} UTC+3)\n\n"
             f"{E_ENTRY} {symbol} ({direction}):\n\n"
             f"Вход {entry} · {time_str}\n"
             f"Стоп: {stop}\n"
@@ -111,7 +111,7 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
 
 
 def build_tp_hit(symbol, direction, target_price, time_str, pct):
-    return (f"{E_ENTRY} {symbol} ({direction}) — TP {E_TARGET} +2R по {target_price} ({time_str} Рига)\n"
+    return (f"{E_ENTRY} {symbol} ({direction}) — TP {E_TARGET} +2R по {target_price} ({time_str} UTC+3)\n"
             f"{E_MONEY} Итог: {pct:+.1f}% депозита")
 
 
@@ -129,7 +129,7 @@ def build_daily_summary(date, sections, total_pct):
     out.append(f"{E_TARGET} Итог дня: {sign}{abs(total_pct):.1f}% депозита")
     return "\n".join(out)
 
-# --- Недельный отчёт (утверждён пользователем 06.10.2026): пятница 22:00 Рига, риск 1% на сделку, отдельно Тип A и C ---
+# --- Недельный отчёт (утверждён пользователем 06.10.2026): пятница 22:00 UTC+3, риск 1% на сделку, отдельно Тип A и C ---
 import re as _re
 
 def _weekly_parse(item):
@@ -162,7 +162,7 @@ def build_weekly(mon, fri, items):
         if not p: continue
         rows[t].append((d, it.get('symbol'), it.get('side'), p[0], p[1]))
     out = [f"{E_CHART} Недельный отчёт · {mon.strftime('%d.%m')} \u2013 {fri.strftime('%d.%m.%Y')}",
-           "(пятница, 22:00 Рига · риск 1% на сделку)", ""]
+           "(пятница, 22:00 UTC+3 · риск 1% на сделку)", ""]
     tot_n = tot_tp = tot_sl = tot_be = 0
     tot_r = 0.0
     for t in ('A', 'C'):

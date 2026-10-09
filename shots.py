@@ -198,7 +198,7 @@ def make_shots(sym, window, r, off, date_str):
         if window == 'C' and r.get('boxH') is not None:
             for y_ in (r['boxL'], r['boxH']): ax.axhline(y_, color='#2f5f9e', linestyle=':', linewidth=1, zorder=1)
             ax.text(0, r['boxH'], f" бокс хай {r['boxH']:.{dec}f}", fontsize=9, color='#2f5f9e', va='bottom', fontweight='bold'); ax.text(0, r['boxL'], f" бокс лой {r['boxL']:.{dec}f}", fontsize=9, color='#2f5f9e', va='top', fontweight='bold')
-        _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", f"M5 · {pd.Timestamp(date_str).strftime('%d.%m.%Y')} · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
+        _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", f"M5 · {pd.Timestamp(date_str).strftime('%d.%m.%Y')} · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время UTC+3")
         _foot(fig, r)
         p = os.path.join(SHOT_DIR, base + '_m5.png'); fig.savefig(p); plt.close(fig)
         out['m5'] = 'state/shots/' + base + '_m5.png'
@@ -215,7 +215,7 @@ def make_shots(sym, window, r, off, date_str):
         ax.scatter([ie], [sig['entry']], marker='^' if side == 'LONG' else 'v', s=140, color=C_ENTRY, zorder=6, edgecolor='white')
         _levels(ax, len(h), sig, dec, ie, h)
         _xticks(ax, h, off, '%d.%m %H:%M', n=10)
-        _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", "H1 · 5 дней до входа · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время Рига")
+        _style(fig, ax, f"{sym} · тип {window} · {side} · {res}", "H1 · 5 дней до входа · Азия жёлтая, Лондон синий, Нью-Йорк фиолетовый · время UTC+3")
         _foot(fig, r)
         p = os.path.join(SHOT_DIR, base + '_h1.png'); fig.savefig(p); plt.close(fig)
         out['h1'] = 'state/shots/' + base + '_h1.png'

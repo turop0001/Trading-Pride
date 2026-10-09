@@ -45,7 +45,7 @@ def main():
         if d.get('workflow_runs'):
             return 'цикл работает'
     api(f'/repos/{REPO}/actions/workflows/loop.yml/dispatches', 'POST', {'ref': 'main'})
-    tg('⚠️ Минутный цикл Пульта не работал в окне — перезапущен автоматически (' + riga.strftime('%H:%M') + ' Рига).')
+    tg('⚠️ Минутный цикл Пульта не работал в окне — перезапущен автоматически (' + riga.strftime('%H:%M') + ' UTC+3).')
     return 'перезапущен'
 
 

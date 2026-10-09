@@ -8,8 +8,8 @@ export const WINDOW_SYMBOLS = {
 };
 
 export const WINDOW_LABEL = {
-  A: 'Тип A · Азия → Франкфурт/Лондон (10:00–14:00 Рига)',
-  C: 'Тип C · Лондон → NY (16:30–18:30 Рига)',
+  A: 'Тип A · Азия → Франкфурт/Лондон (10:00–14:00 UTC+3)',
+  C: 'Тип C · Лондон → NY (16:30–18:30 UTC+3)',
 };
 
 export const STATUS_EMOJI = {
