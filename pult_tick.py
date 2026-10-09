@@ -252,12 +252,12 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             rr_ = float(sig.get('rr') or 2)
             if out == 'T22':
                 xr = float(r.get('exit_r') or 0)
-                upd.append(f"\U0001F7E4 {s} ({r['direction']}) — закрыта в 22:00 UTC+3 "
+                upd.append(f"\U0001F7E4 {s} ({r['direction']}) — закрыта в 22:00 "
                            f"({xr:+.1f}% депозита)")
             elif out == 'BE':
-                upd.append(f"\U0001F7E4 {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} UTC+3 (0% депозита)")
+                upd.append(f"\U0001F7E4 {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} (0% депозита)")
             else:
-                upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} UTC+3 "
+                upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} "
                            f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
     if upd:
         total = 0.0
@@ -266,7 +266,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             total += result_of(res)[1]
         sign = '+' if total > 0 else ('-' if total < 0 else '')
         head = ("\U0001F4CA Итог сделок после отчёта дня · " + dstr + " (22:00 UTC+3)") if final else \
-               ("\U0001F514 Обновление по сделкам · " + dstr)
+               ("\U0001F514 Обновление по сделкам · " + dstr + " (UTC+3)")
         for u_ in upd: push('Сделка закрыта', u_[:140])
         tg(head + "\n\n" + "\n".join(upd)
            + f"\n\n\U0001F3AF Итог дня: {sign}{abs(total):.1f}% депозита")
@@ -318,7 +318,7 @@ def main(send=True):
         if first:
             nxt = ('C', '16:30') if (win == 'A' and lc.C_ENABLED) else (None, None)
             txt = build_window_open(dstr, win, '10:00–14:00' if win == 'A' else '16:30–18:30', lines_for(win, res), *nxt)
-            if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00 UTC+3."
+            if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00."
             tg(txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
         else:
             text = ('изменилось: ' + ', '.join(syms)) if syms else 'без изменений'
@@ -329,7 +329,7 @@ def main(send=True):
             try:
                 _hist_add(None, {'id': f"{today}_{r['sym']}_{win}", 'date': today, 'symbol': r['sym'], 'type': win,
                                  'side': sg.get('side'), 'entry': sg.get('entry'), 'stop': sg.get('stop'), 'target': sg.get('tp'),
-                                 'result': f"сигнал Пульта в {sg.get('time')} UTC+3"})
+                                 'result': f"сигнал Пульта в {sg.get('time')}"})
             except Exception as e:
                 print('history add failed:', e)
             tg(build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], 1.0,
@@ -359,7 +359,7 @@ def main(send=True):
                 n, pct = result_of(res)
                 lines = lines_for(w, res, closed=True) if res else []
                 txt = build_window_closed(dstr, w, rng, lines, nxt[0], nxt[1], trades=n, pct=pct, end_time=rng[-5:])
-                if w == 'C': txt += "\n\n⏰ Следующее — отчёт дня, 19:00 UTC+3."
+                if w == 'C': txt += "\n\n⏰ Следующее — отчёт дня, 19:00."
                 if n and pct == 0: txt += "\n(результат сделки не закрыт на момент отчёта)"
                 tg(txt); flags['close' + w] = True; did.append('close' + w)
                 text = text or f'окно {w} закрыто, отчёт отправлен'

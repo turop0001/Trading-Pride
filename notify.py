@@ -66,7 +66,7 @@ def build_window_open(date, window_label, window_range, lines, next_label=None, 
     body = "\n".join(lines)
     tail = ""
     if next_label and next_time:
-        tail = f"\n\n{E_NEXT} Следующее окно — тип {next_label} (NY), старт {next_time} UTC+3."
+        tail = f"\n\n{E_NEXT} Следующее окно — тип {next_label} (NY), старт {next_time}."
     return head + body + tail
 
 
@@ -77,14 +77,14 @@ def build_window_closed(date, window_label, window_range, lines, next_label=None
     sign = '+' if pct > 0 else ('-' if pct < 0 else '')
     head += f"{E_CHART} Итог окна {window_label}: {trades} сделок, {sign}{abs(pct):.1f}% депозита\n\n"
     if end_time:
-        head += f"{E_CLOCK} Окно {window_label} закрыто в {end_time} UTC+3.\n"
+        head += f"{E_CLOCK} Окно {window_label} закрыто в {end_time}.\n"
     if trades == 0:
         head += f"{E_DOT} Сделок по типу {window_label} сегодня не было\n"
         head += f"{E_DOT} все {len(lines)} инструментов закрылись скипом:\n\n"
     body = "\n".join(lines)
     tail = ""
     if next_label and next_time:
-        tail = f"\n\n{E_NEXT} Следующее окно — (тип {next_label}), старт ({next_time} UTC+3)."
+        tail = f"\n\n{E_NEXT} Следующее окно — (тип {next_label}), старт ({next_time})."
     return head + body + tail
 
 
