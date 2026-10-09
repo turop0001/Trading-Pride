@@ -126,7 +126,7 @@ def _trend_dyn_old(df, start=0, k=1.0, soft_on=None):
             te = ts + step   # время закрытия свечи слома
             te = te.tz_convert('Europe/Riga') if te.tzinfo else te.tz_localize('UTC').tz_convert('Europe/Riga')
             cl = float(df['Close'].values[bi]); fm = (lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v))
-            brk += ' · %s Рига, закрытие %s' % (te.strftime('%d.%m %H:%M'), fm(cl)) + (' (уровень %s)' % fm(lv) if lv is not None else '')
+            brk += ' · (%s)' % te.strftime('%d.%m %H:%M') + (' уровень %s' % fm(lv) if lv is not None else '')
         except Exception:
             pass
     dep, piv, flip = r['dep'], r['piv'], ''
@@ -262,7 +262,7 @@ def _trend_dyn(df, start=0, k=1.0, soft_on=None):
                 step = pd.Timedelta(minutes=60) if (len(df) > 1 and (df.index[1] - df.index[0]) >= pd.Timedelta(minutes=60)) else pd.Timedelta(minutes=15)
                 te = df.index[bi] + step
                 te = te.tz_convert('Europe/Riga') if te.tzinfo else te.tz_localize('UTC').tz_convert('Europe/Riga')
-                brk += ' · %s Рига, закрытие %s (уровень %s)' % (te.strftime('%d.%m %H:%M'), fm(float(df['Close'].values[bi])), fm(e['op']))
+                brk += ' · (%s) уровень %s' % (te.strftime('%d.%m %H:%M'), fm(e['op']))
             except Exception:
                 pass
         flip = ''
@@ -392,8 +392,19 @@ def struct_line(ctx, price, liq, fm):
         parts.append(base)
         if sw.get('flip'): parts.append('Swing %s: %s' % (arrow(tr), sw['flip']))
         if sb['tr'] == -tr or r > 0.1:
-            if r >= 0.7 or sw.get('deep'): parts.append('Откат 70%%+: слом близко, смотрим закрытие телом %s' % brk_lvl)
-            elif sb['tr'] == -tr: parts.append('Откат меньше 70%%: о сломе рано, слом = закрытие телом %s' % brk_lvl)
+            if r >= 0.7 or sw.get('deep'): parts.append('Swing: откат 70%%+, слом близко, смотрим закрытие телом %s' % brk_lvl)
+            elif sb['tr'] == -tr: parts.append('Swing: откат меньше 70%%, о сломе рано, слом = закрытие телом %s' % brk_lvl)
+        shi, slo, st = sb.get('hi'), sb.get('lo'), sb['tr']
+        if shi and slo and shi > slo and st != 0:
+            sr = ((price - slo) if st == -1 else (shi - price)) / (shi - slo)
+            if st == -1:
+                sbl = 'выше LH %s' % nf(shi)
+                parts.append(('Sub M15 ▼: откат %d%% вверх от LL %s к LH %s' % (round(sr*100), nf(slo), nf(shi))) if sr > 0.1 else ('Sub M15 ▼: импульс вниз, цена у LL %s' % nf(slo)))
+            else:
+                sbl = 'ниже HL %s' % nf(slo)
+                parts.append(('Sub M15 ▲: откат %d%% вниз от HH %s к HL %s' % (round(sr*100), nf(shi), nf(slo))) if sr > 0.1 else ('Sub M15 ▲: импульс вверх, цена у HH %s' % nf(shi)))
+            if sr > 0.1:
+                parts.append('Sub M15: ' + ('откат 70%%+, слом близко, смотрим закрытие телом %s' % sbl if sr >= 0.7 else 'откат меньше 70%%, о сломе рано, слом = закрытие телом %s' % sbl))
         for nm, t in (('Swing', sw), ('Sub M15', sb)):
             if t.get('brk'):
                 parts.append('CHoCH %s: %s' % (nm, t['brk'].replace('закрытие телом за', 'телом за')))
