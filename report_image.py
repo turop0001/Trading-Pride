@@ -131,11 +131,11 @@ def fit_caption(text, limit=1000):
     return t if len(t) <= limit else t[:limit - 1].rstrip() + '…'
 
 
-def send_report(text, data, name='report'):
+def send_report(text, data, name='report', caption=None):
     """Картинка + текст ОДНИМ сообщением. При любой неудаче — обычный текст (как раньше)."""
     try:
         png = os.path.join(tempfile.gettempdir(), f'{name}.png')
-        if render(data, png) and notify.send_telegram_photo(png, fit_caption(text)):
+        if render(data, png) and notify.send_telegram_photo(png, fit_caption(caption or text)):
             return True
     except Exception as e:
         print('report_image: фото не ушло:', e)

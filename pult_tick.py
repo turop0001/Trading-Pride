@@ -418,7 +418,8 @@ def main(send=True):
                 except Exception: items_ = []
                 if send:   # 08.10.2026: картинка + текст ОДНИМ сообщением (при сбое картинки — обычный текст, как раньше)
                     import report_image as _ri
-                    _ri.send_report(build_weekly(mon_, fri_, items_), _ri.week_data(mon_, fri_, items_), 'weekly')
+                    _wtxt = build_weekly(mon_, fri_, items_)   # 10.10.2026: в подписи только заголовок (две строки), остальное — на картинке; при сбое картинки уйдёт полный текст
+                    _ri.send_report(_wtxt, _ri.week_data(mon_, fri_, items_), 'weekly', caption='\n'.join(_wtxt.split('\n')[:2]))
                 else:
                     print('[no-send]')
                 state['_weekly'] = {'week': str(mon_), 'sent': t}

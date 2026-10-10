@@ -1,0 +1,24 @@
+name: Resend weekly report
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  resend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Get state
+        run: python -c "import state_sync; state_sync.pull()"
+      - name: Send weekly (картинка + подпись)
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_THREAD_ID: ${{ secrets.TG_THREAD_ID }}
+        run: python resend_weekly.py
