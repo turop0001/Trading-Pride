@@ -36,7 +36,7 @@ async function watchdog() {
   const g = (k) => (t.find((x) => x.type === k) || {}).value;
   if (['Sat', 'Sun'].includes(g('weekday'))) return 'off';
   const m = (+g('hour') % 24) * 60 + +g('minute');
-  if (!((m >= 590 && m <= 840) || (m >= 980 && m <= 1110))) return 'off';
+  if (!((m >= 590 && m <= 840) || (m >= 980 && m <= 1110) || (m >= 1310 && m <= 1335))) return 'off';   // + вечернее окно 21:50–22:15 (10.10.2026)
   const repo = process.env.GH_REPO || 'turop0001/Trading-Pride';
   const h = { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
   for (const st of ['in_progress', 'queued']) {

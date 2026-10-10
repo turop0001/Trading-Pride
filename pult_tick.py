@@ -406,15 +406,19 @@ def main(send=True):
     # ДОБАВЛЕНО 06.10.2026 (утверждено пользователем): недельный отчёт в Telegram — пятница 22:00 Рига, после итога сделок дня.
     # TP/SL, WR, итог в R и в % депозита (риск 1% на сделку), отдельно Тип A и Тип C. Данные — state/history.json.
     try:
-        if wd == 4 and 1320 <= m < 1440:
-            mon_ = riga.date() - dt.timedelta(days=4)
+        # 10.10.2026: запас на случай пропуска GitHub-расписания в 22:00 (09.10 за час не было ни одного запуска): недельный отчёт
+        # догоняется в сб/вс и в пн до 12:00 Рига, если за прошедшую неделю он ещё не отправлен
+        _wk_due = (wd == 4 and m >= 1320) or wd in (5, 6) or (wd == 0 and m < 720)
+        if _wk_due:
+            mon_ = riga.date() - dt.timedelta(days=(wd if wd != 0 else 7))
+            fri_ = mon_ + dt.timedelta(days=4)
             if (state.get('_weekly') or {}).get('week') != str(mon_):
                 hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
                 try: items_ = json.load(open(hp, encoding='utf-8'))
                 except Exception: items_ = []
                 if send:   # 08.10.2026: картинка + текст ОДНИМ сообщением (при сбое картинки — обычный текст, как раньше)
                     import report_image as _ri
-                    _ri.send_report(build_weekly(mon_, riga.date(), items_), _ri.week_data(mon_, riga.date(), items_), 'weekly')
+                    _ri.send_report(build_weekly(mon_, fri_, items_), _ri.week_data(mon_, fri_, items_), 'weekly')
                 else:
                     print('[no-send]')
                 state['_weekly'] = {'week': str(mon_), 'sent': t}
