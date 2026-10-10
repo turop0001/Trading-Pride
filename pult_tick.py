@@ -111,6 +111,11 @@ def analyze_window(state, window, today):
         if prev.get('shots'):
             r['shots'] = prev['shots']
         elif r.get('signal') and any(x in (r.get('note') or '') for x in ('→ TP', '→ SL', '→ БУ')):
+            try:   # 11.10.2026: запись для вкладки «Аналитика сделок» (последние 10 по A и C)
+                import analytics_gen as _ag
+                _ag.add_closed(sym, window, r, lc.riga_now()[1], today)
+            except Exception as e:
+                print('analytics failed:', sym, e)
             try:
                 import shots as _sh
                 sh = _sh.make_shots(sym, window, r, lc.riga_now()[1], today)
@@ -236,6 +241,11 @@ def final_check(state, today, dstr, off, tg, did, final=True):
                 if tr.get(k_) is not None: r[k_] = tr[k_]
             r['line_status'] = 'skip' if out == 'SL' else 'entry'
             r['status_key'] = r['note']
+            try:   # 11.10.2026: финал дня — запись аналитики перезаписывается полным днём
+                import analytics_gen as _ag
+                _ag.add_closed(s, w, r, off, today, force=True)
+            except Exception as e:
+                print('final analytics failed:', s, e)
             try:
                 import shots as _sh
                 sh = _sh.make_shots(s, w, r, off, today)
