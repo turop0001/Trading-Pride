@@ -233,5 +233,16 @@
       "m5": "state/shots/2026-10-08_EURUSD_C_m5.png",
       "h1": "state/shots/2026-10-08_EURUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-12_XAUUSD_A",
+    "date": "2026-10-12",
+    "symbol": "XAUUSD",
+    "type": "A",
+    "side": "long",
+    "entry": 4176.54,
+    "stop": 4172.08,
+    "target": 4185.46,
+    "result": "сигнал Пульта в 12:05"
   }
 ]
