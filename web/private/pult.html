@@ -160,6 +160,7 @@ details.pxc{border:1px solid var(--border);border-radius:10px;background:var(--s
 .acts{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:12px}
 .acts .btn,.acts select{font-size:15px;padding:8px 14px}
 #repNote{font-size:17px;line-height:1.55;color:var(--text)}
+#repNote:empty{display:none}
 #repTitle{font-size:16px}
 .closeBox{display:none;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--surface-2)}
 .closeBox.open{display:block}
@@ -805,7 +806,7 @@ function renderLive(m){
   var t=el('span',m.text==='без изменений'?null:'chg',m.text||'');ln.appendChild(t);
   ln.appendChild(el('small',null,'обновляется каждую минуту в окнах A/C'));
   var mt=el('small',null,'MT5: проверяю…');mt.id='mt5St';ln.appendChild(mt);mt5Check();
-  $('repNote').textContent=(today?'Окно '+m.window+' — проверено в '+m.time+': ':'Последняя проверка '+m.date+' '+m.time+': ')+(m.text||'');
+  $('repNote').textContent=''; /* дубль строки liveLine сверху убран 12.10.2026 */
   var lg=$('liveLog');lg.innerHTML='';
   (m.log||[]).slice().reverse().forEach(function(r){var d=el('div');d.appendChild(el('b',null,r.time));var sp=el('span',r.text==='без изменений'?null:'chg','окно '+r.window+' — '+r.text);d.appendChild(sp);lg.appendChild(d);});
 }
