@@ -57,3 +57,24 @@
 .acx .empty{padding:18px;border:1px dashed var(--a-line);border-radius:8px;color:var(--a-muted);text-align:center}
 .acx.mini .card{padding:10px}
 .acx .cards{display:flex;flex-direction:column;gap:22px}
+
+/* 12.10.2026: графики в карточке маленькие, по клику открываются крупно (крестик/Esc/фон закрывают) */
+.acx .card>.ctl{display:none}
+.acx .pv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.acx .pvc{min-width:0;display:flex;flex-direction:column;gap:6px}
+.acx .pzoom{cursor:zoom-in;border:1px solid var(--a-line);border-radius:6px;overflow:hidden}
+.acx .pzoom:hover{border-color:var(--a-entry)}
+.acx .pv svg{min-width:0}
+.acx .pv .scr{overflow:hidden}
+.acx .pv .tip{display:none}
+.acx .pvh{font-size:.76rem}
+@media (max-width:760px){.acx .pv{grid-template-columns:1fr}}
+.acx .ov{position:fixed;inset:0;z-index:1000;background:rgba(10,14,20,.66);display:flex;align-items:flex-start;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));overflow:auto}
+.acx .ovb{background:var(--a-panel);border:1px solid var(--a-line);border-radius:10px;width:100%;max-width:1500px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.acx .ovh{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--a-line);position:sticky;top:0;background:var(--a-panel);border-radius:10px 10px 0 0;z-index:2}
+.acx .ovx{font:inherit;font-size:1.7rem;line-height:1;width:44px;height:44px;border-radius:8px;border:1px solid var(--a-line);background:var(--a-bg);color:var(--a-fg);cursor:pointer}
+.acx .ovx:hover{border-color:var(--a-sl);color:var(--a-sl)}
+.acx .ovc{padding:12px 14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.acx .ovc .scr{overflow-x:auto}
+.acx .ovc svg{min-width:900px}
+.acx .ovc .tip{display:block}.acx .ovc .tip[hidden]{display:none}

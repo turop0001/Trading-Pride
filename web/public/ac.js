@@ -125,6 +125,24 @@ function drawM5(el,c,st){
   el.querySelectorAll('[data-z]').forEach(function(b){b.onclick=function(){st.z=b.dataset.z;drawM5(el,c,st)}});
 }
 
+
+// крупный просмотр графика поверх страницы: закрытие крестиком, Esc или кликом по фону
+function openBig(el,c,kind,opts){
+  var host=el.closest('.acx')||document.body,old=host.querySelector('.ov');if(old)old.remove();
+  var ov=document.createElement('div');ov.className='ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
+  var title=c.typ+(c.k||'')+' · '+c.sym+' · '+fd(c.day)+' · '+(kind==='m5'?'M5':'H1 за 7 суток');
+  ov.innerHTML='<div class="ovb"><div class="ovh"><b>'+title+'</b><button type="button" class="ovx" aria-label="Закрыть">×</button></div><div class="ovc"></div></div>';
+  var body=ov.querySelector('.ovc');
+  if(kind==='m5'){body.innerHTML='<div class="ctl"></div><div class="chart"></div>';drawM5(body,c,{z:'trade',ci:'v'+(++uid)})}
+  else{body.innerHTML=h1chart(c)}
+  function close(){ov.remove();document.removeEventListener('keydown',key)}
+  function key(e){if(e.key==='Escape')close()}
+  ov.addEventListener('click',function(e){if(e.target===ov)close()});
+  ov.querySelector('.ovx').addEventListener('click',close);
+  document.addEventListener('keydown',key);
+  host.appendChild(ov);
+}
+
 // api комментариев: {load:()=>Promise<{id:{text,at}}>, save:(id,text)=>Promise}; без api блок комментария не рисуется
 function cardEl(c,opts){
   opts=opts||{};var sd=c.side==='long'?1:-1,risk=Math.abs(c.entry-c.stop),ci='u'+(++uid);
@@ -132,10 +150,14 @@ function cardEl(c,opts){
   var hasH1=c.h1&&c.h1.length>=5;
   el.innerHTML='<div class="hd"><span class="t">'+(opts.title||(c.typ+(c.k||'')+'. '+c.sym))+'</span><span class="muted">'+fd(c.day)+'</span><span class="pill '+(sd==1?'long':'short')+'">'+(sd==1?'LONG':'SHORT')+'</span><span class="res '+(c.res==='TP'?'win':c.res==='SL'?'loss':c.res==='BE'?'be':'')+'">'+RT(c)+'</span>'+(c.rk!=null?'<span class="res" style="font-weight:700">стоп '+Number(c.rk).toFixed(2).replace('.',',')+' ATR</span>':'')+'</div>'
    +'<div class="info"><span class="e">вход '+c.tin+' по '+px(c.entry,c.sym)+'</span> · <span class="s">стоп '+px(c.stop,c.sym)+'</span> (риск '+px(risk,c.sym)+')'+(c.be!=null?' · БУ-порог '+px(c.be,c.sym):'')+' · <span class="t">цель '+c.rr+'R '+px(c.tp,c.sym)+'</span> · выход '+c.xt+'</div>'
-   +'<div class="ctl"></div><div class="chart"></div>'
-   +(hasH1?'<div class="sub">H1 за 7 суток до входа: зоны FVG и неснятая ликвидность</div>'+h1chart(c):'')
+   +'<div class="ctl"></div><div class="pv"><div class="pvc"><div class="sub">M5: вход и выход</div><div class="chart pzoom" title="Нажмите, чтобы увеличить"></div></div>'
+   +(hasH1?'<div class="pvc"><div class="sub">H1 за 7 суток до входа: зоны FVG и неснятая ликвидность</div><div class="pzoom h1w" title="Нажмите, чтобы увеличить">'+h1chart(c)+'</div></div>':'')+'</div>'
+   +'<div class="muted pvh">Нажмите на график, чтобы открыть крупно</div>'
    +(opts.api?'<div class="cm"><label for="cm'+ci+'">Комментарий к сделке '+c.typ+(c.k||'')+'</label><textarea id="cm'+ci+'" placeholder="Что видно: вход, стоп, цель, что бы вы изменили"></textarea><div class="cms" id="cs'+ci+'"></div></div>':'');
   if(c.bars.length>5)drawM5(el,c,{z:opts.zoom||'trade',ci:ci});else{el.querySelector('.chart').innerHTML='<div class="empty">Нет свечей M5 для графика</div>'}
+  var zc=el.querySelector('.chart'),zh=el.querySelector('.h1w');
+  if(c.bars.length>5&&zc)zc.addEventListener('click',function(){openBig(el,c,'m5',opts)});
+  if(zh)zh.addEventListener('click',function(){openBig(el,c,'h1',opts)});
   if(opts.api){var ta=el.querySelector('#cm'+ci),stt=el.querySelector('#cs'+ci),cid=c.typ+'_'+c.sym+'_'+c.day,t=null,dirty=false;
     opts.api.load().then(function(map){var v=map&&map[cid];if(v&&typeof v.text==='string'&&!dirty)ta.value=v.text}).catch(function(){stt.textContent='Комментарии пока не загрузились'});
     ta.addEventListener('input',function(){dirty=true;stt.textContent='Сохраняю…';clearTimeout(t);t=setTimeout(function(){opts.api.save(cid,ta.value,{sym:c.sym,day:c.day,n:c.k,typ:c.typ}).then(function(){dirty=false;stt.textContent='Сохранено'}).catch(function(){stt.textContent='Не удалось сохранить'})},700)});}
