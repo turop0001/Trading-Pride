@@ -146,10 +146,15 @@ function openBig(el,c,kind,opts){
 // api комментариев: {load:()=>Promise<{id:{text,at}}>, save:(id,text)=>Promise}; без api блок комментария не рисуется
 function cardEl(c,opts){
   opts=opts||{};var sd=c.side==='long'?1:-1,risk=Math.abs(c.entry-c.stop),ci='u'+(++uid);
+  /* размер стопа в ATR: у Типа C ATR записан в сделке (rk); у Типа A стоп = экстремум выноса ∓ 0,3 ATR, поэтому ATR = |стоп − экстремум| / 0,3 */
+  var rkAtr=(c.rk!=null&&isFinite(c.rk))?+c.rk:(c.typ==='A'&&c.ext!=null&&Math.abs(c.stop-c.ext)>0?risk/(Math.abs(c.stop-c.ext)/0.3):null);
+  /* запасной путь (в записи нет экстремума выноса): средний диапазон 14 свечей M5 перед входом, как у Типа C */
+  if(rkAtr==null&&c.bars&&c.bars.length>1){var bi=-1;for(var q=0;q<c.bars.length;q++){if(c.bars[q][4]===c.tin){bi=q;break}}
+    if(bi>0){var sg=c.bars.slice(Math.max(0,bi-14),bi),sm=0;sg.forEach(function(x){sm+=x[1]-x[2]});var av=sm/sg.length;if(av>0)rkAtr=risk/av}}
   var el=document.createElement('article');el.className='card';el.id=opts.id||('card'+ci);
   var hasH1=c.h1&&c.h1.length>=5;
   el.innerHTML='<div class="hd"><span class="t">'+(opts.title||(c.typ+(c.k||'')+'. '+c.sym))+'</span><span class="muted">'+fd(c.day)+'</span><span class="pill '+(sd==1?'long':'short')+'">'+(sd==1?'LONG':'SHORT')+'</span><span class="res '+(c.res==='TP'?'win':c.res==='SL'?'loss':c.res==='BE'?'be':'')+'">'+RT(c)+'</span>'+(c.rk!=null?'<span class="res" style="font-weight:700">стоп '+Number(c.rk).toFixed(2).replace('.',',')+' ATR</span>':'')+'</div>'
-   +'<div class="info"><span class="e">вход '+c.tin+' по '+px(c.entry,c.sym)+'</span> · <span class="s">стоп '+px(c.stop,c.sym)+'</span> (риск '+px(risk,c.sym)+')'+(c.be!=null?' · БУ-порог '+px(c.be,c.sym):'')+' · <span class="t">цель '+c.rr+'R '+px(c.tp,c.sym)+'</span> · выход '+c.xt+'</div>'
+   +'<div class="info"><span class="e">вход '+c.tin+' по '+px(c.entry,c.sym)+'</span> · <span class="s">стоп '+px(c.stop,c.sym)+'</span>'+(rkAtr!=null?' (стоп '+rkAtr.toFixed(2)+' ATR)':'')+(c.be!=null?' · БУ-порог '+px(c.be,c.sym):'')+' · <span class="t">цель '+c.rr+'R '+px(c.tp,c.sym)+'</span> · выход '+c.xt+'</div>'
    +'<div class="ctl"></div><div class="pv"><div class="pvc"><div class="sub">M5: вход и выход</div><div class="chart pzoom" title="Нажмите, чтобы увеличить"></div></div>'
    +(hasH1?'<div class="pvc"><div class="sub">H1 за 7 суток до входа: зоны FVG и неснятая ликвидность</div><div class="pzoom h1w" title="Нажмите, чтобы увеличить">'+h1chart(c)+'</div></div>':'')+'</div>'
    +'<div class="muted pvh">Нажмите на график, чтобы открыть крупно</div>'
