@@ -23,6 +23,9 @@ details.pxc{border:1px solid var(--border);border-radius:10px;background:var(--s
 
 
 <title>Сигналы дня</title>
+<link rel="stylesheet" href="/ac.css">
+<style>.acph{display:block;width:100%;max-width:100%;min-width:0;font-weight:400;color:inherit;cursor:default}.rgrid>b{min-width:0}.jshots .acph{margin-top:2px}#tab-acad .acx{font-family:inherit}#acMsg{font-size:13px;color:var(--muted);margin:6px 0}</style>
+<script src="/ac.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
@@ -403,6 +406,7 @@ function renderRep(){
     if(r.be_armed&&r.signal&&!(isTP||isSL||isBE))c.rows.push(['Сейчас','<span class="stchip be">Цена дошла до БУ — переноси стоп на вход</span>']);
     c._sig=r.signal||null;c._e=(r.signal&&!(isTP||isSL||isBE))?0:(x.status==='prep'&&!(isTP||isSL||isBE))?1:(x.status==='watch'&&!(isTP||isSL||isBE))?2:3;
     var shotsHtml=null;if(r.shots&&(r.shots.m5||r.shots.h1)){shotsHtml='<a class="shots">'+['m5','h1'].filter(function(k){return r.shots[k];}).map(function(k){var u=RAWB+r.shots[k];return '<span class="shotw" data-u="'+u+'"><img src="'+u+'" alt="'+k+'"><small>'+(k==='m5'?'M5 · день входа':'H1 · 5 дней')+'</small></span>';}).join('')+'</a>';}
+    if(window.acShot&&(r.signal||isTP||isSL||isBE||shotsHtml)){shotsHtml=window.acShot(x.date,x.sym,x.window,shotsHtml?shotsHtml.replace('<a class="shots">','<span class="shots">').replace(/<\/a>$/,'</span>'):'','row');}
     if(shotsHtml)c.rows.push(['Графики сделки',shotsHtml]);
     c._w=x.window;c._s=x.sym;return c;
   }
@@ -509,5 +513,26 @@ function renderRep(){
   z.addEventListener('click',function(){z.classList.remove('open');});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')z.classList.remove('open');});
   document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('.shotw');if(t){e.preventDefault();z.querySelector('img').src=t.getAttribute('data-u');z.classList.add('open');}});})();
+</script>
+<script>
+/* Графики сделок как в личном Пульте (12.10.2026): данные /api/analytics (чтение открыто), отрисовка ac.js */
+(function(){
+var AN=null,ANt=0,ANp=null;
+function loadAN(force){if(!force&&AN&&Date.now()-ANt<60000)return Promise.resolve(AN);if(ANp)return ANp;
+  ANp=fetch('/api/analytics',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){AN={A:j.A||[],C:j.C||[],err:j.error||null};ANt=Date.now();ANp=null;return AN;}).catch(function(){ANp=null;AN=AN||{A:[],C:[],err:'нет связи'};return AN;});
+  return ANp;}
+function nm(x){return String(x||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function find(an,d,s,t){var l=(t==='A'?an.A:t==='C'?an.C:[]);for(var i=0;i<l.length;i++){if(l[i].day===d&&nm(l[i].sym)===nm(s))return l[i];}return null;}
+function esc(v){return String(v==null?'':v).replace(/[&<>"]/g,'');}
+window.acShot=function(date,sym,typ,fb,rm){return '<a class="shots acph" data-d="'+esc(date)+'" data-s="'+esc(sym)+'" data-t="'+esc(typ)+'" data-rm="'+(rm||'row')+'">'+(fb||'')+'</a>';};
+function hyd(){var ph=document.querySelectorAll('.acph:not([data-ok])');if(!ph.length||!window.AC)return;
+  var arr=[].slice.call(ph);arr.forEach(function(n){n.setAttribute('data-ok','1');});
+  loadAN(false).then(function(an){arr.forEach(function(n){if(!n.isConnected)return;
+    var rec=find(an,n.getAttribute('data-d'),n.getAttribute('data-s'),n.getAttribute('data-t'));
+    if(rec){try{window.AC.chartInto(n,JSON.parse(JSON.stringify(rec)),{title:rec.typ+' · '+rec.sym});n.classList.remove('shots');if(n.getAttribute('data-rm')==='row'){var pb=n.parentNode,lb=pb&&pb.previousElementSibling;if(pb&&lb&&lb.tagName==='SPAN'&&/Графики сделки/.test(lb.textContent)){lb.style.display='none';pb.style.gridColumn='1 / -1';}}}catch(e){}}
+    else if(!n.firstElementChild){var p=n.parentNode;if(!p)return;if(n.getAttribute('data-rm')==='box'){p.parentNode&&p.parentNode.removeChild(p);}else{var lab=p.previousElementSibling;p.parentNode&&p.parentNode.removeChild(p);if(lab&&lab.tagName==='SPAN'&&/Графики сделки/.test(lab.textContent))lab.parentNode.removeChild(lab);}}
+  });});}
+var ht=null;new MutationObserver(function(){clearTimeout(ht);ht=setTimeout(hyd,40);}).observe(document.body,{childList:true,subtree:true});
+})();
 </script>
 </body></html>

@@ -1,11 +1,10 @@
 // Аналитика сделок: последние 10 сделок Типа A и Типа C (state/analytics.json в ветке state; до первого тика — копия в main).
 // GET, ключ PULT_KEY. Пишет файл робот (analytics_gen.py), сайт только читает.
 import { readBig } from '../../lib/gh';
-import { keyOk } from '../../lib/auth';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  if (!keyOk(req)) { res.status(401).json({ error: 'нет доступа (PULT_KEY)' }); return; }
+  // Чтение открыто (12.10.2026): страница друга показывает те же графики сделок, что и личный Пульт. Запись только у робота.
   try {
     let { data, missingRef } = await readBig('state/analytics.json', null, 'state');
     if (!data || missingRef) ({ data } = await readBig('state/analytics.json', { A: [], C: [] }));
