@@ -297,5 +297,27 @@
       "m5": "state/shots/2026-10-12_NAS100_A_m5.png",
       "h1": "state/shots/2026-10-12_NAS100_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-12_EURUSD_C",
+    "date": "2026-10-12",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 1.11737,
+    "stop": 1.11723,
+    "target": 1.1178,
+    "result": "сигнал Пульта в 17:05"
+  },
+  {
+    "id": "2026-10-12_GBPUSD_C",
+    "date": "2026-10-12",
+    "symbol": "GBPUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 1.3228,
+    "stop": 1.3226,
+    "target": 1.32339,
+    "result": "сигнал Пульта в 17:05"
   }
 ]
