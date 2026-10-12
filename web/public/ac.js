@@ -128,7 +128,7 @@ function drawM5(el,c,st){
 
 // крупный просмотр графика поверх страницы: закрытие крестиком, Esc или кликом по фону
 function openBig(el,c,kind,opts){
-  var host=el.closest('.acx')||document.body,old=host.querySelector('.ov');if(old)old.remove();
+  var host=document.getElementById('acOvHost');if(!host){host=document.createElement('div');host.id='acOvHost';host.className='acx';document.body.appendChild(host)}var old=host.querySelector('.ov');if(old)old.remove(); /* 12.10: окно живёт в body, поэтому минутное обновление карточек его не закрывает */
   var ov=document.createElement('div');ov.className='ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
   var title=c.typ+(c.k||'')+' · '+c.sym+' · '+fd(c.day)+' · '+(kind==='m5'?'M5':'H1 за 7 суток');
   ov.innerHTML='<div class="ovb"><div class="ovh"><b>'+title+'</b><button type="button" class="ovx" aria-label="Закрыть">×</button></div><div class="ovc"></div></div>';
