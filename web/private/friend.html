@@ -57,6 +57,7 @@ h2{font-size:16px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 @media (max-width:1100px){.g3{grid-template-columns:1fr 1fr}}
 @media (max-width:760px){.g3,.g2{grid-template-columns:1fr}}
+@media (max-width:560px){.chead{flex-wrap:wrap;row-gap:8px}.chead h3{font-size:20px}.chead .st{margin-left:0;font-size:15px;padding:5px 12px;max-width:100%;white-space:normal}.card,.rgrid>*{min-width:0}.rgrid,.rgrid span{overflow-wrap:anywhere}.pxp{max-width:100%}html,body{overflow-x:hidden}}
 .note{font-size:16px;color:var(--muted)}
 .pos{color:var(--long)}.neg{color:var(--short)}
 /* checklist */
@@ -66,7 +67,6 @@ h2{font-size:16px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted
 .btn{font-family:var(--sans);font-size:16px;font-weight:600;padding:7px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer}
 .btn.primary{background:#1d7a4c;border-color:#1d7a4c;color:#fff;font-weight:700}
 :root[data-theme="dark"] .btn.primary{background:#3fb579;border-color:#3fb579;color:#06170e}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{background:#3fb579;border-color:#3fb579;color:#06170e}}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm{font-size:15px;padding:5px 10px}
 .shots{display:flex;gap:10px;flex-wrap:wrap}.shotw{display:flex;flex-direction:column;gap:4px;cursor:zoom-in}.shotw img{width:210px;max-width:100%;border:1px solid var(--border);border-radius:8px;display:block}.shotw small{font-size:12px;color:var(--muted)}
@@ -131,7 +131,6 @@ tr.tot td{font-weight:700;background:var(--surface-2)} tr.cur td{background:var(
 .st.skip{background:var(--off-bg);color:var(--off)}.st.watch{background:var(--side-bg);color:var(--side)}.st.prep{background:#e3ecfb;color:#2f5f9e;border:1px solid #2f5f9e}.st.signal{background:var(--long-bg);color:var(--long)}
 .st.prep{background:var(--blue-bg);color:var(--blue);border:1px solid transparent}
 :root[data-theme="dark"] .st.prep{background:var(--blue-bg);color:var(--blue);border-color:transparent}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .st.prep{background:var(--blue-bg);color:var(--blue);border-color:transparent}}
 .liveBar{display:flex;flex-direction:column;gap:6px;padding:12px 16px}
 .liveBar .ln{font-size:17px;font-weight:600}.liveBar .ln small{font-weight:400;color:var(--muted);margin-left:8px}
 .liveBar details summary{cursor:pointer;color:var(--muted);font-size:15px}
