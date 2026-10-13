@@ -359,5 +359,16 @@
       "m5": "state/shots/2026-10-13_US500_A_m5.png",
       "h1": "state/shots/2026-10-13_US500_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-13_EURUSD_C",
+    "date": "2026-10-13",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 1.1203,
+    "stop": 1.12045,
+    "target": 1.11984,
+    "result": "сигнал Пульта в 16:35"
   }
 ]
