@@ -389,5 +389,16 @@
       "m5": "state/shots/2026-10-13_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-10-13_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-13_XAUUSD_C",
+    "date": "2026-10-13",
+    "symbol": "XAUUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 4174.32,
+    "stop": 4172.58,
+    "target": 4179.53,
+    "result": "сигнал Пульта в 16:55"
   }
 ]
