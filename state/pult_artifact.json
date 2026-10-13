@@ -10,9 +10,9 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4172.81,
-   "boxH": 4191.89,
-   "boxL": 4171.07,
+   "price": 4173.84,
+   "boxH": 4193.95,
+   "boxL": 4173.0,
    "prevH": null,
    "prevL": null,
    "signal": null,
@@ -40,9 +40,9 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
-   "price": 1.11957,
-   "boxH": 1.12045,
-   "boxL": 1.11782,
+   "price": 1.11933,
+   "boxH": 1.12017,
+   "boxL": 1.11751,
    "prevH": null,
    "prevL": null,
    "signal": {
@@ -103,11 +103,11 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (16:35, 1.32533)",
+   "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
-   "price": 1.32442,
-   "boxH": 1.32538,
-   "boxL": 1.32321,
+   "price": 1.3244,
+   "boxH": 1.32549,
+   "boxL": 1.32309,
    "prevH": null,
    "prevL": null,
    "signal": {
@@ -169,13 +169,6 @@
     "GBPUSD"
    ],
    "log": [
-    {
-     "date": "2026-10-13",
-     "time": "16:39",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-13",
      "time": "16:39",
@@ -452,6 +445,16 @@
      "lines": [
       "🟢 EURUSD (🔻 SHORT) — ЗАКРЫТА - TP в 16:45",
       "🟢 GBPUSD (🔻 SHORT) — ВХОД в 16:35"
+     ]
+    },
+    {
+     "date": "2026-10-13",
+     "time": "16:52",
+     "window": "C",
+     "text": "изменилось: EURUSD, GBPUSD",
+     "lines": [
+      "🟢 EURUSD (🔻 SHORT) — ЗАКРЫТА - TP в 16:40",
+      "🟢 GBPUSD (🔻 SHORT) — ЗАКРЫТА - TP в 16:40"
      ]
     }
    ]
