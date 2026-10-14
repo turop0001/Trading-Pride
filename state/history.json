@@ -462,6 +462,10 @@
     "entry": 1.11152,
     "stop": 1.11129,
     "target": 1.11221,
-    "result": "сигнал Пульта в 18:10"
+    "result": "ВХОД → БУ 0R (стоп в безубытке после 51% пути)",
+    "shots": {
+      "m5": "state/shots/2026-10-14_EURUSD_C_m5.png",
+      "h1": "state/shots/2026-10-14_EURUSD_C_h1.png"
+    }
   }
 ]
