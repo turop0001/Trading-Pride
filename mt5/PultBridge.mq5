@@ -46,7 +46,7 @@ input string MapUS30   = "US30";
 input string MapGER40  = "DE40";
 
 CTrade trade;
-datetime lastFeed=0, lastFull=0, lastPoll=0;
+datetime lastFeed=0, lastFull=0, lastPoll=0, lastBar=0;
 string NAMES[7] = {"EURUSD","GBPUSD","XAUUSD","US500","NAS100","US30","GER40"};
 
 string BrokerSym(const string s)
@@ -65,7 +65,7 @@ int OnInit()
    bool demo = AccountInfoInteger(ACCOUNT_TRADE_MODE)==ACCOUNT_TRADE_MODE_DEMO;
    Print("PultBridge: счёт ", AccountInfoInteger(ACCOUNT_LOGIN), demo?" (ДЕМО)":" (РЕАЛЬНЫЙ)",
          TradeEnabled?", торговля ВКЛ":", только журнал");
-   EventSetTimer(5);
+   EventSetTimer(1);
    OnTimer();
    return INIT_SUCCEEDED;
 }
@@ -216,7 +216,12 @@ void SendFeed()
 {
    if(!FeedEnabled || FeedKey=="") return;
    datetime now=TimeLocal();
-   if(now-lastFeed<FeedNow()) return;
+   // 14.10.2026: при открытии нового M5-бара сразу шлём финальные значения только что закрытого бара
+   // (иначе бокс/вынос считались по «недозакрытой» свече → ложный сигнал типа C)
+   datetime bar0=iTime(BrokerSym("EURUSD"),PERIOD_M5,0);
+   bool newBar=(bar0!=0 && bar0!=lastBar);
+   if(!newBar && now-lastFeed<FeedNow()) return;
+   if(bar0!=0) lastBar=bar0;
    bool full=(now-lastFull>=3600);          // раз в час — полная история, иначе последние бары
    int off=(int)MathRound((double)(TimeTradeServer()-TimeGMT())/900.0)*900;
    string body="FEED1\n";
