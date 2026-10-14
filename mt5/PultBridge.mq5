@@ -20,19 +20,21 @@ input string FeedURL         = "https://trading-pride-three.vercel.app/api/feed"
 input string FeedKey         = "";      // ключ личного пульта (последняя часть адреса /p/...)
 input bool   FeedEnabled     = true;    // слать свечи брокера в Пульт
 input int    FeedSec         = 60;
-input int    FastFeedSec     = 20;      // в окнах A/C (UTC 06:30–11:30 и 13:00–16:00) свечи шлём чаще
+input int    FastFeedSec     = 3;      // в окнах A/C (UTC 06:30–11:30 и 13:00–16:00) свечи шлём чаще
 input bool   PendEnabled     = true;    // Тип C: stop-ордер на уровне 20% после выноса (нужен TradeEnabled=true)
 input bool   LimitOnMissA    = false;   // Тип A: НЕ входить на откате (по решению 08.10.2026 пропущенный вход отменяется); оставлено выключенным
 input bool   MoveToBE        = true;    // Тип C: стоп в безубыток на 50% пути к цели
 input bool   TradeEnabled    = false;   // false = только журнал, без сделок
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
 input double RiskPercent     = 1.0;     // риск на сделку, % баланса
-input int    PollSec         = 10;
+input int    PollSec         = 3;
 input int    MaxSignalAgeMin = 10;      // сигнал старше — пропуск
-input double MaxDriftOfStop  = 0.30;    // цена ушла от входа больше доли стопа — пропуск
-input int    MaxEntriesDay   = 3;
-input int    StopAfterLosses = 2;
-input bool   OneIdeaPerGroup = true;
+input double MaxDriftOfStop  = 0.50;    // цена ушла от входа больше доли стопа — пропуск
+input int    MaxEntriesDay   = 0;       // 0 = без лимита входов в день
+input int    StopAfterLosses = 0;       // 0 = без остановки после стопов
+input bool   OneIdeaPerGroup = false;   // false = любые инструменты одновременно, в т.ч. в одну сторону
+input double MaxLots         = 5.0;     // потолок лота на сделку (защита от 10019)
+input double MarginUsePct    = 90.0;    // лот режется, чтобы маржа не превышала этот % свободной
 input long   MagicNumber     = 770077;
 input int    DeviationPts    = 30;
 input string MapEURUSD = "EURUSD";
@@ -278,6 +280,20 @@ void OnTimer()
       }
 }
 
+double CapLots(const string sym,const bool isBuy,double lots,const double price)
+{
+   double step=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP), vmin=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN);
+   if(step<=0) step=0.01;
+   lots=MathMin(lots,MaxLots);
+   double m=0;
+   if(OrderCalcMargin(isBuy?ORDER_TYPE_BUY:ORDER_TYPE_SELL,sym,1.0,price,m) && m>0)
+   {
+      double maxByMargin=AccountInfoDouble(ACCOUNT_MARGIN_FREE)*MarginUsePct/100.0/m;
+      lots=MathMin(lots,maxByMargin);
+   }
+   lots=MathFloor(lots/step)*step;
+   return (lots<vmin)?0:lots;
+}
 double LotsFor(const string sym,const bool isBuy,const double price,const double sl)
 {
    double loss=0;
@@ -286,7 +302,7 @@ double LotsFor(const string sym,const bool isBuy,const double price,const double
    double step=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP), vmin=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN), vmax=SymbolInfoDouble(sym,SYMBOL_VOLUME_MAX);
    double lots=MathFloor(riskMoney/MathAbs(loss)/step)*step;
    if(lots<vmin) return 0;
-   return MathMin(lots,vmax);
+   return CapLots(sym,isBuy,MathMin(lots,vmax),price);
 }
 
 void PlaceLimitA(const string gv,const string id,const string sym,const bool isBuy,const double ref,const double dSL,const double dTP,const datetime endUtc)
@@ -332,7 +348,7 @@ void HandleWait(const string idw,const string psym,const string side,const doubl
    else
    {
       int entries,losses; TodayStats(entries,losses);
-      if(entries>=MaxEntriesDay || losses>=StopAfterLosses) return;
+      if((MaxEntriesDay>0 && entries>=MaxEntriesDay) || (StopAfterLosses>0 && losses>=StopAfterLosses)) return;
       if(OneIdeaPerGroup && GroupBusy(GroupOf(psym),isBuy)) return;
    }
    double lots=LotsFor(sym,isBuy,pe,ps);
@@ -371,8 +387,8 @@ void Process(const string id,const string psym,const string side,const datetime 
    if(dSL<=0) { Done(gv,""); return; }
 
    int entries,losses; TodayStats(entries,losses);
-   if(entries>=MaxEntriesDay)  { Done(gv,id+" пропуск: уже "+(string)entries+" входа сегодня"); return; }
-   if(losses>=StopAfterLosses) { Done(gv,id+" пропуск: уже "+(string)losses+" стопа сегодня"); return; }
+   if(MaxEntriesDay>0 && entries>=MaxEntriesDay)  { Done(gv,id+" пропуск: уже "+(string)entries+" входа сегодня"); return; }
+   if(StopAfterLosses>0 && losses>=StopAfterLosses) { Done(gv,id+" пропуск: уже "+(string)losses+" стопа сегодня"); return; }
    if(OneIdeaPerGroup && GroupBusy(GroupOf(psym),isBuy)) { Done(gv,id+" пропуск: в группе уже есть позиция в ту же сторону"); return; }
 
    // цена входа у брокера = открытие M5-свечи сигнала
@@ -400,7 +416,8 @@ void Process(const string id,const string psym,const string side,const datetime 
    double step=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP), vmin=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN), vmax=SymbolInfoDouble(sym,SYMBOL_VOLUME_MAX);
    double lots=MathFloor(riskMoney/MathAbs(loss)/step)*step;
    if(lots<vmin) { Done(gv,id+" пропуск: лот меньше минимального"); return; }
-   lots=MathMin(lots,vmax);
+   lots=CapLots(sym,isBuy,MathMin(lots,vmax),(isBuy?SymbolInfoDouble(sym,SYMBOL_ASK):SymbolInfoDouble(sym,SYMBOL_BID)));
+   if(lots<=0) { Done(gv,id+" пропуск: лот не влезает в маржу"); return; }
 
    PrintFormat("%s: %s %s лот %.2f вход~%s SL %s TP %s риск %.2f",id,isBuy?"BUY":"SELL",sym,lots,
                DoubleToString(price,dg),DoubleToString(sl,dg),DoubleToString(tk,dg),riskMoney);
