@@ -452,5 +452,16 @@
       "m5": "state/shots/2026-10-14_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-10-14_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-14_EURUSD_C",
+    "date": "2026-10-14",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 1.11152,
+    "stop": 1.11129,
+    "target": 1.11221,
+    "result": "сигнал Пульта в 18:10"
   }
 ]
