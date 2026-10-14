@@ -421,5 +421,16 @@
       "m5": "state/shots/2026-10-14_US30_A_m5.png",
       "h1": "state/shots/2026-10-14_US30_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-14_EURUSD_A",
+    "date": "2026-10-14",
+    "symbol": "EURUSD",
+    "type": "A",
+    "side": "long",
+    "entry": 1.11955,
+    "stop": 1.11928,
+    "target": 1.12009,
+    "result": "сигнал Пульта в 12:20"
   }
 ]
