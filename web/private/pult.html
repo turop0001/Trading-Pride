@@ -250,13 +250,13 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
             <div class="field"><label for="cHalf">Сигнал</label><select id="cHalf"><option value="1">Обычный</option><option value="0.5">½ риска</option></select></div>
           </div>
           <div class="field"><label for="cSym">Инструмент</label><select id="cSym">
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-px="1.1374">EUR/USD</option>
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-px="1.3225">GBP/USD</option>
-            <option data-cs-fp="100" data-cs-ftmo="100" data-px="4276.6">GOLD</option>
-            <option data-cs-fp="50" data-cs-ftmo="1" data-px="7694">US 500</option>
-            <option data-cs-fp="20" data-cs-ftmo="1" data-px="30355">US 100</option>
-            <option data-cs-fp="25" data-cs-ftmo="1" data-px="25490">GER 40</option>
-            <option data-cs-fp="5" data-cs-ftmo="1" data-px="53690">US 30</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="EURUSD" data-px="1.1374">EUR/USD</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="GBPUSD" data-px="1.3225">GBP/USD</option>
+            <option data-cs-fp="100" data-cs-ftmo="100" data-sym="XAUUSD" data-px="4276.6">GOLD</option>
+            <option data-cs-fp="50" data-cs-ftmo="1" data-sym="US500" data-px="7694">US 500</option>
+            <option data-cs-fp="20" data-cs-ftmo="1" data-sym="NAS100" data-px="30355">US 100</option>
+            <option data-cs-fp="25" data-cs-ftmo="1" data-sym="GER40" data-px="25490">GER 40</option>
+            <option data-cs-fp="5" data-cs-ftmo="1" data-sym="US30" data-px="53690">US 30</option>
           </select></div>
           <div class="row2"><div class="field"><label for="cStopP">Стоп в красной зоне TradingView, %</label><input id="cStopP" type="number" step="0.005" placeholder="0.100"></div><div class="field"><label for="cPx">Цена инструмента сейчас</label><input id="cPx" type="number" step="any"></div></div><p class="note" id="cK" style="margin:-4px 0 10px"></p>
           <div class="out">
@@ -663,6 +663,8 @@ function calc(){
   $('oVol').innerHTML='<b>'+(risk/cur).toFixed(2)+'</b><small>стоп '+cur+'</small>';var lot=Math.floor(risk/cur*k*100)/100;$('oLot').innerHTML='<b style="font-size:22px;color:var(--accent)">'+lot.toFixed(2)+'</b><small>$'+fm(lot*cs*px*q)+'</small>';$('oMrg').innerHTML='<b>$'+fm(lot*cs*px*q/100)+'</b>';
 }
 try{var cs=JSON.parse(store('p_calc')||'null');if(cs){$('cDep').value=cs.d;$('cRisk').value=cs.r;$('cSym').selectedIndex=cs.s;if(cs.p)$('cProp').value=cs.p;}}catch(e){}
+/* цены калькулятора: еженедельно обновляются Vercel Cron (/api/prices) */
+try{fetch('/api/prices').then(function(r){return r.json();}).then(function(j){if(!j||!j.px)return;Array.prototype.forEach.call($('cSym').options,function(o){var v=j.px[o.dataset.sym];if(v>0)o.dataset.px=v;});calc();}).catch(function(){});}catch(e){}
 $('cSym').addEventListener('change',function(){$('cPx').value='';});['cProp','cDep','cRisk','cSym','cHalf','cStopP','cPx'].forEach(function(k){$(k).addEventListener('input',calc);$(k).addEventListener('change',calc);});
 
 function pcalc(){
