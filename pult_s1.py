@@ -11,14 +11,15 @@ import numpy as np
 import pandas as pd
 
 ASIA = (180, 600)      # 03:00–10:00 Рига
-WIN = (600, 840)       # окно входа 10:00–14:00 Рига
+WIN = (600, 780)       # 16.10.2026: окно входа 10:00–13:00 Рига (свеча входа должна открыться до 13:00; раньше 14:00)
 END_M = 1320           # 22:00 Рига — закрытие сделки
 BUF = 0.3              # буфер стопа, ATR(M5, 14)
 RR = 2.0               # цель, R (с 01.10.2026: 1:2)
 VBARS = 7              # 07.10.2026: V-разворот — не позже 7 значимых свечей после экстремума
 DOJI = 0.25            # доджи: тело <=25% диапазона, в счёт свечей V-разворота не идут
 FVWIN = 5               # 08.10.2026: окно поиска M5 FVG выноса — последние 5 свечей выноса
-MINSW = 0.5            # 07.10.2026: минимальный вынос за границу Азии, в ATR(M5, 14)
+MINSW = 0.5            # 07.10.2026: минимальный вынос за границу Азии, в ATR(M5, 14) — порог для поиска кандидата входа
+MINSIG = 1.93          # 16.10.2026: п.5 — вынос к моменту сигнала не меньше 1,93 ATR(M5, 14); если сигнал сложился при меньшем выносе — СКИП дня (дальше не ищем). 5 лет: WR 54,3→65,0%, просадка 7→5R, серия SL 7→5, ΣR 696→369
 SWTRG = 1.5            # 08.10.2026: вынос ≤1,5 ATR → триггер входа = ≥2 сильных свечи выкупа (откат 30% не используется); больше 1,5 ATR — как раньше (≥3 сильных ИЛИ откат ≥30%)
 STRONG_SMALL = 2
 
@@ -96,7 +97,7 @@ def analyze_day(d, today, off, sd, h1=None):
     out['chain_now'] = chain_at(n - 1)[1]
     start = ext = ge = None; nsw = 0
     for g in wi:
-        if rm[g] + 5 >= WIN[1]: break          # следующая свеча (вход) должна начаться до 14:00
+        if rm[g] + 5 >= WIN[1]: break          # следующая свеча (вход) должна начаться до 13:00
         if start is None:
             if L[g] < aL: start = g; ext = L[g]; ge = g; nsw = 1
             continue
@@ -128,7 +129,7 @@ def analyze_day(d, today, off, sd, h1=None):
         if f2 and f4 and f7:   # цепочка H1 как правило убрана 01.10.2026 (структура — только контекст)
             e = O[g + 1] if g + 1 < n else None
             out['cand'] = dict(g=int(g), ge=int(ge), start=int(start), ext_f=float(ext), atr=float(atr[g]), nbars=int(nbars), sw_atr=float((aL - ext) / atr[g]),
-                               strong=strong, ret=float(ret), nsw=nsw, chain=chn, t_g=d.index[g])
+                               strong=strong, ret=float(ret), nsw=nsw, chain=chn, t_g=d.index[g], small=bool((aL - ext) / atr[g] < MINSIG))
             out['start'] = start
             return out
     out['start'] = start

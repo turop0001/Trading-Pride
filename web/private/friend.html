@@ -209,7 +209,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 "use strict";
 function $(id){return document.getElementById(id);}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
-var ASIA='03:00–10:00',LON='11:00–16:25',WA='10:00–14:00',WC='16:30–18:30';
+var ASIA='03:00–10:00',LON='11:00–16:25',WA='10:00–13:00',WC='16:30–18:30';
 function setWin(t,type,cls,pill){$('win').textContent=t;var b=$('wbadge');b.textContent=type?'Тип '+type:'';b.className='tbadge '+(type||'');b.style.display=type?'':'none';var p=$('pill');p.className='pill '+cls;p.textContent=pill;}
 
 function tick(){
@@ -218,7 +218,7 @@ function tick(){
   var o={};f.formatToParts(n).forEach(function(p){o[p.type]=p.value;});$('clk').textContent=o.hour+':'+o.minute+':'+o.second;
   var m=parseInt(o.hour,10)*60+parseInt(o.minute,10); // минуты по Риге
   if(['Sat','Sun'].indexOf(o.weekday)>=0){setWin('выходной','', 'off','Рынок закрыт');return;}
-  if(m>=600&&m<840)setWin('до 14:00','A','on','Окно открыто');
+  if(m>=600&&m<780)setWin('до 13:00','A','on','Окно открыто');
   else if(m>=990&&m<=1110)setWin('до 18:30','C','on','Окно открыто');
   else if(m<600)setWin('с 10:00','A','warn','Ждём окно');
   else if(m<990)setWin('с 16:30','C','warn','Ждём окно');
@@ -237,19 +237,19 @@ function rigaMinutesNow(){
     var o={};f.formatToParts(new Date()).forEach(function(p){o[p.type]=p.value;});return parseInt(o.hour,10)*60+parseInt(o.minute,10);}
   catch(e){return 0;}
 }
-function winRank(w){var cFirst=rigaMinutesNow()>=840;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
+function winRank(w){var cFirst=rigaMinutesNow()>=780;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
 var CK={
  A:{title:'Тип A',when:WA+' UTC+3',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40)','правило одно для всех 7; по тесту сильнее всех индексы США.'],
   ['base','Азия вышла за вчерашний бокс только с одной стороны — есть сторона сделки','лонг: хай Азии выше вчерашнего, а лой не ниже; шорт — зеркально.'],
-  ['base','Противоположная сторона Азии ещё не снята первой — ни тенью, ни телом (лонг: хай Азии, шорт: лой)','если до нужного выноса в окне 10:00–14:00 снята противоположная сторона бокса — скип дня по инструменту (тест 5 лет: такие входы WR 40% против 50%).'],
-  ['base','Вынос границы Азии тенью в окне 10:00–14:00 в сторону сделки','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая Азии. Экстремум выноса — самая дальняя точка.'],
-  ['base','Вынос за границу Азии не меньше 0,5 ATR(M5, 14)','расстояние от границы Азии до экстремума выноса. Меньше — откат 30% от такого выноса считается шумом, входа нет (с 07.10.2026).'],
+  ['base','Противоположная сторона Азии ещё не снята первой — ни тенью, ни телом (лонг: хай Азии, шорт: лой)','если до нужного выноса в окне 10:00–13:00 снята противоположная сторона бокса — скип дня по инструменту (тест 5 лет: такие входы WR 40% против 50%).'],
+  ['base','Вынос границы Азии тенью в окне 10:00–13:00 в сторону сделки','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая Азии. Экстремум выноса — самая дальняя точка.'],
+  ['base','Вынос за границу Азии к моменту сигнала не меньше 1,93 ATR(M5, 14)','меньше — скип дня по инструменту (с 16.10.2026). Было: не меньше 0,5 ATR (с 07.10.2026); тест 5 лет: WR 54,3% → 65,0%, просадка 7R → 5R.'],
   ['base','V-разворот: свеча входа не позже 7 значимых свечей M5 после экстремума выноса (доджи не считаются)','доджи — свеча с телом ≤25% диапазона. Затяжной разворот (больше 7 значимых свечей) не берём.'],
   ['base','M5 FVG выноса (в последних 5 свечах выноса) перекрыт закрытиями (или его нет)','пока закрытие свечи выкупа не вышло за дальнюю границу FVG — входа нет.'],
-  ['base','Триггер входа есть: если вынос ≤1,5 ATR(M5, 14) — ≥2 сильные свечи выкупа (тело ≥60% диапазона), откат 30% здесь не работает; если вынос больше 1,5 ATR — как раньше: ≥3 сильные свечи ИЛИ откат ≥30% пути от экстремума к границе Азии','вход по открытию следующей свечи после триггера.'],
+  ['base','Триггер входа: ≥3 сильные свечи выкупа (тело ≥60% диапазона) ИЛИ откат ≥30% пути от экстремума к границе Азии','вход по открытию следующей свечи после триггера. Было (08.10.2026): вынос ≤1,5 ATR — ≥2 сильные свечи, откат не работал; вынос больше 1,5 ATR — ≥3 сильные ИЛИ откат ≥30%. Теперь выносы ≤1,5 ATR отсекает п.5.'],
   ['base','Параметры сделки заданы: стоп = экстремум выноса − 0,3 ATR(M5, 14), цель 2R, закрытие не позже 22:00','стоп не переносим; не дошли ни до цели, ни до стопа — закрываем по рынку в 22:00.'],
-  ['skip','Вынос и вход случились до 14:00','свеча входа должна открыться до 14:00.'],
+  ['skip','Вынос и вход случились до 13:00','свеча входа должна открыться до 13:00 (с 16.10.2026). Было: до 14:00.'],
   ['skip','Внутри цели 1:2 нет встречного H1 FVG','встречный непробитый H1 FVG между входом и целью 2R — скип.'],
   ['skip','Это первый вход по инструменту за день','после SL/TP повторного входа нет.'],
   ['plus','Батут: под лоем Азии (для шорта — над хаем) лежит нетронутый H1 FVG в сторону сделки','цена, снявшая лой, отталкивается от FVG; ищем ближе 50% длины Азии (параметр уточнён мной).'],
@@ -392,14 +392,14 @@ function renderRep(){
   function narHtml(h,d){var a=trDir(h),b=trDir(d),tot=(a&&a===b&&a!=='side')?a:(a||b?'side':null);
     return '<span class="nar">'+narChip('H1 · 7 дн',h)+narChip('D1 · 14 дн',d)+(tot?'<span class="narI"><small>итог</small> <span class="nchip big '+tot+'">'+(tot==='long'?'LONG':tot==='short'?'SHORT':'50/50')+'</span></span>':'')+'</span>';}
   var RAWB='https://raw.githubusercontent.com/turop0001/Trading-Pride/state/';
-  /* Тип A: 06.10.2026 добавлен обязательный №3, 07.10.2026 — №5 (вынос ≥0,5 ATR). Старые записи (ckv 1/2) переводим в нумерацию 1–16 */
+  /* Тип A: 06.10.2026 добавлен обязательный №3, 07.10.2026 — №5 (вынос ≥0,5 ATR, с 16.10 ≥1,93). Старые записи (ckv 1/2) переводим в нумерацию 1–16 */
   function ckm(k,r,a){if(!a||(r.window||k.split('_')[1])!=='A')return a;var v=r.ckv||1;if(v>=3)return a;return a.map(function(n){if(v<2&&n>=3)n++;if(n>=5)n++;return n;});}
   function toLive(k,r){
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:ckm(k,r,r.ck),ckf:ckm(k,r,r.ckf),fx:r.fx,
       struct:r.struct,cfv:r.cfv,pos:r.pos,prob:r.prob,plus:ckm(k,r,r.plus),worse:ckm(k,r,r.worse),why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
-    var wcl=x.window==='A'?840:1110;
-    if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'14:00':'18:30')+')';x.ckf=[];}
+    var wcl=x.window==='A'?780:1110;
+    if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'13:00':'18:30')+')';x.ckf=[];}
     var c=liveCard(x);
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||''),isBE=/→ БУ/.test(x.note||'');
     if(isTP||isSL||isBE){c.res=isTP?'TP':isBE?'BE':'SL';c.stT=isTP?'Закрыта · TP':isBE?'Закрыта · БУ':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':isBE?'be':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}

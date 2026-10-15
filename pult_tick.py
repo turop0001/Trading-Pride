@@ -3,7 +3,7 @@
 аккаунта) — запускается по cron каждые 5 минут в торговые окна (см. .github/workflows/tick.yml).
   10:00 — отчёт открытия окна A (build_window_open), далее каждые 5 мин проверка по полным правилам
           (pult_rules.analyze) — «Обновление» в Telegram только при изменении статуса, сигнал ВХОД;
-  14:00 — отчёт закрытия окна A; 16:30 — открытие окна C; 18:30 — закрытие C; 19:00 — итог дня.
+  13:00 — отчёт закрытия окна A; 16:30 — открытие окна C; 18:30 — закрытие C; 19:00 — итог дня.
   Каждый тик обновляет данные Пульта (файлы state/pult_docs/*.json — читает Vercel-дашборд,
   раньше шло в db claude.ai-артефакта, теперь дашборд независим от Claude):
   строка «проверено в HH:MM — без изменений / изменилось: …» и карточки инструментов.
@@ -18,7 +18,7 @@ import live_check as lc
 from notify import (send_telegram, fmt_line, build_window_open, build_window_closed,
                     build_update, build_signal, build_daily_summary, build_weekly)
 
-EVENTS = [(600, 'openA'), (840, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary'), (1320, 'final')]
+EVENTS = [(600, 'openA'), (780, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary'), (1320, 'final')]
 ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40']
 
 
@@ -36,8 +36,8 @@ def push(title, body, tag=None, sticky=False):
 
 def next_wake(riga, flags=None):
     m = mins(riga); wd = riga.weekday(); flags = flags or {}
-    if wd < 5 and 600 <= m < 840:
-        return max(1, 840 - m) if flags.get('allskipA') else 5
+    if wd < 5 and 600 <= m < 780:
+        return max(1, 780 - m) if flags.get('allskipA') else 5
     if wd < 5 and 990 <= m < 1110:
         return max(1, 1110 - m) if flags.get('allskipC') else 5
     if wd < 5:
@@ -327,7 +327,7 @@ def main(send=True):
             state[f'{s}_{win}'] = r
         if first:
             nxt = ('C', '16:30') if (win == 'A' and lc.C_ENABLED) else (None, None)
-            txt = build_window_open(dstr, win, '10:00–14:00' if win == 'A' else '16:30–18:30', lines_for(win, res), *nxt)
+            txt = build_window_open(dstr, win, '10:00–13:00' if win == 'A' else '16:30–18:30', lines_for(win, res), *nxt)
             if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00."
             tg(txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
         else:
@@ -357,7 +357,7 @@ def main(send=True):
             flags['allskip' + window] = True
             text = (text + '; ' if text and text != 'без изменений' else '') + 'все инструменты — СКИП, ждём закрытия окна'
     if wd < 5:
-        for w, close_m, rng, nxt in (('A', 840, '10:00–14:00', ('C', '16:30') if lc.C_ENABLED else (None, None)), ('C', 1110, '16:30–18:30', (None, None))):
+        for w, close_m, rng, nxt in (('A', 780, '10:00–13:00', ('C', '16:30') if lc.C_ENABLED else (None, None)), ('C', 1110, '16:30–18:30', (None, None))):
             if m >= close_m and flags.get('open' + w) and not flags.get('close' + w):
                 # окно закрыто: НАБЛЮДАЕМ/ВЫНОС без сделки → СКИП (в state, чтобы карточки на сайте не висели)
                 for s_ in syms_of(w):

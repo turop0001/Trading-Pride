@@ -60,7 +60,7 @@ import numpy as np
 import pandas as pd
 
 BOX = {'A': (180, 600), 'C': (660, 985)}      # минуты Риги: Азия 03:00-10:00, Лондон 11:00-16:25
-WIN = {'A': (600, 840), 'C': (990, 1110)}     # окна входа 10:00-14:00, 16:30-18:30
+WIN = {'A': (600, 780), 'C': (990, 1110)}     # окна входа 10:00-13:00 (с 16.10.2026, было до 14:00), 16:30-18:30
 DEC = {'XAUUSD': 2, 'EURUSD': 5, 'GBPUSD': 5, 'US500': 1, 'NAS100': 1, 'US30': 0, 'GER40': 1}
 
 
@@ -710,7 +710,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
 
     # №3 (06.10.2026, обязательный): противоположная сторона бокса Азии (хай для лонга, лой для шорта) не снята раньше нужного выноса —
     # ни тенью, ни телом, в окне 10:00–14:00. Если снята первой — СКИП дня по инструменту (тест 5 лет: 161 сделка отсеяна, WR 40%).
-    _wi = np.flatnonzero((d['rdate'].values == today) & (d['rmin'].values >= 600) & (d['rmin'].values < 840))
+    _wi = np.flatnonzero((d['rdate'].values == today) & (d['rmin'].values >= 600) & (d['rmin'].values < 780))
     _need = _oth = None
     for _g in _wi:
         _hn = (d['Low'].values[_g] < boxL) if sd == 1 else (d['High'].values[_g] > boxH)
@@ -726,9 +726,9 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     res['ck'] = sorted(set(res['ck'] + [3]))
     r = S1.analyze_day(d, today, off, sd, h1)
     if r['start'] is None:
-        if nowm >= 840:
-            res['ckf'] = [10]; res['reasons'] = ['вынос не случился до 14:00']; _why(res, 'Скип: вынос не случился до 14:00', [10])
-            return _out(res, 'skip', dirc, 'СКИП (вынос не случился до 14:00)')
+        if nowm >= 780:
+            res['ckf'] = [10]; res['reasons'] = ['вынос не случился до 13:00']; _why(res, 'Скип: вынос не случился до 13:00', [10])
+            return _out(res, 'skip', dirc, 'СКИП (вынос не случился до 13:00)')
         return _out(res, 'watch', dirc, 'НАБЛЮДАЕМ')
     sweep_t = (d.index[r['start']] + pd.Timedelta(hours=off)).strftime('%H:%M')
     res['ck'] = sorted(set(res['ck'] + [4]))
@@ -738,19 +738,24 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         res['extreme'] = round(sd * (r['last_ext_f'] if r.get('last_ext_f') is not None else 0), dec)
         _sa = r.get('last_sw_atr')
         if _sa is not None:
-            if _sa >= S1.MINSW:
-                res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSW:g} ATR', [5])
+            if _sa >= S1.MINSIG:
+                res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSIG:g} ATR', [5])
             else:
-                _why(res, f'Вынос пока {_sa:.2f} ATR — меньше {S1.MINSW:g} ATR: откат от такого выноса — шум, ждём углубления', [5])
-        if nowm >= 840:
-            res['ckf'] = [10]; res['reasons'] = ['вход не случился до 14:00']; _why(res, 'Скип: условия входа не выполнены до 14:00', [10])
-            return _out(res, 'skip', dirc, 'СКИП (вход не случился до 14:00)')
+                _why(res, f'Вынос пока {_sa:.2f} ATR — меньше {S1.MINSIG:g} ATR: к моменту сигнала нужен вынос ≥{S1.MINSIG:g} ATR, иначе скип дня', [5])
+        if nowm >= 780:
+            res['ckf'] = [10]; res['reasons'] = ['вход не случился до 13:00']; _why(res, 'Скип: условия входа не выполнены до 13:00', [10])
+            return _out(res, 'skip', dirc, 'СКИП (вход не случился до 13:00)')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} в {sweep_t}, ждём вход)')
     g = c['g']
     ext = sd * c['ext_f']
     res['extreme'] = round(ext, dec)
+    if c.get('small'):   # 16.10.2026, п.5: сигнал сложился при выносе < MINSIG ATR — скип дня по инструменту
+        res['ckf'] = [5]; res['ck'] = sorted(set(res['ck'] + [6, 7, 8]))
+        t = f'вынос {c.get("sw_atr", 0):.2f} ATR к моменту сигнала — меньше {S1.MINSIG:g} ATR'
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
+        return _out(res, 'skip', dirc, f'СКИП (вынос {c.get("sw_atr", 0):.2f} ATR < {S1.MINSIG:g} ATR)')
     res['ck'] = sorted(set(res['ck'] + [5, 6, 7, 8]))
-    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR (≥{S1.MINSW:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа ({"≥2 сильных свечи (вынос ≤1,5 ATR)" if c.get("sw_atr", 0) <= S1.SWTRG else "≥3 сильных или откат ≥30% (вынос больше 1,5 ATR)"})', [5, 6, 7, 8])
+    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR (≥{S1.MINSIG:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7, 8])
     if g + 1 >= len(d):
         # предварительная проверка №11 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
         e0 = float(d['Close'].iloc[-1]); s0 = ext - sd * S1.BUF * c['atr']; R0 = (e0 - s0) * sd

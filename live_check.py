@@ -86,7 +86,7 @@ C_ENABLED = True    # 01.10.2026: Тип C снова включён (новые
 
 def window_now(riga_dt):
     mins = riga_dt.hour * 60 + riga_dt.minute
-    if 600 <= mins < 840: return 'A'   # 10:00-14:00
+    if 600 <= mins < 780: return 'A'   # 10:00-13:00 (с 16.10.2026)
     if C_ENABLED and 990 <= mins < 1110: return 'C'  # 16:30-18:30
     return None
 
@@ -352,7 +352,7 @@ ARTIFACT_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state'
 # ДОБАВЛЕНО 28.09.2026 (вечер): окно закрылось, входов не было = СКИП — то же правило, что
 # пользователь попросил для Telegram (см. pult_tick._tg), теперь и для карточек артефакта
 # (раньше карточки «Отчёта дня» после закрытия окна продолжали показывать НАБЛЮДАЕМ/ВЫНОС).
-WINCLOSE = {'A': 840, 'C': 1110}
+WINCLOSE = {'A': 780, 'C': 1110}
 
 
 def _fold_closed(r, window, riga_dt):
