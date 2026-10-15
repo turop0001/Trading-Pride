@@ -582,8 +582,11 @@ def _hdr(res, d, h1, now_utc, off, today, price, boxH, boxL, fm, end_m):
     ctx = X.build(d, h1, now_utc, off, today, price, _completed, lambda x: _resample(x, '1h'))
     liq = X.liquidity(ctx['h1c'], d, today, off, price)
     sw, sb = ctx['swing'], ctx['sub']
-    res['struct'] = dict(swing=f"{X._arrow(sw['tr'])} {sw['txt']}" + (f" ({sw['brk']})" if sw.get('brk') else ''),
-                         sub=f"{X._arrow(sb['tr'])} {sb['txt']}", rec=ctx['rec'], conf=ctx['conf'], score=ctx['score'],
+    _dd = ctx.get('dir') or {}
+    _ds, _db = _dd.get('swing'), _dd.get('sub')
+    _swt = '◆ боковик' if (_ds is not None and _ds['v'] == 'SIDE') else f"{X._arrow(sw['tr'])} {sw['txt']}" + (f" ({sw['brk']})" if sw.get('brk') else '')
+    _sbt = '◆ боковик' if (_db is not None and _db['v'] == 'SIDE') else f"{X._arrow(sb['tr'])} {sb['txt']}"
+    res['struct'] = dict(swing=_swt, sub=_sbt, rec=ctx['rec'], conf=ctx['conf'], score=ctx['score'],
                          line=X.struct_line(ctx, price, liq, fm))
     res['pos'] = X.box_pos(d, today, price, boxH, boxL, end_m)
     return ctx, liq
@@ -615,6 +618,14 @@ def _amps_A(res, ctx, liq, sd, boxH, boxL, win_start_utc):
         sidew = [x for x in liq if x['kind'] == 'hi' and 0 < x['p'] - boxH <= 0.3 * rngA]
     if path: plus.append(14); notes.append(f'ликвидность на пути в пределах 30% Азии: {path[0]["name"]} {path[0]["p"]:.5g}')
     if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(15); notes.append('сторона по тренду (структура Swing+Sub)')
+    # 15.10.2026 ухудшитель №17: H1 FVG ПРОТИВ сделки внутри Азии или в пределах 30% её хая/лоя, не пробитый и УЖЕ тестированный ценой до окна входа
+    #   (для шорта — бычий FVG, для лонга — медвежий): цена показала желание идти в его сторону, вход идёт против этого движения
+    for f in F1:
+        if f['dir'] != -sd or f['inv_t'] is not None or f['t'] >= win_start_utc: continue
+        if f['touch_t'] is None or f['touch_t'] >= win_start_utc: continue
+        if f['hi'] >= boxL - 0.3 * rngA and f['lo'] <= boxH + 0.3 * rngA:
+            worse.append(17); notes.append(f'ухудшитель: тестированный встречный H1 FVG у Азии ({f["lo"]:.5g}–{f["hi"]:.5g}) — цена уже отталкивалась от него')
+            break
     if sidew: worse.append(16); notes.append(f'ухудшитель: несобранная ликвидность у стороны выноса в пределах 30% Азии: {sidew[0]["name"]} {sidew[0]["p"]:.5g}')
     return plus, worse, notes, F1
 
@@ -629,7 +640,7 @@ def _prob_set(res, plus, worse, typ='A'):
 def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     """Тип A (S1, правка 01.10.2026): без цепочки H1, цель 2R, встречный H1 FVG внутри 1:2 = СКИП,
     усилители (батут, ликвидность на пути ≤30% Азии, по тренду) и ухудшитель (ликвидность у стороны выноса).
-    Нумерация пунктов — вкладка «Чек-лист» Типа A: основные 1–9 (№3 — противоположная сторона бокса Азии не снята раньше нужного выноса; №5 — вынос ≥0,5 ATR M5, с 07.10.2026; №6 — V-разворот ≤7 значимых свечей), условия входа 10–12, усилители 13–15, ухудшитель 16."""
+    Нумерация пунктов — вкладка «Чек-лист» Типа A: основные 1–9 (№3 — противоположная сторона бокса Азии не снята раньше нужного выноса; №5 — вынос ≥0,5 ATR M5, с 07.10.2026; №6 — V-разворот ≤7 значимых свечей), условия входа 10–12, усилители 13–15, ухудшители 16 и 17."""
     import pult_s1 as S1
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
@@ -1001,7 +1012,7 @@ def _prob_set_C(res, F1, atr1, sd, ext, plus):
     for f in F1:
         if f['dir'] == sd and f['inv_t'] is None and f['lo'] - tol <= ext_r <= f['hi'] + tol:
             plus.append(11); _why(res, f'батут: H1 FVG {f["lo"]:.5g}–{f["hi"]:.5g}, от него пошёл выкуп', [11]); break
-    if 12 in plus: _why(res, 'по тренду (структура Swing H1 + Sub M15 совпадает со стороной входа)', [12])
+    if 12 in plus: _why(res, 'по тренду (структура Swing H1 + Sub M5 совпадает со стороной входа)', [12])
     res['ck'] = sorted(set(res['ck'] + plus))
     _prob_set(res, plus, [], 'C')
 

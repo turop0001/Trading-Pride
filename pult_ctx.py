@@ -259,7 +259,7 @@ def _trend_dyn(df, start=0, k=1.0, soft_on=None):
             e = real[-1]; bi = e['i']
             brk = 'слом вниз (закрытие телом за HL)' if e['nm'].endswith('↓') else 'слом вверх (закрытие телом за LH)'
             try:
-                step = pd.Timedelta(minutes=60) if (len(df) > 1 and (df.index[1] - df.index[0]) >= pd.Timedelta(minutes=60)) else pd.Timedelta(minutes=15)
+                step = (df.index[1] - df.index[0]) if len(df) > 1 else pd.Timedelta(minutes=15)
                 te = df.index[bi] + step
                 te = te.tz_convert('Europe/Riga') if te.tzinfo else te.tz_localize('UTC').tz_convert('Europe/Riga')
                 brk += ' · (%s) уровень %s' % (te.strftime('%d.%m %H:%M'), fm(e['op']))
@@ -277,6 +277,92 @@ def _trend_dyn(df, start=0, k=1.0, soft_on=None):
         return dict(tr=tr, txt=txt, hi=hi, lo=lo, brk=brk, dep=dep, deep=dep > MAXPB, piv=piv, flip=flip)
     except Exception:
         return _trend_dyn_old(df, start, k, soft_on)
+
+
+
+# ---------- 15.10.2026: направление LONG / SHORT / БОКОВИК, откат и его состояние, Sub на M5 ----------
+def _merge_pv(r):
+    """Точки структуры без «подвисших»: подряд идущие одноимённые сливаются в экстремальную."""
+    pv = []
+    for p in r['pts']:
+        if p[3]: continue
+        i, px, k = p[0], float(p[1]), p[2]
+        if pv and pv[-1][2] == k:
+            if (k == 'H' and px > pv[-1][1]) or (k == 'L' and px < pv[-1][1]): pv[-1] = (i, px, k)
+        else:
+            pv.append((i, px, k))
+    return pv
+
+
+def _retr_state(p):
+    return ('у экстремума' if p < 0.10 else 'слабый' if p < 0.30 else 'обычный 30–50%' if p < 0.50
+            else 'глубокий 50–70%' if p < 0.70 else 'съел импульс, слом близко' if p < 0.995 else 'начало импульса пройдено')
+
+
+def _dir_analyze(df, r):
+    """Хвост трендовых точек, смещение окна, последний импульс (top → ext по телам). side: +1 / −1 / 0."""
+    pv = _merge_pv(r)
+    O, H, L, C = (df[c].values.astype(float) for c in ('Open', 'High', 'Low', 'Close'))
+    lab = []; prev = {'H': None, 'L': None}
+    for i, px, k in pv:
+        q = prev[k]
+        lab.append(None if q is None else (('HH' if px > q else 'LH') if k == 'H' else ('HL' if px > q else 'LL')))
+        prev[k] = px
+    up, dn = ('HH', 'HL'), ('LH', 'LL')
+    last = lab[-1] if lab else None
+    side = 1 if last in up else (-1 if last in dn else 0)
+    tail = 0
+    for l in reversed(lab):
+        if l and l in (up if side == 1 else dn): tail += 1
+        else: break
+    disp = (C[-1] - O[0]) / (H.max() - L.min()) if H.max() > L.min() else 0.0
+    if side == 0: side = r['tr']
+    top = ext = None; pct = 0.0
+    hs = [p for p in pv if p[2] == 'H']; ls = [p for p in pv if p[2] == 'L']
+    body_hi = np.maximum(O, C); body_lo = np.minimum(O, C)
+    if side == -1 and hs:
+        ih, top = hs[-1][0], hs[-1][1]; ext = float(body_lo[ih:].min())
+        pct = (C[-1] - ext) / (top - ext) if top > ext else 0.0
+    elif side == 1 and ls:
+        il, top = ls[-1][0], ls[-1][1]; ext = float(body_hi[il:].max())
+        pct = (ext - C[-1]) / (ext - top) if ext > top else 0.0
+    return dict(pv=pv, lab=lab, side=side, tail=tail, disp=float(disp), top=top, ext=ext, pct=max(0.0, min(1.0, float(pct))))
+
+
+def _dir_verdict(df, r, A, need_bos):
+    """Пять условий тренда (для Sub без условия про BOS ≤72 ч). Возвращает (LONG|SHORT|SIDE, причины боковика)."""
+    side = A['side']; why = []
+    if A['tail'] < 4: why.append('точек по тренду %d из 4' % A['tail'])
+    if A['disp'] * side < 0.5:
+        why.append('смещение %+d%% %s' % (round(A['disp'] * 100), 'против структуры' if A['disp'] * side < 0 else '(<50% размаха)'))
+    if r.get('pend') is not None: why.append('активен кандидат слома (CHoCH)')
+    if A['pct'] >= 0.70: why.append('откат %d%% съел импульс' % round(A['pct'] * 100))
+    if need_bos:
+        t_end = df.index[-1]
+        nb = sum(1 for e in r['ev'] if e['nm'].startswith('BOS') and not e['fake'] and df.index[e['i']] >= t_end - pd.Timedelta(hours=72))
+        if nb == 0: why.append('нет BOS по тренду за 72 ч')
+    return ('SIDE' if why else ('LONG' if side == 1 else 'SHORT')), why
+
+
+def _dir_ctx(h1w, m5):
+    """Swing (H1, 7 дн) → направление; Sub = структура M5 внутри последней завершённой ноги Swing (между двумя последними точками H1)."""
+    out = dict(swing=None, sub=None, sub_df=None)
+    r = _struct2(h1w, 1.0)
+    if r is None: return out
+    A = _dir_analyze(h1w, r); v, why = _dir_verdict(h1w, r, A, True)
+    out['swing'] = dict(v=v, why=why, A=A)
+    pv = A['pv']
+    if len(pv) >= 2:
+        t0, t1 = h1w.index[min(pv[-2][0], len(h1w) - 1)], h1w.index[min(pv[-1][0], len(h1w) - 1)]
+        ww = m5[(m5.index >= t0) & (m5.index < t1 + pd.Timedelta(minutes=10))][['Open', 'High', 'Low', 'Close']]
+        if len(ww) >= 8:
+            rr = _struct2(ww, 1.0)
+            if rr is not None:
+                B = _dir_analyze(ww, rr); sv, swhy = _dir_verdict(ww, rr, B, False)
+                rel = ('Swing боковик' if v == 'SIDE' else 'внутри тренда' if sv == 'SIDE' else 'по тренду' if sv == v else 'против тренда: откат внутри тренда')
+                out['sub'] = dict(v=sv, why=swhy, A=B, rel=rel, npv=len(B['pv']))
+                out['sub_df'] = ww
+    return out
 
 
 def _arrow(t):
@@ -338,24 +424,21 @@ def build(d, h1, now_utc, off, today, price, completed, resample_h1):
         h1w = h1c[h1c.index > h1c.index[-1] - pd.Timedelta(days=7)]
         try:
             sw = _trend_dyn(h1w, 0, 1.0, False)   # 02.10.2026: Swing H1 — слом только за настоящим LH/HL (без «раннего» якоря); новый LH/HL рождается после BOS за последним LL/HH
-            t0 = h1w.index[0]
-            if sw.get('piv') and len(sw['piv']) >= 2:
-                t0 = h1w.index[min(sw['piv'][-2][0], len(h1w) - 1)]
-            m15 = d[['Open', 'High', 'Low', 'Close']].resample('15min', label='left', closed='left').agg(
-                {'Open': 'first', 'High': 'max', 'Low': 'min', 'Close': 'last'}).dropna()
-            m15 = m15[m15.index >= t0 - pd.Timedelta(hours=1)]
-            sb = _trend_dyn(m15, 0, 0.6) if len(m15) > 40 else dict(tr=0, txt='мало данных', hi=None, lo=None, brk='')
+            dc = _dir_ctx(h1w, d)               # 15.10.2026: Sub = M5 внутри последней ноги Swing, направление по 5 условиям
+            ctx['dir'] = dc
+            if dc.get('sub_df') is not None and len(dc['sub_df']) >= 8:
+                sb = _trend_dyn(dc['sub_df'], 0, 1.0)
         except Exception:
             sw = _trend(h1c.iloc[-168:], 3); sb = _trend(h1c.iloc[-120:], 2)
-    # направление по Swing H1; Sub против Swing = откат внутри тренда (видео «Динамический подход», пример EURUSD)
-    sc = 2.0 * sw['tr']
-    if sw['tr'] != 0:
-        sc += sb['tr'] * 1.0                      # Sub по тренду усиливает, против — ослабляет (откат внутри тренда)
-        if sw.get('brk'): sc *= 0.5                # свежий слом структуры — доверие ниже
-        if sw.get('deep'): sc -= 0.5 * sw['tr']     # откат глубже 70% — структура под вопросом
+    # направление: LONG / SHORT / БОКОВИК по структуре Swing (5 условий); Sub соотносится со Swing (по тренду / против = откат внутри тренда)
+    dsw = (ctx.get('dir') or {}).get('swing'); dsb = (ctx.get('dir') or {}).get('sub')
+    if dsw is None or dsw['v'] == 'SIDE':
+        sc = 0.0; rec = '50/50'
     else:
-        sc = 0.5 * sb['tr']
-    rec = 'LONG' if sc >= 1 else 'SHORT' if sc <= -1 else '50/50'
+        sd_ = 1 if dsw['v'] == 'LONG' else -1
+        sc = sd_ * (3.0 if (dsb and dsb['rel'] == 'по тренду') else 2.0)
+        if sw.get('brk'): sc *= 0.5
+        rec = 'LONG' if sc >= 1 else 'SHORT' if sc <= -1 else '50/50'
     conf = 'высокая' if abs(sc) >= 3 else 'средняя' if abs(sc) >= 1.5 else 'слабая' if abs(sc) >= 1 else 'нет'
     ctx['score'] = sc; ctx['conf'] = conf
     ctx.update(swing=sw, sub=sb, rec=rec)
@@ -366,29 +449,42 @@ def _liq_w(name):
     return 2.0 if 'D1' in name else 1.5 if ('вчера' in name or 'Лондон' in name) else 1.0
 
 
+def _live_retr(A, price):
+    """Откат в % от начала импульса до экстремума (по телам) с текущей ценой."""
+    top, ext = A.get('top'), A.get('ext')
+    if top is None or ext is None or top == ext: return None
+    p = (price - ext) / (top - ext) if A['side'] == -1 else (ext - price) / (ext - top)
+    return max(0.0, min(1.0, p))
+
+
 def struct_line(ctx, price, liq, fm):
-    """«Где цена» (09.10.2026, по просьбе трейдера): только две вещи — откат Swing в % и уведомление о сломе CHoCH
-    (стрелка = направление структуры, текст слома — куда сломали). Остальное (Sub-откат, рекомендации «рано/близко»,
-    цель-ликвидность, разворот без пробоя) в строку больше не пишем."""
+    """«Где цена» (15.10.2026): направление по структуре Swing (LONG / SHORT / БОКОВИК), откат % и его состояние,
+    Sub M5 внутри последней ноги Swing, CHoCH. Рекомендацию и вероятность не дублируем — они в блоке «Рекомендация»."""
     sw, sb = ctx['swing'], ctx['sub']
+    dc = ctx.get('dir') or {}
+    ds, db = dc.get('swing'), dc.get('sub')
     nf = lambda v: ('%.5f' % v) if v < 20 else ('%.2f' % v)
-    hi, lo, tr = sw.get('hi'), sw.get('lo'), sw['tr']
     arrow = lambda t: '▲' if t == 1 else ('▼' if t == -1 else '')
     parts = []
-    if hi and lo and hi > lo and tr != 0:
-        rng = hi - lo
-        if tr == -1:
-            r = (price - lo) / rng
-            base = ('Swing ▼: импульс вниз, цена у LL %s' % nf(lo)) if r <= 0.1 else \
-                   ('Swing ▼: откат %d%% вверх от LL %s к LH %s' % (round(r * 100), nf(lo), nf(hi)))
+    if ds is not None and ds['v'] != 'SIDE':
+        A = ds['A']; p = _live_retr(A, price); a = A['side']
+        if p is None or p < 0.10:
+            parts.append('Swing %s: импульс %s, цена у %s %s' % (arrow(a), 'вверх' if a == 1 else 'вниз', 'HH' if a == 1 else 'LL', nf(A['ext'] if A['ext'] is not None else price)))
         else:
-            r = (hi - price) / rng
-            base = ('Swing ▲: импульс вверх, цена у HH %s' % nf(hi)) if r <= 0.1 else \
-                   ('Swing ▲: откат %d%% вниз от HH %s к HL %s' % (round(r * 100), nf(hi), nf(lo)))
-        parts.append(base)
+            parts.append('Swing %s: откат %d%% %s (%s) от %s %s к %s %s' % (arrow(a), round(p * 100), 'вниз' if a == 1 else 'вверх', _retr_state(p),
+                         'HH' if a == 1 else 'LL', nf(A['ext']), 'HL' if a == 1 else 'LH', nf(A['top'])))
+    elif ds is not None:
+        parts.append('Swing: чёткого тренда нет, боковик — ' + '; '.join(ds['why'][:2]))
     else:
-        parts.append('Swing: чёткого тренда нет, цена в диапазоне')
-    for nm, t in (('Swing', sw), ('Sub M15', sb)):
+        parts.append('Swing: чёткого тренда нет, мало данных')
+    if db is not None:
+        B = db['A']; pb = _live_retr(B, price); a = B['side']
+        if db['v'] == 'SIDE':
+            parts.append('Sub M5: боковик внутри ноги Swing')
+        else:
+            st = ('откат %d%% (%s)' % (round(pb * 100), _retr_state(pb))) if pb is not None and pb >= 0.10 else 'у экстремума'
+            parts.append('Sub M5 %s: %s — %s' % (arrow(a), st, db['rel']))
+    for nm, t in (('Swing', sw), ('Sub M5', sb)):
         if t.get('brk'):
             a = arrow(t['tr'])
             parts.append('CHoCH %s%s: %s' % (nm, (' ' + a) if a else '', t['brk'].replace('закрытие телом за', 'телом за')))

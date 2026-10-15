@@ -557,6 +557,7 @@ var CK={
   ['plus','На пути к цели есть ликвидность в пределах 30% длины Азии от границы Азии','хай/лой H1 и D1, вчерашний день/Лондон: цена тянется забрать её.'],
   ['plus','По тренду: сторона сделки совпадает с рекомендацией структуры (Swing и Sub)','структура — только контекст, правилом входа не является.'],
   ['minus','У стороны выноса нет несобранной ликвидности в пределах 30% длины Азии','если она есть — цена захочет её снять, выкупа может не быть (ухудшитель).']],
+  ['minus','Нет FVG H1 с тестом против направления сделки (внутри Азии или в пределах 30% её хая/лоя)','FVG H1 против сделки (для шорта — бычий), который цена уже тестировала до окна входа и не пробила: цена показала желание идти в его сторону, вход против него — ухудшитель.'],
   mng:'<b>После входа:</b> цель 2R, стоп не переносим, в 22:00 закрываем по рынку. Структура Swing/Sub, ликвидность и FVG H1 показываются в карточке и влияют на оценку вероятности, но вход определяют только пункты 1–12. Мои бэктесты (451 сделка, 2022–2026): WR 78%, +602R при 1:2 — см. вкладку «Аналитика».'},
  C:{title:'Тип C',when:WC+' UTC+3',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD)','только 3 инструмента, на которых тип протестирован.'],
@@ -570,7 +571,7 @@ var CK={
   ['skip','Стоп не меньше 0,25 ATR(M5) — исполнимо со спредом','моя защита: при микростопе спред съедает сделку; в ваши правила не входило.'],
   ['skip','Это первый вход по инструменту за день','после SL/TP/БУ повторного входа нет.'],
   ['plus','Батут: H1 FVG, от которого отреагировали свечи выноса и пошёл выкуп','экстремум выноса внутри/рядом с H1 FVG в сторону сделки.'],
-  ['plus','По тренду: сторона входа совпадает с направлением Swing H1 (за 7 дней); Sub M15 против = откат внутри тренда','тренд правилом не является — только усилитель.']],
+  ['plus','По тренду: сторона входа совпадает с направлением Swing H1 (за 7 дней); Sub M5 против = откат внутри тренда','тренд правилом не является — только усилитель.']],
   mng:'<b>После входа:</b> цель 3R, на 50% пути стоп переносим в безубыток. Структура и ликвидность — только контекст в карточке. Прогон Пульта за 5 лет (1695 сделок): WR 43.7%, +1601.7R, просадка −7R — см. вкладку «Аналитика».'}
 };
 (function(){var o={base:0,skip:1,plus:2,minus:3,half:4};['A','C'].forEach(function(t){
@@ -713,13 +714,13 @@ function trPill(lbl,v){v=String(v||'—');var up=/▲/.test(v),dn=/▼/.test(v),
   var code=(v.match(/HH\/HL|LH\/LL/)||[''])[0];
   return '<span class="pl tr '+cls+'"><i>'+lbl+'</i> '+(up?'▲':dn?'▼':'◆')+' '+w+(code?' <small>'+code+'</small>':'')+'</span>';}
 function narrHTML(line){var p=String(line||'').split(' | ');if(p.length<1||!p[0])return null;
-  p=p.filter(function(t){return /^(Swing [▲▼]: (откат|импульс)|Swing: чёткого|CHoCH)/i.test(t);}).map(function(t){return t.replace(/\s*·\s*Sub M15[^|]*/i,'');});if(!p.length)return null;
+  p=p.filter(function(t){return /^(Swing [▲▼]: (откат|импульс)|Swing: чёткого|Sub M5|CHoCH)/i.test(t);}).map(function(t){return t;});if(!p.length)return null;
   function cl(c){return c==='long'?'var(--long)':c==='short'?'var(--short)':'var(--side)';}
   return '<div class="pxn">'+p.map(function(t){
     if(/^CHoCH/i.test(t)){var i=t.indexOf(':'),hd=i>0?t.slice(0,i):t,tl=i>0?t.slice(i+1):'';
       var hc=/▲/.test(hd)?'long':/▼/.test(hd)?'short':'side',tc=/вверх/i.test(tl)?'long':/вниз/i.test(tl)?'short':'side';
       return '<span class="nl imp" style="border-left-color:'+cl(tc)+'"><b style="color:'+cl(hc)+'">'+hd.replace(/</g,'&lt;')+':</b><span style="color:'+cl(tc)+'">'+tl.replace(/</g,'&lt;')+'</span></span>';}
-    var c=/^Swing ▲/.test(t)?'long':/^Swing ▼/.test(t)?'short':'side';
+    var c=/^(Swing|Sub M5) ▲/.test(t)?'long':/^(Swing|Sub M5) ▼/.test(t)?'short':'side';
     var h=t.replace(/</g,'&lt;').replace(/(откат \d+%)/i,'<u class="pcb">$1</u>');
     return '<span class="nl imp '+c+'">'+h+'</span>';}).join('')+'</div>';}
 function cfvHTML(f){if(!f||f.lo==null)return null;var up=f.side==='long',e=+f.entry,t=+f.tp,lo=+f.lo,hi=+f.hi,a=Math.min(e,t),b=Math.max(e,t),w=b-a||1;
@@ -759,7 +760,7 @@ function liveCard(x){
   rows.push(['Статус',stn]);
   /* структура: Swing (главная) и Sub (внутренняя) + рекомендация; только контекст, не правило входа */
   if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
-    rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+(rc==='50/50'?'НЕТ ПРЕИМУЩЕСТВА · скип/осторожно':rc+(x.struct.conf?' · '+x.struct.conf:''))+'</span></div>']);
+    rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+(rc==='50/50'?'БОКОВИК · нет подтверждённого тренда':rc+(x.struct.conf?' · '+x.struct.conf:''))+'</span></div>']);
     if(x.struct.line){var nh=narrHTML(x.struct.line);rows.push(['Где цена',nh||String(x.struct.line)]);}}
   if(x.window==='C'){if(x.boxH!=null&&x.boxL!=null)rows.push(['Бокс Лондона','хай '+x.boxH+' · лой '+x.boxL]);}
   else if(x.pos)rows.push(['Цена / Бокс Азии','<div class="pxp"><span class="pl side">'+x.pos+'</span></div>']);
