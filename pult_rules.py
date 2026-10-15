@@ -620,8 +620,9 @@ def _amps_A(res, ctx, liq, sd, boxH, boxL, win_start_utc):
     if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(15); notes.append('сторона по тренду (структура Swing+Sub)')
     # 15.10.2026 ухудшитель №17: H1 FVG ПРОТИВ сделки внутри Азии или в пределах 30% её хая/лоя, не пробитый и УЖЕ тестированный ценой до окна входа
     #   (для шорта — бычий FVG, для лонга — медвежий): цена показала желание идти в его сторону, вход идёт против этого движения
+    _day0 = win_start_utc - pd.Timedelta(hours=10)      # начало торгового дня (00:00 по Риге): FVG и тест — внутри ЭТОГО дня, не вчерашние
     for f in F1:
-        if f['dir'] != -sd or f['inv_t'] is not None or f['t'] >= win_start_utc: continue
+        if f['dir'] != -sd or f['inv_t'] is not None or f['t'] >= win_start_utc or f['t'] < _day0: continue
         if f['touch_t'] is None or f['touch_t'] >= win_start_utc: continue
         if f['hi'] >= boxL - 0.3 * rngA and f['lo'] <= boxH + 0.3 * rngA:
             worse.append(17); notes.append(f'ухудшитель: тестированный встречный H1 FVG у Азии ({f["lo"]:.5g}–{f["hi"]:.5g}) — цена уже отталкивалась от него')
