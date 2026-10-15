@@ -95,13 +95,15 @@ def _fvgs(F, min_size):
         if L[k - 1] > H[k + 1] and (L[k - 1] - H[k + 1]) >= min_size:
             out.append(dict(k=k, t=T[k], lo=float(H[k + 1]), hi=float(L[k - 1]), dir=-1))
     for f in out:
-        f['inv_t'] = None; f['touch_t'] = None; f['reject'] = False
+        f['inv_t'] = None; f['touch_t'] = None; f['reject'] = False; f['pierce_t'] = None
         for j in range(f['k'] + 2, len(F)):
             if f['dir'] == 1:
+                if f['pierce_t'] is None and L[j] < f['lo']: f['pierce_t'] = T[j]
                 if f['touch_t'] is None and L[j] <= f['hi']: f['touch_t'] = T[j]
                 if C[j] < f['lo']: f['inv_t'] = T[j]; break
                 if f['touch_t'] is not None and C[j] > f['hi']: f['reject'] = True
             else:
+                if f['pierce_t'] is None and H[j] > f['hi']: f['pierce_t'] = T[j]
                 if f['touch_t'] is None and H[j] >= f['lo']: f['touch_t'] = T[j]
                 if C[j] > f['hi']: f['inv_t'] = T[j]; break
                 if f['touch_t'] is not None and C[j] < f['lo']: f['reject'] = True
@@ -603,7 +605,7 @@ def _why(res, txt, nn=None):
 def _amps_A(res, ctx, liq, sd, boxH, boxL, win_start_utc):
     """Усилители/ухудшитель Типа A: 11 батут, 12 ликвидность на пути (≤30% длины Азии), 13 по тренду; 14 ухудшитель."""
     rngA = max(boxH - boxL, 1e-12)
-    F1, _ = _h1_fvgs(ctx['h1c'])
+    F1, _atr1 = _h1_fvgs(ctx['h1c'])
     plus, worse, notes = [], [], []
     for f in F1:
         if f['dir'] != sd or f['inv_t'] is not None or f['t'] >= win_start_utc: continue
@@ -624,6 +626,8 @@ def _amps_A(res, ctx, liq, sd, boxH, boxL, win_start_utc):
     for f in F1:
         if f['dir'] != -sd or f['inv_t'] is not None or f['t'] >= win_start_utc or f['t'] < _day0: continue
         if f['touch_t'] is None or f['touch_t'] >= win_start_utc: continue
+        if f.get('pierce_t') is not None and f['pierce_t'] < win_start_utc: continue      # уже прошит фитилём насквозь — не валиден
+        if (f['hi'] - f['lo']) < 0.35 * _atr1: continue                                    # короткие FVG (<0,35 ATR H1) не в счёт
         if f['hi'] >= boxL - 0.3 * rngA and f['lo'] <= boxH + 0.3 * rngA:
             worse.append(17); notes.append(f'ухудшитель: тестированный встречный H1 FVG у Азии ({f["lo"]:.5g}–{f["hi"]:.5g}) — цена уже отталкивалась от него')
             break
