@@ -483,5 +483,16 @@
       "m5": "state/shots/2026-10-15_US30_A_m5.png",
       "h1": "state/shots/2026-10-15_US30_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-15_GER40_A",
+    "date": "2026-10-15",
+    "symbol": "GER40",
+    "type": "A",
+    "side": "short",
+    "entry": 25269.6,
+    "stop": 25320.9,
+    "target": 25166.9,
+    "result": "сигнал Пульта в 11:00"
   }
 ]
