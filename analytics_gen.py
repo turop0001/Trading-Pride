@@ -51,7 +51,7 @@ def _simulate(bars, typ, sig, out):
             return b[4], (0.0 if armed else -1.0)
         if hit_tp:
             return b[4], RR[typ]
-        if typ == 'C' and be and not armed and ((hi >= be) if sd == 1 else (lo <= be)):
+        if be and not armed and ((hi >= be) if sd == 1 else (lo <= be)):
             armed = True; cur = e
     last = bars[-1]
     return '22:00', round(sd * (last[3] - e) / risk, 2)
@@ -112,10 +112,10 @@ def build(typ, s, day, o, df, sig, boxH, boxL, ext, out, R=None, xt=None, end_ut
     rec = dict(id=f'{typ}_{s}_{day}', sym=s, typ=typ, day=str(day), boxH=boxH, boxL=boxL, ext=ext, side=sig['side'], entry=sig['entry'],
                stop=sig['stop'], tp=sig['tp'], tin=sig['time'], res=out, R=round(float(R), 2), xt=xt,
                bars=bars, h1=h1b, fvg=fv, liq=lq, prob=sig.get('prob'), struct=sig.get('struct'))
+    rec['be'] = sig.get('be_at')   # 16.10.2026: БУ есть у обоих типов (A — на 80% пути к цели 2R, C — на 50% к цели 3R)
     if typ == 'A':
         rec['liqx'] = sig.get('liqx'); rec['swn'] = sig.get('swn')
     else:
-        rec['be'] = sig.get('be_at')
         i = next((k for k, b in enumerate(bars) if b[4] == sig['time']), None)
         if i:
             seg = bars[max(0, i - 14):i]

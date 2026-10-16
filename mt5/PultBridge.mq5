@@ -10,9 +10,10 @@
 //|   сразу после ВЫНОСА (двигается вместе с экстремумом); перенос стопа |
 
 //|   к цене сигнала; свечи шлются каждые 20 с в окнах, опрос каждые 10 с|
+//| v1.21 (16.10.2026): БУ для Типа A на 80% пути к цели (1,6R), C — 50%|
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.20"
+#property version   "1.21"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -23,7 +24,7 @@ input int    FeedSec         = 60;
 input int    FastFeedSec     = 3;      // в окнах A/C (UTC 06:30–11:30 и 13:00–16:00) свечи шлём чаще
 input bool   PendEnabled     = true;    // Тип C: stop-ордер на уровне 20% после выноса (нужен TradeEnabled=true)
 input bool   LimitOnMissA    = false;   // Тип A: НЕ входить на откате (по решению 08.10.2026 пропущенный вход отменяется); оставлено выключенным
-input bool   MoveToBE        = true;    // Тип C: стоп в безубыток на 50% пути к цели
+input bool   MoveToBE        = true;    // стоп в безубыток: Тип A на 80% пути к цели, Тип C на 50%
 input bool   TradeEnabled    = false;   // false = только журнал, без сделок
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
 input double RiskPercent     = 1.0;     // риск на сделку, % баланса
@@ -152,19 +153,20 @@ void DeletePending(const string id)
 // ---------- сопровождение позиций и отложенных ордеров (каждые 5 с) ----------
 void ManageTrades()
 {
-   // 1) Тип C: стоп в БУ, когда цена прошла 50% пути к цели
+   // 1) стоп в БУ, когда цена прошла 80% (Тип A) или 50% (Тип C) пути к цели
    if(MoveToBE)
       for(int i=PositionsTotal()-1;i>=0;i--)
       {
          ulong tk=PositionGetTicket(i);
          if(!PositionSelectByTicket(tk) || PositionGetInteger(POSITION_MAGIC)!=MagicNumber) continue;
          string cm=PositionGetString(POSITION_COMMENT);
-         if(StringFind(cm,"_C")<0) continue;
+         bool isA=(StringFind(cm,"_A")>=0), isC=(StringFind(cm,"_C")>=0);
+         if(!isA && !isC) continue;
          string sym=PositionGetString(POSITION_SYMBOL);
          bool isBuy=PositionGetInteger(POSITION_TYPE)==POSITION_TYPE_BUY;
          double op=PositionGetDouble(POSITION_PRICE_OPEN), sl=PositionGetDouble(POSITION_SL), tp=PositionGetDouble(POSITION_TP);
          if(tp<=0) continue;
-         double be=op+0.5*(tp-op);
+         double be=op+(isA?0.8:0.5)*(tp-op);
          int dg=(int)SymbolInfoInteger(sym,SYMBOL_DIGITS);
          double bid=SymbolInfoDouble(sym,SYMBOL_BID), ask=SymbolInfoDouble(sym,SYMBOL_ASK);
          if(isBuy && bid>=be && sl<op-SymbolInfoDouble(sym,SYMBOL_POINT)) { if(trade.PositionModify(tk,NormalizeDouble(op,dg),tp)) Print(cm," стоп в БУ (",DoubleToString(op,dg),")"); }

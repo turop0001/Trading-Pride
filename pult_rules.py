@@ -794,7 +794,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     swn = int(g - r['start'] + 1)   # свечей от начала выноса до триггера
     sig = dict(date=str(today), window='A', time=(t_in + pd.Timedelta(hours=off)).strftime('%H:%M'),
                t_utc=str(t_in), entry=round(entry, dec), stop=round(stop, dec), tp=round(tp, dec), side=bias,
-               rr=S1.RR, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=list(worse), prob=res['prob'],
+               be_at=round(entry + S1.BEF * (tp - entry), dec), rr=S1.RR, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=list(worse), prob=res['prob'],
                strong=int(c['strong']), struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'),
                liqx=liqx, swn=swn, ckv=3)
     res['signal'] = sig
