@@ -317,7 +317,7 @@ def main(send=True):
             if r.get('be_armed') and not p.get('be_armed') and str(r.get('note', '')).startswith('В СДЕЛКЕ') and (r.get('signal') or {}).get('be_at'):
                 sg_ = r['signal']
                 try:
-                    tg(f"\u26A0\uFE0F {s} ({r['direction']}) — цена дошла до БУ ({sg_['be_at']}). Переноси стоп на вход {sg_['entry']}.")
+                    tg(f"\u26A0\uFE0F {s} ({r['direction']}) — цена прошла {round(100 * (sg_['be_at'] - sg_['entry']) / (sg_['tp'] - sg_['entry'])) if sg_.get('tp') != sg_.get('entry') else 80}% пути к цели (БУ {sg_['be_at']}). Переноси стоп на вход {sg_['entry']}.")
                     push(f"{s} · цена дошла до БУ", f"Переноси стоп на вход {sg_['entry']}", tag=f'{s}_{win}_be', sticky=True)
                     did.append('be_alert'); r['be_alert_at'] = t
                 except Exception as e:
