@@ -620,7 +620,7 @@ def _amps_A(res, ctx, liq, sd, boxH, boxL, win_start_utc):
         path = [x for x in liq if x['kind'] == 'lo' and 0 < boxL - x['p'] <= 0.3 * rngA]
         sidew = [x for x in liq if x['kind'] == 'hi' and 0 < x['p'] - boxH <= 0.3 * rngA]
     if path: plus.append(14); notes.append(f'ликвидность на пути в пределах 30% Азии: {path[0]["name"]} {path[0]["p"]:.5g}')
-    if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(15); notes.append('сторона по тренду (структура Swing+Sub)')
+    if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(15); notes.append('сторона по тренду (структура Swing)')
     # 15.10.2026 ухудшитель №17: H1 FVG ПРОТИВ сделки внутри Азии или в пределах 30% её хая/лоя, не пробитый и УЖЕ тестированный ценой до окна входа
     #   (для шорта — бычий FVG, для лонга — медвежий): цена показала желание идти в его сторону, вход идёт против этого движения
     _day0 = win_start_utc - pd.Timedelta(hours=10)      # начало торгового дня (00:00 по Риге): FVG и тест — внутри ЭТОГО дня, не вчерашние
@@ -1023,7 +1023,7 @@ def _prob_set_C(res, F1, atr1, sd, ext, plus):
     for f in F1:
         if f['dir'] == sd and f['inv_t'] is None and f['lo'] - tol <= ext_r <= f['hi'] + tol:
             plus.append(11); _why(res, f'батут: H1 FVG {f["lo"]:.5g}–{f["hi"]:.5g}, от него пошёл выкуп', [11]); break
-    if 12 in plus: _why(res, 'по тренду (структура Swing H1 + Sub M5 совпадает со стороной входа)', [12])
+    if 12 in plus: _why(res, 'по тренду (структура Swing H1 совпадает со стороной входа)', [12])
     res['ck'] = sorted(set(res['ck'] + plus))
     _prob_set(res, plus, [], 'C')
 
