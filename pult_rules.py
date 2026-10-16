@@ -570,9 +570,10 @@ def _cfv(cf, sd, entry, tp, off, dec):
 
 
 def _counter_fvg(F1, sd, entry, tp):
-    """Встречный неинвертированный H1 FVG внутри пути entry → tp (1:2)."""
+    """Встречный H1 FVG внутри пути entry → tp. Не считается: инвертированный (закрытие H1 за ним) и уже ПРОШИТЫЙ фитилём насквозь
+    (16.10.2026: XAUUSD C — FVG 4161.03–4163.54 прошит лоем Лондона 4154.96, но закрытия под ним не было — скип был ошибочным)."""
     for f in F1:
-        if f['dir'] != -sd or f['inv_t'] is not None: continue
+        if f['dir'] != -sd or f['inv_t'] is not None or f.get('pierce_t') is not None: continue
         if sd == 1 and f['hi'] > entry and f['lo'] <= tp: return f
         if sd == -1 and f['lo'] < entry and f['hi'] >= tp: return f
     return None
