@@ -514,5 +514,16 @@
       "m5": "state/shots/2026-10-15_GBPUSD_A_m5.png",
       "h1": "state/shots/2026-10-15_GBPUSD_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-16_GBPUSD_C",
+    "date": "2026-10-16",
+    "symbol": "GBPUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 1.3348,
+    "stop": 1.33503,
+    "target": 1.33411,
+    "result": "сигнал Пульта в 16:45"
   }
 ]
