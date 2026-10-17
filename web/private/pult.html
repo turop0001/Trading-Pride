@@ -257,6 +257,9 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
             <option data-cs-fp="20" data-cs-ftmo="1" data-sym="NAS100" data-px="30355">US 100</option>
             <option data-cs-fp="25" data-cs-ftmo="1" data-sym="GER40" data-px="25490">GER 40</option>
             <option data-cs-fp="5" data-cs-ftmo="1" data-sym="US30" data-px="53690">US 30</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="AUDUSD" data-px="0.7015">AUD/USD</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-q="inv" data-sym="USDJPY" data-px="157.36">USD/JPY</option>
+            <option data-cs-fp="5000" data-cs-ftmo="5000" data-sym="XAGUSD" data-px="60.79">SILVER</option>
           </select></div>
           <div class="row2"><div class="field"><label for="cStopP">Стоп в красной зоне TradingView, %</label><input id="cStopP" type="number" step="0.005" placeholder="0.100"></div><div class="field"><label for="cPx">Цена инструмента сейчас</label><input id="cPx" type="number" step="any"></div></div><p class="note" id="cK" style="margin:-4px 0 10px"></p>
           <div class="out">
@@ -293,7 +296,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
         <div class="field" id="hFromW" hidden><label>С</label><input id="hFrom" type="date"></div>
         <div class="field" id="hToW" hidden><label>По</label><input id="hTo" type="date"></div>
         <div class="field"><label>Тип</label><select id="hType"><option value="">A и C</option><option>A</option><option>C</option></select></div>
-        <div class="field"><label>Инструмент</label><select id="hSym"><option value="">Все</option><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option></select></div>
+        <div class="field"><label>Инструмент</label><select id="hSym"><option value="">Все</option><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option><option>AUDUSD</option><option>USDJPY</option><option>XAGUSD</option></select></div>
         <div class="field"><label>Вход</label><select id="hEnt"><option value="">Все</option><option value="yes">Был мой вход</option><option value="no">Не входил</option></select></div>
       </div>
       <div class="msg" id="hMsg"></div>
@@ -312,7 +315,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
         <div class="field" id="fFromW" hidden><label>С</label><input id="fFrom" type="date"></div>
         <div class="field" id="fToW" hidden><label>По</label><input id="fTo" type="date"></div>
         <div class="field"><label>Тип</label><select id="fType"><option value="">A и C</option><option>A</option><option>C</option></select></div>
-        <div class="field"><label>Инструмент</label><select id="fSym"><option value="">Все</option><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option></select></div>
+        <div class="field"><label>Инструмент</label><select id="fSym"><option value="">Все</option><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option><option>AUDUSD</option><option>USDJPY</option><option>XAGUSD</option></select></div>
         <div class="field"><label>Итог</label><select id="fOut"><option value="">Все</option><option value="TP">TP</option><option value="SL">SL</option><option value="BE">БУ</option></select></div>
         <div class="field"><label>Вид</label><div class="seg" id="fView"><button type="button" data-w="pie" class="on">Круг</button><button type="button" data-w="line">График</button></div></div>
       </div>
@@ -330,7 +333,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
     <div class="card" style="margin-bottom:16px">
       <h2>Новая сделка · только где вошёл</h2>
       <div class="jform">
-        <div class="field"><label for="jSym">Инструмент</label><select id="jSym"><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option></select></div>
+        <div class="field"><label for="jSym">Инструмент</label><select id="jSym"><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>US500</option><option>NAS100</option><option>US30</option><option>GER40</option><option>AUDUSD</option><option>USDJPY</option><option>XAGUSD</option></select></div>
         <div class="field"><label for="jType">Тип</label><select id="jType"><option>A</option><option>C</option></select></div>
         <div class="field"><label for="jSide">Сторона</label><select id="jSide"><option value="long">Long</option><option value="short">Short</option></select></div>
         <div class="field"><label for="jDate">Дата</label><input id="jDate" type="date"></div>
@@ -541,7 +544,7 @@ function riskNow(){
 /* checklists */
 var CK={
  A:{title:'Тип A',when:WA+' UTC+3',items:[
-  ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40)','правило одно для всех 7; по тесту сильнее всех индексы США.'],
+  ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40, AUDUSD, USDJPY, XAGUSD)','правило одно для всех 10; по тесту сильнее всех индексы США.'],
   ['base','Азия вышла за вчерашний бокс только с одной стороны — есть сторона сделки','лонг: хай Азии выше вчерашнего, а лой не ниже; шорт — зеркально.'],
   ['base','Противоположная сторона Азии ещё не снята первой — ни тенью, ни телом (лонг: хай Азии, шорт: лой)','если до нужного выноса в окне 10:00–13:00 снята противоположная сторона бокса — скип дня по инструменту (тест 5 лет: такие входы WR 40% против 50%).'],
   ['base','Вынос границы Азии тенью в окне 10:00–13:00 в сторону сделки','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая Азии. Экстремум выноса — самая дальняя точка.'],
@@ -737,12 +740,12 @@ function ckBlock(kind,title,nums,cgi,pick){
   var det=items.map(function(it){var on=nums.indexOf(it[0])>=0;return '<div class="'+(on?'on':'')+'">'+(on?(kind==='minus'?'✕ ':'✓ '):'○ ')+it[0]+'. '+escA(it[1])+'</div>';}).join('');
   return '<div class="pxw"><details class="pxc k-'+kind+'"><summary><div class="pxh"><span>'+(kind==='req'?'Обязательные':kind==='cond'?'Условия входа':kind==='plus'?'Что усиливает':'Что ухудшает')+'</span><em>'+head+'</em></div><div class="pxbar"><i style="width:'+Math.round((kind==='minus'?(tot?n/tot:0):p)*100)+'%;background:'+col+'"></i></div><div class="pxchips">'+chips+'</div></summary><div class="pxd">'+det+'</div></details></div>';}
 /* лот для карточки «Вход»: те же формулы и настройки, что в калькуляторе (депозит, риск, ½ риска) */
-var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1]};
+var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1],AUDUSD:[100000,100000],USDJPY:[100000,100000],XAGUSD:[5000,5000]};
 function lotFor(sym,entry,stop,prop){
   try{var cs=LOTCS[sym];if(!cs)return null;cs=cs[prop==='ftmo'?1:0];
     var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||25000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,d=Math.abs(entry-stop);
     if(!(d>0)||!(risk>0))return {lot:0,risk:risk,pct:pct};
-    return {lot:Math.floor(risk/(d*cs)*100)/100,risk:risk,pct:pct};}catch(e){return null;}
+    var qj=sym==='USDJPY'?1/entry:1;return {lot:Math.floor(risk/(d*cs*qj)*100)/100,risk:risk,pct:pct};}catch(e){return null;}
 }
 function lotsRow(sym,entry,stop){
   var e=parseFloat(entry),s=parseFloat(stop);if(!isFinite(e)||!isFinite(s))return null;

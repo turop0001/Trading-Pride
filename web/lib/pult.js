@@ -3,7 +3,7 @@
 // (тот же файл, что коммитит GitHub Actions после каждого тика).
 
 export const WINDOW_SYMBOLS = {
-  A: ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40'],
+  A: ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY', 'XAGUSD'],
   C: ['XAUUSD', 'EURUSD', 'GBPUSD'],
 };
 

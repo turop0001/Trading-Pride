@@ -11,9 +11,10 @@
 
 //|   к цене сигнала; свечи шлются каждые 20 с в окнах, опрос каждые 10 с|
 //| v1.21 (16.10.2026): БУ для Типа A на 80% пути к цели (1,6R), C — 50%|
+//| v1.22 (17.10.2026): Тип A +3 инструмента: AUDUSD, USDJPY, XAGUSD    |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.21"
+#property version   "1.22"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -45,17 +46,21 @@ input string MapUS500  = "US500";
 input string MapNAS100 = "USTEC";
 input string MapUS30   = "US30";
 input string MapGER40  = "DE40";
+input string MapAUDUSD = "AUDUSD";
+input string MapUSDJPY = "USDJPY";
+input string MapXAGUSD = "XAGUSD";
 
 CTrade trade;
 datetime lastFeed=0, lastFull=0, lastPoll=0, lastBar=0;
-string NAMES[7] = {"EURUSD","GBPUSD","XAUUSD","US500","NAS100","US30","GER40"};
+string NAMES[10] = {"EURUSD","GBPUSD","XAUUSD","US500","NAS100","US30","GER40","AUDUSD","USDJPY","XAGUSD"};
 
 string BrokerSym(const string s)
 {
    if(s=="EURUSD") return MapEURUSD;  if(s=="GBPUSD") return MapGBPUSD;
    if(s=="XAUUSD") return MapXAUUSD;  if(s=="US500")  return MapUS500;
    if(s=="NAS100") return MapNAS100;  if(s=="US30")   return MapUS30;
-   if(s=="GER40")  return MapGER40;   return "";
+   if(s=="GER40")  return MapGER40;   if(s=="AUDUSD") return MapAUDUSD;
+   if(s=="USDJPY") return MapUSDJPY;  if(s=="XAGUSD") return MapXAGUSD;   return "";
 }
 int GroupOf(const string s) { return (s=="US500"||s=="NAS100"||s=="US30"||s=="GER40") ? 1 : 2; }
 
@@ -97,7 +102,7 @@ bool GroupBusy(const int grp, const bool isBuy)
       if(!PositionSelectByTicket(tk) || PositionGetInteger(POSITION_MAGIC)!=MagicNumber) continue;
       string ps=PositionGetString(POSITION_SYMBOL);
       bool pb=PositionGetInteger(POSITION_TYPE)==POSITION_TYPE_BUY;
-      for(int k=0;k<7;k++) if(BrokerSym(NAMES[k])==ps && GroupOf(NAMES[k])==grp && pb==isBuy) return true;
+      for(int k=0;k<10;k++) if(BrokerSym(NAMES[k])==ps && GroupOf(NAMES[k])==grp && pb==isBuy) return true;
    }
    return false;
 }
@@ -110,7 +115,7 @@ bool InFastWindow()
 }
 int FeedNow() { return InFastWindow() ? MathMin(FastFeedSec,FeedSec) : FeedSec; }
 
-string PsymOf(const string bsym) { for(int k=0;k<7;k++) if(BrokerSym(NAMES[k])==bsym) return NAMES[k]; return ""; }
+string PsymOf(const string bsym) { for(int k=0;k<10;k++) if(BrokerSym(NAMES[k])==bsym) return NAMES[k]; return ""; }
 
 ulong FindOrder(const string id)
 {
@@ -227,7 +232,7 @@ void SendFeed()
    bool full=(now-lastFull>=3600);          // раз в час — полная история, иначе последние бары
    int off=(int)MathRound((double)(TimeTradeServer()-TimeGMT())/900.0)*900;
    string body="FEED1\n";
-   for(int k=0;k<7;k++)
+   for(int k=0;k<10;k++)
    {
       string sym=BrokerSym(NAMES[k]);
       if(sym=="" || !SymbolSelect(sym,true)) continue;
