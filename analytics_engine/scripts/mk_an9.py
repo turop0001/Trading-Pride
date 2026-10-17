@@ -33,11 +33,11 @@ idx=[i for i,l in enumerate(lines) if 'Прогон Пульта на истор
 def card(L,title):
     a=L.index('<div class="card"><h2>'+title); b=L.find('<div class="card">',a+10); b=len(L) if b<0 else b; return a,b
 def sumrow(name,a,months):
-    return ('<tr><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td><td class="%s">%s</td><td>%s</td><td>%.1f</td><td>%s</td><td>%s</td><td>%s / %s</td></tr>'
-        %(name,a['n'],a['tp'],a['sl'],a['be'],a['wr'],cls(a['R']),fr(a['R']),fr(a['avg']),a['n']/months,fr(a['R']/months),fdd(a['dd']),ddp(a['dd'],0.25),ddp(a['dd'],1)))
+    return ('<tr><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td><td class="%s">%s</td><td>%s</td><td>%.1f</td><td>%s</td><td>%s</td><td>%s</td></tr>'
+        %(name,a['n'],a['tp'],a['sl'],a['be'],a['wr'],cls(a['R']),fr(a['R']),fr(a['avg']),a['n']/months,fr(a['R']/months),fdd(a['dd']),ddp(a['dd'],1)))
 def acrow(name,a,months):
-    return ('<tr class="tot"><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td><td class="%s">%s</td><td>%s</td><td>%.1f</td><td>%s</td><td>%s</td><td>%s / %s</td></tr>'
-      %(name,a['n'],a['tp'],a['sl'],a['be'],a['wr'],cls(a['R']),fr(a['R']),fr(a['avg']),a['n']/months,fr(a['R']/months),fdd(a['dd']),ddp(a['dd'],0.25),ddp(a['dd'],1)))
+    return ('<tr class="tot"><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td><td class="%s">%s</td><td>%s</td><td>%.1f</td><td>%s</td><td>%s</td><td>%s</td></tr>'
+      %(name,a['n'],a['tp'],a['sl'],a['be'],a['wr'],cls(a['R']),fr(a['R']),fr(a['avg']),a['n']/months,fr(a['R']/months),fdd(a['dd']),ddp(a['dd'],1)))
 i0=L.index('<tr><td>Тип A · 8 инстр. · 2026'); i1=L.index('<tr class="tot"><td>Тип C · 3 инстр. · 2026</td>')
 L=L[:i0]+sumrow('Тип A · 9 инстр. · 2026 (БУ 80%)',AA['y26'],9)+sumrow('Тип A · 9 инстр. · 5 лет (БУ 80%)',AA['all'],60)+L[i1:]
 j0=L.index('<tr class="tot"><td>Тип A + Тип C вместе · 2026</td>'); j1=L.index('</tbody>',j0)

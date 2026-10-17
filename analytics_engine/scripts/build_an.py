@@ -14,8 +14,8 @@ YN={2021:'2021 (с 11.10)',2026:'2026 (до 28.09)'}
 def row(name,s,months,bold=False):
     n=s['n'];rm=s['R']/months
     cls=' class="tot"' if bold else ''
-    return ('<tr%s><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td>%s<td>%+.2fR</td><td>%.1f</td><td>%+.1fR</td><td>%s</td><td>−%d%% / −%d%%</td></tr>'
-        %(cls,name,n,s['tp'],s['sl'],s['be'],s['wr'],cell(s['R']),s['avg'],n/months,rm,dd(s['dd']),round(s['dd']*0.25/100*100),round(s['dd'])))
+    return ('<tr%s><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td>%s<td>%+.2fR</td><td>%.1f</td><td>%+.1fR</td><td>%s</td><td>−%d%%</td></tr>'
+        %(cls,name,n,s['tp'],s['sl'],s['be'],s['wr'],cell(s['R']),s['avg'],n/months,rm,dd(s['dd']),round(s['dd'])))
 M5=59.8;M26=9.0
 rows_sum=''.join([
  row('Тип C · 3 инстр. · 2026 (правила с 08.10)',C['y26'],M26,True),
