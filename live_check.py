@@ -40,14 +40,14 @@ STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', '
 TICKERS = {
     'XAUUSD': 'PAXG-USD', 'EURUSD': 'EURUSD=X', 'GBPUSD': 'GBPUSD=X',
     'US500': 'ES=F', 'NAS100': 'NQ=F', 'US30': 'YM=F', 'GER40': 'MT5:GER40',
-    # 17.10.2026: Тип A +AUDUSD (USDJPY и XAGUSD не взяты: на движке аналитики поднимают просадку с 4R до 4,4R и 5,4R); основной источник — свечи MT5 (Tickmill), Yahoo — запасной путь
-    'AUDUSD': 'AUDUSD=X',
+    # 17.10.2026: Тип A +AUDUSD, +USDJPY (XAGUSD не взят: на движке аналитики поднимает просадку до 5,4R); основной источник — свечи MT5 (Tickmill), Yahoo — запасной путь
+    'AUDUSD': 'AUDUSD=X', 'USDJPY': 'JPY=X',
 }
 
-# Инструменты по типу — Тип A торгует все 8 (с 17.10.2026: +AUDUSD; GER40 временно пропущен, см. комментарий выше),
+# Инструменты по типу — Тип A торгует все 9 (с 17.10.2026: +AUDUSD, USDJPY; GER40 временно пропущен, см. комментарий выше),
 # Тип C только 3 (XAUUSD/EURUSD/GBPUSD) — раньше main() проверял ВСЕ TICKERS в обоих окнах.
 WINDOW_SYMBOLS = {
-    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD'],
+    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY'],
     'C': ['XAUUSD', 'EURUSD', 'GBPUSD'],
 }
 

@@ -19,7 +19,7 @@ from notify import (send_telegram, fmt_line, build_window_open, build_window_clo
                     build_update, build_signal, build_daily_summary, build_weekly)
 
 EVENTS = [(600, 'openA'), (780, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary'), (1320, 'final')]
-ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD']
+ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY']
 
 
 def mins(t): return t.hour * 60 + t.minute

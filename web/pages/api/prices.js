@@ -5,7 +5,7 @@
 import { readBig, writeJson, ensureBranch } from '../../lib/gh';
 
 const BR = 'feed', LIVE = 'feed/live.json', FILE = 'feed/prices.json';
-const DEC = { EURUSD: 4, GBPUSD: 4, XAUUSD: 1, US500: 0, NAS100: 0, GER40: 0, US30: 0, AUDUSD: 4 };
+const DEC = { EURUSD: 4, GBPUSD: 4, XAUUSD: 1, US500: 0, NAS100: 0, GER40: 0, US30: 0, AUDUSD: 4, USDJPY: 2 };
 
 async function fresh() {
   const { data } = await readBig(LIVE, null, BR);

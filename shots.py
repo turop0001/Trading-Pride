@@ -166,7 +166,7 @@ def make_shots(sym, window, r, off, date_str):
     if d is None or len(d) < 50:
         return None
     d = d[['Open', 'High', 'Low', 'Close']].dropna()
-    dec = 2 if sym in ('XAUUSD',) else (1 if sym in ('US500', 'NAS100', 'US30', 'GER40') else 5)
+    dec = 2 if sym in ('XAUUSD',) else (3 if sym == 'USDJPY' else (1 if sym in ('US500', 'NAS100', 'US30', 'GER40') else 5))
     t_in = pd.Timestamp(sig['t_utc'])
     if t_in.tzinfo is None:
         t_in = t_in.tz_localize('UTC')
