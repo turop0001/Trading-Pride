@@ -43,8 +43,8 @@ Ccard=('<div class="card"><h2>Тип C · итоги по правилам Пу�
  +tbl(['Инструмент','Сделок','TP / SL / БУ','WR','ΣR','R / сделка','Макс. просадка'],[
    '<tr><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td>%s<td>%+.2fR</td><td>%s</td></tr>'%(k,s['n'],s['tp'],s['sl'],s['be'],s['wr'],cell(s['R']),s['avg'],dd(s['dd'])) for k,s in C['syms'].items()])
  +'<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">▶ По месяцам (Тип C, правила с 08.10)</summary>'
- +tbl(['Месяц','Сделок','TP / SL / БУ','WR','ΣR','R / сделка'],[
-   '<tr><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td>%s<td>%+.2fR</td></tr>'%(mname(m),s['n'],s['tp'],s['sl'],s['be'],s['wr'],cell(s['R']),s['avg']) for m,s in C['months'].items()])
+ +tbl(['Месяц','Сделок','TP / SL / БУ','WR','ΣR','R / сделка','Макс. просадка','Макс. серия SL'],[
+   '<tr><td>%s</td><td>%d</td><td>%d / %d / %d</td><td>%.1f%%</td>%s<td>%+.2fR</td><td>%s</td><td>%d</td></tr>'%(mname(m),s['n'],s['tp'],s['sl'],s['be'],s['wr'],cell(s['R']),s['avg'],dd(s['dd']),s['st']) for m,s in C['months'].items()])
  +'</details></div>')
 # 3. Combined card
 a5,c5,t5=A['all'],C['all'],AC['all']
