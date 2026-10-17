@@ -223,12 +223,12 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
       <div class="card" id="ckC"></div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="card">
-          <h2>FundingPips · 2 Step · этап 2</h2>
+          <h2>FundingPips · 2 Step · <select id="pStage" style="font:inherit;font-weight:inherit;color:inherit;background:transparent;border:1px solid var(--line,#ccc);border-radius:6px;padding:1px 6px"><option value="1">этап 1</option><option value="2">этап 2</option></select></h2>
           <div class="row2">
-            <div class="field"><label for="pStart">Старт депозита, $</label><input id="pStart" type="number" value="25000"></div>
-            <div class="field"><label for="pNow">Текущий баланс, $</label><input id="pNow" type="number" step="0.01" value="23300"><small id="pNowHint" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div>
+            <div class="field"><label for="pStart">Старт депозита, $</label><input id="pStart" type="number" value="50000"></div>
+            <div class="field"><label for="pNow">Текущий баланс, $</label><input id="pNow" type="number" step="0.01" value="50000"><small id="pNowHint" style="display:block;font-size:12px;margin-top:3px;color:var(--muted)"></small></div>
           </div>
-          <div class="field"><label for="pTarget">Цель этапа 2, % от старта</label><input id="pTarget" type="number" step="0.1" value="5"></div>
+          <div class="field"><label for="pTarget" id="pTargetLbl">Цель этапа 1, % от старта</label><input id="pTarget" type="number" step="0.1" value="8"></div>
           <div class="out">
             <div class="kv"><span>P/L от старта</span><span class="v" id="pPL">—</span></div>
             <div class="kv"><span>До цели этапа</span><span class="v" id="pToTarget">—</span></div>
@@ -243,7 +243,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
           <h2>Калькулятор лота</h2>
           <div class="row2">
             <div class="field"><label for="cProp">Проп-компания</label><select id="cProp"><option value="fp">FundingPips</option><option value="ftmo">FTMO</option></select></div>
-            <div class="field"><label for="cDep">Депозит, $</label><select id="cDep"><option>10000</option><option selected>25000</option><option>50000</option><option>100000</option></select></div>
+            <div class="field"><label for="cDep">Депозит, $</label><select id="cDep"><option>10000</option><option>25000</option><option selected>50000</option><option>100000</option></select></div>
           </div>
           <div class="row2">
             <div class="field"><label for="cRisk">Риск от депозита</label><select id="cRisk"><option value="auto">Авто (по счёту выше)</option><option value="1">1%</option><option value="0.5">0.5%</option><option value="0.25">0.25%</option></select></div>
@@ -530,7 +530,7 @@ tick();setInterval(tick,1000);
    баланса, с фиксацией на 0.25% ниже пол+500 до восстановления выше пол+1000. Плюс pRisk/pDay
    считались от СТАРТА (s), а не от ТЕКУЩЕГО баланса (now) — риск не отражал реальный текущий счёт. */
 function riskNow(){
-  var s=+$('pStart').value||25000, now=+$('pNow').value||s, floor=s*0.9;
+  var s=+$('pStart').value||50000, now=+$('pNow').value||s, floor=s*0.9;
   if(now<=floor) return {pct:0, st:s, now:now, floor:floor, dead:true};
   var lowLock=floor+500, lowUnlock=floor+1000;
   var locked=store('p_riskLocked025')==='1';
@@ -658,7 +658,7 @@ try{var sv=JSON.parse(store('p_rules5')||'{}');Object.keys(sv).forEach(function(
    иной, чем у FundingPips (см. data-cs-fp / data-cs-ftmo на инструментах), поэтому коэффициент
    «лотов на $10 000» меняется автоматически при смене компании и при смене текущей цены. */
 function calc(){
-  var rs=$('cRisk').value,prop=$('cProp').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||25000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,so=$('cSym').options[$('cSym').selectedIndex],cs=+so.dataset[prop==='ftmo'?'csFtmo':'csFp'],px=+$('cPx').value||+so.dataset.px,q=so.dataset.q==='inv'?1/px:(+so.dataset.q||1),k=10000/(cs*px*q),sp=+$('cStopP').value;
+  var rs=$('cRisk').value,prop=$('cProp').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||50000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,so=$('cSym').options[$('cSym').selectedIndex],cs=+so.dataset[prop==='ftmo'?'csFtmo':'csFp'],px=+$('cPx').value||+so.dataset.px,q=so.dataset.q==='inv'?1/px:(+so.dataset.q||1),k=10000/(cs*px*q),sp=+$('cStopP').value;
   $('cK').textContent='Контракт '+cs+' ('+(prop==='ftmo'?'FTMO':'FundingPips')+') · цена '+px+(q!==1?' · пересчёт в $ ×'+q.toFixed(4):'')+' → коэффициент '+k.toFixed(4)+' лота на $10 000';
   store('p_calc',JSON.stringify({d:$('cDep').value,r:rs,s:$('cSym').selectedIndex,p:prop}));
   $('oRisk').innerHTML='<b>$'+fm(risk)+'</b><small>'+pct.toFixed(2)+'%</small>';$('oWin').innerHTML='<b class="pos">+$'+fm(risk*2)+'</b><small>+'+(pct*2).toFixed(2)+'%</small>';
@@ -685,13 +685,17 @@ function pcalc(){
   calc();upd();
 }
 ['pStart','pNow','pTarget'].forEach(function(k){$(k).addEventListener('input',pcalc);});
+/* 18.10.2026: выбор этапа FundingPips 2 Step — этап 1 (цель 8%) / этап 2 (цель 5%) */
+function stageApply(v,fromUser){$('pStage').value=v;$('pTargetLbl').textContent='Цель этапа '+v+', % от старта';if(fromUser)$('pTarget').value=(v==='1'?8:5);store('p_stage',v);pcalc();}
+$('pStage').addEventListener('change',function(){stageApply(this.value,true);});
+stageApply(store('p_stage')==='2'?'2':'1',store('p_stage')===null);
 /* 29.09.2026: текущий баланс = база (введена вручную) + точные суммы $ закрытых сделок журнала,
    сохранённых ПОСЛЕ ввода базы. Правка поля «Текущий баланс» задаёт новую базу. */
-function balAnchor(){try{var a=JSON.parse(store('p_balAnchor')||'null');if(a&&isFinite(a.v))return a;}catch(e){}return {v:+$('pNow').value||23300,ts:0};}
+function balAnchor(){try{var a=JSON.parse(store('p_balAnchor2')||'null');if(a&&isFinite(a.v))return a;}catch(e){}return {v:50000,ts:Date.parse('2026-10-18T00:00:00Z')};}
 function balApply(){var a=balAnchor(),sum=0,n=0;(typeof DOCS!=='undefined'?DOCS:[]).forEach(function(x){var d=x.d;if(d&&isFinite(+d.usd)&&d.usd!==undefined&&(d.ts||0)>a.ts){sum+=+d.usd;n++;}});
   var v=Math.round((a.v+sum)*100)/100;if(document.activeElement!==$('pNow')){$('pNow').value=v;pcalc();}
   var h=$('pNowHint');if(h)h.textContent=n?('база $'+a.v.toLocaleString('ru-RU')+(sum>=0?' + ':' − ')+'$'+Math.abs(Math.round(sum*100)/100).toLocaleString('ru-RU')+' по '+n+' сделк'+(n===1?'е':'ам')+' журнала'):'обновляется по суммам закрытых сделок';}
-$('pNow').addEventListener('change',function(){store('p_balAnchor',JSON.stringify({v:+$('pNow').value||0,ts:Date.now()}));balApply();});
+$('pNow').addEventListener('change',function(){store('p_balAnchor2',JSON.stringify({v:+$('pNow').value||0,ts:Date.now()}));balApply();});
 
 /* report — данные обновляет монитор */
 /* ИСПРАВЛЕНО 28.09.2026: карточки «Отчёта дня» больше не зашиты в страницу (там висели данные
@@ -744,7 +748,7 @@ function ckBlock(kind,title,nums,cgi,pick){
 var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1],AUDUSD:[100000,100000],USDJPY:[100000,100000],UK100:[0.9,0.9],EURGBP:[100000,100000]};
 function lotFor(sym,entry,stop,prop){
   try{var cs=LOTCS[sym];if(!cs)return null;cs=cs[prop==='ftmo'?1:0];
-    var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||25000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,d=Math.abs(entry-stop);
+    var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||50000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,d=Math.abs(entry-stop);
     if(!(d>0)||!(risk>0))return {lot:0,risk:risk,pct:pct};
     var qj=sym==='USDJPY'?1/entry:((sym==='UK100'||sym==='EURGBP')?1.3225:1);return {lot:Math.floor(risk/(d*cs*qj)*100)/100,risk:risk,pct:pct};}catch(e){return null;}
 }
