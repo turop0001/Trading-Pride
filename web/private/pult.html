@@ -259,7 +259,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
             <option data-cs-fp="5" data-cs-ftmo="1" data-sym="US30" data-px="53690">US 30</option>
             <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="AUDUSD" data-px="0.7015">AUD/USD</option>
             <option data-cs-fp="100000" data-cs-ftmo="100000" data-q="inv" data-sym="USDJPY" data-px="157.36">USD/JPY</option>
-            <option data-cs-fp="1" data-cs-ftmo="1" data-q="1.3225" data-sym="UK100" data-px="10728">UK 100</option>
+            <option data-cs-fp="0.9" data-cs-ftmo="0.9" data-q="1.3225" data-sym="UK100" data-px="10728">UK 100</option>
             <option data-cs-fp="100000" data-cs-ftmo="100000" data-q="1.3225" data-sym="EURGBP" data-px="0.8579">EUR/GBP</option>
           </select></div>
           <div class="row2"><div class="field"><label for="cStopP">Стоп в красной зоне TradingView, %</label><input id="cStopP" type="number" step="0.005" placeholder="0.100"></div><div class="field"><label for="cPx">Цена инструмента сейчас</label><input id="cPx" type="number" step="any"></div></div><p class="note" id="cK" style="margin:-4px 0 10px"></p>
@@ -741,7 +741,7 @@ function ckBlock(kind,title,nums,cgi,pick){
   var det=items.map(function(it){var on=nums.indexOf(it[0])>=0;return '<div class="'+(on?'on':'')+'">'+(on?(kind==='minus'?'✕ ':'✓ '):'○ ')+it[0]+'. '+escA(it[1])+'</div>';}).join('');
   return '<div class="pxw"><details class="pxc k-'+kind+'"><summary><div class="pxh"><span>'+(kind==='req'?'Обязательные':kind==='cond'?'Условия входа':kind==='plus'?'Что усиливает':'Что ухудшает')+'</span><em>'+head+'</em></div><div class="pxbar"><i style="width:'+Math.round((kind==='minus'?(tot?n/tot:0):p)*100)+'%;background:'+col+'"></i></div><div class="pxchips">'+chips+'</div></summary><div class="pxd">'+det+'</div></details></div>';}
 /* лот для карточки «Вход»: те же формулы и настройки, что в калькуляторе (депозит, риск, ½ риска) */
-var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1],AUDUSD:[100000,100000],USDJPY:[100000,100000],UK100:[1,1],EURGBP:[100000,100000]};
+var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1],AUDUSD:[100000,100000],USDJPY:[100000,100000],UK100:[0.9,0.9],EURGBP:[100000,100000]};
 function lotFor(sym,entry,stop,prop){
   try{var cs=LOTCS[sym];if(!cs)return null;cs=cs[prop==='ftmo'?1:0];
     var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||25000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,d=Math.abs(entry-stop);
