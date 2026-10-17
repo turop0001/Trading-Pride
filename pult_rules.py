@@ -61,7 +61,7 @@ import pandas as pd
 
 BOX = {'A': (180, 600), 'C': (660, 985)}      # минуты Риги: Азия 03:00-10:00, Лондон 11:00-16:25
 WIN = {'A': (600, 780), 'C': (990, 1110)}     # окна входа 10:00-13:00 (с 16.10.2026, было до 14:00), 16:30-18:30
-DEC = {'XAUUSD': 2, 'EURUSD': 5, 'GBPUSD': 5, 'US500': 1, 'NAS100': 1, 'US30': 0, 'GER40': 1, 'AUDUSD': 5, 'USDJPY': 3}
+DEC = {'XAUUSD': 2, 'EURUSD': 5, 'GBPUSD': 5, 'US500': 1, 'NAS100': 1, 'US30': 0, 'GER40': 1, 'AUDUSD': 5, 'USDJPY': 3, 'UK100': 1, 'EURGBP': 5}
 
 
 def prev_trading_date(d):

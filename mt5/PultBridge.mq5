@@ -11,7 +11,7 @@
 
 //|   к цене сигнала; свечи шлются каждые 20 с в окнах, опрос каждые 10 с|
 //| v1.21 (16.10.2026): БУ для Типа A на 80% пути к цели (1,6R), C — 50%|
-//| v1.22 (17.10.2026): Тип A +2 инструмента: AUDUSD, USDJPY            |
+//| v1.22 (17.10.2026): Тип A +4 инструмента: AUDUSD, USDJPY, UK100, EURGBP |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
 #property version   "1.22"
@@ -48,10 +48,12 @@ input string MapUS30   = "US30";
 input string MapGER40  = "DE40";
 input string MapAUDUSD = "AUDUSD";
 input string MapUSDJPY = "USDJPY";
+input string MapUK100  = "UK100";
+input string MapEURGBP = "EURGBP";
 
 CTrade trade;
 datetime lastFeed=0, lastFull=0, lastPoll=0, lastBar=0;
-string NAMES[9] = {"EURUSD","GBPUSD","XAUUSD","US500","NAS100","US30","GER40","AUDUSD","USDJPY"};
+string NAMES[11] = {"EURUSD","GBPUSD","XAUUSD","US500","NAS100","US30","GER40","AUDUSD","USDJPY","UK100","EURGBP"};
 
 string BrokerSym(const string s)
 {
@@ -59,9 +61,10 @@ string BrokerSym(const string s)
    if(s=="XAUUSD") return MapXAUUSD;  if(s=="US500")  return MapUS500;
    if(s=="NAS100") return MapNAS100;  if(s=="US30")   return MapUS30;
    if(s=="GER40")  return MapGER40;   if(s=="AUDUSD") return MapAUDUSD;
-   if(s=="USDJPY") return MapUSDJPY;  return "";
+   if(s=="USDJPY") return MapUSDJPY;  if(s=="UK100")  return MapUK100;
+   if(s=="EURGBP") return MapEURGBP;  return "";
 }
-int GroupOf(const string s) { return (s=="US500"||s=="NAS100"||s=="US30"||s=="GER40") ? 1 : 2; }
+int GroupOf(const string s) { return (s=="US500"||s=="NAS100"||s=="US30"||s=="GER40"||s=="UK100") ? 1 : 2; }
 
 int OnInit()
 {
@@ -101,7 +104,7 @@ bool GroupBusy(const int grp, const bool isBuy)
       if(!PositionSelectByTicket(tk) || PositionGetInteger(POSITION_MAGIC)!=MagicNumber) continue;
       string ps=PositionGetString(POSITION_SYMBOL);
       bool pb=PositionGetInteger(POSITION_TYPE)==POSITION_TYPE_BUY;
-      for(int k=0;k<9;k++) if(BrokerSym(NAMES[k])==ps && GroupOf(NAMES[k])==grp && pb==isBuy) return true;
+      for(int k=0;k<11;k++) if(BrokerSym(NAMES[k])==ps && GroupOf(NAMES[k])==grp && pb==isBuy) return true;
    }
    return false;
 }
@@ -114,7 +117,7 @@ bool InFastWindow()
 }
 int FeedNow() { return InFastWindow() ? MathMin(FastFeedSec,FeedSec) : FeedSec; }
 
-string PsymOf(const string bsym) { for(int k=0;k<9;k++) if(BrokerSym(NAMES[k])==bsym) return NAMES[k]; return ""; }
+string PsymOf(const string bsym) { for(int k=0;k<11;k++) if(BrokerSym(NAMES[k])==bsym) return NAMES[k]; return ""; }
 
 ulong FindOrder(const string id)
 {
@@ -231,7 +234,7 @@ void SendFeed()
    bool full=(now-lastFull>=3600);          // раз в час — полная история, иначе последние бары
    int off=(int)MathRound((double)(TimeTradeServer()-TimeGMT())/900.0)*900;
    string body="FEED1\n";
-   for(int k=0;k<9;k++)
+   for(int k=0;k<11;k++)
    {
       string sym=BrokerSym(NAMES[k]);
       if(sym=="" || !SymbolSelect(sym,true)) continue;

@@ -42,12 +42,14 @@ TICKERS = {
     'US500': 'ES=F', 'NAS100': 'NQ=F', 'US30': 'YM=F', 'GER40': 'MT5:GER40',
     # 17.10.2026: Тип A +AUDUSD, +USDJPY (XAGUSD не взят: на движке аналитики поднимает просадку до 5,4R); основной источник — свечи MT5 (Tickmill), Yahoo — запасной путь
     'AUDUSD': 'AUDUSD=X', 'USDJPY': 'JPY=X',
+    # 17.10.2026: Тип A +UK100 (индекс, как GER40: в азиатском боксе Yahoo не торгуется — только свечи MT5), +EURGBP
+    'UK100': 'MT5:UK100', 'EURGBP': 'EURGBP=X',
 }
 
-# Инструменты по типу — Тип A торгует все 9 (с 17.10.2026: +AUDUSD, USDJPY; GER40 временно пропущен, см. комментарий выше),
+# Инструменты по типу — Тип A торгует все 11 (с 17.10.2026: +AUDUSD, USDJPY, UK100, EURGBP; GER40 временно пропущен, см. комментарий выше),
 # Тип C только 3 (XAUUSD/EURUSD/GBPUSD) — раньше main() проверял ВСЕ TICKERS в обоих окнах.
 WINDOW_SYMBOLS = {
-    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY'],
+    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY', 'UK100', 'EURGBP'],
     'C': ['XAUUSD', 'EURUSD', 'GBPUSD'],
 }
 

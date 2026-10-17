@@ -4,7 +4,7 @@ import sys, os, datetime as dt, pandas as pd
 import analytics_gen as AG
 BASE = os.path.expanduser('~/mnt/Work/Trading System/_bt/_data/')
 last = dt.date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else dt.date(2026, 10, 9)
-SYMS = {'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'GER40', 'NAS100', 'US30', 'US500', 'AUDUSD', 'USDJPY'], 'C': ['XAUUSD', 'EURUSD', 'GBPUSD']}
+SYMS = {'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'GER40', 'NAS100', 'US30', 'US500', 'AUDUSD', 'USDJPY', 'UK100', 'EURGBP'], 'C': ['XAUUSD', 'EURUSD', 'GBPUSD']}
 
 
 def load(s):

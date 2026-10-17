@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 var W=1000,Hh=470,L=66,R=150,T=54,Bt=34,HW=1000,HH=360;
-var DECM={XAUUSD:2,EURUSD:5,GBPUSD:5,US500:1,NAS100:1,US30:0,GER40:1,AUDUSD:5,USDJPY:3};
+var DECM={XAUUSD:2,EURUSD:5,GBPUSD:5,US500:1,NAS100:1,US30:0,GER40:1,AUDUSD:5,USDJPY:3,UK100:1,EURGBP:5};
 function dec(s){return DECM[s]!=null?DECM[s]:5}
 function px(v,s){return Number(v).toFixed(dec(s))}
 var CFG={A:{rr:2,b0:'03:00',b1:'09:55',s0:'10:00',bn:'Азия'},C:{rr:3,b0:'11:00',b1:'16:25',s0:'16:30',bn:'бокс'}};

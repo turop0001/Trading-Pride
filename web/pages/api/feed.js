@@ -11,7 +11,7 @@ import { readBig, writeJson, ensureBranch } from '../../lib/gh';
 
 export const config = { api: { bodyParser: { sizeLimit: '4mb' } } };
 const KEEP = { M5: 12 * 24 * 12, H1: 24 * 40, D1: 60 }; // ~12 дней M5, 40 дней H1, 60 D1
-const SYMS = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY'];
+const SYMS = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY', 'UK100', 'EURGBP'];
 const BR = 'feed', HIST = 'feed/hist.json', LIVE = 'feed/live.json';
 const KEEP_LIVE = { M5: 120, H1: 6, D1: 3 };
 
