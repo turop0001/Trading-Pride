@@ -12,9 +12,10 @@
 //|   к цене сигнала; свечи шлются каждые 20 с в окнах, опрос каждые 10 с|
 //| v1.21 (16.10.2026): БУ для Типа A на 80% пути к цели (1,6R), C — 50%|
 //| v1.22 (17.10.2026): Тип A +4 инструмента: AUDUSD, USDJPY, UK100, EURGBP |
+//| v1.23 (18.10.2026): торговля только Тип C (TradeTypeA=false); Тип C — 8 инстр. |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.22"
+#property version   "1.23"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -26,6 +27,7 @@ input int    FastFeedSec     = 3;      // в окнах A/C (UTC 06:30–11:30 �
 input bool   PendEnabled     = true;    // Тип C: stop-ордер на уровне 20% после выноса (нужен TradeEnabled=true)
 input bool   LimitOnMissA    = false;   // Тип A: НЕ входить на откате (по решению 08.10.2026 пропущенный вход отменяется); оставлено выключенным
 input bool   MoveToBE        = true;    // стоп в безубыток: Тип A на 80% пути к цели, Тип C на 50%
+input bool   TradeTypeA      = false;   // v1.23 (18.10.2026): торговать Тип A (false = только Тип C; сигналы A в Пульте и на графике остаются)
 input bool   TradeEnabled    = false;   // false = только журнал, без сделок
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
 input double RiskPercent     = 1.0;     // риск на сделку, % баланса
@@ -276,6 +278,7 @@ void OnTimer()
       int nf=StringSplit(lines[i],'|',f);
       if(nf<8) continue;
       seen+=(f[7]=="wait"?StringSubstr(f[0],0,StringLen(f[0])-1):f[0])+"|";
+      if(!TradeTypeA && StringFind(f[0],"_A")>0) continue;   // v1.23: Тип A не торгуем
       if(f[7]=="wait") { if(PendEnabled) HandleWait(f[0],f[1],f[2],StringToDouble(f[4]),StringToDouble(f[5]),StringToDouble(f[6]),(nf>9?StringToDouble(f[9]):0)); continue; }
       Process(f[0],f[1],f[2],(datetime)StringToInteger(f[3]),StringToDouble(f[4]),StringToDouble(f[5]),StringToDouble(f[6]),f[7],nowUtc,(nf>10?(datetime)StringToInteger(f[10]):0));
    }

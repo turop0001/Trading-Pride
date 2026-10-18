@@ -25,6 +25,10 @@ ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDU
 def mins(t): return t.hour * 60 + t.minute
 
 
+# 18.10.2026 (решение владельца): уведомления (Telegram, push) — только Тип C; Тип A считается и рисуется как раньше (карточки, state, аналитика), но не шлётся.
+NOTIFY_WIN = ('C',)
+
+
 def push(title, body, tag=None, sticky=False):
     """Push на телефон/компьютер (webpush_send.py); тихо ничего не делает, если ключа или подписок нет."""
     try:
@@ -212,6 +216,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
     один раз до конца дня. Если TP/SL уже случился — обновляем карточку, историю, скриншоты и
     шлём одно короткое сообщение с итогом сделки и обновлённым итогом дня."""
     upd = []
+    chg = []
     for w in ('A', 'C'):
         for s in syms_of(w):
             r = state.get(f'{s}_{w}', {})
@@ -259,6 +264,8 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             state[f'{s}_{w}'] = r
             tm = tr.get('exit_time') or '22:00'
             r['exit_time'] = tm
+            chg.append(1)
+            if w not in NOTIFY_WIN: continue   # Тип A: карточки/state обновлены, уведомление не шлём
             rr_ = float(sig.get('rr') or 2)
             if out == 'T22':
                 xr = float(r.get('exit_r') or 0)
@@ -271,7 +278,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
                            f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
     if upd:
         total = 0.0
-        for w in ('A', 'C'):
+        for w in NOTIFY_WIN:
             res = {s: state.get(f'{s}_{w}', {}) for s in syms_of(w) if state.get(f'{s}_{w}', {}).get('date') == today}
             total += result_of(res)[1]
         sign = '+' if total > 0 else ('-' if total < 0 else '')
@@ -283,7 +290,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
         ds = state.get('_daily_summary') or {}
         ds['total_pct'] = total; state['_daily_summary'] = ds
         did.append('final')
-    return bool(upd)
+    return bool(upd) or bool(chg)
 
 
 def main(send=True):
@@ -294,6 +301,8 @@ def main(send=True):
     flags = state.get('_flags', {})
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))
+    tgw = lambda w_, x: tg(x) if w_ in NOTIFY_WIN else print('[Тип', w_, 'без уведомления]')
+    pushw = lambda w_, *a_, **k_: push(*a_, **k_) if w_ in NOTIFY_WIN else None
     window = lc.window_now(riga) if wd < 5 else None
     did = []
 
@@ -309,7 +318,7 @@ def main(send=True):
             if (ls, r.get('direction'), tgnote) != (p_ls, p.get('direction'), p_tgnote):
                 changed.append(line); syms.append(s)
                 if not first and tgnote and not tgnote.startswith('НАБЛЮДАЕМ'):
-                    push(f"{s} · тип {win} — {tgnote}", str(r.get('direction') or ''), tag=f'{s}_{win}')
+                    pushw(win, f"{s} · тип {win} — {tgnote}", str(r.get('direction') or ''), tag=f'{s}_{win}')
             else:
                 unchanged.append(line)
             if r.pop('new_signal', False): sigs.append(r)
@@ -317,8 +326,8 @@ def main(send=True):
             if r.get('be_armed') and not p.get('be_armed') and str(r.get('note', '')).startswith('В СДЕЛКЕ') and (r.get('signal') or {}).get('be_at'):
                 sg_ = r['signal']
                 try:
-                    tg(f"\u26A0\uFE0F {s} ({r['direction']}) — цена прошла {round(100 * (sg_['be_at'] - sg_['entry']) / (sg_['tp'] - sg_['entry'])) if sg_.get('tp') != sg_.get('entry') else 80}% пути к цели (БУ {sg_['be_at']}). Переноси стоп на вход {sg_['entry']}.")
-                    push(f"{s} · цена дошла до БУ", f"Переноси стоп на вход {sg_['entry']}", tag=f'{s}_{win}_be', sticky=True)
+                    tgw(win, f"\u26A0\uFE0F {s} ({r['direction']}) — цена прошла {round(100 * (sg_['be_at'] - sg_['entry']) / (sg_['tp'] - sg_['entry'])) if sg_.get('tp') != sg_.get('entry') else 80}% пути к цели (БУ {sg_['be_at']}). Переноси стоп на вход {sg_['entry']}.")
+                    pushw(win, f"{s} · цена дошла до БУ", f"Переноси стоп на вход {sg_['entry']}", tag=f'{s}_{win}_be', sticky=True)
                     did.append('be_alert'); r['be_alert_at'] = t
                 except Exception as e:
                     print('be alert failed:', e)
@@ -329,11 +338,11 @@ def main(send=True):
             nxt = ('C', '16:30') if (win == 'A' and lc.C_ENABLED) else (None, None)
             txt = build_window_open(dstr, win, '10:00–13:00' if win == 'A' else '16:30–18:30', lines_for(win, res), *nxt)
             if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00."
-            tg(txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
+            tgw(win, txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
         else:
             text = ('изменилось: ' + ', '.join(syms)) if syms else 'без изменений'
             if changed:
-                tg(build_update(dstr, win, t, changed, unchanged)); did.append('update')
+                tgw(win, build_update(dstr, win, t, changed, unchanged)); did.append('update')
         for r in sigs:
             sg = r['signal']
             try:
@@ -342,7 +351,7 @@ def main(send=True):
                                  'result': f"сигнал Пульта в {sg.get('time')}"})
             except Exception as e:
                 print('history add failed:', e)
-            tg(build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], 1.0,
+            tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], 1.0,
                             note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2)); did.append('signal')
         return text, syms, changed
 
@@ -371,7 +380,7 @@ def main(send=True):
                 txt = build_window_closed(dstr, w, rng, lines, nxt[0], nxt[1], trades=n, pct=pct, end_time=rng[-5:])
                 if w == 'C': txt += "\n\n⏰ Следующее — отчёт дня, 19:00."
                 if n and pct == 0: txt += "\n(результат сделки не закрыт на момент отчёта)"
-                tg(txt); flags['close' + w] = True; did.append('close' + w)
+                tgw(w, txt); flags['close' + w] = True; did.append('close' + w)
                 text = text or f'окно {w} закрыто, отчёт отправлен'
         if m >= 1140 and not flags.get('summary') and (flags.get('openA') or flags.get('openC')):
             sections, total = [], 0.0
@@ -384,7 +393,9 @@ def main(send=True):
                 # в итоговом отчёте дня больше нет (по просьбе пользователя).
                 main_l = lines_for(w, res, closed=True)
                 sections.append((w, main_l, []))
-            tg(build_daily_summary(dstr, sections, total).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + (' ( вместе тип A и C )' if lc.C_ENABLED else ' (тип A)'), 1))
+            sections_n = [x for x in sections if x[0] in NOTIFY_WIN]
+            total_n = sum(result_of({s: state.get(f'{s}_{x[0]}', {}) for s in syms_of(x[0]) if state.get(f'{s}_{x[0]}', {}).get('date') == today})[1] for x in sections_n)
+            tg(build_daily_summary(dstr, sections_n, total_n).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + ' (тип C)', 1))
             flags['summary'] = True; did.append('summary'); text = text or 'отчёт дня отправлен'
             # ДОБАВЛЕНО 29.09.2026: сохраняем отчёт дня в state (коммитится в репозиторий вместе
             # с остальным state) — нужно странице Vercel, чтобы показывать тот же итог дня, что
