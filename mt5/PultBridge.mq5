@@ -13,6 +13,7 @@
 //| v1.21 (16.10.2026): БУ для Типа A на 80% пути к цели (1,6R), C — 50%|
 //| v1.22 (17.10.2026): Тип A +4 инструмента: AUDUSD, USDJPY, UK100, EURGBP |
 //| v1.23 (18.10.2026): торговля только Тип C (TradeTypeA=false); Тип C — 8 инстр. |
+//| v1.24 (18.10.2026): Тип C — риск ×0,5 после 2 SL подряд по счёту (HalfRiskAfter2SL) |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
 #property version   "1.23"
@@ -31,6 +32,7 @@ input bool   TradeTypeA      = false;   // v1.23 (18.10.2026): торговат�
 input bool   TradeEnabled    = false;   // false = только журнал, без сделок
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
 input double RiskPercent     = 1.0;     // риск на сделку, % баланса
+input bool   HalfRiskAfter2SL = true;    // v1.24: Тип C — после 2 SL подряд риск ×0,5 до первого TP (БУ серию не меняет)
 input int    PollSec         = 3;
 input int    MaxSignalAgeMin = 10;      // сигнал старше — пропуск
 input double MaxDriftOfStop  = 0.50;    // цена ушла от входа больше доли стопа — пропуск
@@ -311,11 +313,45 @@ double CapLots(const string sym,const bool isBuy,double lots,const double price)
    lots=MathFloor(lots/step)*step;
    return (lots<vmin)?0:lots;
 }
-double LotsFor(const string sym,const bool isBuy,const double price,const double sl)
+int CStreakSL()
+{
+   // серия стопов Типа C по счёту (по закрытию): SL +1, TP сброс, БУ не меняет; считаем за последние 90 дней
+   if(!HistorySelect(TimeCurrent()-90*86400,TimeCurrent()+86400)) return 0;
+   ulong cpos[]; int nc=0, streak=0;
+   double base=AccountInfoDouble(ACCOUNT_BALANCE)*RiskPercent/100.0;
+   int n=HistoryDealsTotal();
+   for(int i=0;i<n;i++)
+   {
+      ulong t=HistoryDealGetTicket(i);
+      if(t==0 || HistoryDealGetInteger(t,DEAL_MAGIC)!=MagicNumber) continue;
+      long en=HistoryDealGetInteger(t,DEAL_ENTRY);
+      ulong pid=(ulong)HistoryDealGetInteger(t,DEAL_POSITION_ID);
+      if(en==DEAL_ENTRY_IN)
+      {
+         if(StringFind(HistoryDealGetString(t,DEAL_COMMENT),"_C")>0) { ArrayResize(cpos,nc+1); cpos[nc++]=pid; }
+         continue;
+      }
+      if(en!=DEAL_ENTRY_OUT) continue;
+      bool isC=false;
+      for(int k=0;k<nc;k++) if(cpos[k]==pid) { isC=true; break; }
+      if(!isC) continue;
+      double pr=HistoryDealGetDouble(t,DEAL_PROFIT)+HistoryDealGetDouble(t,DEAL_SWAP)+HistoryDealGetDouble(t,DEAL_COMMISSION);
+      long rs=HistoryDealGetInteger(t,DEAL_REASON);
+      if(rs==DEAL_REASON_TP || pr>0.3*base) streak=0;
+      else if(pr< -0.5*base) streak++;
+   }
+   return streak;
+}
+double RiskPct(const string id)
+{
+   if(HalfRiskAfter2SL && StringFind(id,"_C")>0 && CStreakSL()>=2) return RiskPercent*0.5;
+   return RiskPercent;
+}
+double LotsFor(const string sym,const bool isBuy,const double price,const double sl,const string rid="")
 {
    double loss=0;
    if(!OrderCalcProfit(isBuy?ORDER_TYPE_BUY:ORDER_TYPE_SELL,sym,1.0,price,sl,loss) || loss>=0) return 0;
-   double riskMoney=AccountInfoDouble(ACCOUNT_BALANCE)*RiskPercent/100.0;
+   double riskMoney=AccountInfoDouble(ACCOUNT_BALANCE)*RiskPct(rid)/100.0;
    double step=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP), vmin=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN), vmax=SymbolInfoDouble(sym,SYMBOL_VOLUME_MAX);
    double lots=MathFloor(riskMoney/MathAbs(loss)/step)*step;
    if(lots<vmin) return 0;
@@ -368,7 +404,7 @@ void HandleWait(const string idw,const string psym,const string side,const doubl
       if((MaxEntriesDay>0 && entries>=MaxEntriesDay) || (StopAfterLosses>0 && losses>=StopAfterLosses)) return;
       if(OneIdeaPerGroup && GroupBusy(GroupOf(psym),isBuy)) return;
    }
-   double lots=LotsFor(sym,isBuy,pe,ps);
+   double lots=LotsFor(sym,isBuy,pe,ps,id);
    if(lots<=0) return;
    trade.SetTypeFillingBySymbol(sym);
    datetime exp=TimeCurrent()+2*3600;
@@ -429,7 +465,7 @@ void Process(const string id,const string psym,const string side,const datetime 
 
    double loss=0;
    if(!OrderCalcProfit(isBuy?ORDER_TYPE_BUY:ORDER_TYPE_SELL,sym,1.0,price,sl,loss) || loss>=0) { Print(id," не посчитан лот"); return; }
-   double riskMoney=AccountInfoDouble(ACCOUNT_BALANCE)*RiskPercent/100.0;
+   double riskMoney=AccountInfoDouble(ACCOUNT_BALANCE)*RiskPct(id)/100.0;
    double step=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP), vmin=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN), vmax=SymbolInfoDouble(sym,SYMBOL_VOLUME_MAX);
    double lots=MathFloor(riskMoney/MathAbs(loss)/step)*step;
    if(lots<vmin) { Done(gv,id+" пропуск: лот меньше минимального"); return; }

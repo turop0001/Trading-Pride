@@ -747,17 +747,18 @@ function ckBlock(kind,title,nums,cgi,pick){
   return '<div class="pxw"><details class="pxc k-'+kind+'"><summary><div class="pxh"><span>'+(kind==='req'?'Обязательные':kind==='cond'?'Условия входа':kind==='plus'?'Что усиливает':'Что ухудшает')+'</span><em>'+head+'</em></div><div class="pxbar"><i style="width:'+Math.round((kind==='minus'?(tot?n/tot:0):p)*100)+'%;background:'+col+'"></i></div><div class="pxchips">'+chips+'</div></summary><div class="pxd">'+det+'</div></details></div>';}
 /* лот для карточки «Вход»: те же формулы и настройки, что в калькуляторе (депозит, риск, ½ риска) */
 var LOTCS={XAUUSD:[100,100],EURUSD:[100000,100000],GBPUSD:[100000,100000],US500:[50,1],NAS100:[20,1],GER40:[25,1],US30:[5,1],AUDUSD:[100000,100000],USDJPY:[100000,100000],UK100:[0.9,0.9],EURGBP:[100000,100000]};
-function lotFor(sym,entry,stop,prop){
+function cStreakSL(){try{var a=(DOCS||[]).filter(function(x){return x.d&&x.d.type==='C';}).sort(function(p,q){return (p.d.ts||0)-(q.d.ts||0);}),n=0;a.forEach(function(x){var o=outOf(x.d);if(o==='SL')n++;else if(o==='TP')n=0;});return n;}catch(e){return 0;}}
+function lotFor(sym,entry,stop,prop,win){
   try{var cs=LOTCS[sym];if(!cs)return null;cs=cs[prop==='ftmo'?1:0];
-    var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||50000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value),risk=dep*pct/100,d=Math.abs(entry-stop);
+    var rs=$('cRisk').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||50000):+$('cDep').value),pct=(rs==='auto'?riskNow().pct:+rs)*(+$('cHalf').value)*((win==='C'&&+$('cHalf').value===1&&cStreakSL()>=2)?0.5:1),risk=dep*pct/100,d=Math.abs(entry-stop);
     if(!(d>0)||!(risk>0))return {lot:0,risk:risk,pct:pct};
     var qj=sym==='USDJPY'?1/entry:((sym==='UK100'||sym==='EURGBP')?1.3225:1);return {lot:Math.floor(risk/(d*cs*qj)*100)/100,risk:risk,pct:pct};}catch(e){return null;}
 }
-function lotsRow(sym,entry,stop){
+function lotsRow(sym,entry,stop,win){
   var e=parseFloat(entry),s=parseFloat(stop);if(!isFinite(e)||!isFinite(s))return null;
-  var a=lotFor(sym,e,s,'fp'),b=lotFor(sym,e,s,'ftmo');if(!a||!b)return null;
+  var a=lotFor(sym,e,s,'fp',win),b=lotFor(sym,e,s,'ftmo',win);if(!a||!b)return null;
   var chip=function(n,r,c){return '<span class="pl '+c+'" style="font-size:14px;padding:5px 14px;gap:8px;border-width:2px"><i style="font-weight:800;font-size:13px;opacity:1;letter-spacing:.03em">'+n+'</i> <b style="font-size:19px">'+r.lot.toFixed(2)+'</b></span>';};
-  return '<div class="pxp">'+chip('FP',a,'base')+chip('FTMO',b,'warn')+'<span class="pl" style="font-size:15px;font-weight:700;padding:5px 13px;border-color:var(--text)">риск $'+fm(a.risk)+' · '+a.pct.toFixed(2)+'%</span></div>';
+  return '<div class="pxp">'+chip('FP',a,'base')+chip('FTMO',b,'warn')+'<span class="pl" style="font-size:15px;font-weight:700;padding:5px 13px;border-color:var(--text)">риск $'+fm(a.risk)+' · '+a.pct.toFixed(2)+'%'+((win==='C'&&cStreakSL()>=2&&+$('cHalf').value===1)?' · ×0,5 после 2 SL':'')+'</span></div>';
 }
 function liveCard(x){
   var dir=String(x.direction||''),es=/SHORT/.test(dir)?'short':/LONG/.test(dir)?'long':null;
@@ -791,7 +792,7 @@ function liveCard(x){
   if(x.sl_why)rows.push(['Разбор SL',x.sl_why]);
   var curR=null;
   if(x.signal){var xt=x.exit_time?' · '+x.exit_time:'',isT=/→ TP/.test(x.note||''),isS=/→ SL/.test(x.note||'');
-    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);if(x.status==='entry'&&!isT&&!isS){var lr=lotsRow(x.sym,x.signal.entry,x.signal.stop);if(lr)rows.splice(2,0,['Лот на вход',lr]);}rows.push(['Цель '+(x.signal.rr||2)+'R',x.signal.tp+(isT?xt:'')]);
+    rows.push(['Вход',x.signal.entry+' · '+x.signal.time]);rows.push(['Стоп',x.signal.stop+(isS?xt:'')]);if(x.status==='entry'&&!isT&&!isS){var lr=lotsRow(x.sym,x.signal.entry,x.signal.stop,x.window);if(lr)rows.splice(2,0,['Лот на вход',lr]);}rows.push(['Цель '+(x.signal.rr||2)+'R',x.signal.tp+(isT?xt:'')]);
     if(x.signal.be_at)rows.push(['Стоп в БУ при',String(x.signal.be_at)+(function(){var e=parseFloat(x.signal.entry),t=parseFloat(x.signal.tp),b=parseFloat(x.signal.be_at);return (isFinite(e)&&isFinite(t)&&t!==e&&isFinite(b))?' ('+Math.round((b-e)/(t-e)*100)+'% пути)':'';})()]);
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
