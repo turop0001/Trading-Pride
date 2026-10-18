@@ -16,7 +16,7 @@
 //| v1.24 (18.10.2026): Тип C — риск ×0,5 после 2 SL подряд по счёту (HalfRiskAfter2SL) |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.23"
+#property version   "1.24"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -31,7 +31,7 @@ input bool   MoveToBE        = true;    // стоп в безубыток: Ти�
 input bool   TradeTypeA      = false;   // v1.23 (18.10.2026): торговать Тип A (false = только Тип C; сигналы A в Пульте и на графике остаются)
 input bool   TradeEnabled    = false;   // false = только журнал, без сделок
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
-input double RiskPercent     = 1.0;     // риск на сделку, % баланса
+input double RiskPercent     = 0.5;     // риск на сделку, % баланса (стандарт 0,5%; после 2 SL подряд Типа C — ×0,5 = 0,25%)
 input bool   HalfRiskAfter2SL = true;    // v1.24: Тип C — после 2 SL подряд риск ×0,5 до первого TP (БУ серию не меняет)
 input int    PollSec         = 3;
 input int    MaxSignalAgeMin = 10;      // сигнал старше — пропуск
