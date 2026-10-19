@@ -537,15 +537,11 @@
     "symbol": "XAUUSD",
     "type": "C",
     "side": "long",
-    "entry": 4153.41,
-    "stop": 4151.86,
-    "target": 4158.06,
+    "entry": 4151.58,
+    "stop": 4142.88,
+    "target": 4177.68,
     "result": "ВХОД → SL −1R",
-    "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 9.3R",
-    "shots": {
-      "m5": "state/shots/2026-10-19_XAUUSD_C_m5.png",
-      "h1": "state/shots/2026-10-19_XAUUSD_C_h1.png"
-    }
+    "autopsy": "шла в плюс до +0.4R, стоп через 1 ч 55 мин; после стопа цель не достигнута, цена ушла дальше против на 1.7R"
   },
   {
     "id": "2026-10-19_US500_C",
@@ -553,15 +549,10 @@
     "symbol": "US500",
     "type": "C",
     "side": "long",
-    "entry": 7734.2,
-    "stop": 7731.8,
-    "target": 7741.7,
-    "result": "ВХОД → SL −1R",
-    "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 17:10 — стоп выбило",
-    "shots": {
-      "m5": "state/shots/2026-10-19_US500_C_m5.png",
-      "h1": "state/shots/2026-10-19_US500_C_h1.png"
-    }
+    "entry": 7686.6,
+    "stop": 7681.6,
+    "target": 7701.4,
+    "result": "ВХОД → TP 🎯 +3R"
   },
   {
     "id": "2026-10-19_AUDUSD_C",
@@ -569,14 +560,10 @@
     "symbol": "AUDUSD",
     "type": "C",
     "side": "short",
-    "entry": 0.6993,
-    "stop": 0.69952,
-    "target": 0.69865,
-    "result": "ВХОД → TP 🎯 +3R",
-    "shots": {
-      "m5": "state/shots/2026-10-19_AUDUSD_C_m5.png",
-      "h1": "state/shots/2026-10-19_AUDUSD_C_h1.png"
-    }
+    "entry": 0.69914,
+    "stop": 0.69932,
+    "target": 0.69861,
+    "result": "ВХОД → TP 🎯 +3R"
   },
   {
     "id": "2026-10-19_EURGBP_C",

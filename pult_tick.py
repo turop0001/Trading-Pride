@@ -306,6 +306,17 @@ def main(send=True):
     window = lc.window_now(riga) if wd < 5 else None
     did = []
 
+    # 20.10.2026 (решение владельца): MT5 выключен (нет свежих свечей советника) -> никаких сигналов, карточек и сообщений
+    # в Telegram/push до его включения; окно открывается отчётом, когда свечи появятся. Yahoo как запасной путь отключён (live_check.MT5_ONLY).
+    if wd < 5 and 600 <= m < 1320 and lc.MT5_ONLY and not lc.mt5_online():
+        st_ = state.get('_mt5') or {}
+        state['_mt5'] = {'online': False, 'since': st_.get('since') if st_.get('online') is False else t, 'date': today, 'checked': t}
+        lc.save_state(state)
+        print('MT5 OFFLINE - ждём включения советника, сигналов нет'); print('NEXT_MIN: 1')
+        return
+    if (state.get('_mt5') or {}).get('online') is False:
+        state['_mt5'] = {'online': True, 'since': t, 'date': today}
+
     def check_and_update(win, first):
         res = analyze_window(state, win, today)
         changed, unchanged, syms, sigs = [], [], [], []

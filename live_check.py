@@ -105,7 +105,7 @@ def _fill_asia_gap(m, ticker, period):
     например, терминал был выключен ночью. Обычная часовая пауза индексов дыру не создаёт и ничего не подмешивает:
     иначе уровни фьючерса Yahoo смешиваются с ценами CFD брокера (ложные/запоздалые сигналы)."""
     import pandas as pd
-    if m is None or str(ticker).startswith('MT5:'): return m
+    if m is None or str(ticker).startswith('MT5:') or MT5_ONLY: return m
     try:
         riga, off = riga_now()
         if riga.hour * 60 + riga.minute < 600 or riga.weekday() >= 5: return m   # бокс Азии ещё идёт / выходной
@@ -128,7 +128,7 @@ def fetch_ohlc(ticker, period, interval):
     if m is not None and len(m) >= 10 and interval not in ('60m', '1d'):
         m = _fill_asia_gap(m, ticker, period)
     if m is not None and len(m) >= 10: return m
-    if str(ticker).startswith('MT5:'): return None
+    if str(ticker).startswith('MT5:') or MT5_ONLY: return None
     import yfinance as yf
     import pandas as pd
     d = yf.download(ticker, period=period, interval=interval, progress=False, auto_adjust=False)
@@ -166,10 +166,10 @@ def trend_narrative(ticker):
 
 def fetch(ticker, src=None):
     # src='Yahoo' — принудительно Yahoo (сигнал был посчитан по Yahoo: уровни фьючерса ≠ цены CFD)
-    m = None if src == 'Yahoo' else mt5_frame(ticker, 'M5')
+    m = None if (src == 'Yahoo' and not MT5_ONLY) else mt5_frame(ticker, 'M5')
     if m is not None:
         return _fill_asia_gap(m, ticker, '10d')
-    if str(ticker).startswith('MT5:'): return None
+    if str(ticker).startswith('MT5:') or MT5_ONLY: return None
     import yfinance as yf
     import pandas as pd
     # ИСПРАВЛЕНО 28.09.2026: period 5d -> 10d. Для вычисления bias нужен бокс ПРЕДЫДУЩЕГО
@@ -190,6 +190,9 @@ def fetch(ticker, src=None):
 FEED_URL = 'https://api.github.com/repos/turop0001/Trading-Pride/contents/feed/{}.json?ref=feed'
 _FEED = {'t': 0, 'data': None}
 SRC = {}   # sym -> 'MT5' | 'Yahoo' (для логов/карточек)
+# 20.10.2026 (решение владельца): ТОЛЬКО свечи MT5. Запасной путь Yahoo (фьючерсы/индикативные квоты) давал ложные входы и стопы
+# (19.10: US500 и золото по Yahoo). Если MT5 выключен — Пульт и Telegram молчат до его включения. Вернуть Yahoo: PULT_ALLOW_YAHOO=1.
+MT5_ONLY = os.environ.get('PULT_ALLOW_YAHOO', '') != '1'
 
 
 def _feed():
@@ -242,6 +245,17 @@ def mt5_frame(ticker, tf='M5', max_age_h=None):
     d.index = pd.to_datetime(d.pop('t'), unit='s', utc=True)
     if tf == 'M5': SRC[sym] = 'MT5'
     return d
+
+
+def mt5_online(max_min=15):
+    """True, если советник MT5 присылает свежие свечи (хотя бы по одному инструменту последний M5-бар не старше max_min минут)."""
+    import time
+    data = _feed()
+    best = 0
+    for sym, tfs in ((data or {}).get('syms') or {}).items():
+        b = (tfs.get('M5') or [])
+        if b: best = max(best, b[-1][0])
+    return bool(best) and time.time() - best <= max_min * 60 + 300
 
 
 def is_stale(d, n=4):
