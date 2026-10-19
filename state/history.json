@@ -546,5 +546,16 @@
       "m5": "state/shots/2026-10-19_XAUUSD_C_m5.png",
       "h1": "state/shots/2026-10-19_XAUUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-19_US500_C",
+    "date": "2026-10-19",
+    "symbol": "US500",
+    "type": "C",
+    "side": "long",
+    "entry": 7734.2,
+    "stop": 7731.8,
+    "target": 7741.7,
+    "result": "сигнал Пульта в 16:55"
   }
 ]
