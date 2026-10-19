@@ -572,6 +572,10 @@
     "entry": 0.6993,
     "stop": 0.69952,
     "target": 0.69865,
-    "result": "сигнал Пульта в 17:20"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-19_AUDUSD_C_m5.png",
+      "h1": "state/shots/2026-10-19_AUDUSD_C_h1.png"
+    }
   }
 ]
