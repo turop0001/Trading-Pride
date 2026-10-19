@@ -577,5 +577,16 @@
       "m5": "state/shots/2026-10-19_AUDUSD_C_m5.png",
       "h1": "state/shots/2026-10-19_AUDUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-19_EURGBP_C",
+    "date": "2026-10-19",
+    "symbol": "EURGBP",
+    "type": "C",
+    "side": "short",
+    "entry": 0.84249,
+    "stop": 0.84255,
+    "target": 0.84232,
+    "result": "сигнал Пульта в 18:20"
   }
 ]
