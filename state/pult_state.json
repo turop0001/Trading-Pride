@@ -739,6 +739,99 @@
       "lines": [
         "🟢 XAUUSD (▲ LONG) — ВХОД в 16:40"
       ]
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:41",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:41",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:42",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:42",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:42",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:43",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:43",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:43",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:44",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:44",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:44",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:45",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-19",
+      "time": "16:45",
+      "window": "C",
+      "text": "изменилось: XAUUSD",
+      "lines": [
+        "🔴 XAUUSD (▲ LONG) — ЗАКРЫТА - SL в 16:45"
+      ]
     }
   ],
   "_daily_summary": {
@@ -772,11 +865,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4153.41,
+    "price": 4152.0,
     "boxH": 4169.64,
     "boxL": 4153.52,
     "reasons": [],
-    "checked_at": "16:41",
+    "checked_at": "16:45",
     "ck": [
       1,
       2,
@@ -792,7 +885,7 @@
     ],
     "ckf": [],
     "why": [
-      "В сделке: вход 16:40 по 4153.41, вероятность средняя; усилители: батут (H1 FVG); структура без преимущества."
+      "Стоп в 16:45 (вход 16:40 по 4153.41). Причины: вероятность была средняя."
     ],
     "struct": {
       "swing": "◆ боковик",
@@ -803,7 +896,6 @@
       "line": "Swing: чёткого тренда нет, боковик — точек по тренду 1 из 4; смещение -4% (<50% размаха) | Sub M5: боковик внутри ноги Swing"
     },
     "pos": "Ниже",
-    "extreme": 4152.0,
     "plus": [
       11
     ],
@@ -845,13 +937,20 @@
       "sv": 2,
       "src": "Yahoo"
     },
-    "line_status": "entry",
+    "be_armed": false,
+    "exit_time": "16:45",
+    "autopsy": "",
+    "line_status": "skip",
     "direction": "▲ LONG",
-    "note": "ВХОД (16:40, 4153.41)",
-    "status_key": "ВХОД (16:40, 4153.41)",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-10-19",
+    "shots": {
+      "m5": "state/shots/2026-10-19_XAUUSD_C_m5.png",
+      "h1": "state/shots/2026-10-19_XAUUSD_C_h1.png"
+    },
     "trend_h1": {
       "tr": "боковик",
       "ratio": -0.12,
@@ -866,11 +965,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.12259,
+    "price": 1.12233,
     "boxH": 1.12334,
     "boxL": 1.11944,
     "reasons": [],
-    "checked_at": "16:41",
+    "checked_at": "16:45",
     "ck": [
       1,
       2
@@ -909,11 +1008,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.33257,
+    "price": 1.33239,
     "boxH": 1.33415,
     "boxL": 1.33104,
     "reasons": [],
-    "checked_at": "16:41",
+    "checked_at": "16:45",
     "ck": [
       1,
       2
@@ -1004,11 +1103,11 @@
   "US500_C": {
     "sym": "US500",
     "window": "C",
-    "price": 7745.5,
+    "price": 7740.2,
     "boxH": 7752.2,
     "boxL": 7733.0,
     "reasons": [],
-    "checked_at": "16:41",
+    "checked_at": "16:45",
     "ck": [
       1,
       2
@@ -1081,11 +1180,11 @@
   "AUDUSD_C": {
     "sym": "AUDUSD",
     "window": "C",
-    "price": 0.69867,
+    "price": 0.69852,
     "boxH": 0.69935,
     "boxL": 0.6973,
     "reasons": [],
-    "checked_at": "16:41",
+    "checked_at": "16:45",
     "ck": [
       1,
       2
@@ -1124,11 +1223,11 @@
   "EURGBP_C": {
     "sym": "EURGBP",
     "window": "C",
-    "price": 0.84224,
+    "price": 0.84205,
     "boxH": 0.84244,
     "boxL": 0.84071,
     "reasons": [],
-    "checked_at": "16:41",
+    "checked_at": "16:45",
     "ck": [
       1,
       2
