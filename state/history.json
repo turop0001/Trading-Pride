@@ -661,5 +661,38 @@
       "m5": "state/shots/2026-10-20_GER40_C_m5.png",
       "h1": "state/shots/2026-10-20_GER40_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-20_UK100_C",
+    "date": "2026-10-20",
+    "symbol": "UK100",
+    "type": "C",
+    "side": "short",
+    "entry": 10719.2,
+    "stop": 10727.7,
+    "target": 10693.8,
+    "result": "сигнал Пульта в 16:55"
+  },
+  {
+    "id": "2026-10-20_AUDUSD_C",
+    "date": "2026-10-20",
+    "symbol": "AUDUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 0.69998,
+    "stop": 0.70017,
+    "target": 0.69942,
+    "result": "сигнал Пульта в 16:55"
+  },
+  {
+    "id": "2026-10-20_EURGBP_C",
+    "date": "2026-10-20",
+    "symbol": "EURGBP",
+    "type": "C",
+    "side": "long",
+    "entry": 0.83884,
+    "stop": 0.83856,
+    "target": 0.83967,
+    "result": "сигнал Пульта в 16:55"
   }
 ]
