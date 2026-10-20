@@ -6,11 +6,13 @@
    "date": "2026-10-20",
    "sym": "XAUUSD",
    "window": "C",
-   "status": "watch",
-   "direction": "—",
-   "note": "НАБЛЮДАЕМ",
-   "reasons": [],
-   "price": 4120.85,
+   "status": "skip",
+   "direction": "🔻 SHORT",
+   "note": "СКИП (стоп слишком мал)",
+   "reasons": [
+    "стоп 0.73 меньше 0,25 ATR(M5) — не исполнить со спредом"
+   ],
+   "price": 4127.28,
    "boxH": 4127.46,
    "boxL": 4111.87,
    "prevH": null,
@@ -26,7 +28,7 @@
     "ratio": -0.32,
     "pct": -0.51
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -40,7 +42,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.12301,
+   "price": 1.12317,
    "boxH": 1.12332,
    "boxL": 1.12047,
    "prevH": null,
@@ -56,7 +58,7 @@
     "ratio": 0.07,
     "pct": 0.04
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -66,11 +68,11 @@
    "date": "2026-10-20",
    "sym": "GBPUSD",
    "window": "C",
-   "status": "entry",
+   "status": "skip",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (16:35, 1.33826)",
+   "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.33843,
+   "price": 1.33826,
    "boxH": 1.33815,
    "boxL": 1.33364,
    "prevH": null,
@@ -118,7 +120,7 @@
     "ratio": 1.84,
     "pct": 1.08
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -132,7 +134,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7681.2,
+   "price": 7682.4,
    "boxH": 7702.6,
    "boxL": 7661.7,
    "prevH": null,
@@ -148,7 +150,7 @@
     "ratio": -1.21,
     "pct": -1.14
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -162,7 +164,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 10713.4,
+   "price": 10714.7,
    "boxH": 10725.2,
    "boxL": 10678.9,
    "prevH": null,
@@ -178,7 +180,7 @@
     "ratio": 1.5,
     "pct": 1.72
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -188,11 +190,13 @@
    "date": "2026-10-20",
    "sym": "GER40",
    "window": "C",
-   "status": "watch",
-   "direction": "—",
-   "note": "НАБЛЮДАЕМ",
-   "reasons": [],
-   "price": 25153.5,
+   "status": "skip",
+   "direction": "🔻 SHORT",
+   "note": "СКИП (стоп слишком мал)",
+   "reasons": [
+    "стоп 6.6 меньше 0,25 ATR(M5) — не исполнить со спредом"
+   ],
+   "price": 25177.5,
    "boxH": 25166.5,
    "boxL": 25045.5,
    "prevH": null,
@@ -208,7 +212,7 @@
     "ratio": -0.67,
     "pct": -0.77
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -222,7 +226,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 0.69939,
+   "price": 0.69954,
    "boxH": 0.69988,
    "boxL": 0.69831,
    "prevH": null,
@@ -238,7 +242,7 @@
     "ratio": 0.53,
     "pct": 0.35
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -252,7 +256,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 0.83907,
+   "price": 0.83904,
    "boxH": 0.84147,
    "boxL": 0.83885,
    "prevH": null,
@@ -268,7 +272,7 @@
     "ratio": -2.65,
     "pct": -0.86
    },
-   "checked": "16:35"
+   "checked": "16:40"
   }
  },
  {
@@ -277,117 +281,14 @@
   "data": {
    "date": "2026-10-20",
    "window": "C",
-   "time": "16:35",
-   "text": "изменилось: GBPUSD",
+   "time": "16:40",
+   "text": "изменилось: XAUUSD, GBPUSD, GER40",
    "changed": [
-    "GBPUSD"
+    "XAUUSD",
+    "GBPUSD",
+    "GER40"
    ],
    "log": [
-    {
-     "date": "2026-10-20",
-     "time": "12:52",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:53",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:53",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:53",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:54",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:54",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:54",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:55",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:55",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:55",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:56",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:56",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:56",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:57",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "12:57",
-     "window": "A",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-20",
      "time": "12:57",
@@ -574,6 +475,119 @@
      "text": "изменилось: GBPUSD",
      "lines": [
       "🟢 GBPUSD (🔻 SHORT) — ВХОД в 16:35"
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:35",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:36",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:36",
+     "window": "C",
+     "text": "изменилось: GER40",
+     "lines": [
+      "⚠️ GER40 (🔻 SHORT) — ВЫНОС"
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:36",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:37",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:37",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:37",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:38",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:38",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:38",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:39",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:39",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:39",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:40",
+     "window": "C",
+     "text": "изменилось: XAUUSD",
+     "lines": [
+      "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:40",
+     "window": "C",
+     "text": "изменилось: XAUUSD, GBPUSD, GER40",
+     "lines": [
+      "⚪ XAUUSD (🔻 SHORT) — СКИП",
+      "🔴 GBPUSD (🔻 SHORT) — ЗАКРЫТА - SL в 16:40",
+      "⚪ GER40 (🔻 SHORT) — СКИП"
      ]
     }
    ]
