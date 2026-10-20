@@ -8,9 +8,9 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "В СДЕЛКЕ",
+   "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
-   "price": 4130.0,
+   "price": 4129.03,
    "boxH": 4127.46,
    "boxL": 4111.87,
    "prevH": null,
@@ -58,7 +58,7 @@
     "ratio": -0.32,
     "pct": -0.51
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -72,7 +72,7 @@
    "direction": "🔻 SHORT",
    "note": "В СДЕЛКЕ",
    "reasons": [],
-   "price": 1.12339,
+   "price": 1.1233,
    "boxH": 1.12332,
    "boxL": 1.12047,
    "prevH": null,
@@ -123,7 +123,7 @@
     "ratio": 0.07,
     "pct": 0.04
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -137,7 +137,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.33896,
+   "price": 1.33934,
    "boxH": 1.33815,
    "boxL": 1.33364,
    "prevH": null,
@@ -185,7 +185,7 @@
     "ratio": 1.84,
     "pct": 1.08
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -199,7 +199,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7685.9,
+   "price": 7687.4,
    "boxH": 7702.6,
    "boxL": 7661.7,
    "prevH": null,
@@ -215,7 +215,7 @@
     "ratio": -1.21,
     "pct": -1.14
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -225,11 +225,11 @@
    "date": "2026-10-20",
    "sym": "UK100",
    "window": "C",
-   "status": "watch",
-   "direction": "—",
-   "note": "НАБЛЮДАЕМ",
+   "status": "prep",
+   "direction": "🔻 SHORT",
+   "note": "ВЫНОС (хая бокса, ждём откат 20%)",
    "reasons": [],
-   "price": 10720.9,
+   "price": 10720.4,
    "boxH": 10725.2,
    "boxL": 10678.9,
    "prevH": null,
@@ -245,7 +245,7 @@
     "ratio": 1.5,
     "pct": 1.72
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -259,7 +259,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 25167.5,
+   "price": 25207.5,
    "boxH": 25166.5,
    "boxL": 25045.5,
    "prevH": null,
@@ -307,7 +307,7 @@
     "ratio": -0.67,
     "pct": -0.77
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -321,7 +321,7 @@
    "direction": "🔻 SHORT",
    "note": "ВЫНОС (хая бокса, ждём откат 20%)",
    "reasons": [],
-   "price": 0.70005,
+   "price": 0.69993,
    "boxH": 0.69988,
    "boxL": 0.69831,
    "prevH": null,
@@ -337,7 +337,7 @@
     "ratio": 0.53,
     "pct": 0.35
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -347,13 +347,11 @@
    "date": "2026-10-20",
    "sym": "EURGBP",
    "window": "C",
-   "status": "skip",
+   "status": "prep",
    "direction": "▲ LONG",
-   "note": "СКИП (стоп слишком мал)",
-   "reasons": [
-    "стоп 0.00003 меньше 0,25 ATR(M5) — не исполнить со спредом"
-   ],
-   "price": 0.83875,
+   "note": "ВЫНОС (лоя бокса, ждём откат 20%)",
+   "reasons": [],
+   "price": 0.83868,
    "boxH": 0.84147,
    "boxL": 0.83885,
    "prevH": null,
@@ -369,7 +367,7 @@
     "ratio": -2.65,
     "pct": -0.86
    },
-   "checked": "16:50"
+   "checked": "16:53"
   }
  },
  {
@@ -378,78 +376,12 @@
   "data": {
    "date": "2026-10-20",
    "window": "C",
-   "time": "16:50",
-   "text": "изменилось: GER40, EURGBP",
+   "time": "16:53",
+   "text": "изменилось: XAUUSD",
    "changed": [
-    "GER40",
-    "EURGBP"
+    "XAUUSD"
    ],
    "log": [
-    {
-     "date": "2026-10-20",
-     "time": "16:37",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:37",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:38",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:38",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:38",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:39",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:39",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:39",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-20",
-     "time": "16:40",
-     "window": "C",
-     "text": "изменилось: XAUUSD",
-     "lines": [
-      "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
-     ]
-    },
     {
      "date": "2026-10-20",
      "time": "16:40",
@@ -685,6 +617,75 @@
      "lines": [
       "🔴 GER40 (🔻 SHORT) — ЗАКРЫТА - SL в 16:50",
       "⚪ EURGBP (▲ LONG) — СКИП"
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:51",
+     "window": "C",
+     "text": "изменилось: UK100",
+     "lines": [
+      "⚠️ UK100 (🔻 SHORT) — ВЫНОС"
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:51",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:51",
+     "window": "C",
+     "text": "изменилось: EURGBP",
+     "lines": [
+      "⚠️ EURGBP (▲ LONG) — ВЫНОС"
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:52",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:52",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:52",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:53",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-20",
+     "time": "16:53",
+     "window": "C",
+     "text": "изменилось: XAUUSD",
+     "lines": [
+      "🟢 XAUUSD (🔻 SHORT) — ЗАКРЫТА - TP в 16:50"
      ]
     }
    ]

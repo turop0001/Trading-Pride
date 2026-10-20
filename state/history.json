@@ -629,7 +629,11 @@
     "entry": 4130.0,
     "stop": 4131.75,
     "target": 4124.75,
-    "result": "сигнал Пульта в 16:45"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-20_XAUUSD_C_m5.png",
+      "h1": "state/shots/2026-10-20_XAUUSD_C_h1.png"
+    }
   },
   {
     "id": "2026-10-20_EURUSD_C",
