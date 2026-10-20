@@ -699,7 +699,7 @@
     "stop": 0.83856,
     "target": 0.83967,
     "result": "ВХОД → SL −1R",
-    "autopsy": "",
+    "autopsy": "шла в плюс до +1.0R, стоп через 15 мин; после стопа данных пока мало; H1 и D1 против входа",
     "shots": {
       "m5": "state/shots/2026-10-20_EURGBP_C_m5.png",
       "h1": "state/shots/2026-10-20_EURGBP_C_h1.png"
