@@ -698,7 +698,12 @@
     "entry": 0.83884,
     "stop": 0.83856,
     "target": 0.83967,
-    "result": "сигнал Пульта в 16:55"
+    "result": "ВХОД → SL −1R",
+    "autopsy": "",
+    "shots": {
+      "m5": "state/shots/2026-10-20_EURGBP_C_m5.png",
+      "h1": "state/shots/2026-10-20_EURGBP_C_h1.png"
+    }
   },
   {
     "id": "2026-10-20_US500_C",

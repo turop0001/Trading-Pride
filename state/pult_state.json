@@ -514,87 +514,6 @@
   "_log": [
     {
       "date": "2026-10-20",
-      "time": "16:39",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:39",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:39",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:40",
-      "window": "C",
-      "text": "изменилось: XAUUSD",
-      "lines": [
-        "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС"
-      ]
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:40",
-      "window": "C",
-      "text": "изменилось: XAUUSD, GBPUSD, GER40",
-      "lines": [
-        "⚪ XAUUSD (🔻 SHORT) — СКИП",
-        "🔴 GBPUSD (🔻 SHORT) — ЗАКРЫТА - SL в 16:40",
-        "⚪ GER40 (🔻 SHORT) — СКИП"
-      ]
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:40",
-      "window": "C",
-      "text": "изменилось: XAUUSD, EURUSD",
-      "lines": [
-        "⚠️ XAUUSD (🔻 SHORT) — ВЫНОС",
-        "⚠️ EURUSD (🔻 SHORT) — ВЫНОС"
-      ]
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:41",
-      "window": "C",
-      "text": "изменилось: GER40",
-      "lines": [
-        "⚠️ GER40 (🔻 SHORT) — ВЫНОС"
-      ]
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:41",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:41",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-20",
-      "time": "16:42",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-20",
       "time": "16:42",
       "window": "C",
       "text": "без изменений",
@@ -1113,6 +1032,78 @@
       "lines": [
         "🟢 US500 (🔻 SHORT) — ВХОД в 17:05"
       ]
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:06",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:06",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:07",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:07",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:07",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:08",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:08",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:08",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:09",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-20",
+      "time": "17:09",
+      "window": "C",
+      "text": "изменилось: EURGBP",
+      "lines": [
+        "🔴 EURGBP (▲ LONG) — ЗАКРЫТА - SL в 17:05"
+      ]
     }
   ],
   "_daily_summary": {
@@ -1142,7 +1133,7 @@
     "boxH": 4127.46,
     "boxL": 4111.87,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1235,7 +1226,7 @@
     "boxH": 1.12332,
     "boxL": 1.12047,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1335,7 +1326,7 @@
     "boxH": 1.33815,
     "boxL": 1.33364,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1479,11 +1470,11 @@
   "US500_C": {
     "sym": "US500",
     "window": "C",
-    "price": 7703.9,
+    "price": 7704.6,
     "boxH": 7702.6,
     "boxL": 7661.7,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1510,7 +1501,6 @@
       "line": "Swing: чёткого тренда нет, боковик — точек по тренду 3 из 4; смещение -50% (<50% размаха) | Sub M5: боковик внутри ноги Swing"
     },
     "pos": "Выше",
-    "extreme": 7709.6,
     "plus": [
       11
     ],
@@ -1552,10 +1542,11 @@
       "sv": 2,
       "src": "MT5"
     },
+    "be_armed": false,
     "line_status": "entry",
     "direction": "🔻 SHORT",
-    "note": "ВХОД (17:05, 7704.6)",
-    "status_key": "ВХОД (17:05, 7704.6)",
+    "note": "В СДЕЛКЕ",
+    "status_key": "В СДЕЛКЕ",
     "tg_note": "ВХОД",
     "stale": false,
     "date": "2026-10-20",
@@ -1577,7 +1568,7 @@
     "boxH": 10725.2,
     "boxL": 10678.9,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1639,7 +1630,7 @@
       "sv": 2,
       "src": "MT5"
     },
-    "be_armed": false,
+    "be_armed": true,
     "line_status": "entry",
     "direction": "🔻 SHORT",
     "note": "В СДЕЛКЕ",
@@ -1656,7 +1647,8 @@
       "tr": "боковик",
       "ratio": 1.5,
       "pct": 1.72
-    }
+    },
+    "be_alert_at": "17:07"
   },
   "GER40_C": {
     "sym": "GER40",
@@ -1665,7 +1657,7 @@
     "boxH": 25166.5,
     "boxL": 25045.5,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1759,7 +1751,7 @@
     "boxH": 0.69988,
     "boxL": 0.69831,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1853,7 +1845,7 @@
     "boxH": 0.84147,
     "boxL": 0.83885,
     "reasons": [],
-    "checked_at": "17:05",
+    "checked_at": "17:09",
     "ck": [
       1,
       2,
@@ -1868,7 +1860,7 @@
     ],
     "ckf": [],
     "why": [
-      "В сделке: вход 16:55 по 0.83884, вероятность низкая; усилителей не было; структура без преимущества."
+      "Стоп в 17:05 (вход 16:55 по 0.83884). Причины: усилителей не было; вероятность была низкая."
     ],
     "struct": {
       "swing": "◆ боковик",
@@ -1916,13 +1908,19 @@
       "src": "MT5"
     },
     "be_armed": false,
-    "line_status": "entry",
+    "exit_time": "17:05",
+    "autopsy": "",
+    "line_status": "skip",
     "direction": "▲ LONG",
-    "note": "В СДЕЛКЕ",
-    "status_key": "В СДЕЛКЕ",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-10-20",
+    "shots": {
+      "m5": "state/shots/2026-10-20_EURGBP_C_m5.png",
+      "h1": "state/shots/2026-10-20_EURGBP_C_h1.png"
+    },
     "trend_h1": {
       "tr": "шорт",
       "ratio": -1.58,
