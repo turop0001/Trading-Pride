@@ -644,7 +644,12 @@
     "entry": 1.12339,
     "stop": 1.12366,
     "target": 1.12257,
-    "result": "сигнал Пульта в 16:45"
+    "result": "ВХОД → SL −1R",
+    "autopsy": "",
+    "shots": {
+      "m5": "state/shots/2026-10-20_EURUSD_C_m5.png",
+      "h1": "state/shots/2026-10-20_EURUSD_C_h1.png"
+    }
   },
   {
     "id": "2026-10-20_GER40_C",
