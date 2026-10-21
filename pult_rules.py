@@ -569,11 +569,18 @@ def _cfv(cf, sd, entry, tp, off, dec):
                 tp=round(float(tp), dec), side='long' if sd == 1 else 'short')
 
 
-def _counter_fvg(F1, sd, entry, tp):
+def _counter_fvg(F1, sd, entry, tp, t_known=None):
     """Встречный H1 FVG внутри пути entry → tp. Не считается: инвертированный (закрытие H1 за ним) и уже ПРОШИТЫЙ фитилём насквозь
-    (16.10.2026: XAUUSD C — FVG 4161.03–4163.54 прошит лоем Лондона 4154.96, но закрытия под ним не было — скип был ошибочным)."""
+    (16.10.2026: XAUUSD C — FVG 4161.03–4163.54 прошит лоем Лондона 4154.96, но закрытия под ним не было — скип был ошибочным).
+    21.10.2026 (причина: EURUSD/UK100 C — скип правила №8 пропал задним числом, когда цена дошла до цели и прошила FVG): инверсия и
+    прошивка учитываются только если произошли ДО момента решения t_known (H1-свеча закрыта к этому времени); прошивка после сигнала
+    скип не отменяет. t_known=None — по всей имеющейся истории (старое поведение, только для диагностики)."""
+    def _known(ts):
+        if ts is None: return False
+        if t_known is None: return True
+        return pd.Timestamp(ts) + pd.Timedelta(hours=1) <= pd.Timestamp(t_known)
     for f in F1:
-        if f['dir'] != -sd or f['inv_t'] is not None or f.get('pierce_t') is not None: continue
+        if f['dir'] != -sd or _known(f['inv_t']) or _known(f.get('pierce_t')): continue
         if sd == 1 and f['hi'] > entry and f['lo'] <= tp: return f
         if sd == -1 and f['lo'] < entry and f['hi'] >= tp: return f
     return None
@@ -761,7 +768,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         # предварительная проверка №11 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
         e0 = float(d['Close'].iloc[-1]); s0 = ext - sd * S1.BUF * c['atr']; R0 = (e0 - s0) * sd
         if R0 > 0:
-            cf0 = _counter_fvg(F1, sd, e0, e0 + sd * S1.RR * R0)
+            cf0 = _counter_fvg(F1, sd, e0, e0 + sd * S1.RR * R0, d.index[-1] + pd.Timedelta(minutes=5))
             if cf0 is not None:
                 res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))   # пройдены все, кроме №11
                 t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} (H1 свеча {_cft(cf0, off)} UTC+3) внутри цели 1:2 (по текущей цене {fmtp(e0)})'
@@ -774,7 +781,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     if (entry - stop) * sd <= 0 or R <= 0:
         return _out(res, 'skip', dirc, 'СКИП (некорректный стоп)')
     tp = entry + sd * S1.RR * R
-    cf = _counter_fvg(F1, sd, entry, tp)
+    cf = _counter_fvg(F1, sd, entry, tp, d.index[g + 1])
     if cf is not None:
         res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))
         t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} UTC+3) внутри цели 1:2'
@@ -1004,7 +1011,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
             if leg > 0 and nowm < 1110:
                 e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
-                if R_ >= 0.25 * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_) is None:
+                if R_ >= 0.25 * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + 1.5 * R_), dec), ext=round(sd * ext, dec))
         except Exception as e:
@@ -1027,7 +1034,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     entry_r, stop_r, tp_r, be_r = sd * entry, sd * stop_f, sd * tp_f, sd * be_f
     _prob_set_C(res, F1, atr1, sd, ext, plus)
     plus = res['plus']
-    cf = _counter_fvg(F1, sd, entry_r, tp_r)
+    cf = _counter_fvg(F1, sd, entry_r, tp_r, d.index[entry_g])
     res['ck'] = sorted(set(res['ck'] + [5]))
     _why(res, 'Откат ≥20% длины выноса достигнут', [5])
     if cf is not None:

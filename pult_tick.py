@@ -323,6 +323,50 @@ def _fix_uk100_20261021(state):
         print('fix_uk100 failed:', e)
 
 
+def _fix_c_20261021(state):
+    """21.10.2026 (разовая правка, идемпотентная): EURUSD C (16:50) и UK100 C (17:00) задним числом превратились из СКИП (правило №8, встречный
+    H1 FVG внутри цели 1:3) во ВХОД, когда цена дошла до цели и прошила FVG (инверсия/прошивка считалась по всей истории, а не до момента
+    сигнала). Теперь _counter_fvg учитывает прошивку только до сигнала; здесь возвращаем карточки в СКИП, убираем сделки из истории и
+    аналитики (+3R ×2 были ложными), удаляем скрины. Любая ошибка игнорируется."""
+    try:
+        root = os.path.dirname(os.path.abspath(__file__)); sd = os.path.join(root, 'state')
+        bad = {'EURUSD_C': '16:50', 'UK100_C': '17:00'}
+        sk = None
+        for k, tm in bad.items():
+            u = state.get(k) or {}
+            if u.get('date') == '2026-10-21' and (u.get('signal') or {}).get('time') == tm:
+                if sk is None: sk = json.load(open(os.path.join(sd, '_fix_C_skip.json'), encoding='utf-8'))
+                state[k] = sk[k]
+                try:
+                    pdp = os.path.join(sd, 'pult_docs', f'pult__{k}.json')
+                    if os.path.isdir(os.path.dirname(pdp)): json.dump(sk[k], open(pdp, 'w', encoding='utf-8'), ensure_ascii=False)
+                except Exception as e:
+                    print('fix_c doc failed:', e)
+        ids = ('2026-10-21_EURUSD_C', '2026-10-21_UK100_C')
+        hp = os.path.join(sd, 'history.json')
+        if os.path.exists(hp):
+            h = json.load(open(hp, encoding='utf-8'))
+            h2 = [x for x in h if x.get('id') not in ids]
+            if len(h2) != len(h): json.dump(h2, open(hp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        ap = os.path.join(sd, 'analytics.json')
+        if os.path.exists(ap):
+            raw = open(ap, encoding='utf-8').read(); a = json.loads(raw)
+            aids = ('C_EURUSD_2026-10-21', 'C_UK100_2026-10-21')
+            if any(r.get('id') in aids for r in a.get('C', [])):
+                fill = json.load(open(os.path.join(sd, '_fix_C_fill.json'), encoding='utf-8'))
+                lst = [r for r in a['C'] if r.get('id') not in aids]
+                for g in reversed(fill):
+                    if not any(r.get('id') == g['id'] for r in lst): lst = [g] + lst
+                a['C'] = lst[-10:]
+                open(ap, 'w', encoding='utf-8').write(json.dumps(a, ensure_ascii=False, separators=(',', ':')) if '\n' not in raw.strip() else json.dumps(a, ensure_ascii=False, indent=1))
+        for sym in ('EURUSD', 'UK100'):
+            for suf in ('m5', 'h1'):
+                p = os.path.join(sd, 'shots', f'2026-10-21_{sym}_C_{suf}.png')
+                if os.path.exists(p): os.remove(p)
+    except Exception as e:
+        print('fix_c failed:', e)
+
+
 def _risk_pct_for(win):
     """21.10.2026: риск в сообщении сигнала. Стандарт 0,5% (решение владельца 18.10); у Типа C после 2 SL подряд по счёту
     (все инструменты вместе, БУ серию не меняет, TP сбрасывает) — 0,25% до первого TP. Серия берётся из state/history.json."""
@@ -347,6 +391,7 @@ def main(send=True):
     m = mins(riga); wd = riga.weekday()
     state = lc.load_state()
     _fix_uk100_20261021(state)
+    _fix_c_20261021(state)
     flags = state.get('_flags', {})
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))
