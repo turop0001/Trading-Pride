@@ -784,7 +784,11 @@
     "entry": 25687.0,
     "stop": 25714.5,
     "target": 25604.5,
-    "result": "сигнал Пульта в 17:00"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-21_GER40_C_m5.png",
+      "h1": "state/shots/2026-10-21_GER40_C_h1.png"
+    }
   },
   {
     "id": "2026-10-21_GBPUSD_C",
