@@ -739,6 +739,10 @@
     "entry": 10723.6,
     "stop": 10715.8,
     "target": 10739.2,
-    "result": "сигнал Пульта в 11:05"
+    "result": "ВХОД → TP 🎯 +2R",
+    "shots": {
+      "m5": "state/shots/2026-10-21_UK100_A_m5.png",
+      "h1": "state/shots/2026-10-21_UK100_A_h1.png"
+    }
   }
 ]
