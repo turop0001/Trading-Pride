@@ -836,14 +836,19 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
     res = _analyze_C2(sym, d, now_utc, off, prev, h1)
     try:
         if res.get('error') or res.get('signal') or (prev or {}).get('signal'): return res
-        p = res.get('pend')
-        if res.get('line_status') != 'prep' or not p: return res
+        if res.get('line_status') != 'prep' or res.get('extreme') is None: return res
         dall = d[d.index <= pd.Timestamp(now_utc, tz='UTC')]
         done = _completed(d, now_utc, 5)
         if not len(dall) or not len(done) or dall.index[-1] <= done.index[-1]: return res
-        fb = dall.iloc[-1]; e_, ext_ = float(p['entry']), float(p['ext'])
-        if p['side'] == 'short': ok = float(fb['High']) <= ext_ and float(fb['Low']) <= e_
-        else: ok = float(fb['Low']) >= ext_ and float(fb['High']) >= e_
+        fb = dall.iloc[-1]; ext_ = float(res['extreme'])
+        short = 'SHORT' in str(res.get('direction') or '')
+        # уровень отката 20% от закрытого экстремума (бокс — по закрытым барам); без предрасчёта pend (он не учитывает открытие свечи выше уровня)
+        if short:
+            lvl_ = ext_ - 0.2 * (ext_ - float(res['boxH']))
+            ok = (ext_ - float(res['boxH'])) > 0 and float(fb['High']) <= ext_ and float(fb['Low']) <= lvl_
+        else:
+            lvl_ = ext_ + 0.2 * (float(res['boxL']) - ext_)
+            ok = (float(res['boxL']) - ext_) > 0 and float(fb['Low']) >= ext_ and float(fb['High']) >= lvl_
         if not ok: return res
         now2 = (dall.index[-1] + pd.Timedelta(minutes=5, seconds=41)).tz_convert('UTC').tz_localize(None).to_pydatetime()
         r2 = _analyze_C2(sym, d, now2, off, prev, h1)
