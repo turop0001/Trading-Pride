@@ -167,6 +167,9 @@ def add_closed(sym, window, r, off, date_str, force=False):
     day = dt.date.fromisoformat(date_str)
     out = _outcome_from_note(r.get('note'))
     ext = r.get('extreme')
+    if ext is None: ext = sig.get('ext')
+    if ext is None and window == 'C' and sig.get('entry') is not None and sig.get('stop') is not None:
+        ext = (float(sig['stop']) + 0.1 * float(sig['entry'])) / 1.1   # старые записи: стоп = ext ± 0,1·(entry−ext)
     R = r.get('exit_r') if out == 'T22' else None
     rec = build(window, sym, day, off, d, sig, r.get('boxH'), r.get('boxL'), ext, out, R=R)
     if rec['ext'] is None: rec['ext'] = rec['stop']

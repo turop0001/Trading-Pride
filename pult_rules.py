@@ -883,12 +883,10 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
                 print('struct fix failed', sym, e)
         _prob_set(res, sg.get('plus') or [], [], 'C')
         return _close_why(_track(res, d, sg, sd, dirc, fmtp, live=dall))
-    if len(dall) > len(d):      # дальше (вынос, откат 20%) считаем по барам вместе с формирующимся
-        d = dall
-        loc = d.index + pd.Timedelta(hours=off)
-        d['rdate'] = [x.date() for x in loc]
-        d['rmin'] = [x.hour * 60 + x.minute for x in loc]
-        price = float(d['Close'].iloc[-1]); res['price'] = round(price, dec)
+    # 21.10.2026: вынос, откат 20%, вход и скипы считаем ТОЛЬКО по закрытым M5 (как индикатор v37.1+; вход внутри незакрытой
+    # свечи давал ложные входы и мигание СКИП→ВЫНОС→ВХОД). Формирующаяся свеча нужна только для цены и для слежения за стопом/целью.
+    if len(dall) > len(d):
+        res['price'] = round(float(dall['Close'].iloc[-1]), dec)
     day = d[d['rdate'] == today]
     win = day[(day['rmin'] >= wa) & (day['rmin'] < 1320)]
     idx = {t: i for i, t in enumerate(d.index)}
@@ -1009,7 +1007,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
     sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=0)).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
-               side='long' if sd == 1 else 'short', rr=3.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[],
+               side='long' if sd == 1 else 'short', rr=3.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[], ext=round(sd * ext, dec),
                prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'), sv=2)
     res['signal'] = sig; res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
