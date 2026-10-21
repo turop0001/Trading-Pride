@@ -769,6 +769,10 @@
     "entry": 29588.5,
     "stop": 29534.8,
     "target": 29696.1,
-    "result": "сигнал Пульта в 12:10"
+    "result": "ВХОД → TP 🎯 +2R",
+    "shots": {
+      "m5": "state/shots/2026-10-21_NAS100_A_m5.png",
+      "h1": "state/shots/2026-10-21_NAS100_A_h1.png"
+    }
   }
 ]
