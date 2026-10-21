@@ -814,7 +814,11 @@
     "entry": 1.1235,
     "stop": 1.1238,
     "target": 1.12261,
-    "result": "сигнал Пульта в 16:50"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-21_EURUSD_C_m5.png",
+      "h1": "state/shots/2026-10-21_EURUSD_C_h1.png"
+    }
   },
   {
     "id": "2026-10-21_UK100_C",
@@ -825,6 +829,10 @@
     "entry": 10779.1,
     "stop": 10787.9,
     "target": 10752.7,
-    "result": "сигнал Пульта в 17:00"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-21_UK100_C_m5.png",
+      "h1": "state/shots/2026-10-21_UK100_C_h1.png"
+    }
   }
 ]

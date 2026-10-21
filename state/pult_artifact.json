@@ -10,7 +10,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4130.87,
+   "price": 4130.16,
    "boxH": 4142.11,
    "boxL": 4112.0,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -0.48,
     "pct": -0.94
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -38,9 +38,9 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (16:50, 1.12350)",
+   "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
-   "price": 1.12237,
+   "price": 1.12241,
    "boxH": 1.12357,
    "boxL": 1.12141,
    "prevH": null,
@@ -92,7 +92,7 @@
     "ratio": -0.39,
     "pct": -0.28
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -158,7 +158,7 @@
     "ratio": 1.38,
     "pct": 0.99
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -174,7 +174,7 @@
    "reasons": [
     "широкий M5 FVG (8.1 ≥ 2× средней свечи Лондона) перед экстремумом"
    ],
-   "price": 7734.3,
+   "price": 7734.0,
    "boxH": 7740.8,
    "boxL": 7714.2,
    "prevH": null,
@@ -190,7 +190,7 @@
     "ratio": -1.07,
     "pct": -1.28
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -202,9 +202,9 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (17:00, 10779.1)",
+   "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
-   "price": 10752.4,
+   "price": 10749.2,
    "boxH": 10783.1,
    "boxL": 10718.4,
    "prevH": null,
@@ -253,7 +253,7 @@
     "ratio": 1.18,
     "pct": 1.77
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -316,7 +316,7 @@
     "ratio": -0.06,
     "pct": -0.09
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -382,7 +382,7 @@
     "ratio": 0.91,
     "pct": 0.77
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -445,7 +445,7 @@
     "ratio": -2.66,
     "pct": -1.14
    },
-   "checked": "18:00"
+   "checked": "18:01"
   }
  },
  {
@@ -454,20 +454,13 @@
   "data": {
    "date": "2026-10-21",
    "window": "C",
-   "time": "18:00",
+   "time": "18:01",
    "text": "изменилось: EURUSD, UK100",
    "changed": [
     "EURUSD",
     "UK100"
    ],
    "log": [
-    {
-     "date": "2026-10-21",
-     "time": "17:47",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-21",
      "time": "17:48",
@@ -742,6 +735,16 @@
      "lines": [
       "🟢 EURUSD (🔻 SHORT) — ВХОД в 16:50",
       "🟢 UK100 (🔻 SHORT) — ВХОД в 17:00"
+     ]
+    },
+    {
+     "date": "2026-10-21",
+     "time": "18:01",
+     "window": "C",
+     "text": "изменилось: EURUSD, UK100",
+     "lines": [
+      "🟢 EURUSD (🔻 SHORT) — ЗАКРЫТА - TP в 17:05",
+      "🟢 UK100 (🔻 SHORT) — ЗАКРЫТА - TP в 17:55"
      ]
     }
    ]
