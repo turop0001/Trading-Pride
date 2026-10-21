@@ -715,21 +715,6 @@
     }
   },
   {
-    "id": "2026-10-21_UK100_A",
-    "date": "2026-10-21",
-    "symbol": "UK100",
-    "type": "A",
-    "side": "long",
-    "entry": 10723.6,
-    "stop": 10715.8,
-    "target": 10739.2,
-    "result": "ВХОД → TP 🎯 +2R",
-    "shots": {
-      "m5": "state/shots/2026-10-21_UK100_A_m5.png",
-      "h1": "state/shots/2026-10-21_UK100_A_h1.png"
-    }
-  },
-  {
     "id": "2026-10-21_US500_A",
     "date": "2026-10-21",
     "symbol": "US500",
