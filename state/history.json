@@ -743,5 +743,27 @@
       "m5": "state/shots/2026-10-21_NAS100_A_m5.png",
       "h1": "state/shots/2026-10-21_NAS100_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-21_AUDUSD_C",
+    "date": "2026-10-21",
+    "symbol": "AUDUSD",
+    "type": "C",
+    "side": "long",
+    "entry": 0.70241,
+    "stop": 0.7022,
+    "target": 0.70304,
+    "result": "сигнал Пульта в 16:40"
+  },
+  {
+    "id": "2026-10-21_EURGBP_C",
+    "date": "2026-10-21",
+    "symbol": "EURGBP",
+    "type": "C",
+    "side": "short",
+    "entry": 0.83895,
+    "stop": 0.83906,
+    "target": 0.83862,
+    "result": "сигнал Пульта в 16:40"
   }
 ]
