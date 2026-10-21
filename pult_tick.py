@@ -293,11 +293,42 @@ def final_check(state, today, dstr, off, tg, did, final=True):
     return bool(upd) or bool(chg)
 
 
+def _fix_uk100_20261021(state):
+    """21.10.2026 (разовая правка, идемпотентная): UK100 Тип A за 21.10 ошибочно вошёл по неполным свечам (вынос 5.07 ATR),
+    по свечам MT5 — СКИП (1.76 ATR < 1.93). Работающий цикл держит старое состояние в памяти и затирал исправление в ветке state,
+    поэтому правим локальные файлы цикла: карточка, история, аналитика, скрины. Безопасно: любая ошибка игнорируется."""
+    try:
+        root = os.path.dirname(os.path.abspath(__file__)); sd = os.path.join(root, 'state')
+        u = state.get('UK100_A') or {}
+        if u.get('date') == '2026-10-21' and (u.get('signal') or {}).get('time') == '11:05':
+            state['UK100_A'] = json.load(open(os.path.join(sd, '_fix_UK100_A_skip.json'), encoding='utf-8'))
+        hp = os.path.join(sd, 'history.json')
+        if os.path.exists(hp):
+            h = json.load(open(hp, encoding='utf-8'))
+            h2 = [x for x in h if x.get('id') != '2026-10-21_UK100_A']
+            if len(h2) != len(h): json.dump(h2, open(hp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        ap = os.path.join(sd, 'analytics.json')
+        if os.path.exists(ap):
+            raw = open(ap, encoding='utf-8').read(); a = json.loads(raw)
+            if any(r.get('id') == 'A_UK100_2026-10-21' for r in a.get('A', [])):
+                g = json.load(open(os.path.join(sd, '_fix_A_GBPUSD_0908.json'), encoding='utf-8'))
+                lst = [r for r in a['A'] if r.get('id') != 'A_UK100_2026-10-21']
+                if not any(r.get('id') == g['id'] for r in lst): lst = [g] + lst
+                a['A'] = lst[-10:]
+                open(ap, 'w', encoding='utf-8').write(json.dumps(a, ensure_ascii=False, separators=(',', ':')) if '\n' not in raw.strip() else json.dumps(a, ensure_ascii=False, indent=1))
+        for fn in ('2026-10-21_UK100_A_m5.png', '2026-10-21_UK100_A_h1.png'):
+            p = os.path.join(sd, 'shots', fn)
+            if os.path.exists(p): os.remove(p)
+    except Exception as e:
+        print('fix_uk100 failed:', e)
+
+
 def main(send=True):
     riga, off = lc.riga_now()
     today = riga.strftime('%Y-%m-%d'); dstr = riga.strftime('%d.%m.%Y'); t = riga.strftime('%H:%M')
     m = mins(riga); wd = riga.weekday()
     state = lc.load_state()
+    _fix_uk100_20261021(state)
     flags = state.get('_flags', {})
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))
