@@ -372,7 +372,7 @@ def analyze(sym, d, window, now_utc, off, prev=None, h1=None):
     h1 — часовые бары (UTC, ~40 суток) для цепочки H1 (Тип A, S1). Возвращает dict со статусом в формате Пульта."""
     prev = prev or {}
     if window == 'C':
-        return finalize_why(_analyze_C2(sym, d, now_utc, off, prev, h1))
+        return finalize_why(_analyze_C_instant(sym, d, now_utc, off, prev, h1))
     if window == 'A' and not LEGACY_A:
         return finalize_why(_analyze_A_s1(sym, d, now_utc, off, prev, h1))
     dec = DEC.get(sym, 5)
@@ -826,6 +826,33 @@ def _close_why(res):
         res['sl_why'] = ('Разбор SL: ' + ('; '.join(miss) if miss else 'все пункты и усилители были выполнены — стоп в рамках статистики (WR ~78%)') + '.')
         if res.get('autopsy'): res['sl_why'] += ' ' + res['autopsy']
     return res
+
+
+def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
+    """21.10.2026: решения Типа C — по закрытым M5 (без мигания), КРОМЕ момента входа: если вынос уже есть (по закрытым барам),
+    а формирующаяся свеча НЕ обновила экстремум выноса и уже дошла до уровня отката 20% — это необратимый факт (уровень считается от
+    закрытого экстремума), поэтому вход фиксируем сразу, не дожидаясь закрытия свечи (раньше сигнал опаздывал до 5 минут).
+    Если формирующаяся свеча обновила экстремум — ждём её закрытия, как и прежде."""
+    res = _analyze_C2(sym, d, now_utc, off, prev, h1)
+    try:
+        if res.get('error') or res.get('signal') or (prev or {}).get('signal'): return res
+        p = res.get('pend')
+        if res.get('line_status') != 'prep' or not p: return res
+        dall = d[d.index <= pd.Timestamp(now_utc, tz='UTC')]
+        done = _completed(d, now_utc, 5)
+        if not len(dall) or not len(done) or dall.index[-1] <= done.index[-1]: return res
+        fb = dall.iloc[-1]; e_, ext_ = float(p['entry']), float(p['ext'])
+        if p['side'] == 'short': ok = float(fb['High']) <= ext_ and float(fb['Low']) <= e_
+        else: ok = float(fb['Low']) >= ext_ and float(fb['High']) >= e_
+        if not ok: return res
+        now2 = (dall.index[-1] + pd.Timedelta(minutes=5, seconds=41)).tz_convert('UTC').tz_localize(None).to_pydatetime()
+        r2 = _analyze_C2(sym, d, now2, off, prev, h1)
+        if r2.get('error') or not r2.get('signal'): return res   # мгновенно — только ВХОД (он залипает через prev); скипы ждут закрытия свечи, чтобы не мигали
+        r2['checked_at'] = res.get('checked_at'); r2['price'] = res.get('price')
+        return r2
+    except Exception as ex:
+        print('instant C failed', sym, ex)
+        return res
 
 
 def _analyze_C2(sym, d, now_utc, off, prev, h1):

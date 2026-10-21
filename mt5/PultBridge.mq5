@@ -16,9 +16,11 @@
 //| v1.24 (18.10.2026): Тип C — риск ×0,5 после 2 SL подряд по счёту (HalfRiskAfter2SL) |
 //| v1.25 (21.10.2026): Tickmill — MaxLots 5→500 (индексы с контрактом 1 дают лот ×20–50 |
 //|   против FundingPips, старый потолок 5 резал риск); потолок брокера SYMBOL_VOLUME_MAX |
+//| v1.26 (21.10.2026): StartStreakSL — стартовая серия SL для нового счёта: 2 = риск ×0,5 до |
+//|   первого TP (на новом демо Tickmill истории сделок нет, серия считалась 0)               |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.25"
+#property version   "1.26"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -35,6 +37,7 @@ input bool   TradeEnabled    = false;   // false = только журнал, б
 input bool   DemoOnly        = true;    // не торговать на реальном счёте
 input double RiskPercent     = 0.5;     // риск на сделку, % баланса (стандарт 0,5%; после 2 SL подряд Типа C — ×0,5 = 0,25%)
 input bool   HalfRiskAfter2SL = true;    // v1.24: Тип C — после 2 SL подряд риск ×0,5 до первого TP (БУ серию не меняет)
+input int    StartStreakSL     = 0;       // v1.26: стартовая серия SL Типа C для нового счёта (2 = ×0,5 до первого TP; 0 = считать только по сделкам счёта)
 input int    PollSec         = 3;
 input int    MaxSignalAgeMin = 10;      // сигнал старше — пропуск
 input double MaxDriftOfStop  = 0.50;    // цена ушла от входа больше доли стопа — пропуск
@@ -320,7 +323,7 @@ int CStreakSL()
 {
    // серия стопов Типа C по счёту (по закрытию): SL +1, TP сброс, БУ не меняет; считаем за последние 90 дней
    if(!HistorySelect(TimeCurrent()-90*86400,TimeCurrent()+86400)) return 0;
-   ulong cpos[]; int nc=0, streak=0;
+   ulong cpos[]; int nc=0, streak=MathMax(0,StartStreakSL);
    double base=AccountInfoDouble(ACCOUNT_BALANCE)*RiskPercent/100.0;
    int n=HistoryDealsTotal();
    for(int i=0;i<n;i++)
