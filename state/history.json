@@ -804,5 +804,27 @@
       "m5": "state/shots/2026-10-21_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-10-21_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-21_EURUSD_C",
+    "date": "2026-10-21",
+    "symbol": "EURUSD",
+    "type": "C",
+    "side": "short",
+    "entry": 1.1235,
+    "stop": 1.1238,
+    "target": 1.12261,
+    "result": "сигнал Пульта в 16:50"
+  },
+  {
+    "id": "2026-10-21_UK100_C",
+    "date": "2026-10-21",
+    "symbol": "UK100",
+    "type": "C",
+    "side": "short",
+    "entry": 10779.1,
+    "stop": 10787.9,
+    "target": 10752.7,
+    "result": "сигнал Пульта в 17:00"
   }
 ]
