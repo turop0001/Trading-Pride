@@ -323,6 +323,24 @@ def _fix_uk100_20261021(state):
         print('fix_uk100 failed:', e)
 
 
+def _risk_pct_for(win):
+    """21.10.2026: риск в сообщении сигнала. Стандарт 0,5% (решение владельца 18.10); у Типа C после 2 SL подряд по счёту
+    (все инструменты вместе, БУ серию не меняет, TP сбрасывает) — 0,25% до первого TP. Серия берётся из state/history.json."""
+    try:
+        if win != 'C': return 0.5
+        hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
+        st = 0
+        for x in json.load(open(hp, encoding='utf-8')):
+            if x.get('type') != 'C': continue
+            r = x.get('result') or ''
+            if 'ВХОД →' not in r: continue
+            if 'TP' in r: st = 0
+            elif 'SL' in r: st += 1
+        return 0.25 if st >= 2 else 0.5
+    except Exception:
+        return 0.5
+
+
 def main(send=True):
     riga, off = lc.riga_now()
     today = riga.strftime('%Y-%m-%d'); dstr = riga.strftime('%d.%m.%Y'); t = riga.strftime('%H:%M')
@@ -393,7 +411,7 @@ def main(send=True):
                                  'result': f"сигнал Пульта в {sg.get('time')}"})
             except Exception as e:
                 print('history add failed:', e)
-            tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], 1.0,
+            tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], _risk_pct_for(win),
                             note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2)); did.append('signal')
         return text, syms, changed
 
