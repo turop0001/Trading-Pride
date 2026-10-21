@@ -769,6 +769,10 @@
     "entry": 0.83895,
     "stop": 0.83906,
     "target": 0.83862,
-    "result": "сигнал Пульта в 16:40"
+    "result": "ВХОД → БУ 0R (стоп в безубытке после 48% пути)",
+    "shots": {
+      "m5": "state/shots/2026-10-21_EURGBP_C_m5.png",
+      "h1": "state/shots/2026-10-21_EURGBP_C_h1.png"
+    }
   }
 ]
