@@ -243,7 +243,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
         <div class="card">
           <h2>Калькулятор лота</h2>
           <div class="row2">
-            <div class="field"><label for="cProp">Проп-компания</label><select id="cProp"><option value="fp">FundingPips</option><option value="ftmo">FTMO</option></select></div>
+            <div class="field"><label for="cProp">Проп-компания</label><select id="cProp"><option value="fp">FundingPips</option><option value="ftmo">FTMO</option><option value="tm">Tickmill</option></select></div>
             <div class="field"><label for="cDep">Депозит, $</label><select id="cDep"><option>10000</option><option>25000</option><option selected>50000</option><option>100000</option></select></div>
           </div>
           <div class="row2">
@@ -252,17 +252,17 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
             <div class="field"><label for="cHalf">Сигнал</label><select id="cHalf"><option value="1">Обычный</option><option value="0.5">½ риска</option></select></div>
           </div>
           <div class="field"><label for="cSym">Инструмент</label><select id="cSym">
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="EURUSD" data-px="1.1374">EUR/USD</option>
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="GBPUSD" data-px="1.3225">GBP/USD</option>
-            <option data-cs-fp="100" data-cs-ftmo="100" data-sym="XAUUSD" data-px="4276.6">GOLD</option>
-            <option data-cs-fp="50" data-cs-ftmo="1" data-sym="US500" data-px="7694">US 500</option>
-            <option data-cs-fp="20" data-cs-ftmo="1" data-sym="NAS100" data-px="30355">US 100</option>
-            <option data-cs-fp="25" data-cs-ftmo="1" data-sym="GER40" data-px="25490">GER 40</option>
-            <option data-cs-fp="5" data-cs-ftmo="1" data-sym="US30" data-px="53690">US 30</option>
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-sym="AUDUSD" data-px="0.7015">AUD/USD</option>
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-q="inv" data-sym="USDJPY" data-px="157.36">USD/JPY</option>
-            <option data-cs-fp="0.9" data-cs-ftmo="0.9" data-q="1.3225" data-sym="UK100" data-px="10728">UK 100</option>
-            <option data-cs-fp="100000" data-cs-ftmo="100000" data-q="1.3225" data-sym="EURGBP" data-px="0.8579">EUR/GBP</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-cs-tm="100000" data-sym="EURUSD" data-px="1.1374">EUR/USD</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-cs-tm="100000" data-sym="GBPUSD" data-px="1.3225">GBP/USD</option>
+            <option data-cs-fp="100" data-cs-ftmo="100" data-cs-tm="100" data-sym="XAUUSD" data-px="4276.6">GOLD</option>
+            <option data-cs-fp="50" data-cs-ftmo="1" data-cs-tm="1" data-sym="US500" data-px="7694">US 500</option>
+            <option data-cs-fp="20" data-cs-ftmo="1" data-cs-tm="1" data-sym="NAS100" data-px="30355">US 100</option>
+            <option data-cs-fp="25" data-cs-ftmo="1" data-cs-tm="1" data-q-tm="1.1374" data-sym="GER40" data-px="25490">GER 40</option>
+            <option data-cs-fp="5" data-cs-ftmo="1" data-cs-tm="1" data-sym="US30" data-px="53690">US 30</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-cs-tm="100000" data-sym="AUDUSD" data-px="0.7015">AUD/USD</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-cs-tm="100000" data-q="inv" data-sym="USDJPY" data-px="157.36">USD/JPY</option>
+            <option data-cs-fp="0.9" data-cs-ftmo="0.9" data-cs-tm="1" data-q="1.3225" data-sym="UK100" data-px="10728">UK 100</option>
+            <option data-cs-fp="100000" data-cs-ftmo="100000" data-cs-tm="100000" data-q="1.3225" data-sym="EURGBP" data-px="0.8579">EUR/GBP</option>
           </select></div>
           <div class="row2"><div class="field"><label for="cStopP">Стоп в красной зоне TradingView, %</label><input id="cStopP" type="number" step="0.005" placeholder="0.100"></div><div class="field"><label for="cPx">Цена инструмента сейчас</label><input id="cPx" type="number" step="any"></div></div><p class="note" id="cK" style="margin:-4px 0 10px"></p>
           <div class="out">
@@ -653,6 +653,7 @@ buildCK('A');buildCK('C');
 try{var sv=JSON.parse(store('p_rules5')||'{}');Object.keys(sv).forEach(function(k){var e=$(k);if(e)e.checked=sv[k];});}catch(e){}
 
 /* calculator */
+/* 21.10.2026: добавлена Tickmill (cProp='tm'): контракт 1 по индексам (US500/US100/GER40/US30/UK100), GER40 в EUR → ×EURUSD (data-q-tm); forex 100000, золото 100. */
 /* ИСПРАВЛЕНО 28.09.2026: при rs==='auto' сумма риска считалась от значения выпадающего списка
    cDep («депозит, $» — ручной what-if выбор 10000/25000/50000/100000), а не от реального текущего
    баланса (pNow) — то есть даже с верным % риска сумма в $ была неверной, если cDep не совпадал
@@ -662,8 +663,8 @@ try{var sv=JSON.parse(store('p_rules5')||'{}');Object.keys(sv).forEach(function(
    «лотов на $10 000» меняется автоматически при смене компании и при смене текущей цены. */
 function calc(){
   $('cRiskMyW').hidden=($('cRisk').value!=='custom');
-  var rs=$('cRisk').value,prop=$('cProp').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||50000):+$('cDep').value),pct=riskPctSel()*(+$('cHalf').value),risk=dep*pct/100,so=$('cSym').options[$('cSym').selectedIndex],cs=+so.dataset[prop==='ftmo'?'csFtmo':'csFp'],px=+$('cPx').value||+so.dataset.px,q=so.dataset.q==='inv'?1/px:(+so.dataset.q||1),k=10000/(cs*px*q),sp=+$('cStopP').value;
-  $('cK').textContent='Контракт '+cs+' ('+(prop==='ftmo'?'FTMO':'FundingPips')+') · цена '+px+(q!==1?' · пересчёт в $ ×'+q.toFixed(4):'')+' → коэффициент '+k.toFixed(4)+' лота на $10 000';
+  var rs=$('cRisk').value,prop=$('cProp').value,dep=(rs==='auto'?(+$('pNow').value||+$('pStart').value||50000):+$('cDep').value),pct=riskPctSel()*(+$('cHalf').value),risk=dep*pct/100,so=$('cSym').options[$('cSym').selectedIndex],cs=+so.dataset[prop==='tm'?'csTm':prop==='ftmo'?'csFtmo':'csFp'],px=+$('cPx').value||+so.dataset.px,q=so.dataset.q==='inv'?1/px:(+(prop==='tm'&&so.dataset.qTm?so.dataset.qTm:so.dataset.q)||1),k=10000/(cs*px*q),sp=+$('cStopP').value;
+  $('cK').textContent='Контракт '+cs+' ('+(prop==='tm'?'Tickmill':prop==='ftmo'?'FTMO':'FundingPips')+') · цена '+px+(q!==1?' · пересчёт в $ ×'+q.toFixed(4):'')+' → коэффициент '+k.toFixed(4)+' лота на $10 000';
   store('p_calc',JSON.stringify({d:$('cDep').value,r:rs,m:$('cRiskMy').value,s:$('cSym').selectedIndex,p:prop}));
   $('oRisk').innerHTML='<b>$'+fm(risk)+'</b><small>'+pct.toFixed(2)+'%</small>';$('oWin').innerHTML='<b class="pos">+$'+fm(risk*2)+'</b><small>+'+(pct*2).toFixed(2)+'%</small>';
   var cur=sp?Math.round(sp*1000)/10:null,tb=$('cTab');tb.innerHTML='';

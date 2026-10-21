@@ -14,9 +14,11 @@
 //| v1.22 (17.10.2026): Тип A +4 инструмента: AUDUSD, USDJPY, UK100, EURGBP |
 //| v1.23 (18.10.2026): торговля только Тип C (TradeTypeA=false); Тип C — 8 инстр. |
 //| v1.24 (18.10.2026): Тип C — риск ×0,5 после 2 SL подряд по счёту (HalfRiskAfter2SL) |
+//| v1.25 (21.10.2026): Tickmill — MaxLots 5→500 (индексы с контрактом 1 дают лот ×20–50 |
+//|   против FundingPips, старый потолок 5 резал риск); потолок брокера SYMBOL_VOLUME_MAX |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.24"
+#property version   "1.25"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -39,7 +41,7 @@ input double MaxDriftOfStop  = 0.50;    // цена ушла от входа б�
 input int    MaxEntriesDay   = 0;       // 0 = без лимита входов в день
 input int    StopAfterLosses = 0;       // 0 = без остановки после стопов
 input bool   OneIdeaPerGroup = false;   // false = любые инструменты одновременно, в т.ч. в одну сторону
-input double MaxLots         = 5.0;     // потолок лота на сделку (защита от 10019)
+input double MaxLots         = 500.0;   // потолок лота на сделку (v1.25: было 5 — на Tickmill индексы дают лот ×20–50; реальный лимит — маржа и макс. объём брокера)
 input double MarginUsePct    = 90.0;    // лот режется, чтобы маржа не превышала этот % свободной
 input long   MagicNumber     = 770077;
 input int    DeviationPts    = 30;
@@ -304,6 +306,7 @@ double CapLots(const string sym,const bool isBuy,double lots,const double price)
    double step=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP), vmin=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN);
    if(step<=0) step=0.01;
    lots=MathMin(lots,MaxLots);
+   double vmax=SymbolInfoDouble(sym,SYMBOL_VOLUME_MAX); if(vmax>0) lots=MathMin(lots,vmax);
    double m=0;
    if(OrderCalcMargin(isBuy?ORDER_TYPE_BUY:ORDER_TYPE_SELL,sym,1.0,price,m) && m>0)
    {
