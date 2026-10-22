@@ -10,7 +10,7 @@
    "direction": "▲ LONG",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 4057.97,
+   "price": 4059.8,
    "boxH": 4094.25,
    "boxL": 4057.7,
    "prevH": null,
@@ -75,7 +75,7 @@
    "reasons": [
     "встречный H1 FVG 1.12160–1.12193 (H1 свеча 22.10 13:00 UTC+3) внутри цели 1:3"
    ],
-   "price": 1.11945,
+   "price": 1.11953,
    "boxH": 1.12439,
    "boxL": 1.11929,
    "prevH": null,
@@ -105,7 +105,7 @@
    "direction": "▲ LONG",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 1.3363,
+   "price": 1.33565,
    "boxH": 1.3419,
    "boxL": 1.33618,
    "prevH": null,
@@ -237,7 +237,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 10731.9,
+   "price": 10732.9,
    "boxH": 10752.2,
    "boxL": 10677.1,
    "prevH": null,
@@ -369,7 +369,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 0.70072,
+   "price": 0.70071,
    "boxH": 0.70228,
    "boxL": 0.6994,
    "prevH": null,
@@ -399,7 +399,7 @@
    "direction": "▲ LONG",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 0.83772,
+   "price": 0.83806,
    "boxH": 0.83856,
    "boxL": 0.8373,
    "prevH": null,
@@ -458,18 +458,9 @@
    "date": "2026-10-22",
    "window": "C",
    "time": "17:45",
-   "text": "изменилось: GBPUSD",
-   "changed": [
-    "GBPUSD"
-   ],
+   "text": "без изменений",
+   "changed": [],
    "log": [
-    {
-     "date": "2026-10-22",
-     "time": "17:32",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-22",
      "time": "17:32",
@@ -748,6 +739,13 @@
      "lines": [
       "🔴 GBPUSD (▲ LONG) — ЗАКРЫТА - SL в 17:45"
      ]
+    },
+    {
+     "date": "2026-10-22",
+     "time": "17:45",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
     }
    ]
   }
