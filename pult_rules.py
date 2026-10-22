@@ -1134,8 +1134,11 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
         if end_utc is not None: lv = lv[lv.index < end_utc]
         if len(lv): after = pd.concat([after, lv])
     out = None; xt = None; armed = False; be = sig.get('be_at')
-    # 22.10.2026: порог БУ мог быть пройден ВНУТРИ входной свечи (вход по её открытию) — такую свечу сюда не берём (результат не меняем),
-    # но для уведомления «переноси стоп на вход» запоминаем: res['be_armed_entry']. Если вход был на уровне внутри свечи — порядок внутри неизвестен, не считаем.
+    # 22.10.2026: БУ на входной свече (только живая сделка, вход по ОТКРЫТИЮ свечи). Историческая M5-свеча не говорит, что было раньше (low или high),
+    # но Пульт опрашивает рынок каждые 5–20 с: при первом опросе, где порог БУ уже пройден, запоминаем «базу» (high шорта / low лонга свечи на тот момент).
+    # Если позже в этой же свече high/low стал ХУЖЕ базы и достиг входа — цена вернулась на вход ПОСЛЕ взвода → БУ 0R (как у брокера).
+    # res['be_armed_entry'] — для уведомления «переноси стоп на вход». Старые дни/повторные прогоны (нет be_track, прошло >12 мин) не меняются.
+    entry_be = False; eb_arm = False; eb_time = None
     try:
         _tT = pd.Timestamp(sig['t_utc']); _eb = None
         if _tT in d.index: _eb = d.loc[_tT]
@@ -1143,9 +1146,30 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
         if be and _eb is not None:
             _R = abs(sig['entry'] - sig['stop']) or 1e-12
             if abs(float(_eb['Open']) - sig['entry']) <= 0.02 * _R:
-                res['be_armed_entry'] = bool((float(_eb['High']) >= be) if sd == 1 else (float(_eb['Low']) <= be))
+                eb_arm = bool((float(_eb['High']) >= be) if sd == 1 else (float(_eb['Low']) <= be))
+                res['be_armed_entry'] = eb_arm
+                if eb_arm:
+                    ret = float(_eb['Low']) if sd == 1 else float(_eb['High'])       # экстремум «возврата» к входу
+                    bt = sig.get('be_track')
+                    fresh = (pd.Timestamp.now(tz='UTC') - _tT) <= pd.Timedelta(minutes=12)
+                    if bt is None and fresh:
+                        sig['be_track'] = {'bar': str(_tT), 'base': ret}
+                    elif bt is not None and bt.get('bar') == str(_tT):
+                        worse = (ret < bt['base']) if sd == 1 else (ret > bt['base'])
+                        touched = (ret <= sig['entry']) if sd == 1 else (ret >= sig['entry'])
+                        if worse and touched:
+                            entry_be = True; eb_time = _tT.tz_convert('Europe/Riga').strftime('%H:%M') if _tT.tzinfo else None
+                        elif not worse:
+                            pass
+                        if worse and not touched:
+                            sig['be_track']['base'] = ret
     except Exception as _e:
         print('be_armed_entry failed:', _e)
+    armed0 = bool(eb_arm and sig.get('be_track') and sig['be_track'].get('bar') == str(pd.Timestamp(sig['t_utc'])))
+    if entry_be:
+        out = 'BE'; xt = eb_time; after = after.iloc[0:0]
+    elif armed0:
+        armed = True        # стоп на входе уже со следующей свечи
     for _, r in after.iterrows():
         stp = sig['entry'] if armed else sig['stop']
         tt_ = _.tz_convert('Europe/Riga').strftime('%H:%M') if _.tzinfo else None
