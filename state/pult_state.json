@@ -757,6 +757,43 @@
         "🟢 UK100 (🔻 SHORT) — ВХОД в 16:40",
         "🟢 EURGBP (▲ LONG) — ВХОД в 16:40"
       ]
+    },
+    {
+      "date": "2026-10-22",
+      "time": "16:41",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "16:41",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "16:41",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "16:42",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "16:42",
+      "window": "C",
+      "text": "изменилось: US500",
+      "lines": [
+        "🟢 US500 (🔻 SHORT) — ЗАКРЫТА - TP в 16:40"
+      ]
     }
   ],
   "_daily_summary": {
@@ -799,11 +836,11 @@
   "XAUUSD_C": {
     "sym": "XAUUSD",
     "window": "C",
-    "price": 4066.24,
+    "price": 4065.03,
     "boxH": 4094.25,
     "boxL": 4057.7,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2
@@ -842,11 +879,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.12004,
+    "price": 1.12022,
     "boxH": 1.12439,
     "boxL": 1.11929,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2
@@ -885,11 +922,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.33733,
+    "price": 1.33747,
     "boxH": 1.3419,
     "boxL": 1.33618,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2
@@ -986,7 +1023,7 @@
     "boxH": 7689.3,
     "boxL": 7669.0,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2,
@@ -1002,7 +1039,7 @@
     ],
     "ckf": [],
     "why": [
-      "В сделке: вход 16:35 по 7697.0, вероятность средняя; усилители: батут (H1 FVG); структура без преимущества."
+      "Цель 3R достигнута в 16:40: вход 16:35 по 7697.0, вероятность средняя; усилители: батут (H1 FVG); структура без преимущества."
     ],
     "struct": {
       "swing": "◆ боковик",
@@ -1056,13 +1093,18 @@
       "src": "MT5"
     },
     "be_armed": false,
+    "exit_time": "16:40",
     "line_status": "entry",
     "direction": "🔻 SHORT",
-    "note": "В СДЕЛКЕ",
-    "status_key": "В СДЕЛКЕ",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → TP 🎯 +3R",
+    "status_key": "ВХОД → TP 🎯 +3R",
+    "tg_note": "ЗАКРЫТА - TP",
     "stale": false,
     "date": "2026-10-22",
+    "shots": {
+      "m5": "state/shots/2026-10-22_US500_C_m5.png",
+      "h1": "state/shots/2026-10-22_US500_C_h1.png"
+    },
     "trend_h1": {
       "tr": "боковик",
       "ratio": -0.11,
@@ -1077,11 +1119,11 @@
   "UK100_C": {
     "sym": "UK100",
     "window": "C",
-    "price": 10761.9,
+    "price": 10757.7,
     "boxH": 10752.2,
     "boxL": 10677.1,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2,
@@ -1108,7 +1150,6 @@
       "line": "Swing: чёткого тренда нет, боковик — точек по тренду 1 из 4; смещение -37% против структуры | Sub M5: боковик внутри ноги Swing"
     },
     "pos": "Выше",
-    "extreme": 10762.9,
     "plus": [
       11
     ],
@@ -1151,10 +1192,11 @@
       "sv": 2,
       "src": "MT5"
     },
+    "be_armed": false,
     "line_status": "entry",
     "direction": "🔻 SHORT",
-    "note": "ВХОД (16:40, 10758.1)",
-    "status_key": "ВХОД (16:40, 10758.1)",
+    "note": "В СДЕЛКЕ",
+    "status_key": "В СДЕЛКЕ",
     "tg_note": "ВХОД",
     "stale": false,
     "date": "2026-10-22",
@@ -1176,7 +1218,7 @@
     "boxH": 25527.2,
     "boxL": 25311.2,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2,
@@ -1273,11 +1315,11 @@
   "AUDUSD_C": {
     "sym": "AUDUSD",
     "window": "C",
-    "price": 0.70102,
+    "price": 0.70104,
     "boxH": 0.70228,
     "boxL": 0.6994,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2
@@ -1316,11 +1358,11 @@
   "EURGBP_C": {
     "sym": "EURGBP",
     "window": "C",
-    "price": 0.8375,
+    "price": 0.83745,
     "boxH": 0.83856,
     "boxL": 0.8373,
     "reasons": [],
-    "checked_at": "16:40",
+    "checked_at": "16:42",
     "ck": [
       1,
       2,
@@ -1346,7 +1388,6 @@
       "line": "Swing ▼: импульс вниз, цена у LL 0.83744 | Sub M5 ▼: у экстремума — по тренду"
     },
     "pos": "Внутри",
-    "extreme": 0.83726,
     "plus": [],
     "worse": [],
     "prob": "низкая",
@@ -1384,10 +1425,11 @@
       "sv": 2,
       "src": "MT5"
     },
+    "be_armed": false,
     "line_status": "entry",
     "direction": "▲ LONG",
-    "note": "ВХОД (16:40, 0.83745)",
-    "status_key": "ВХОД (16:40, 0.83745)",
+    "note": "В СДЕЛКЕ",
+    "status_key": "В СДЕЛКЕ",
     "tg_note": "ВХОД",
     "stale": false,
     "date": "2026-10-22",

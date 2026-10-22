@@ -10,7 +10,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 4066.24,
+   "price": 4065.03,
    "boxH": 4094.25,
    "boxL": 4057.7,
    "prevH": null,
@@ -26,7 +26,7 @@
     "ratio": -0.4,
     "pct": -0.75
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -40,7 +40,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.12004,
+   "price": 1.12022,
    "boxH": 1.12439,
    "boxL": 1.11929,
    "prevH": null,
@@ -56,7 +56,7 @@
     "ratio": 0.12,
     "pct": 0.08
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -70,7 +70,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.33733,
+   "price": 1.33747,
    "boxH": 1.3419,
    "boxL": 1.33618,
    "prevH": null,
@@ -86,7 +86,7 @@
     "ratio": 1.77,
     "pct": 1.24
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -98,7 +98,7 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "В СДЕЛКЕ",
+   "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
    "price": 7696.5,
    "boxH": 7689.3,
@@ -152,7 +152,7 @@
     "ratio": -1.13,
     "pct": -1.41
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -164,9 +164,9 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (16:40, 10758.1)",
+   "note": "В СДЕЛКЕ",
    "reasons": [],
-   "price": 10761.9,
+   "price": 10757.7,
    "boxH": 10752.2,
    "boxL": 10677.1,
    "prevH": null,
@@ -218,7 +218,7 @@
     "ratio": 1.66,
     "pct": 2.55
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -284,7 +284,7 @@
     "ratio": 1.05,
     "pct": 1.61
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -298,7 +298,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 0.70102,
+   "price": 0.70104,
    "boxH": 0.70228,
    "boxL": 0.6994,
    "prevH": null,
@@ -314,7 +314,7 @@
     "ratio": 0.91,
     "pct": 0.78
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -326,9 +326,9 @@
    "window": "C",
    "status": "entry",
    "direction": "▲ LONG",
-   "note": "ВХОД (16:40, 0.83745)",
+   "note": "В СДЕЛКЕ",
    "reasons": [],
-   "price": 0.8375,
+   "price": 0.83745,
    "boxH": 0.83856,
    "boxL": 0.8373,
    "prevH": null,
@@ -377,7 +377,7 @@
     "ratio": -2.38,
     "pct": -0.99
    },
-   "checked": "16:40"
+   "checked": "16:42"
   }
  },
  {
@@ -386,11 +386,10 @@
   "data": {
    "date": "2026-10-22",
    "window": "C",
-   "time": "16:40",
-   "text": "изменилось: UK100, EURGBP",
+   "time": "16:42",
+   "text": "изменилось: US500",
    "changed": [
-    "UK100",
-    "EURGBP"
+    "US500"
    ],
    "log": [
     {
@@ -640,6 +639,43 @@
      "lines": [
       "🟢 UK100 (🔻 SHORT) — ВХОД в 16:40",
       "🟢 EURGBP (▲ LONG) — ВХОД в 16:40"
+     ]
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:41",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:41",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:41",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:42",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:42",
+     "window": "C",
+     "text": "изменилось: US500",
+     "lines": [
+      "🟢 US500 (🔻 SHORT) — ЗАКРЫТА - TP в 16:40"
      ]
     }
    ]
