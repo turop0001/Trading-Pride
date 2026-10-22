@@ -581,6 +581,8 @@ def _counter_fvg(F1, sd, entry, tp, t_known=None):
         if t_known is None: return True
         return pd.Timestamp(ts) + pd.Timedelta(hours=1) <= pd.Timestamp(t_known)
     for f in F1:
+        # 23.10.2026: FVG, сформированный ПОСЛЕ момента решения (третья свеча H1 закрылась позже t_known), сигнал не блокирует
+        if t_known is not None and f.get('t') is not None and pd.Timestamp(f['t']) + pd.Timedelta(hours=2) > pd.Timestamp(t_known): continue
         if f['dir'] != -sd or _known(f['inv_t']) or _known(f.get('pierce_t')): continue
         if sd == 1 and f['hi'] > entry and f['lo'] <= tp: return f
         if sd == -1 and f['lo'] < entry and f['hi'] >= tp: return f
@@ -848,18 +850,21 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
         dall = d[d.index <= pd.Timestamp(now_utc, tz='UTC')]
         done = _completed(d, now_utc, 5)
         if not len(dall) or not len(done) or dall.index[-1] <= done.index[-1]: return res
-        fb = dall.iloc[-1]; ext_ = float(res['extreme'])
+        # 23.10.2026: формирующаяся свеча M10 = уже закрытая половина (M5) + текущая M5
+        g10 = dall.index[-1].floor(f'{C_TF}min')
+        fb = dall[dall.index >= g10]; ext_ = float(res['extreme'])
+        fbH = float(fb['High'].max()); fbL = float(fb['Low'].min())
         short = 'SHORT' in str(res.get('direction') or '')
         # уровень отката 20% от закрытого экстремума (бокс — по закрытым барам); без предрасчёта pend (он не учитывает открытие свечи выше уровня)
         if short:
             lvl_ = ext_ - 0.2 * (ext_ - float(res['boxH']))
-            ok = (ext_ - float(res['boxH'])) > 0 and float(fb['High']) <= ext_ and float(fb['Low']) <= lvl_
+            ok = (ext_ - float(res['boxH'])) > 0 and fbH <= ext_ and fbL <= lvl_
         else:
             lvl_ = ext_ + 0.2 * (float(res['boxL']) - ext_)
-            ok = (float(res['boxL']) - ext_) > 0 and float(fb['Low']) >= ext_ and float(fb['High']) >= lvl_
+            ok = (float(res['boxL']) - ext_) > 0 and fbL >= ext_ and fbH >= lvl_
         if not ok: return res
         now2 = (dall.index[-1] + pd.Timedelta(minutes=5, seconds=41)).tz_convert('UTC').tz_localize(None).to_pydatetime()
-        r2 = _analyze_C2(sym, d, now2, off, prev, h1)
+        r2 = _analyze_C2(sym, d, now2, off, prev, h1, form=True)
         if r2.get('error') or not r2.get('signal'): return res   # мгновенно — только ВХОД (он залипает через prev); скипы ждут закрытия свечи, чтобы не мигали
         r2['checked_at'] = res.get('checked_at'); r2['price'] = res.get('price')
         return r2
@@ -868,7 +873,29 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
         return res
 
 
-def _analyze_C2(sym, d, now_utc, off, prev, h1):
+C_TF = 10   # 23.10.2026: Тип C — вынос, экстремум и пороги считаются по свечам M10 (вход по касанию и сопровождение — по M5)
+
+
+def _c10_frame(d5, box, today, wa, form):
+    """M10-свечи для Типа C: бокс Лондона (из M5 бокса) + свечи дня с окна выноса. Последняя свеча берётся только закрытой
+    (обе M5), а при form=True — и формирующаяся (для мгновенного входа по касанию)."""
+    k5 = C_TF // 5
+    def agg(g):
+        if not len(g): return pd.DataFrame(columns=['Open', 'High', 'Low', 'Close', 'rdate', 'rmin'])
+        key = (g['rmin'] // C_TF).values
+        us = list(dict.fromkeys(key)); rows = []; ix = []
+        for j, u in enumerate(us):
+            x = g[key == u]
+            if j == len(us) - 1 and len(x) < k5 and not form: continue
+            rows.append((float(x['Open'].iloc[0]), float(x['High'].max()), float(x['Low'].min()), float(x['Close'].iloc[-1]), today, int(u) * C_TF))
+            ix.append(x.index[0].floor(f'{C_TF}min'))
+        return pd.DataFrame(rows, index=pd.DatetimeIndex(ix), columns=['Open', 'High', 'Low', 'Close', 'rdate', 'rmin'])
+    day = d5[(d5['rdate'] == today) & (d5['rmin'] >= wa) & (d5['rmin'] < 1320)]
+    box10 = agg(box)
+    return pd.concat([box10, agg(day)]), box10
+
+
+def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     """Тип C (новые правила 01.10.2026). Бокс Лондона 11:00–16:25, вход 16:30–18:30. Вынос телом или тенью:
     вниз → лонг, вверх → шорт (вчерашний Лондон не важен). ≤4 свечей выноса (доджи не считаются), широкий M5 FVG
     (≥2× средней свечи Лондона) в 3 свечах перед экстремумом — СКИП; вход ВСЕГДА на откате 20% длины выноса
@@ -927,6 +954,9 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
     # свечи давал ложные входы и мигание СКИП→ВЫНОС→ВХОД). Формирующаяся свеча нужна только для цены и для слежения за стопом/целью.
     if len(dall) > len(d):
         res['price'] = round(float(dall['Close'].iloc[-1]), dec)
+    # 23.10.2026: дальше — M10 (d5 остаётся M5 для поиска свечи касания и сопровождения)
+    d5 = d
+    d, box = _c10_frame(d5, box, today, wa, form)
     day = d[d['rdate'] == today]
     win = day[(day['rmin'] >= wa) & (day['rmin'] < 1320)]
     idx = {t: i for i, t in enumerate(d.index)}
@@ -988,7 +1018,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         return _out(res, 'skip', dirc, 'СКИП (вынос длиннее 4 свечей)')
     res['ck'] = sorted(set(res['ck'] + [4]))
     _why(res, f'Свечей выноса {nsw} (≤4)', [4])
-    # широкий M5 FVG в 3 свечах перед экстремумом (контр-ножка выноса)
+    # широкий M10 FVG в 3 свечах перед экстремумом (контр-ножка выноса)
     bx = box.iloc[-20:]
     avgR = float((bx['High'] - bx['Low']).mean()) if len(bx) else 0.0
     wide = None
@@ -997,9 +1027,9 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         if a >= 0 and c_ < n and L[a] > H[c_] and (L[a] - H[c_]) >= 2 * avgR and avgR > 0:
             wide = (float(L[a] - H[c_]), a, c_); break
     if wide:
-        res['ckf'] = [7]; t = f'широкий M5 FVG ({wide[0]:.{dec}f} ≥ 2× средней свечи Лондона) перед экстремумом'
+        res['ckf'] = [7]; t = f'широкий M10 FVG ({wide[0]:.{dec}f} ≥ 2× средней свечи Лондона) перед экстремумом'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [7])
-        return _out(res, 'skip', dirc, 'СКИП (широкий M5 FVG перед экстремумом)')
+        return _out(res, 'skip', dirc, 'СКИП (широкий M10 FVG перед экстремумом)')
     leg = lowB - ext
     if entry_g is None or leg <= 0:
         if nowm >= 1110:
@@ -1022,27 +1052,34 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1):
         res['ckf'] = [5]; res['reasons'] = ['откат 20% после 18:30']; _why(res, 'Скип: откат ≥20% позже 18:30', [5])
         return _out(res, 'skip', dirc, 'СКИП (вход позже 18:30)')
     lvl = ext + 0.2 * leg
-    entry = max(lvl, float(O[entry_g]))   # вход по уровню отката 20%
+    # 23.10.2026: вход по касанию 20% — свеча M5 внутри свечи M10, где уровень достигнут; цена входа = max(уровень, открытие этой M5)
+    t_bar = d.index[entry_g]
+    sub5 = d5[(d5.index >= t_bar) & (d5.index < t_bar + pd.Timedelta(minutes=C_TF))]
+    so = sub5['Open'].values.astype(float) * sd
+    sh = (sub5['High'].values if sd == 1 else -sub5['Low'].values).astype(float)
+    fi = next((j for j in range(len(sh)) if sh[j] >= lvl), None)
+    if fi is None: entry = max(lvl, float(O[entry_g])); t_fill = t_bar
+    else: entry = max(lvl, float(so[fi])); t_fill = sub5.index[fi]
     stop_f = ext - 0.1 * (entry - ext)
     R = entry - stop_f
     tp_f = entry + 3 * R
     atr_m = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
     if R < 0.25 * atr_m:
-        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше 0,25 ATR(M5) — не исполнить со спредом'
+        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше 0,25 ATR(M10) — не исполнить со спредом'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
         return _out(res, 'skip', dirc, 'СКИП (стоп слишком мал)')
     be_f = entry + 0.5 * (tp_f - entry)
     entry_r, stop_r, tp_r, be_r = sd * entry, sd * stop_f, sd * tp_f, sd * be_f
     _prob_set_C(res, F1, atr1, sd, ext, plus)
     plus = res['plus']
-    cf = _counter_fvg(F1, sd, entry_r, tp_r, d.index[entry_g])
+    cf = _counter_fvg(F1, sd, entry_r, tp_r, t_bar + pd.Timedelta(minutes=C_TF))
     res['ck'] = sorted(set(res['ck'] + [5]))
     _why(res, 'Откат ≥20% длины выноса достигнут', [5])
     if cf is not None:
         res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} UTC+3) внутри цели 1:3'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8]); res['cfv'] = _cfv(cf, sd, entry_r, tp_r, off, dec)
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:3)')
-    t_in = d.index[entry_g]      # свеча входа (вход по её закрытию, трекинг — со следующей свечи)
+    t_in = t_fill      # M5-свеча касания (трекинг — со следующей свечи M5)
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
     sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=0)).strftime('%H:%M'), t_utc=str(t_in),
