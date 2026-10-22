@@ -367,6 +367,44 @@ def _fix_c_20261021(state):
         print('fix_c failed:', e)
 
 
+def _fix_a_20261022(state):
+    """22.10.2026 (разовая правка, идемпотентная): компьютер был выключен до 13:26 по Риге — MT5 офлайн, окно A (10:00–13:00) не считалось,
+    карточек за 22.10 не было. По полным свечам брокера (ExportM5_range, сервер = Рига) окно A пересчитано движком Пульта:
+    US30 — вход LONG 11:30 по 52524, SL в 11:55 (−1R), остальные 10 инструментов — СКИП. Здесь заливаем карточки, историю и аналитику.
+    Telegram/push не шлём. Любая ошибка игнорируется."""
+    try:
+        root = os.path.dirname(os.path.abspath(__file__)); sd = os.path.join(root, 'state')
+        fp = os.path.join(sd, '_fix_A_0922.json')
+        if not os.path.exists(fp): return
+        if lc.riga_now()[0].strftime('%Y-%m-%d') != '2026-10-22': return
+        if (state.get('US30_A') or {}).get('date') == '2026-10-22': return
+        fill = json.load(open(fp, encoding='utf-8'))
+        for s_, r_ in fill.items():
+            state[f'{s_}_A'] = r_
+            try:
+                pdp = os.path.join(sd, 'pult_docs', f'pult__{s_}_A.json')
+                if os.path.isdir(os.path.dirname(pdp)):
+                    json.dump({'date': '2026-10-22', 'sym': s_, 'window': 'A', 'status': r_.get('line_status'), 'direction': r_.get('direction'),
+                               'note': r_.get('note'), 'reasons': r_.get('reasons', []), 'price': r_.get('price'), 'boxH': r_.get('boxH'),
+                               'boxL': r_.get('boxL'), 'prevH': r_.get('prevH'), 'prevL': r_.get('prevL'), 'signal': r_.get('signal'),
+                               'trendH1': r_.get('trend_h1'), 'trendD1': r_.get('trend_d1'), 'checked': '13:00'},
+                              open(pdp, 'w', encoding='utf-8'), ensure_ascii=False)
+            except Exception as e:
+                print('fix_a doc failed:', e)
+        u = fill.get('US30') or {}; sg = u.get('signal') or {}
+        if sg:
+            _hist_add(None, {'id': '2026-10-22_US30_A', 'date': '2026-10-22', 'symbol': 'US30', 'type': 'A', 'side': sg.get('side'),
+                             'entry': sg.get('entry'), 'stop': sg.get('stop'), 'target': sg.get('tp'), 'result': u.get('note'), 'autopsy': u.get('autopsy')})
+            try:
+                import analytics_gen as _ag
+                for rec in json.load(open(os.path.join(sd, '_fix_A_an.json'), encoding='utf-8')):
+                    if not _ag.has('A', 'US30', '2026-10-22'): _ag.upsert(rec)
+            except Exception as e:
+                print('fix_a analytics failed:', e)
+    except Exception as e:
+        print('fix_a failed:', e)
+
+
 def _risk_pct_for(win):
     """21.10.2026: риск в сообщении сигнала. Стандарт 0,5% (решение владельца 18.10); у Типа C после 2 SL подряд по счёту
     (все инструменты вместе, БУ серию не меняет, TP сбрасывает) — 0,25% до первого TP. Серия берётся из state/history.json."""
@@ -392,6 +430,7 @@ def main(send=True):
     state = lc.load_state()
     _fix_uk100_20261021(state)
     _fix_c_20261021(state)
+    _fix_a_20261022(state)
     flags = state.get('_flags', {})
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))
