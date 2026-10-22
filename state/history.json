@@ -837,6 +837,11 @@
     "entry": 25540.2,
     "stop": 25553.4,
     "target": 25500.6,
-    "result": "сигнал Пульта в 16:35"
+    "result": "ВХОД → SL −1R",
+    "autopsy": "",
+    "shots": {
+      "m5": "state/shots/2026-10-22_GER40_C_m5.png",
+      "h1": "state/shots/2026-10-22_GER40_C_h1.png"
+    }
   }
 ]
