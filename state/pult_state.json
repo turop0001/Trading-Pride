@@ -1498,12 +1498,12 @@
       "src": "MT5"
     },
     "be_armed": false,
-    "exit_time": "16:40",
+    "exit_time": "16:39",
     "line_status": "entry",
     "direction": "🔻 SHORT",
-    "note": "ВХОД → TP 🎯 +3R",
-    "status_key": "ВХОД → TP 🎯 +3R",
-    "tg_note": "ЗАКРЫТА - TP",
+    "note": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+    "status_key": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+    "tg_note": "ЗАКРЫТА - БУ",
     "stale": false,
     "date": "2026-10-22",
     "shots": {
@@ -1862,9 +1862,10 @@
     }
   },
   "_mt5": {
-    "online": true,
-    "since": "13:26",
-    "date": "2026-10-22"
+    "online": false,
+    "since": "21:55",
+    "date": "2026-10-22",
+    "checked": "21:55"
   },
   "USDJPY_trend": {
     "date": "2026-10-21",
