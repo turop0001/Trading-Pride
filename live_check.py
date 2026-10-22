@@ -188,7 +188,9 @@ def fetch(ticker, src=None):
 # шлёт свечи M5/H1/D1 на сайт (/api/feed) -> ветка `feed`, файл feed/mt5.json. Если свежих свечей
 # MT5 нет (терминал выключен) — прежний запасной путь Yahoo (кроме GER40: у Yahoo его нет).
 FEED_URL = 'https://api.github.com/repos/turop0001/Trading-Pride/contents/feed/{}.json?ref=feed'
-_FEED = {'t': 0, 'data': None}
+_FEED = {'t': 0, 'th': 0, 'data': None, 'parts': {}, 'ban': 0}
+# 22.10.2026: в окне C данные брокера читаем каждые FAST_FEED_S секунд (live.json), hist.json — раз в 60 с (лимит GITHUB_TOKEN ≈1000 запросов/час); при 403/429 — пауза 2 мин на редком чтении.
+FAST_FEED_S = 5
 SRC = {}   # sym -> 'MT5' | 'Yahoo' (для логов/карточек)
 # 20.10.2026 (решение владельца): ТОЛЬКО свечи MT5. Запасной путь Yahoo (фьючерсы/индикативные квоты) давал ложные входы и стопы
 # (19.10: US500 и золото по Yahoo). Если MT5 выключен — Пульт и Telegram молчат до его включения. Вернуть Yahoo: PULT_ALLOW_YAHOO=1.
@@ -196,19 +198,31 @@ MT5_ONLY = os.environ.get('PULT_ALLOW_YAHOO', '') != '1'
 
 
 def _feed():
-    import time, urllib.request
-    if time.time() - _FEED['t'] < 15: return _FEED['data']
-    _FEED['t'] = time.time()
+    import time, urllib.request, urllib.error
+    now = time.time()
+    try:
+        fast = window_now(riga_now()[0]) == 'C'
+    except Exception:
+        fast = False
+    ttl = FAST_FEED_S - 1 if (fast and now >= _FEED['ban']) else 15
+    if now - _FEED['t'] < ttl: return _FEED['data']
+    _FEED['t'] = now
     try:
         h = {'Accept': 'application/vnd.github.raw', 'User-Agent': 'pult'}
         tok = os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
         if tok: h['Authorization'] = f'Bearer {tok}'
-        parts = []
-        for name in ('hist', 'live'):
+        names = ['live']
+        if (not fast) or now - _FEED['th'] >= 60 or 'hist' not in _FEED['parts']:
+            names = ['hist', 'live']; _FEED['th'] = now
+        for name in names:
             try:
-                parts.append(json.load(urllib.request.urlopen(urllib.request.Request(FEED_URL.format(name), headers=h), timeout=20)))
+                _FEED['parts'][name] = json.load(urllib.request.urlopen(urllib.request.Request(FEED_URL.format(name), headers=h), timeout=20))
+            except urllib.error.HTTPError as e:
+                if e.code in (403, 429): _FEED['ban'] = now + 120
+                print(f'MT5 feed {name} недоступен:', str(e)[:120])
             except Exception as e:
                 print(f'MT5 feed {name} недоступен:', str(e)[:120])
+        parts = [_FEED['parts'][n] for n in ('hist', 'live') if n in _FEED['parts']]
         syms = {}
         for p in parts:   # live поверх hist: одинаковое время бара — берём более свежий
             for sym, tfs in (p.get('syms') or {}).items():

@@ -10,6 +10,7 @@ import live_check as lc
 import pult_tick
 
 HB = 'state/loop_heartbeat.txt'
+_LAST = {'hb': 0}
 
 
 def git_push():
@@ -53,10 +54,14 @@ while True:
     if m < START:
         time.sleep(30); continue
     try:
-        open(HB, 'w').write(str(int(time.time())))
-        _hot_reload()
+        _t = time.time()
+        if _t - _LAST['hb'] >= 20:                # 22.10.2026: heartbeat и подтяжка кода — раз в 20 с (при тике 5 с иначе пуш состояния каждый тик)
+            open(HB, 'w').write(str(int(_t))); _LAST['hb'] = _t
+            _hot_reload()
         pult_tick.main()
         git_push()
     except Exception as e:
         print('tick error:', e)
-    time.sleep(20 - dt.datetime.utcnow().second % 20)   # 08.10.2026: тик каждые 20 с (раньше 60) — меньше задержка сигналов
+    # 08.10.2026: тик каждые 20 с; 22.10.2026: в окне C (16:30–18:30) — каждые 5 с
+    _step = 5 if 990 <= m < 1110 else 20
+    time.sleep(_step - dt.datetime.utcnow().second % _step)

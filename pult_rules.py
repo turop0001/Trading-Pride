@@ -1134,6 +1134,18 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
         if end_utc is not None: lv = lv[lv.index < end_utc]
         if len(lv): after = pd.concat([after, lv])
     out = None; xt = None; armed = False; be = sig.get('be_at')
+    # 22.10.2026: порог БУ мог быть пройден ВНУТРИ входной свечи (вход по её открытию) — такую свечу сюда не берём (результат не меняем),
+    # но для уведомления «переноси стоп на вход» запоминаем: res['be_armed_entry']. Если вход был на уровне внутри свечи — порядок внутри неизвестен, не считаем.
+    try:
+        _tT = pd.Timestamp(sig['t_utc']); _eb = None
+        if _tT in d.index: _eb = d.loc[_tT]
+        elif live is not None and len(live) and _tT in live.index: _eb = live.loc[_tT]
+        if be and _eb is not None:
+            _R = abs(sig['entry'] - sig['stop']) or 1e-12
+            if abs(float(_eb['Open']) - sig['entry']) <= 0.02 * _R:
+                res['be_armed_entry'] = bool((float(_eb['High']) >= be) if sd == 1 else (float(_eb['Low']) <= be))
+    except Exception as _e:
+        print('be_armed_entry failed:', _e)
     for _, r in after.iterrows():
         stp = sig['entry'] if armed else sig['stop']
         tt_ = _.tz_convert('Europe/Riga').strftime('%H:%M') if _.tzinfo else None
