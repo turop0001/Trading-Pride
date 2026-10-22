@@ -405,6 +405,46 @@ def _fix_a_20261022(state):
         print('fix_a failed:', e)
 
 
+def _fix_us500_be_20261022(state, tg):
+    """22.10.2026 (разовая правка, идемпотентная): US500 Тип C — по факту на счёте БУ 0R (порог БУ пройден и цена вернулась на вход внутри
+    входной свечи 16:35, закрыта в 16:39:50), а карточка/история/аналитика записали TP +3R. Исправляем историю, аналитику, карточку и шлём
+    одно сообщение-исправление в Telegram. Условие: запись истории всё ещё «TP». Любая ошибка игнорируется."""
+    try:
+        root = os.path.dirname(os.path.abspath(__file__)); hp = os.path.join(root, 'state', 'history.json')
+        items = json.load(open(hp, encoding='utf-8'))
+        it = next((x for x in items if x.get('id') == '2026-10-22_US500_C'), None)
+        if not it or 'TP' not in str(it.get('result', '')): return
+        _hist_add(None, {'id': '2026-10-22_US500_C', 'result': 'ВХОД → БУ 0R (стоп в безубытке после 50% пути)',
+                         'autopsy': 'порог БУ пройден внутри входной свечи (16:36), цена вернулась на вход и закрыла сделку в 16:39 по БУ; после этого цена дошла до цели'})
+        try:
+            import analytics_gen as _ag
+            j = _ag.load(_ag.PATH)
+            rec = next((x for x in j['C'] if x['id'] == 'C_US500_2026-10-22'), None)
+            if rec:
+                rec = dict(rec); rec.update(res='BE', R=0.0, xt='16:39'); _ag.upsert(rec)
+        except Exception as e:
+            print('fix_us500 analytics failed:', e)
+        r = state.get('US500_C') or {}
+        if (r.get('signal') or {}).get('date') == '2026-10-22':
+            r['note'] = 'ВХОД → БУ 0R (стоп в безубытке после 50% пути)'; r['status_key'] = r['note']; r['tg_note'] = 'ЗАКРЫТА - БУ'; r['exit_time'] = '16:39'
+            state['US500_C'] = r
+        try:
+            pdp = os.path.join(root, 'state', 'pult_docs', 'pult__US500_C.json')
+            if os.path.exists(pdp):
+                dj = json.load(open(pdp, encoding='utf-8'))
+                if dj.get('date') == '2026-10-22':
+                    dj['note'] = 'ВХОД → БУ 0R (стоп в безубытке после 50% пути)'; json.dump(dj, open(pdp, 'w', encoding='utf-8'), ensure_ascii=False)
+        except Exception as e:
+            print('fix_us500 doc failed:', e)
+        try:
+            tg("\u270F\uFE0F Исправление за 22.10: US500 (\U0001F53B SHORT, тип C) закрыта по БУ 0R в 16:39, а не TP — порог БУ был пройден внутри свечи входа, "
+               "цена вернулась на вход, и стоп сработал на счёте. Итог окна C за 22.10: 0 TP, 5 SL, 1 БУ, −5R.")
+        except Exception as e:
+            print('fix_us500 tg failed:', e)
+    except Exception as e:
+        print('fix_us500 failed:', e)
+
+
 def _risk_pct_for(win):
     """21.10.2026: риск в сообщении сигнала. Стандарт 0,5% (решение владельца 18.10); у Типа C после 2 SL подряд по счёту
     (все инструменты вместе, БУ серию не меняет, TP сбрасывает) — 0,25% до первого TP. Серия берётся из state/history.json."""
@@ -435,6 +475,7 @@ def main(send=True):
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))
     tgw = lambda w_, x: tg(x) if w_ in NOTIFY_WIN else print('[Тип', w_, 'без уведомления]')
+    _fix_us500_be_20261022(state, tg)
     pushw = lambda w_, *a_, **k_: push(*a_, **k_) if w_ in NOTIFY_WIN else None
     window = lc.window_now(riga) if wd < 5 else None
     did = []
