@@ -511,34 +511,6 @@
   "_log": [
     {
       "date": "2026-10-22",
-      "time": "16:34",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-22",
-      "time": "16:34",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-22",
-      "time": "16:35",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-22",
-      "time": "16:35",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-22",
       "time": "16:35",
       "window": "C",
       "text": "изменилось: US500, UK100, GER40",
@@ -1085,6 +1057,36 @@
       "window": "C",
       "text": "без изменений",
       "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "17:01",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "17:01",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "17:01",
+      "window": "C",
+      "text": "без изменений",
+      "lines": []
+    },
+    {
+      "date": "2026-10-22",
+      "time": "17:02",
+      "window": "C",
+      "text": "изменилось: XAUUSD",
+      "lines": [
+        "🔴 XAUUSD (▲ LONG) — ЗАКРЫТА - SL в 17:00"
+      ]
     }
   ],
   "_daily_summary": {
@@ -1131,7 +1133,7 @@
     "boxH": 4094.25,
     "boxL": 4057.7,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2,
@@ -1146,7 +1148,7 @@
     ],
     "ckf": [],
     "why": [
-      "В сделке: вход 16:50 по 4062.9, вероятность низкая; усилителей не было; структура без преимущества."
+      "Стоп в 17:00 (вход 16:50 по 4062.9). Причины: усилителей не было; вероятность была низкая."
     ],
     "struct": {
       "swing": "▼ LH/LL",
@@ -1195,13 +1197,19 @@
       "src": "MT5"
     },
     "be_armed": false,
-    "line_status": "entry",
+    "exit_time": "17:00",
+    "autopsy": "",
+    "line_status": "skip",
     "direction": "▲ LONG",
-    "note": "В СДЕЛКЕ",
-    "status_key": "В СДЕЛКЕ",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → SL −1R",
+    "status_key": "ВХОД → SL −1R",
+    "tg_note": "ЗАКРЫТА - SL",
     "stale": false,
     "date": "2026-10-22",
+    "shots": {
+      "m5": "state/shots/2026-10-22_XAUUSD_C_m5.png",
+      "h1": "state/shots/2026-10-22_XAUUSD_C_h1.png"
+    },
     "trend_h1": {
       "tr": "шорт",
       "ratio": -1.61,
@@ -1216,11 +1224,11 @@
   "EURUSD_C": {
     "sym": "EURUSD",
     "window": "C",
-    "price": 1.11919,
+    "price": 1.11916,
     "boxH": 1.12439,
     "boxL": 1.11929,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2
@@ -1259,11 +1267,11 @@
   "GBPUSD_C": {
     "sym": "GBPUSD",
     "window": "C",
-    "price": 1.3369,
+    "price": 1.3368,
     "boxH": 1.3419,
     "boxL": 1.33618,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2
@@ -1360,7 +1368,7 @@
     "boxH": 7689.3,
     "boxL": 7669.0,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2,
@@ -1460,7 +1468,7 @@
     "boxH": 10752.2,
     "boxL": 10677.1,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2,
@@ -1561,7 +1569,7 @@
     "boxH": 25527.2,
     "boxL": 25311.2,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2,
@@ -1658,11 +1666,11 @@
   "AUDUSD_C": {
     "sym": "AUDUSD",
     "window": "C",
-    "price": 0.70119,
+    "price": 0.70106,
     "boxH": 0.70228,
     "boxL": 0.6994,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2
@@ -1705,7 +1713,7 @@
     "boxH": 0.83856,
     "boxL": 0.8373,
     "reasons": [],
-    "checked_at": "17:00",
+    "checked_at": "17:02",
     "ck": [
       1,
       2,
