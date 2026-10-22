@@ -6,16 +6,49 @@
    "date": "2026-10-22",
    "sym": "XAUUSD",
    "window": "C",
-   "status": "watch",
-   "direction": "—",
-   "note": "НАБЛЮДАЕМ",
+   "status": "entry",
+   "direction": "▲ LONG",
+   "note": "ВХОД (16:50, 4062.90)",
    "reasons": [],
-   "price": 4063.24,
+   "price": 4063.27,
    "boxH": 4094.25,
    "boxL": 4057.7,
    "prevH": null,
    "prevL": null,
-   "signal": null,
+   "signal": {
+    "date": "2026-10-22",
+    "window": "C",
+    "time": "16:50",
+    "t_utc": "2026-10-22 13:50:00+00:00",
+    "entry": 4062.9,
+    "stop": 4054.21,
+    "tp": 4088.97,
+    "be_at": 4075.94,
+    "side": "long",
+    "rr": 3.0,
+    "end_utc": "2026-10-22 19:00:00+00:00",
+    "ck": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "plus": [],
+    "worse": [],
+    "ext": 4055.0,
+    "prob": "низкая",
+    "struct": "50/50",
+    "sconf": "нет",
+    "sscore": 0.0,
+    "sv": 2,
+    "src": "MT5"
+   },
    "trendH1": {
     "tr": "шорт",
     "ratio": -1.61,
@@ -26,7 +59,7 @@
     "ratio": -0.4,
     "pct": -0.75
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -40,7 +73,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.11968,
+   "price": 1.11989,
    "boxH": 1.12439,
    "boxL": 1.11929,
    "prevH": null,
@@ -56,7 +89,7 @@
     "ratio": 0.12,
     "pct": 0.08
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -70,7 +103,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.33699,
+   "price": 1.3373,
    "boxH": 1.3419,
    "boxL": 1.33618,
    "prevH": null,
@@ -86,7 +119,7 @@
     "ratio": 1.77,
     "pct": 1.24
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -100,7 +133,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → TP 🎯 +3R",
    "reasons": [],
-   "price": 7690.4,
+   "price": 7687.3,
    "boxH": 7689.3,
    "boxL": 7669.0,
    "prevH": null,
@@ -152,7 +185,7 @@
     "ratio": -1.13,
     "pct": -1.41
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -166,7 +199,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 10761.4,
+   "price": 10758.4,
    "boxH": 10752.2,
    "boxL": 10677.1,
    "prevH": null,
@@ -218,7 +251,7 @@
     "ratio": 1.66,
     "pct": 2.55
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -232,7 +265,7 @@
    "direction": "🔻 SHORT",
    "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 25531.2,
+   "price": 25551.2,
    "boxH": 25527.2,
    "boxL": 25311.2,
    "prevH": null,
@@ -284,7 +317,7 @@
     "ratio": 1.05,
     "pct": 1.61
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -298,7 +331,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 0.7012,
+   "price": 0.70126,
    "boxH": 0.70228,
    "boxL": 0.6994,
    "prevH": null,
@@ -314,7 +347,7 @@
     "ratio": 0.91,
     "pct": 0.78
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -328,7 +361,7 @@
    "direction": "▲ LONG",
    "note": "В СДЕЛКЕ",
    "reasons": [],
-   "price": 0.83749,
+   "price": 0.83748,
    "boxH": 0.83856,
    "boxL": 0.8373,
    "prevH": null,
@@ -377,7 +410,7 @@
     "ratio": -2.38,
     "pct": -0.99
    },
-   "checked": "16:47"
+   "checked": "16:50"
   }
  },
  {
@@ -386,79 +419,12 @@
   "data": {
    "date": "2026-10-22",
    "window": "C",
-   "time": "16:47",
-   "text": "изменилось: UK100",
+   "time": "16:50",
+   "text": "изменилось: XAUUSD",
    "changed": [
-    "UK100"
+    "XAUUSD"
    ],
    "log": [
-    {
-     "date": "2026-10-22",
-     "time": "16:34",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:35",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:35",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:35",
-     "window": "C",
-     "text": "изменилось: US500, UK100, GER40",
-     "lines": [
-      "🟢 US500 (🔻 SHORT) — ВХОД в 16:35",
-      "⚠️ UK100 (🔻 SHORT) — ВЫНОС",
-      "🟢 GER40 (🔻 SHORT) — ВХОД в 16:35"
-     ]
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:36",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:36",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:36",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:37",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-22",
-     "time": "16:37",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-22",
      "time": "16:37",
@@ -683,6 +649,71 @@
      "text": "изменилось: UK100",
      "lines": [
       "🔴 UK100 (🔻 SHORT) — ЗАКРЫТА - SL в 16:45"
+     ]
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:48",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:48",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:48",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:49",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:49",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:49",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:50",
+     "window": "C",
+     "text": "изменилось: XAUUSD",
+     "lines": [
+      "🟢 XAUUSD (▲ LONG) — ВХОД в 16:50"
      ]
     }
    ]
