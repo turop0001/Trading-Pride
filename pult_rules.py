@@ -971,6 +971,20 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
             else: sd = 1 if dn else -1
             g0 = idx[t]; break
     if sd is None:
+        # 23.10.2026: M10 решает вынос только на закрытии обеих M5 — но карточка не должна «молчать» до 10 минут:
+        # если уже закрытая M5 окна вышла за границу бокса, показываем ВЫНОС (только статус; экстремум/скипы/вход — по закрытой M10)
+        try:
+            w5 = d5[(d5['rdate'] == today) & (d5['rmin'] >= wa) & (d5['rmin'] < 1110)]
+            for t5, r5 in w5.iterrows():
+                dn5 = r5['Low'] < boxL; up5 = r5['High'] > boxH
+                if dn5 or up5:
+                    s5 = (1 if r5['Close'] < r5['Open'] else -1) if (dn5 and up5) else (1 if dn5 else -1)
+                    dirc5 = '▲ LONG' if s5 == 1 else '🔻 SHORT'
+                    res['ck'] = sorted(set(res['ck'] + [3]))
+                    _why(res, f'Граница бокса снята в {(t5 + pd.Timedelta(hours=off)).strftime("%H:%M")} (M5), решение по закрытой M10', [3])
+                    return _out(res, 'prep', dirc5, f'ВЫНОС ({"лоя" if s5 == 1 else "хая"} бокса, ждём закрытия M10)')
+        except Exception as e:
+            print('early sweep failed', sym, e)
         _why(res, 'Бокс Лондона 11:00–16:25 сформирован; выноса границы пока нет', [2])
         if nowm >= 1110:
             res['ckf'] = [3]; res['reasons'] = ['вынос не случился до 18:30']; _why(res, 'Скип: вынос не случился до 18:30', [3])
