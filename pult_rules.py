@@ -1299,6 +1299,13 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
         if (r['Low'] <= stp) if sd == 1 else (r['High'] >= stp): out = 'BE' if armed else 'SL'; xt = tt_; break
         if (r['High'] >= sig['tp']) if sd == 1 else (r['Low'] <= sig['tp']): out = 'TP'; xt = tt_; break
         if be and not armed and ((r['High'] >= be) if sd == 1 else (r['Low'] <= be)): armed = True
+    # 23.10.2026: если БУ был пройден уже на свече входа, итог TP/SL не объявляем, пока эта свеча не закрылась целиком и фид не доехал
+    # (+90 с): иначе TP на свече входа (EURGBP 23.10: «TP» в 16:45, через 2 минуты поправка на БУ, цена вернулась на вход после БУ)
+    if out in ('TP', 'SL') and eb_arm:
+        try:
+            if pd.Timestamp.now(tz='UTC') < pd.Timestamp(sig['t_utc']) + pd.Timedelta(minutes=5, seconds=90): out = None; xt = None
+        except Exception as _e:
+            print('entry hold failed:', _e)
     if be: res['be_armed'] = bool(armed)
     if out is None and end_utc is not None and len(d) and d.index[-1] + pd.Timedelta(minutes=5) >= end_utc:
         # 22:00: ни цель, ни стоп — закрываем по рынку (последняя свеча до 22:00)
