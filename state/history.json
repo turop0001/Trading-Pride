@@ -938,7 +938,11 @@
     "entry": 7614.0,
     "stop": 7612.4,
     "target": 7618.8,
-    "result": "сигнал Пульта в 16:40"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-23_US500_C_m5.png",
+      "h1": "state/shots/2026-10-23_US500_C_h1.png"
+    }
   },
   {
     "id": "2026-10-23_GER40_C",
@@ -949,7 +953,11 @@
     "entry": 25070.4,
     "stop": 25062.7,
     "target": 25093.5,
-    "result": "сигнал Пульта в 16:40"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-23_GER40_C_m5.png",
+      "h1": "state/shots/2026-10-23_GER40_C_h1.png"
+    }
   },
   {
     "id": "2026-10-23_EURGBP_C",
@@ -960,6 +968,10 @@
     "entry": 0.83745,
     "stop": 0.83752,
     "target": 0.83725,
-    "result": "сигнал Пульта в 16:40"
+    "result": "ВХОД → TP 🎯 +3R",
+    "shots": {
+      "m5": "state/shots/2026-10-23_EURGBP_C_m5.png",
+      "h1": "state/shots/2026-10-23_EURGBP_C_h1.png"
+    }
   }
 ]
