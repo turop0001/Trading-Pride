@@ -1261,13 +1261,18 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
     # но Пульт опрашивает рынок каждые 5–20 с: при первом опросе, где порог БУ уже пройден, запоминаем «базу» (high шорта / low лонга свечи на тот момент).
     # Если позже в этой же свече high/low стал ХУЖЕ базы и достиг входа — цена вернулась на вход ПОСЛЕ взвода → БУ 0R (как у брокера).
     # res['be_armed_entry'] — для уведомления «переноси стоп на вход». Старые дни/повторные прогоны (нет be_track, прошло >12 мин) не меняются.
-    entry_be = False; eb_arm = False; eb_time = None
+    entry_be = False; eb_arm = False; eb_time = None; mid_arm = False
     try:
         _tT = pd.Timestamp(sig['t_utc']); _eb = None
         if _tT in d.index: _eb = d.loc[_tT]
         elif live is not None and len(live) and _tT in live.index: _eb = live.loc[_tT]
         if be and _eb is not None:
             _R = abs(sig['entry'] - sig['stop']) or 1e-12
+            if abs(float(_eb['Open']) - sig['entry']) > 0.02 * _R:
+                # 23.10.2026: вход ВНУТРИ свечи (касание уровня 20% снизу/сверху): до касания цена по другую сторону от входа, значит порог БУ
+                # пройден уже после входа — оповещение «переноси стоп» идёт сразу, стоп на входе действует со следующей свечи
+                eb_arm = bool((float(_eb['High']) >= be) if sd == 1 else (float(_eb['Low']) <= be))
+                res['be_armed_entry'] = eb_arm; mid_arm = eb_arm
             if abs(float(_eb['Open']) - sig['entry']) <= 0.02 * _R:
                 eb_arm = bool((float(_eb['High']) >= be) if sd == 1 else (float(_eb['Low']) <= be))
                 res['be_armed_entry'] = eb_arm
@@ -1288,7 +1293,7 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
                             sig['be_track']['base'] = ret
     except Exception as _e:
         print('be_armed_entry failed:', _e)
-    armed0 = bool(eb_arm and sig.get('be_track') and sig['be_track'].get('bar') == str(pd.Timestamp(sig['t_utc'])))
+    armed0 = bool(mid_arm or (eb_arm and sig.get('be_track') and sig['be_track'].get('bar') == str(pd.Timestamp(sig['t_utc']))))
     if entry_be:
         out = 'BE'; xt = eb_time; after = after.iloc[0:0]
     elif armed0:
