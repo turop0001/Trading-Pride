@@ -400,6 +400,40 @@ def _fix_c_20261021(state):
         print('fix_c failed:', e)
 
 
+def _fix_gbpusd_c_20261023(state):
+    """23.10.2026 (разовая правка, идемпотентная): GBPUSD C (вход 16:50 по 1.33692) был ложным — из фида MT5 выпали свечи 14:25-15:50
+    (потеря связи), в боксе Лондона не оказалось свечи 15:00 с лоем 1.3365, и Пульт увидел вынос бокса 1.33717, которого не было.
+    Сбрасываем карточку (следующий тик пересчитает её по полным данным), убираем сделку из истории, аналитики и скрины."""
+    try:
+        u = state.get('GBPUSD_C') or {}
+        sg = u.get('signal') or {}
+        if u.get('date') != '2026-10-23' or sg.get('entry') != 1.33692: return
+        root = os.path.dirname(os.path.abspath(__file__)); sd = os.path.join(root, 'state')
+        state['GBPUSD_C'] = {}
+        pdp = os.path.join(sd, 'pult_docs', 'pult__GBPUSD_C.json')
+        try:
+            if os.path.exists(pdp): os.remove(pdp)
+        except Exception as e:
+            print('fix_gbp doc failed:', e)
+        hp = os.path.join(sd, 'history.json')
+        if os.path.exists(hp):
+            h = json.load(open(hp, encoding='utf-8'))
+            h2 = [x for x in h if x.get('id') != '2026-10-23_GBPUSD_C']
+            if len(h2) != len(h): json.dump(h2, open(hp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        ap = os.path.join(sd, 'analytics.json')
+        if os.path.exists(ap):
+            raw = open(ap, encoding='utf-8').read(); a = json.loads(raw)
+            lst = [r for r in a.get('C', []) if r.get('id') != 'C_GBPUSD_2026-10-23']
+            if len(lst) != len(a.get('C', [])):
+                a['C'] = lst
+                open(ap, 'w', encoding='utf-8').write(json.dumps(a, ensure_ascii=False, separators=(',', ':')) if '\n' not in raw.strip() else json.dumps(a, ensure_ascii=False, indent=1))
+        for suf in ('m5', 'h1'):
+            pp = os.path.join(sd, 'shots', f'2026-10-23_GBPUSD_C_{suf}.png')
+            if os.path.exists(pp): os.remove(pp)
+    except Exception as e:
+        print('fix_gbp failed:', e)
+
+
 def _fix_a_20261022(state):
     """22.10.2026 (разовая правка, идемпотентная): компьютер был выключен до 13:26 по Риге — MT5 офлайн, окно A (10:00–13:00) не считалось,
     карточек за 22.10 не было. По полным свечам брокера (ExportM5_range, сервер = Рига) окно A пересчитано движком Пульта:
@@ -504,6 +538,7 @@ def main(send=True):
     _fix_uk100_20261021(state)
     _fix_c_20261021(state)
     _fix_a_20261022(state)
+    _fix_gbpusd_c_20261023(state)
     flags = state.get('_flags', {})
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))
