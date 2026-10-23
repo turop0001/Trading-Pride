@@ -924,6 +924,14 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     price = float(d['Close'].iloc[-1])
     res = dict(sym=sym, window='C', price=round(price, dec), boxH=round(boxH, dec), boxL=round(boxL, dec),
                reasons=[], checked_at=nl.strftime('%H:%M'), ck=[1, 2], ckf=[], why=[])
+    # 23.10.2026: защита от дыры в данных. Бокс Лондона всегда = 65 M5-свечей (11:00–16:20). Если после его закрытия
+    # не хватает >=2 свечей (потеря связи MT5/фида), границы бокса неверны -> сигнал не даём (ложный вход GBPUSD 23.10).
+    _need = (bb - ba) // 5
+    _miss = _need - len(box)
+    if nowm >= bb and _miss >= 2 and not (prev.get('signal') and prev['signal'].get('date') == str(today)):
+        res['data_gap'] = _miss
+        _why(res, f'В боксе Лондона не хватает {_miss} из {_need} свечей M5 — границы неточные')
+        return _out(res, 'skip', '—', f'СКИП (нет данных: не хватает {_miss} свечей бокса)')
     ctx, liq = _hdr(res, d, h1, now_utc, off, today, price, boxH, boxL, fmtp, bb)
     if nowm < bb and not (prev.get('signal') and prev['signal'].get('date') == str(today)):
         res['ck'] = [1]
