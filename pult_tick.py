@@ -531,9 +531,13 @@ def main(send=True):
             p = state.get(f'{s}_{win}', {})
             if p.get('date') != today: p = {}
             ls, tgnote = _tg(r)
-            line = fmt_line(ls, s, r['direction'], tgnote)
+            r_dir, p_dir = r.get('direction'), p.get('direction')
+            # 23.10.2026: ранний статус «ВЫНОС» по первой M5 — только на карточке сайта; в Telegram/push «ВЫНОС» уходит на закрытии M10
+            if r.get('early_sweep'): ls, tgnote, r_dir = 'watch', 'НАБЛЮДАЕМ', '—'
+            line = fmt_line(ls, s, r_dir if r.get('early_sweep') else r['direction'], tgnote)
             p_ls, p_tgnote = _tg(p)
-            if (ls, r.get('direction'), tgnote) != (p_ls, p.get('direction'), p_tgnote):
+            if p.get('early_sweep'): p_ls, p_tgnote, p_dir = 'watch', 'НАБЛЮДАЕМ', '—'
+            if (ls, r_dir, tgnote) != (p_ls, p_dir, p_tgnote):
                 changed.append(line); syms.append(s)
                 if not first and tgnote and not tgnote.startswith('НАБЛЮДАЕМ'):
                     pushw(win, f"{s} · тип {win} — {tgnote}", str(r.get('direction') or ''), tag=f'{s}_{win}')

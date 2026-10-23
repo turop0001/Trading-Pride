@@ -980,6 +980,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
                 if dn5 or up5:
                     s5 = (1 if r5['Close'] < r5['Open'] else -1) if (dn5 and up5) else (1 if dn5 else -1)
                     dirc5 = '▲ LONG' if s5 == 1 else '🔻 SHORT'
+                    res['early_sweep'] = True
                     res['ck'] = sorted(set(res['ck'] + [3]))
                     _why(res, f'Граница бокса снята в {(t5 + pd.Timedelta(hours=off)).strftime("%H:%M")} (M5), решение по закрытой M10', [3])
                     return _out(res, 'prep', dirc5, f'ВЫНОС ({"лоя" if s5 == 1 else "хая"} бокса, ждём закрытия M10)')
