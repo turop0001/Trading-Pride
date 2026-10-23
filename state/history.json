@@ -930,36 +930,6 @@
     }
   },
   {
-    "id": "2026-10-23_US500_C",
-    "date": "2026-10-23",
-    "symbol": "US500",
-    "type": "C",
-    "side": "long",
-    "entry": 7614.0,
-    "stop": 7612.4,
-    "target": 7618.8,
-    "result": "ВХОД → TP 🎯 +3R",
-    "shots": {
-      "m5": "state/shots/2026-10-23_US500_C_m5.png",
-      "h1": "state/shots/2026-10-23_US500_C_h1.png"
-    }
-  },
-  {
-    "id": "2026-10-23_GER40_C",
-    "date": "2026-10-23",
-    "symbol": "GER40",
-    "type": "C",
-    "side": "long",
-    "entry": 25070.4,
-    "stop": 25062.7,
-    "target": 25093.5,
-    "result": "ВХОД → TP 🎯 +3R",
-    "shots": {
-      "m5": "state/shots/2026-10-23_GER40_C_m5.png",
-      "h1": "state/shots/2026-10-23_GER40_C_h1.png"
-    }
-  },
-  {
     "id": "2026-10-23_EURGBP_C",
     "date": "2026-10-23",
     "symbol": "EURGBP",
@@ -968,7 +938,7 @@
     "entry": 0.83745,
     "stop": 0.83752,
     "target": 0.83725,
-    "result": "ВХОД → TP 🎯 +3R",
+    "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
     "shots": {
       "m5": "state/shots/2026-10-23_EURGBP_C_m5.png",
       "h1": "state/shots/2026-10-23_EURGBP_C_h1.png"
