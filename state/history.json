@@ -912,5 +912,16 @@
       "m5": "state/shots/2026-10-22_GBPUSD_C_m5.png",
       "h1": "state/shots/2026-10-22_GBPUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-23_UK100_A",
+    "date": "2026-10-23",
+    "symbol": "UK100",
+    "type": "A",
+    "side": "long",
+    "entry": 10696.5,
+    "stop": 10683.9,
+    "target": 10721.7,
+    "result": "сигнал Пульта в 10:55"
   }
 ]
