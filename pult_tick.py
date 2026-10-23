@@ -434,6 +434,53 @@ def _fix_gbpusd_c_20261023(state):
         print('fix_gbp failed:', e)
 
 
+def _fix_c_gap_20261023(state):
+    """23.10.2026 (разовая, идемпотентная): US500 и GER40 C — ложные входы из-за дыры в данных (стоп по полным данным < 0.25 ATR -> СКИП).
+    Сбрасываем карточки (пересчёт по полным данным), убираем из истории/аналитики/скринов. EURGBP C — по факту БУ 0R (карточка и MT5 верны),
+    а в истории/аналитике стояло TP +3R — исправляем на БУ 0R."""
+    try:
+        root = os.path.dirname(os.path.abspath(__file__)); sd = os.path.join(root, 'state')
+        D = '2026-10-23'
+        drop = []
+        for sym, ent in (('US500', 7614.0), ('GER40', 25070.4)):
+            u = state.get(sym + '_C') or {}
+            if u.get('date') == D and (u.get('signal') or {}).get('entry') == ent and 'TP' in str(u.get('note') or ''):
+                state[sym + '_C'] = {}
+                drop.append(sym)
+                try:
+                    pdp = os.path.join(sd, 'pult_docs', f'pult__{sym}_C.json')
+                    if os.path.exists(pdp): os.remove(pdp)
+                except Exception as e:
+                    print('fix_gap doc failed:', e)
+                for suf in ('m5', 'h1'):
+                    pp = os.path.join(sd, 'shots', f'{D}_{sym}_C_{suf}.png')
+                    if os.path.exists(pp): os.remove(pp)
+        hp = os.path.join(sd, 'history.json')
+        if os.path.exists(hp):
+            h = json.load(open(hp, encoding='utf-8')); ch = False; out = []
+            for x in h:
+                if x.get('id') in [f'{D}_{s}_C' for s in ('US500', 'GER40')] and drop:
+                    ch = True; continue
+                if x.get('id') == f'{D}_EURGBP_C' and 'TP' in str(x.get('result') or ''):
+                    x['result'] = 'ВХОД → БУ 0R (стоп в безубытке после 50% пути)'; ch = True
+                out.append(x)
+            if ch: json.dump(out, open(hp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        ap = os.path.join(sd, 'analytics.json')
+        if os.path.exists(ap):
+            raw = open(ap, encoding='utf-8').read(); a = json.loads(raw); ch = False; lst = []
+            for r in a.get('C', []):
+                if r.get('id') in [f'C_{s}_{D}' for s in ('US500', 'GER40')] and drop:
+                    ch = True; continue
+                if r.get('id') == f'C_EURGBP_{D}' and r.get('res') == 'TP':
+                    r['res'] = 'BE'; r['R'] = 0.0; r['xt'] = '16:45'; ch = True
+                lst.append(r)
+            if ch:
+                a['C'] = lst
+                open(ap, 'w', encoding='utf-8').write(json.dumps(a, ensure_ascii=False, separators=(',', ':')) if '\n' not in raw.strip() else json.dumps(a, ensure_ascii=False, indent=1))
+    except Exception as e:
+        print('fix_c_gap failed:', e)
+
+
 def _fix_a_20261022(state):
     """22.10.2026 (разовая правка, идемпотентная): компьютер был выключен до 13:26 по Риге — MT5 офлайн, окно A (10:00–13:00) не считалось,
     карточек за 22.10 не было. По полным свечам брокера (ExportM5_range, сервер = Рига) окно A пересчитано движком Пульта:
@@ -539,6 +586,7 @@ def main(send=True):
     _fix_c_20261021(state)
     _fix_a_20261022(state)
     _fix_gbpusd_c_20261023(state)
+    _fix_c_gap_20261023(state)
     flags = state.get('_flags', {})
     if flags.get('date') != today: flags = {'date': today}
     tg = (lambda x: send_telegram(x)) if send else (lambda x: print('[no-send]'))

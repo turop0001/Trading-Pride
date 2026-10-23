@@ -932,6 +932,16 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
         res['data_gap'] = _miss
         _why(res, f'В боксе Лондона не хватает {_miss} из {_need} свечей M5 — границы неточные')
         return _out(res, 'skip', '—', f'СКИП (нет данных: не хватает {_miss} свечей бокса)')
+    # 23.10.2026 (усиление): дыры ПОСЛЕ бокса (16:25 → сейчас, в т.ч. до конца окна) тоже искажают ATR(M10) и вход.
+    # Считаем пропуски только ВНУТРИ диапазона (между первой и последней пришедшей свечой), чтобы задержка свежей свечи не мешала.
+    if nowm > bb and not (prev.get('signal') and prev['signal'].get('date') == str(today)):
+        _post = sorted(int(x) for x, dd in zip(d['rmin'], d['rdate']) if dd == today and bb <= x < min(nowm, wb + 5))
+        if len(_post) >= 2:
+            _gm = (_post[-1] - _post[0]) // 5 + 1 - len(_post)
+            if _gm >= 3:
+                res['data_gap'] = _gm
+                _why(res, f'После бокса пропущено {_gm} свечей M5 — данные неполные')
+                return _out(res, 'skip', '—', f'СКИП (нет данных: пропущено {_gm} свечей M5)')
     ctx, liq = _hdr(res, d, h1, now_utc, off, today, price, boxH, boxL, fmtp, bb)
     if nowm < bb and not (prev.get('signal') and prev['signal'].get('date') == str(today)):
         res['ck'] = [1]
