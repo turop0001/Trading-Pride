@@ -873,6 +873,8 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
         return res
 
 
+C_MAXSTOP = 1.0   # 23.10.2026: стоп не шире 1,0 ATR(M10) — иначе СКИП (фильтр 0,25–1,0 ATR)
+C_TRAIL = False   # 23.10.2026: Тип C без TP — БУ на +1R, дальше стоп ступеньками по 1R (на +2R стоп +1R, на +3R стоп +2R …), выход 22:00
 C_TF = 10   # 23.10.2026: Тип C — вынос, экстремум и пороги считаются по свечам M10 (вход по касанию и сопровождение — по M5)
 
 
@@ -1042,9 +1044,9 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
             if leg > 0 and nowm < 1110:
                 e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
-                if R_ >= 0.25 * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
+                if 0.25 * atr_ <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
-                                       tp=round(sd * t_, dec), be_at=round(sd * (e_ + 1.5 * R_), dec), ext=round(sd * ext, dec))
+                                       tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
             print('pend failed', sym, e)
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 20%)')
@@ -1068,7 +1070,11 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
         res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше 0,25 ATR(M10) — не исполнить со спредом'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
         return _out(res, 'skip', dirc, 'СКИП (стоп слишком мал)')
-    be_f = entry + 0.5 * (tp_f - entry)
+    if R > C_MAXSTOP * atr_m:
+        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} больше 1,0 ATR(M10) — слишком широкий'
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
+        return _out(res, 'skip', dirc, 'СКИП (стоп слишком широкий)')
+    be_f = entry + (1.0 * R if C_TRAIL else 0.5 * (tp_f - entry))
     entry_r, stop_r, tp_r, be_r = sd * entry, sd * stop_f, sd * tp_f, sd * be_f
     _prob_set_C(res, F1, atr1, sd, ext, plus)
     plus = res['plus']
@@ -1084,7 +1090,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
     sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=0)).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
-               side='long' if sd == 1 else 'short', rr=3.0, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[], ext=round(sd * ext, dec),
+               side='long' if sd == 1 else 'short', rr=3.0, trail=int(C_TRAIL), end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[], ext=round(sd * ext, dec),
                prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'), sv=2)
     res['signal'] = sig; res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
@@ -1153,6 +1159,70 @@ def _bepct(sig):
         return 70
 
 
+def _fr(x):
+    return f'{x:+.1f}'.replace('.', ',')
+
+
+def _track_trail(res, d, sig, sd, dirc, fmtp, live=None):
+    """23.10.2026: Тип C без TP. БУ на +1R, затем стоп ступеньками: достигнуто +kR (по закрытой M5) → стоп на (k−1)R.
+    Стоп двигается только вверх (для шорта — вниз) и только по ЗАКРЫТЫМ M5; формирующаяся свеча лишь проверяется на касание текущего стопа.
+    Честный выход: если новый стоп не ниже закрытия свечи (лонг), сделка закрывается по рынку на закрытии.
+    Любая сделка, закрытая в плюс, — TP с R (например «TP +2,3R»); около нуля — БУ; ниже — SL."""
+    res['signal'] = sig
+    if sig.get('ck'): res['ck'] = list(sig['ck']); res['ckf'] = []
+    if sig.get('fx'): res['fx'] = sig['fx']
+    e = float(sig['entry']); R = abs(e - float(sig['stop'])) or 1e-12
+    t0 = pd.Timestamp(sig['t_utc'])
+    end_utc = pd.Timestamp(sig['end_utc']) if sig.get('end_utc') else None
+    closed = d[d.index > t0]
+    if end_utc is not None: closed = closed[closed.index < end_utc]
+    lv = None
+    if live is not None and len(live):
+        lv = live[live.index > (closed.index[-1] if len(closed) else t0)]
+        if end_utc is not None: lv = lv[lv.index < end_utc]
+        if not len(lv): lv = None
+    lvl = lambda p: (p - e) * sd / R            # цена -> в R от входа
+    px = lambda k: e + sd * k * R                # R -> цена
+    stop = float(sig['stop']); best = 0.0; moves = []; out = None; xt = None; xr = None
+    tl = lambda ix: ix.tz_convert('Europe/Riga').strftime('%H:%M') if ix.tzinfo else None
+    def hit(r, st): return (r['Low'] <= st) if sd == 1 else (r['High'] >= st)
+    for ix, r in closed.iterrows():
+        if hit(r, stop):
+            out = True; xt = tl(ix); xr = lvl(stop); break
+        hh = lvl(r['High'] if sd == 1 else r['Low']); best = max(best, hh)
+        k = int(best // 1)
+        if k >= 1:
+            ns = px(k - 1)
+            if (ns > stop) if sd == 1 else (ns < stop):
+                cl = float(r['Close'])
+                if (cl <= ns) if sd == 1 else (cl >= ns):      # новый стоп не ниже закрытия — выходим по рынку
+                    out = True; xt = tl(ix); xr = lvl(cl); moves.append(dict(t=xt, lvl=k - 1, stop=round(cl, 8), mkt=1)); break
+                stop = ns; moves.append(dict(t=xt or tl(ix), lvl=k - 1, stop=round(ns, 8)))
+    if out is None and lv is not None:
+        for ix, r in lv.iterrows():
+            if hit(r, stop): out = True; xt = tl(ix); xr = lvl(stop); break
+            best = max(best, lvl(r['High'] if sd == 1 else r['Low']))
+    res['stop_now'] = round(stop, 8); res['peak_r'] = round(best, 2); res['trail_moves'] = moves
+    res['be_armed'] = bool(stop != float(sig['stop']))
+    if out is None and end_utc is not None and len(d) and d.index[-1] + pd.Timedelta(minutes=5) >= end_utc:
+        c = closed['Close'] if len(closed) else None
+        xr = lvl(float(c.iloc[-1])) if c is not None and len(c) else 0.0
+        res['exit_time'] = '22:00'; res['exit_r'] = round(xr, 2)
+        if xr > 0.05:
+            return _out(res, 'entry', dirc, f'ВХОД → TP 🎯 {_fr(xr)}R (закрыта в 22:00)', tg='ЗАКРЫТА - TP')
+        return _out(res, 'entry', dirc, f'ВХОД → закрыта в 22:00 ({_fr(xr)}R)', tg='ЗАКРЫТА - 22:00')
+    if out:
+        res['exit_time'] = xt; res['exit_r'] = round(xr, 2)
+        if xr > 0.05:
+            return _out(res, 'entry', dirc, f'ВХОД → TP 🎯 {_fr(xr)}R', tg='ЗАКРЫТА - TP')
+        if xr > -0.05:
+            return _out(res, 'entry', dirc, 'ВХОД → БУ 0R (стоп в безубытке)', tg='ЗАКРЫТА - БУ')
+        res['exit_r'] = -1.0
+        res['autopsy'] = autopsy(sig, sd, d, res)
+        return _out(res, 'skip', dirc, 'ВХОД → SL −1R', tg='ЗАКРЫТА - SL')
+    return _out(res, 'entry', dirc, 'В СДЕЛКЕ')
+
+
 def _track(res, d, sig, sd, dirc, fmtp, live=None):
     """Ведём сделку по барам. Цель = sig['rr'] R (по умолчанию 2), у S1 — 3R и закрытие по времени в 22:00 Рига
     (sig['end_utc'] — момент закрытия; бары с этого времени уже не учитываются)."""
@@ -1161,6 +1231,7 @@ def _track(res, d, sig, sd, dirc, fmtp, live=None):
     if sig.get('fx'): res['fx'] = sig['fx']
     rr = float(sig.get('rr') or 2)
     rtxt = f'{rr:g}R'
+    if sig.get('trail'): return _track_trail(res, d, sig, sd, dirc, fmtp, live)
     after = d[d.index > pd.Timestamp(sig['t_utc'])]
     end_utc = pd.Timestamp(sig['end_utc']) if sig.get('end_utc') else None
     if end_utc is not None: after = after[after.index < end_utc]

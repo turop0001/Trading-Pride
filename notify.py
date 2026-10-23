@@ -101,7 +101,14 @@ def build_update(date, window_label, time_str, changed_lines, unchanged_lines=No
     return head + body + tail
 
 
-def build_signal(date, window_label, time_str, symbol, direction, entry, stop, target_2r, risk_pct, note='есть order flow', rr=2):
+def build_signal(date, window_label, time_str, symbol, direction, entry, stop, target_2r, risk_pct, note='есть order flow', rr=2, trail=False, be_at=None):
+    if trail:
+        return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} UTC+3)\n\n"
+                f"{E_ENTRY} {symbol} ({direction}):\n\n"
+                f"Вход {entry} · {time_str}\n"
+                f"Стоп: {stop}\n"
+                f"{E_TARGET} Без тейка. БУ на +1R: {be_at}. Дальше стоп ступеньками — пришлю уведомление на каждом шаге. Выход в 22:00.\n"
+                f"{E_NEWS} Риск: {risk_pct}%")
     return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} UTC+3)\n\n"
             f"{E_ENTRY} {symbol} ({direction}):\n\n"
             f"Вход {entry} · {time_str}\n"

@@ -170,8 +170,9 @@ def add_closed(sym, window, r, off, date_str, force=False):
     if ext is None: ext = sig.get('ext')
     if ext is None and window == 'C' and sig.get('entry') is not None and sig.get('stop') is not None:
         ext = (float(sig['stop']) + 0.1 * float(sig['entry'])) / 1.1   # старые записи: стоп = ext ± 0,1·(entry−ext)
-    R = r.get('exit_r') if out == 'T22' else None
-    rec = build(window, sym, day, off, d, sig, r.get('boxH'), r.get('boxL'), ext, out, R=R)
+    R = r.get('exit_r') if (out == 'T22' or sig.get('trail')) else None
+    xt_ = r.get('exit_time') if sig.get('trail') else None
+    rec = build(window, sym, day, off, d, sig, r.get('boxH'), r.get('boxL'), ext, out, R=R, xt=xt_)
     if rec['ext'] is None: rec['ext'] = rec['stop']
     upsert(rec)
     return rec['id']
@@ -214,7 +215,7 @@ def replay(typ, D, last_day, need, log=print, max_back=400):
                 r2 = analyze(s, d2, now2.tz_localize(None).to_pydatetime(), o, {'signal': sig}, h1)
                 tg = r2.get('tg_note') or ''
                 out = 'TP' if 'TP' in tg else 'SL' if 'SL' in tg else 'BE' if 'БУ' in tg else 'T22' if '22' in tg else 'OPEN'
-                R = {'TP': RR[typ], 'SL': -1.0, 'BE': 0.0}.get(out, r2.get('exit_r', 0.0))
+                R = r2.get('exit_r', 0.0) if sig.get('trail') else {'TP': RR[typ], 'SL': -1.0, 'BE': 0.0}.get(out, r2.get('exit_r', 0.0))
                 xt = r2.get('exit_time') or '22:00'
                 rec = build(typ, s, day, o, df, sig, r['boxH'], r['boxL'], r.get('extreme'), out, R, xt, end_utc=now2)
                 res.append(rec)

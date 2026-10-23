@@ -188,7 +188,8 @@ def result_of(res):
         if r.get('signal'):
             n += 1
             rr = float((r.get('signal') or {}).get('rr') or 2)
-            if 'TP' in r.get('note', ''): pct += rr
+            if (r.get('signal') or {}).get('trail') and r.get('exit_r') is not None and ('→ TP' in r.get('note', '') or '→ БУ' in r.get('note', '') or '→ SL' in r.get('note', '') or 'закрыта в 22:00' in r.get('note', '')): pct += float(r['exit_r'])
+            elif 'TP' in r.get('note', ''): pct += rr
             elif 'SL' in r.get('note', ''): pct -= 1.0
             elif r.get('exit_r') is not None and 'закрыта в 22:00' in r.get('note', ''): pct += float(r['exit_r'])
     return n, pct
@@ -209,6 +210,28 @@ def _hist_add(state_dir_file, item):
 
 
 EMO_TP, EMO_SL = '\U0001F7E2', '\U0001F534'
+
+
+def trail_notify(r, s, win, tgf, pushf, prev=None):
+    """23.10.2026: Тип C без TP — на каждом шаге стопа (БУ на +1R, +1R, +2R …) шлём в Telegram и push «переноси стоп на …».
+    r['trail_sent'] — сколько шагов уже озвучено (чтобы не дублировать); работает только пока сделка В СДЕЛКЕ."""
+    sg = r.get('signal') or {}
+    if not sg.get('trail'): return 0
+    sent = int(r.get('trail_sent') if r.get('trail_sent') is not None else ((prev or {}).get('trail_sent') or 0))
+    mv = r.get('trail_moves') or []
+    n = 0
+    for i, m in enumerate(mv):
+        if i < sent or m.get('mkt'): continue
+        lv = int(m.get('lvl', 0)); st = m.get('stop')
+        where = 'на вход (БУ)' if lv <= 0 else f'на +{lv}R'
+        try:
+            tgf(win, f"\u26A0\uFE0F {s} ({r.get('direction')}) — цена прошла +{lv + 1}R. Переноси стоп {where}: {st}.")
+            pushf(win, f"{s} · стоп {where}", f"Переноси стоп на {st}", tag=f'{s}_{win}_tr{lv}', sticky=True)
+            n += 1
+        except Exception as e:
+            print('trail notify failed:', e)
+    r['trail_sent'] = max(sent, len(mv))
+    return n
 
 
 def final_check(state, today, dstr, off, tg, did, final=True):
@@ -234,6 +257,15 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             sd_ = 1 if long_ else -1
             tr = _pr._track({}, _pr._completed(d, dt.datetime.utcnow(), 5), sig, sd_, r.get('direction', ''), str)
             nt = str(tr.get('note', ''))
+            if sig.get('trail'):
+                for k_ in ('stop_now', 'peak_r', 'trail_moves', 'be_armed'):
+                    if tr.get(k_) is not None: r[k_] = tr[k_]
+                if nt.startswith('В СДЕЛКЕ'):
+                    try:
+                        if w in NOTIFY_WIN and trail_notify(r, s, w, lambda w_, x: tg(x), lambda w_, *a_, **k_: push(*a_, **k_)): did.append('trail')
+                    except Exception as e:
+                        print('trail sweep failed:', e)
+                    state[f'{s}_{w}'] = r
             if nt.startswith('В СДЕЛКЕ'): continue
             out = 'TP' if '→ TP' in nt else ('SL' if '→ SL' in nt else ('BE' if '→ БУ' in nt else 'T22'))
             if out == 'T22' and not final: continue
@@ -274,6 +306,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
             elif out == 'BE':
                 upd.append(f"\U0001F7E4 {s} ({r['direction']}) — ЗАКРЫТА - БУ в {tm} (0% депозита)")
             else:
+                if sig.get('trail') and r.get('exit_r') is not None: rr_ = float(r['exit_r'])
                 upd.append(f"{EMO_TP if out == 'TP' else EMO_SL} {s} ({r['direction']}) — ЗАКРЫТА - {out} в {tm} "
                            f"({('+%.1f%%' % rr_) if out == 'TP' else '-1.0%'} депозита)")
     if upd:
@@ -508,7 +541,11 @@ def main(send=True):
                 unchanged.append(line)
             if r.pop('new_signal', False): sigs.append(r)
             # 08.10.2026: цена дошла до уровня БУ (по формирующейся свече MT5) — один раз шлём «переноси стоп»
-            if (r.get('be_armed') or r.get('be_armed_entry')) and not p.get('be_armed') and not p.get('be_alert_at') and str(r.get('note', '')).startswith('В СДЕЛКЕ') and (r.get('signal') or {}).get('be_at'):
+            if (r.get('signal') or {}).get('trail'):
+                if str(r.get('note', '')).startswith('В СДЕЛКЕ'):
+                    if trail_notify(r, s, win, tgw, pushw, p): did.append('trail')
+                else: r['trail_sent'] = p.get('trail_sent')
+            elif (r.get('be_armed') or r.get('be_armed_entry')) and not p.get('be_armed') and not p.get('be_alert_at') and str(r.get('note', '')).startswith('В СДЕЛКЕ') and (r.get('signal') or {}).get('be_at'):
                 sg_ = r['signal']
                 try:
                     tgw(win, f"\u26A0\uFE0F {s} ({r['direction']}) — цена прошла {round(100 * (sg_['be_at'] - sg_['entry']) / (sg_['tp'] - sg_['entry'])) if sg_.get('tp') != sg_.get('entry') else 80}% пути к цели (БУ {sg_['be_at']}). Переноси стоп на вход {sg_['entry']}.")
@@ -537,7 +574,7 @@ def main(send=True):
             except Exception as e:
                 print('history add failed:', e)
             tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], _risk_pct_for(win),
-                            note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2)); did.append('signal')
+                            note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2, trail=bool(sg.get('trail')), be_at=sg.get('be_at'))); did.append('signal')
         return text, syms, changed
 
     text, syms, changed_lines = None, [], []
