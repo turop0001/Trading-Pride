@@ -873,6 +873,8 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
         return res
 
 
+# 24.10.2026: издержки Типа C в единицах цены = минимальный спред + комиссия $6/лот (индексы без комиссии). Стоп меньше издержек — СКИП (k=1)
+C_COST = {'XAUUSD': 0.22, 'EURUSD': 0.00013, 'GBPUSD': 0.00014, 'AUDUSD': 0.00014, 'EURGBP': 0.000135, 'US500': 0.4, 'GER40': 0.8, 'UK100': 1.0}
 C_MAXSTOP = 1.0   # 23.10.2026: стоп не шире 1,0 ATR(M10) — иначе СКИП (фильтр 0,25–1,0 ATR)
 C_TRAIL = False   # 23.10.2026: Тип C без TP — БУ на +1R, дальше стоп ступеньками по 1R (на +2R стоп +1R, на +3R стоп +2R …), выход 22:00
 C_TF = 10   # 23.10.2026: Тип C — вынос, экстремум и пороги считаются по свечам M10 (вход по касанию и сопровождение — по M5)
@@ -1077,7 +1079,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
             if leg > 0 and nowm < 1110:
                 e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
-                if 0.25 * atr_ <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
+                if max(0.25 * atr_, C_COST.get(sym, 0.0)) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
@@ -1099,6 +1101,10 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     R = entry - stop_f
     tp_f = entry + 3 * R
     atr_m = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
+    if R < C_COST.get(sym, 0.0):
+        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше спреда+комиссии ({C_COST.get(sym, 0.0):.{dec}f}) — не окупится'
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
+        return _out(res, 'skip', dirc, 'СКИП (стоп меньше спреда+комиссии)')
     if R < 0.25 * atr_m:
         res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше 0,25 ATR(M10) — не исполнить со спредом'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
