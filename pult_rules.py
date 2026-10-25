@@ -750,7 +750,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         _sa = r.get('last_sw_atr')
         if _sa is not None:
             if _sa >= S1.MINSIG:
-                res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSIG:g} ATR', [5])
+                res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSIG:g} ATR (и меньше {S1.MAXSIG:g})', [5])
             else:
                 _why(res, f'Вынос пока {_sa:.2f} ATR — меньше {S1.MINSIG:g} ATR: к моменту сигнала нужен вынос ≥{S1.MINSIG:g} ATR, иначе скип дня', [5])
         if nowm >= 780:
@@ -765,8 +765,13 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         t = f'вынос {c.get("sw_atr", 0):.2f} ATR к моменту сигнала — меньше {S1.MINSIG:g} ATR'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
         return _out(res, 'skip', dirc, f'СКИП (вынос {c.get("sw_atr", 0):.2f} ATR < {S1.MINSIG:g} ATR)')
+    if c.get('big'):     # 25.10.2026, п.5: вынос к моменту сигнала ≥ MAXSIG ATR — скип дня по инструменту
+        res['ckf'] = [5]; res['ck'] = sorted(set(res['ck'] + [6, 7, 8]))
+        t = f'вынос {c.get("sw_atr", 0):.2f} ATR к моменту сигнала — не меньше {S1.MAXSIG:g} ATR'
+        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
+        return _out(res, 'skip', dirc, f'СКИП (вынос {c.get("sw_atr", 0):.2f} ATR ≥ {S1.MAXSIG:g} ATR)')
     res['ck'] = sorted(set(res['ck'] + [5, 6, 7, 8]))
-    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR (≥{S1.MINSIG:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7, 8])
+    _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR ({S1.MINSIG:g}–{S1.MAXSIG:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7, 8])
     if g + 1 >= len(d):
         # предварительная проверка №11 по текущей цене (вход будет по открытию следующей свечи): не ждём лишнюю минуту
         e0 = float(d['Close'].iloc[-1]); s0 = ext - sd * S1.BUF * c['atr']; R0 = (e0 - s0) * sd

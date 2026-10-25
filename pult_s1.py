@@ -20,6 +20,7 @@ VBARS = 7              # 07.10.2026: V-разворот — не позже 7 з
 DOJI = 0.25            # доджи: тело <=25% диапазона, в счёт свечей V-разворота не идут
 FVWIN = 5               # 08.10.2026: окно поиска M5 FVG выноса — последние 5 свечей выноса
 MINSW = 0.5            # 07.10.2026: минимальный вынос за границу Азии, в ATR(M5, 14) — порог для поиска кандидата входа
+MAXSIG = 2.5           # 25.10.2026: п.5 — вынос к моменту сигнала меньше 2,5 ATR (иначе СКИП дня). Честная база 5 лет (причинные правила): 1341 сделка +165R просадка −28R → 514 сделок +136R просадка −16R, WR 38,5→43,4%
 MINSIG = 1.93          # 16.10.2026: п.5 — вынос к моменту сигнала не меньше 1,93 ATR(M5, 14); если сигнал сложился при меньшем выносе — СКИП дня (дальше не ищем). 5 лет: WR 54,3→65,0%, просадка 7→5R, серия SL 7→5, ΣR 696→369
 SWTRG = 1.5            # 08.10.2026: вынос ≤1,5 ATR → триггер входа = ≥2 сильных свечи выкупа (откат 30% не используется); больше 1,5 ATR — как раньше (≥3 сильных ИЛИ откат ≥30%)
 STRONG_SMALL = 2
@@ -130,7 +131,7 @@ def analyze_day(d, today, off, sd, h1=None):
         if f2 and f4 and f7:   # цепочка H1 как правило убрана 01.10.2026 (структура — только контекст)
             e = O[g + 1] if g + 1 < n else None
             out['cand'] = dict(g=int(g), ge=int(ge), start=int(start), ext_f=float(ext), atr=float(atr[g]), nbars=int(nbars), sw_atr=float((aL - ext) / atr[g]),
-                               strong=strong, ret=float(ret), nsw=nsw, chain=chn, t_g=d.index[g], small=bool((aL - ext) / atr[g] < MINSIG))
+                               strong=strong, ret=float(ret), nsw=nsw, chain=chn, t_g=d.index[g], small=bool((aL - ext) / atr[g] < MINSIG), big=bool((aL - ext) / atr[g] >= MAXSIG))
             out['start'] = start
             return out
     out['start'] = start
