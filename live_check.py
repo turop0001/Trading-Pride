@@ -50,7 +50,7 @@ TICKERS = {
 # Тип C с 18.10.2026 — 8 инструментов (XAUUSD, EURUSD, GBPUSD, US500, UK100, GER40, AUDUSD, EURGBP); раньше только 3 — раньше main() проверял ВСЕ TICKERS в обоих окнах.
 WINDOW_SYMBOLS = {
     'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY', 'UK100', 'EURGBP'],
-    'C': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'UK100', 'GER40', 'AUDUSD', 'EURGBP'],   # 18.10.2026: Тип C — 8 инструментов (решение владельца; пошаговый тест 5 лет MT5)
+    'C': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'UK100', 'GER40', 'AUDUSD'],   # 26.10.2026: EURGBP из Типа C убран (худший по итогу за 5 лет: +234R из +3738R, просадка −6R, WR 57%); с 18.10.2026 было 8 инструментов
 }
 
 # ПРОВЕРЕНО 26.09.2026: замена GC=F -> PAXG-USD резко снижает разницу со спотом

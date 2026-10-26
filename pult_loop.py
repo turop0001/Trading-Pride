@@ -64,5 +64,5 @@ while True:
     except Exception as e:
         print('tick error:', e)
     # 08.10.2026: тик каждые 20 с; 22.10.2026: в окне C (16:30–18:30) — каждые 5 с
-    _step = 5 if 990 + _K <= m < 1110 + _K else 20
+    _step = 3 if (990 + _K <= m < 1110 + _K or 600 <= m < 840) else 20   # 26.10.2026: окна C и A — тик каждые 3 с (было 5 с в C и 20 с в A)
     time.sleep(_step - dt.datetime.utcnow().second % _step)
