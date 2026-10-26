@@ -953,7 +953,12 @@
     "entry": 4002.55,
     "stop": 4001.04,
     "target": 4007.07,
-    "result": "сигнал Пульта в 15:40"
+    "result": "ВХОД → SL −1R",
+    "autopsy": "",
+    "shots": {
+      "m5": "state/shots/2026-10-26_XAUUSD_C_m5.png",
+      "h1": "state/shots/2026-10-26_XAUUSD_C_h1.png"
+    }
   },
   {
     "id": "2026-10-26_US500_C",
