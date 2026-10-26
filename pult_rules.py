@@ -763,9 +763,9 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         res['extreme'] = round(sd * (r['last_ext_f'] if r.get('last_ext_f') is not None else 0), dec)
         _sa = r.get('last_sw_atr')
         if _sa is not None and _sa >= S1.MAXSIG:   # 26.10.2026: вынос только растёт — любой будущий сигнал будет ≥ MAXSIG, значит скип дня сразу (результаты те же, статус раньше)
-            t = f'вынос {_sa:.2f} ATR — не меньше {S1.MAXSIG:g} ATR'
+            t = f'вынос {_sa:.2f} ATR — больше {S1.MAXSIG:g} ATR'
             res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
-            return _out(res, 'skip', dirc, f'СКИП (вынос {_sa:.2f} ATR ≥ {S1.MAXSIG:g} ATR)')
+            return _out(res, 'skip', dirc, f'СКИП (вынос {_sa:.2f} ATR > {S1.MAXSIG:g} ATR)')
         if _sa is not None:
             if _sa >= S1.MINSIG:
                 res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSIG:g} ATR (и меньше {S1.MAXSIG:g})', [5])
@@ -785,9 +785,9 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
         return _out(res, 'skip', dirc, f'СКИП (вынос {c.get("sw_atr", 0):.2f} ATR < {S1.MINSIG:g} ATR)')
     if c.get('big'):     # 25.10.2026, п.5: вынос к моменту сигнала ≥ MAXSIG ATR — скип дня по инструменту
         res['ckf'] = [5]; res['ck'] = sorted(set(res['ck'] + [6, 7, 8]))
-        t = f'вынос {c.get("sw_atr", 0):.2f} ATR к моменту сигнала — не меньше {S1.MAXSIG:g} ATR'
+        t = f'вынос {c.get("sw_atr", 0):.2f} ATR к моменту сигнала — больше {S1.MAXSIG:g} ATR'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
-        return _out(res, 'skip', dirc, f'СКИП (вынос {c.get("sw_atr", 0):.2f} ATR ≥ {S1.MAXSIG:g} ATR)')
+        return _out(res, 'skip', dirc, f'СКИП (вынос {c.get("sw_atr", 0):.2f} ATR > {S1.MAXSIG:g} ATR)')
     res['ck'] = sorted(set(res['ck'] + [5, 6, 7, 8]))
     _why(res, f'Вынос {c.get("sw_atr", 0):.2f} ATR ({S1.MINSIG:g}–{S1.MAXSIG:g}), V-разворот: {c.get("nbars", 0)} значимых свечей (≤{S1.VBARS}), M5 FVG перекрыт, триггер входа (≥3 сильных или откат ≥30%)', [5, 6, 7, 8])
     if g + 1 >= len(d):
@@ -898,7 +898,7 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
 
 # 24.10.2026: издержки Типа C в единицах цены = минимальный спред + комиссия $6/лот (индексы без комиссии). Стоп меньше издержек — СКИП (k=1)
 C_COST = {'XAUUSD': 0.22, 'EURUSD': 0.00013, 'GBPUSD': 0.00014, 'AUDUSD': 0.00014, 'EURGBP': 0.000135, 'US500': 0.4, 'GER40': 0.8, 'UK100': 1.0}
-C_MAXSTOP = 0.7   # 24.10.2026: стоп не шире 0,7 ATR(M10) (было 1,0 с 23.10) — иначе СКИП (фильтр 0,25–0,7 ATR)
+C_MAXSTOP = 0.7   # 24.10.2026: стоп не шире 0,7 ATR(M10) (было 1,0 с 23.10) — иначе СКИП; с 26.10.2026 нижний порог 0,25 ATR убран (остался спред+комиссия)
 C_TRAIL = False   # 23.10.2026: Тип C без TP — БУ на +1R, дальше стоп ступеньками по 1R (на +2R стоп +1R, на +3R стоп +2R …), выход 22:00
 C_TF = 10   # 23.10.2026: Тип C — вынос, экстремум и пороги считаются по свечам M10 (вход по касанию и сопровождение — по M5)
 
@@ -923,10 +923,12 @@ def _c10_frame(d5, box, today, wa, form):
 
 
 def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
-    """Тип C (новые правила 01.10.2026). Бокс Лондона 11:00–16:25, вход 16:30–18:30. Вынос телом или тенью:
-    вниз → лонг, вверх → шорт (вчерашний Лондон не важен). ≤4 свечей выноса (доджи не считаются), широкий M5 FVG
+    """Тип C (новые правила 01.10.2026). Бокс Лондона 11:00–16:25, вход 16:30–18:30. Вынос — только ЗАКРЫТИЕМ M10-свечи
+    телом за границей бокса (тень не считается, с 26.10.2026): вниз → лонг, вверх → шорт (вчерашний Лондон не важен). ≤4 свечей выноса (доджи не считаются), широкий M5 FVG
     (≥2× средней свечи Лондона) в 3 свечах перед экстремумом — СКИП; вход ВСЕГДА на откате 20% длины выноса
-    (с 08.10.2026; поглощение свечи выноса отменено), стоп за экстремумом +0,1R, цель 3R, БУ на 50% пути, встречный H1 FVG внутри 1:3 — СКИП.
+    (с 08.10.2026; поглощение свечи выноса отменено), с 26.10.2026 вход только по цене ВНЕ границ бокса (откат внутри бокса не берём,
+    ждём следующий откат от нового экстремума), стоп за экстремумом +0,1R любого размера (не меньше спреда+комиссии, не больше 0,7 ATR),
+    цель 3R, БУ на 50% пути, встречный H1 FVG внутри 1:3 — СКИП.
     Нумерация: основные 1–6, скипы 7–10, усилители 11–12."""
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
@@ -1008,7 +1010,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     # направление — по первому выносу границы бокса (тело или тень)
     sd = None; g0 = None
     for t, r in win.iterrows():
-        dn = r['Low'] < boxL; up = r['High'] > boxH
+        dn = r['Close'] < boxL; up = r['Close'] > boxH   # 26.10.2026: вынос = закрытие M10 телом за границей бокса (тень не в счёт)
         if dn or up:
             if dn and up: sd = 1 if r['Close'] < r['Open'] else -1
             else: sd = 1 if dn else -1
@@ -1019,7 +1021,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
         try:
             w5 = d5[(d5['rdate'] == today) & (d5['rmin'] >= wa) & (d5['rmin'] < wb)]
             for t5, r5 in w5.iterrows():
-                dn5 = r5['Low'] < boxL; up5 = r5['High'] > boxH
+                dn5 = r5['Close'] < boxL; up5 = r5['Close'] > boxH   # 26.10.2026: вынос только закрытием телом за границей бокса
                 if dn5 or up5:
                     s5 = (1 if r5['Close'] < r5['Open'] else -1) if (dn5 and up5) else (1 if dn5 else -1)
                     dirc5 = '▲ LONG' if s5 == 1 else '🔻 SHORT'
@@ -1066,6 +1068,14 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
         # 08.10.2026: вход ВСЕГДА на откате 20% длины выноса (вход по поглощению свечи выноса отменён)
         ok = H[g] >= lvl; mode = 'pb20'
         if ok:
+            # 26.10.2026: вход только по цене ВНЕ границ бокса Лондона. Цена входа = max(уровень 20%, открытие M5 касания),
+            # как ниже при расчёте сигнала; если она внутри бокса — откат пропускаем и ждём следующий (экстремум может обновиться)
+            _tb = d.index[g]; _s5 = d5[(d5.index >= _tb) & (d5.index < _tb + pd.Timedelta(minutes=C_TF))]
+            _so = _s5['Open'].values.astype(float) * sd; _sh = (_s5['High'].values if sd == 1 else -_s5['Low'].values).astype(float)
+            _fi = next((j for j in range(len(_sh)) if _sh[j] >= lvl), None)
+            _e = max(lvl, float(O[g])) if _fi is None else max(lvl, float(_so[_fi]))
+            if _e > lowB: ok = False
+        if ok:
             entry_g = g; break
     # свечи выноса: от g0 до экстремума, доджи (тело ≤25% диапазона) не считаем
     nsw = 0
@@ -1102,7 +1112,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
             if leg > 0 and nowm < wb:
                 e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
-                if max(0.25 * atr_, C_COST.get(sym, 0.0)) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
+                if C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
@@ -1128,10 +1138,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
         res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше спреда+комиссии ({C_COST.get(sym, 0.0):.{dec}f}) — не окупится'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
         return _out(res, 'skip', dirc, 'СКИП (стоп меньше спреда+комиссии)')
-    if R < 0.25 * atr_m:
-        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше 0,25 ATR(M10) — не исполнить со спредом'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
-        return _out(res, 'skip', dirc, 'СКИП (стоп слишком мал)')
+    # 26.10.2026: нижний порог 0,25 ATR(M10) убран (микростоп в день с узким выносом брал TP у владельца); остаётся порог спред+комиссия выше
     if R > C_MAXSTOP * atr_m:
         res['ckf'] = [9]; t = f'стоп {R:.{dec}f} больше 0,7 ATR(M10) — слишком широкий'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
