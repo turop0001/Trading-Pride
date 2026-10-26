@@ -511,8 +511,8 @@ var st0=store('p_tab');show(secs[st0]?st0:'pult');
 function tzOffMin(tz,d){try{var p=new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'longOffset'}).formatToParts(d).filter(function(x){return x.type==='timeZoneName';})[0].value;var mm=/GMT([+-])(\d{1,2})(?::?(\d{2}))?/.exec(p);if(!mm)return 0;return (mm[1]==='-'?-1:1)*(parseInt(mm[2],10)*60+parseInt(mm[3]||'0',10));}catch(e){return null;}}
 function cK(d){var ny=tzOffMin('America/New_York',d),rg=tzOffMin('Europe/Riga',d);if(ny===null||rg===null)return 0;return (570-ny+rg)-990;}
 function hmm(x){return ('0'+Math.floor(x/60)).slice(-2)+':'+('0'+x%60).slice(-2);}
-var CK=cK(new Date());
-var ASIA='03:00–10:00',LON='11:00–16:25',WA='10:00–13:00',WC=hmm(990+CK)+'–'+hmm(1110+CK);
+var CSH=cK(new Date());
+var ASIA='03:00–10:00',LON='11:00–16:25',WA='10:00–13:00',WC=hmm(990+CSH)+'–'+hmm(1110+CSH);
 function setWin(t,type,cls,pill){$('win').textContent=t;var b=$('wbadge');b.textContent=type?'Тип '+type:'';b.className='tbadge '+(type||'');b.style.display=type?'':'none';var p=$('pill');p.className='pill '+cls;p.textContent=pill;}
 /* ДОБАВЛЕНО 28.09.2026, УТОЧНЕНО: чек-листы Типа A/C в «Пульте» остаются на своих местах
    (A слева, C справа) — не переставляются. Поднимается наверх только карточка Типа C в
@@ -524,9 +524,9 @@ function tick(){
   var m=parseInt(o.hour,10)*60+parseInt(o.minute,10); // минуты по Риге
   if(['Sat','Sun'].indexOf(o.weekday)>=0){setWin('выходной','', 'off','Рынок закрыт');return;}
   if(m>=600&&m<780)setWin('до 13:00','A','on','Окно открыто');
-  else if(m>=990+CK&&m<=1110+CK)setWin('до '+hmm(1110+CK),'C','on','Окно открыто');
+  else if(m>=990+CSH&&m<=1110+CSH)setWin('до '+hmm(1110+CSH),'C','on','Окно открыто');
   else if(m<600)setWin('с 10:00','A','warn','Ждём окно');
-  else if(m<990+CK)setWin('с '+hmm(990+CK),'C','warn','Ждём окно');
+  else if(m<990+CSH)setWin('с '+hmm(990+CSH),'C','warn','Ждём окно');
   else setWin('закрыто','','off','Окна на сегодня закрыты');
 }
 tick();setInterval(tick,1000);
@@ -1070,8 +1070,8 @@ renderHist();
     var x={date:r.date,sym:r.sym||k.split('_')[0],window:r.window||k.split('_')[1],status:r.line_status,direction:stripBias(r.direction),
       note:r.note||r.tg_note,reasons:r.reasons,price:r.price,checked:r.checked_at,boxH:r.boxH,boxL:r.boxL,prevH:r.prevH,prevL:r.prevL,signal:r.signal,ck:ckm(k,r,r.ck),ckf:ckm(k,r,r.ckf),fx:r.fx,
       struct:r.struct,cfv:r.cfv,pos:r.pos,prob:r.prob,plus:ckm(k,r,r.plus),worse:ckm(k,r,r.worse),why:r.why,sl_why:r.sl_why,exit_time:r.exit_time};
-    var wcl=x.window==='A'?780:1110+CK;
-    if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'13:00':hmm(1110+CK))+')';x.ckf=[];}
+    var wcl=x.window==='A'?780:1110+CSH;
+    if(!x.signal&&(x.status==='watch'||x.status==='prep')&&(x.date<REPDAY||(x.date===REPDAY&&rigaMinutesNow()>=wcl))){x.status='skip';x.note='СКИП (вход не случился до '+(x.window==='A'?'13:00':hmm(1110+CSH))+')';x.ckf=[];}
     var c=liveCard(x);
     var isTP=/→ TP/.test(x.note||''),isSL=/→ SL/.test(x.note||''),isBE=/→ БУ/.test(x.note||'');
     if(isTP||isSL||isBE){c.res=isTP?'TP':isBE?'BE':'SL';c.stT=isTP?'Закрыта · TP':isBE?'Закрыта · БУ':'Закрыта · SL ❌';var sr=c.rows.find(function(z){return z[0]==='Статус';});if(sr)sr[1]='<span class="stchip '+(isTP?'tp':isBE?'be':'sl')+'">'+String(x.note).replace(/[<>&]/g,'')+'</span>';}
