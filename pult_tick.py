@@ -623,6 +623,10 @@ def main(send=True):
             p_ls, p_tgnote = _tg(p)
             if p.get('early_sweep'): p_ls, p_tgnote, p_dir = 'watch', 'НАБЛЮДАЕМ', '—'
             if (ls, r_dir, tgnote) != (p_ls, p_dir, p_tgnote):
+                # 26.10.2026: снятие границы бокса («ВЫНОС») должно быть в чате ВСЕГДА: если вход пришёл в той же проверке, что и вынос
+                # (M10 закрылась за боксом, а следующая свеча уже открылась за уровнем отката 20%), сначала строка «ВЫНОС», затем «ВХОД»
+                if str(tgnote).startswith('ВХОД') and str(p_tgnote) != 'ВЫНОС' and not str(p_tgnote).startswith(('ВХОД', 'В СДЕЛКЕ', 'ЗАКРЫТА')):
+                    changed.append(fmt_line('prep', s, r['direction'], 'ВЫНОС'))
                 changed.append(line); syms.append(s)
                 if not first and tgnote and not tgnote.startswith('НАБЛЮДАЕМ'):
                     pushw(win, f"{s} · тип {win} — {tgnote}", str(r.get('direction') or ''), tag=f'{s}_{win}')
