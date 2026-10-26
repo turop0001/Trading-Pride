@@ -618,10 +618,9 @@ def main(send=True):
             ls, tgnote = _tg(r)
             r_dir, p_dir = r.get('direction'), p.get('direction')
             # 23.10.2026: ранний статус «ВЫНОС» по первой M5 — только на карточке сайта; в Telegram/push «ВЫНОС» уходит на закрытии M10
-            if r.get('early_sweep'): ls, tgnote, r_dir = 'watch', 'НАБЛЮДАЕМ', '—'
-            line = fmt_line(ls, s, r_dir if r.get('early_sweep') else r['direction'], tgnote)
+            # 26.10.2026: ранний «ВЫНОС» по первой закрытой M5 теперь идёт и в Telegram/push (решение владельца)
+            line = fmt_line(ls, s, r['direction'], tgnote)
             p_ls, p_tgnote = _tg(p)
-            if p.get('early_sweep'): p_ls, p_tgnote, p_dir = 'watch', 'НАБЛЮДАЕМ', '—'
             if (ls, r_dir, tgnote) != (p_ls, p_dir, p_tgnote):
                 # 26.10.2026: снятие границы бокса («ВЫНОС») должно быть в чате ВСЕГДА: если вход пришёл в той же проверке, что и вынос
                 # (M10 закрылась за боксом, а следующая свеча уже открылась за уровнем отката 20%), сначала строка «ВЫНОС», затем «ВХОД»
