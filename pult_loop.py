@@ -45,7 +45,8 @@ state_sync.pull()
 r0, _ = lc.riga_now()
 m0 = r0.hour * 60 + r0.minute
 # окно A, окно C (+5 мин на отчёт закрытия) или вечернее 21:55–22:15 Рига (10.10.2026: отчёты 22:00 — итог сделок и недельный отчёт — не должны зависеть от одиночного 5-минутного запуска)
-START, END = (595, 845) if m0 < 900 else ((985, 1145) if m0 < 1200 else (1315, 1335))
+_K = lc.c_k(r0.date())   # 26.10.2026: окно C на час раньше в недели расхождения DST (США лето / Рига зима)
+START, END = (595, 845) if m0 < 900 else ((985 + _K, 1145 + _K) if m0 < 1200 else (1315, 1335))
 while True:
     riga, _ = lc.riga_now()
     m = riga.hour * 60 + riga.minute
@@ -63,5 +64,5 @@ while True:
     except Exception as e:
         print('tick error:', e)
     # 08.10.2026: тик каждые 20 с; 22.10.2026: в окне C (16:30–18:30) — каждые 5 с
-    _step = 5 if 990 <= m < 1110 else 20
+    _step = 5 if 990 + _K <= m < 1110 + _K else 20
     time.sleep(_step - dt.datetime.utcnow().second % _step)

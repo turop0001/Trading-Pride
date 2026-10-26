@@ -195,7 +195,8 @@ def replay(typ, D, last_day, need, log=print, max_back=400):
         if day.weekday() < 5:
             o = _utc_off(day)
             for s, df in D.items():
-                now1 = pd.Timestamp(dt.datetime.combine(day, dt.time(*t_end)) - dt.timedelta(hours=o), tz='UTC')
+                _te = (t_end[0] + (PR.c_shift(day) // 60 if typ != 'A' else 0), t_end[1])   # 26.10.2026: окно C на час раньше в недели расхождения DST
+                now1 = pd.Timestamp(dt.datetime.combine(day, dt.time(*_te)) - dt.timedelta(hours=o), tz='UTC')
                 now2 = pd.Timestamp(dt.datetime.combine(day, dt.time(22, 5)) - dt.timedelta(hours=o), tz='UTC')
                 d1 = df[(df.index < now1) & (df.index >= now1 - pd.Timedelta(days=12))]
                 if len(d1) < 100 or d1.index[-1] < now1 - pd.Timedelta(minutes=30): continue

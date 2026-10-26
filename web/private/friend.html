@@ -193,7 +193,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 <div class="wrap">
   <div class="hdr">
     <div class="brand">Сигналы <span>дня</span></div>
-    <div class="clock"><small>UTC+3</small><b id="clk">--:--:--</b></div>
+    <div class="clock"><small>Рига</small><b id="clk">--:--:--</b></div>
     <div class="winbox"><span class="clock"><small>Окно</small></span><span class="wt" id="win">--</span><span class="tbadge" id="wbadge"></span></div>
     <span class="pill off" id="pill">…</span>
   </div>
@@ -243,7 +243,7 @@ function rigaMinutesNow(){
 }
 function winRank(w){var cFirst=rigaMinutesNow()>=780;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
 var CK={
- A:{title:'Тип A',when:WA+' UTC+3',items:[
+ A:{title:'Тип A',when:WA+' Рига',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, NAS100, US30, GER40, AUDUSD, USDJPY, UK100, EURGBP)','правило одно для всех 11; по тесту сильнее всех индексы США.'],
   ['base','Азия вышла за вчерашний бокс только с одной стороны — есть сторона сделки','лонг: хай Азии выше вчерашнего, а лой не ниже; шорт — зеркально.'],
   ['base','Противоположная сторона Азии ещё не снята первой — ни тенью, ни телом (лонг: хай Азии, шорт: лой)','если до нужного выноса в окне 10:00–13:00 снята противоположная сторона бокса — скип дня по инструменту (тест 5 лет: такие входы WR 40% против 50%).'],
@@ -262,7 +262,7 @@ var CK={
   ['minus','У стороны выноса нет несобранной ликвидности в пределах 30% длины Азии','если она есть — цена захочет её снять, выкупа может не быть (ухудшитель).'],
   ['minus','Нет FVG H1 с тестом против направления сделки (внутри Азии или в пределах 30% её хая/лоя)','FVG H1 против сделки (для шорта — бычий), образованный в этот же день, широкий (не короче 0,35 ATR H1), который цена уже тестировала до окна входа и не прошила насквозь (фитиль за дальнюю границу = не валиден): цена показала желание идти в его сторону, вход против него — ухудшитель.']],
   mng:'<b>После входа:</b> цель 2R, при 80% пути (1,6R) стоп переносим на вход (БУ = 0R), остаток в 22:00 закрываем по рынку. Структура Swing/Sub, ликвидность и FVG H1 показываются в карточке и влияют на оценку вероятности, но вход определяют только пункты 1–12. Мои бэктесты (451 сделка, 2022–2026): WR 78%, +602R при 1:2 — см. вкладку «Аналитика».'},
- C:{title:'Тип C',when:WC+' UTC+3',items:[
+ C:{title:'Тип C',when:WC+' Рига',items:[
   ['base','Инструмент из списка (XAUUSD, EURUSD, GBPUSD, US500, UK100, GER40, AUDUSD, EURGBP)','8 инструментов; тип протестирован пошагово на 5 годах MT5.'],
   ['base','Бокс Лондона 11:00–16:25 сформирован','границы бокса — хай и лой 11:00–16:25.'],
   ['base','Вынос границы бокса в окне 16:30–18:30 (закрытием тела или тенью): вниз → лонг, вверх → шорт','вчерашний Лондон не важен.'],
@@ -417,7 +417,7 @@ function renderRep(){
   }
   function renderNews(N){var el=$('repNews');if(!el)return;if(!N||N.err&&!(N.items||[]).length){el.style.display='none';return;}
     var it=N.items||[];el.style.display='flex';
-    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (UTC+3)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
+    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (Рига)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
   function applyState(S){
     if(!S||S.error){$('repNote').textContent='Ошибка загрузки данных: '+((S&&S.error)||'нет ответа');return;}
     try{renderNews(S._news);}catch(e){console.log('news',e);}

@@ -62,6 +62,20 @@ import pandas as pd
 
 BOX = {'A': (180, 600), 'C': (660, 985)}      # минуты Риги: Азия 03:00-10:00, Лондон 11:00-16:25
 WIN = {'A': (600, 780), 'C': (990, 1110)}     # окна входа 10:00-13:00 (с 16.10.2026, было до 14:00), 16:30-18:30
+def c_shift(day):
+    """Сдвиг окна Типа C в минутах (0 или −60): NY открывается в 9:30 по Нью-Йорку; в обычные недели это 16:30 по Риге."""
+    from zoneinfo import ZoneInfo
+    t = dt.datetime.combine(day, dt.time(12))
+    ny = int(t.replace(tzinfo=ZoneInfo('America/New_York')).utcoffset().total_seconds() // 60)
+    rg = int(t.replace(tzinfo=ZoneInfo('Europe/Riga')).utcoffset().total_seconds() // 60)
+    return (570 - ny + rg) - 990
+
+
+def c_win(day):
+    """(бокс, окно входа) Типа C в минутах Риги на дату: обычно (660, 985), (990, 1110); в недели расхождения DST на час раньше."""
+    k = c_shift(day)
+    return (BOX['C'][0], BOX['C'][1] + k), (WIN['C'][0] + k, WIN['C'][1] + k)
+
 DEC = {'XAUUSD': 2, 'EURUSD': 5, 'GBPUSD': 5, 'US500': 1, 'NAS100': 1, 'US30': 0, 'GER40': 1, 'AUDUSD': 5, 'USDJPY': 3, 'UK100': 1, 'EURGBP': 5}
 
 
@@ -748,6 +762,10 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     if c is None:
         res['extreme'] = round(sd * (r['last_ext_f'] if r.get('last_ext_f') is not None else 0), dec)
         _sa = r.get('last_sw_atr')
+        if _sa is not None and _sa >= S1.MAXSIG:   # 26.10.2026: вынос только растёт — любой будущий сигнал будет ≥ MAXSIG, значит скип дня сразу (результаты те же, статус раньше)
+            t = f'вынос {_sa:.2f} ATR — не меньше {S1.MAXSIG:g} ATR'
+            res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
+            return _out(res, 'skip', dirc, f'СКИП (вынос {_sa:.2f} ATR ≥ {S1.MAXSIG:g} ATR)')
         if _sa is not None:
             if _sa >= S1.MINSIG:
                 res['ck'] = sorted(set(res['ck'] + [5])); _why(res, f'Вынос {_sa:.2f} ATR — не меньше {S1.MINSIG:g} ATR (и меньше {S1.MAXSIG:g})', [5])
@@ -779,7 +797,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
             cf0 = _counter_fvg(F1, sd, e0, e0 + sd * S1.RR * R0, d.index[-1] + pd.Timedelta(minutes=5))
             if cf0 is not None:
                 res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))   # пройдены все, кроме №11
-                t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} (H1 свеча {_cft(cf0, off)} UTC+3) внутри цели 1:2 (по текущей цене {fmtp(e0)})'
+                t = f'встречный H1 FVG {fmtp(cf0["lo"])}–{fmtp(cf0["hi"])} (H1 свеча {_cft(cf0, off)} Рига) внутри цели 1:2 (по текущей цене {fmtp(e0)})'
                 res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11]); res['cfv'] = _cfv(cf0, sd, e0, e0 + sd * S1.RR * R0, off, dec)
                 return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
         return _out(res, 'prep', dirc, 'ВЫНОС (условия входа выполнены, ждём свечу входа)')
@@ -792,7 +810,7 @@ def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     cf = _counter_fvg(F1, sd, entry, tp, d.index[g + 1])
     if cf is not None:
         res['ckf'] = [11]; res['ck'] = sorted(set(res['ck'] + [9, 10, 12]))
-        t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} UTC+3) внутри цели 1:2'
+        t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} Рига) внутри цели 1:2'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [11]); res['cfv'] = _cfv(cf, sd, entry, tp, off, dec)
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:2)')
     t_in = d.index[g + 1]
@@ -904,7 +922,7 @@ def _c10_frame(d5, box, today, wa, form):
     return pd.concat([box10, agg(day)]), box10
 
 
-def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
+def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     """Тип C (новые правила 01.10.2026). Бокс Лондона 11:00–16:25, вход 16:30–18:30. Вынос телом или тенью:
     вниз → лонг, вверх → шорт (вчерашний Лондон не важен). ≤4 свечей выноса (доджи не считаются), широкий M5 FVG
     (≥2× средней свечи Лондона) в 3 свечах перед экстремумом — СКИП; вход ВСЕГДА на откате 20% длины выноса
@@ -923,7 +941,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     today = (now_utc + dt.timedelta(hours=off)).date()
     nl = now_utc + dt.timedelta(hours=off)
     nowm = nl.hour * 60 + nl.minute
-    ba, bb = BOX['C']; wa, wb = WIN['C']
+    (ba, bb), (wa, wb) = c_win(today)    # 26.10.2026: сдвиг окна C на −1 ч, когда США на летнем, а Рига на зимнем времени
     box = _box(d, today, ba, bb)
     if len(box) < 10:
         return dict(error='no_box')
@@ -999,7 +1017,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
         # 23.10.2026: M10 решает вынос только на закрытии обеих M5 — но карточка не должна «молчать» до 10 минут:
         # если уже закрытая M5 окна вышла за границу бокса, показываем ВЫНОС (только статус; экстремум/скипы/вход — по закрытой M10)
         try:
-            w5 = d5[(d5['rdate'] == today) & (d5['rmin'] >= wa) & (d5['rmin'] < 1110)]
+            w5 = d5[(d5['rdate'] == today) & (d5['rmin'] >= wa) & (d5['rmin'] < wb)]
             for t5, r5 in w5.iterrows():
                 dn5 = r5['Low'] < boxL; up5 = r5['High'] > boxH
                 if dn5 or up5:
@@ -1012,7 +1030,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
         except Exception as e:
             print('early sweep failed', sym, e)
         _why(res, 'Бокс Лондона 11:00–16:25 сформирован; выноса границы пока нет', [2])
-        if nowm >= 1110:
+        if nowm >= wb:
             res['ckf'] = [3]; res['reasons'] = ['вынос не случился до 18:30']; _why(res, 'Скип: вынос не случился до 18:30', [3])
             return _out(res, 'skip', '—', 'СКИП (вынос не случился до 18:30)')
         return _out(res, 'watch', '—', 'НАБЛЮДАЕМ')
@@ -1074,14 +1092,14 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
         return _out(res, 'skip', dirc, 'СКИП (широкий M10 FVG перед экстремумом)')
     leg = lowB - ext
     if entry_g is None or leg <= 0:
-        if nowm >= 1110:
+        if nowm >= wb:
             _w = 'откат 20%'
             res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
             return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
         # 08.10.2026: расчётный отложенный ордер для советника MT5 (stop-ордер на уровне 20%); не выдаём, если сделка заведомо будет скипнута
         try:
-            if leg > 0 and nowm < 1110:
+            if leg > 0 and nowm < wb:
                 e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
                 if max(0.25 * atr_, C_COST.get(sym, 0.0)) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
@@ -1126,7 +1144,7 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     res['ck'] = sorted(set(res['ck'] + [5]))
     _why(res, 'Откат ≥20% длины выноса достигнут', [5])
     if cf is not None:
-        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} UTC+3) внутри цели 1:3'
+        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} Рига) внутри цели 1:3'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8]); res['cfv'] = _cfv(cf, sd, entry_r, tp_r, off, dec)
         return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:3)')
     t_in = t_fill      # M5-свеча касания (трекинг — со следующей свечи M5)
@@ -1140,6 +1158,32 @@ def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
     return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry_r)})')
 
+
+
+_CSHIFT_TXT = (('16:20', '15:20'), ('16:25', '15:25'), ('16:30', '15:30'), ('18:30', '17:30'))
+
+
+def _shift_txt(x):
+    if isinstance(x, str):
+        for a_, b_ in _CSHIFT_TXT: x = x.replace(a_, b_)
+        return x
+    if isinstance(x, list): return [_shift_txt(i) for i in x]
+    if isinstance(x, tuple): return tuple(_shift_txt(i) for i in x)
+    if isinstance(x, dict): return {k: _shift_txt(v) for k, v in x.items()}
+    return x
+
+
+def _analyze_C2(sym, d, now_utc, off, prev, h1, form=False):
+    """Обёртка 26.10.2026: окно C живёт по открытию Нью-Йорка (9:30 NY = 16:30 по Риге). В недели, когда США уже на летнем времени,
+    а Рига ещё на зимнем (последнее воскресенье октября — первое воскресенье ноября; второе воскресенье марта — последнее воскресенье марта),
+    NY открывается в 15:30 по Риге: бокс 11:00–15:25, вынос и вход 15:30–17:30. Тексты в ответе сдвигаются вместе с окном."""
+    r = _analyze_C2_core(sym, d, now_utc, off, prev, h1, form)
+    try:
+        if c_shift((now_utc + dt.timedelta(hours=off)).date()) != 0 and isinstance(r, dict):
+            r = _shift_txt(r)
+    except Exception:
+        pass
+    return r
 
 def _prob_set_C(res, F1, atr1, sd, ext, plus):
     plus = list(plus)

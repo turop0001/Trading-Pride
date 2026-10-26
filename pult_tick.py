@@ -42,10 +42,12 @@ def next_wake(riga, flags=None):
     m = mins(riga); wd = riga.weekday(); flags = flags or {}
     if wd < 5 and 600 <= m < 780:
         return max(1, 780 - m) if flags.get('allskipA') else 5
-    if wd < 5 and 990 <= m < 1110:
-        return max(1, 1110 - m) if flags.get('allskipC') else 5
+    k = lc.c_k(riga.date())
+    if wd < 5 and 990 + k <= m < 1110 + k:
+        return max(1, 1110 + k - m) if flags.get('allskipC') else 5
     if wd < 5:
-        for em, _ in EVENTS:
+        for em, nm in EVENTS:
+            if nm in ('openC', 'closeC'): em += k
             if em > m: return max(1, em - m)
     # следующий будний день 10:00
     d = riga.date() + dt.timedelta(days=1)
@@ -644,8 +646,10 @@ def main(send=True):
                 r['be_alert_at'] = p['be_alert_at']
             state[f'{s}_{win}'] = r
         if first:
-            nxt = ('C', '16:30') if (win == 'A' and lc.C_ENABLED) else (None, None)
-            txt = build_window_open(dstr, win, '10:00–13:00' if win == 'A' else '16:30–18:30', lines_for(win, res), *nxt)
+            _k = lc.c_k(riga.date())
+            _h = lambda x: '%02d:%02d' % divmod(x, 60)
+            nxt = ('C', _h(990 + _k)) if (win == 'A' and lc.C_ENABLED) else (None, None)
+            txt = build_window_open(dstr, win, '10:00–13:00' if win == 'A' else _h(990 + _k) + '–' + _h(1110 + _k), lines_for(win, res), *nxt)
             if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00."
             tgw(win, txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
         else:
@@ -675,7 +679,9 @@ def main(send=True):
             flags['allskip' + window] = True
             text = (text + '; ' if text and text != 'без изменений' else '') + 'все инструменты — СКИП, ждём закрытия окна'
     if wd < 5:
-        for w, close_m, rng, nxt in (('A', 780, '10:00–13:00', ('C', '16:30') if lc.C_ENABLED else (None, None)), ('C', 1110, '16:30–18:30', (None, None))):
+        _k = lc.c_k(riga.date()); _h = lambda x: '%02d:%02d' % divmod(x, 60)
+        _cr = _h(990 + _k) + '–' + _h(1110 + _k)
+        for w, close_m, rng, nxt in (('A', 780, '10:00–13:00', ('C', _h(990 + _k)) if lc.C_ENABLED else (None, None)), ('C', 1110 + _k, _cr, (None, None))):
             if m >= close_m and flags.get('open' + w) and not flags.get('close' + w):
                 # окно закрыто: НАБЛЮДАЕМ/ВЫНОС без сделки → СКИП (в state, чтобы карточки на сайте не висели)
                 for s_ in syms_of(w):
@@ -783,7 +789,7 @@ def main(send=True):
     lc.save_state(state)
     docs = []
     if window or did:
-        docs = lc.build_artifact_payload(state, riga, window or ('C' if m >= 990 else 'A'), syms, text or 'без изменений')
+        docs = lc.build_artifact_payload(state, riga, window or ('C' if m >= 990 + lc.c_k(riga.date()) else 'A'), syms, text or 'без изменений')
     print('DONE:', t, did, text)
     print('ARTIFACT_DOCS:', json.dumps([f"{x['collection']}__{x['doc_id']}.json" for x in docs]))
     print('NEXT_MIN:', next_wake(riga, flags))

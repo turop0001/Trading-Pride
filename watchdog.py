@@ -21,7 +21,11 @@ def api(path, method='GET', body=None):
 def in_window(riga):
     if riga.weekday() >= 5: return False
     m = riga.hour * 60 + riga.minute
-    return 590 <= m <= 840 or 980 <= m <= 1110     # A: 09:50–14:00, C: 16:20–18:30
+    try:
+        import live_check as _lc; k = _lc.c_k(riga.date())
+    except Exception:
+        k = 0
+    return 590 <= m <= 840 or 980 + k <= m <= 1110 + k     # A: 09:50–14:00, C: 16:20–18:30 (−60 мин в недели сдвига)
 
 
 def tg(text):
@@ -45,7 +49,7 @@ def main():
         if d.get('workflow_runs'):
             return 'цикл работает'
     api(f'/repos/{REPO}/actions/workflows/loop.yml/dispatches', 'POST', {'ref': 'main'})
-    tg('⚠️ Минутный цикл Пульта не работал в окне — перезапущен автоматически (' + riga.strftime('%H:%M') + ' UTC+3).')
+    tg('⚠️ Минутный цикл Пульта не работал в окне — перезапущен автоматически (' + riga.strftime('%H:%M') + ' Рига).')
     return 'перезапущен'
 
 

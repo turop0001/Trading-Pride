@@ -88,10 +88,20 @@ def riga_now():
 C_ENABLED = True    # 01.10.2026: Тип C снова включён (новые правила, бокс Лондона 11:00–16:25, вход 16:30–18:30)
 
 
+def c_k(day):
+    """Сдвиг окна Типа C (мин) в недели, когда США на летнем времени, а Рига на зимнем: −60 (окно 15:30–17:30). 26.10.2026."""
+    try:
+        import pult_rules
+        return pult_rules.c_shift(day)
+    except Exception:
+        return 0
+
+
 def window_now(riga_dt):
     mins = riga_dt.hour * 60 + riga_dt.minute
+    k = c_k(riga_dt.date())
     if 600 <= mins < 780: return 'A'   # 10:00-13:00 (с 16.10.2026)
-    if C_ENABLED and 990 <= mins < 1110: return 'C'  # 16:30-18:30
+    if C_ENABLED and 990 + k <= mins < 1110 + k: return 'C'  # 16:30-18:30 (15:30-17:30 в недели сдвига)
     return None
 
 
@@ -388,7 +398,8 @@ WINCLOSE = {'A': 780, 'C': 1110}
 
 
 def _fold_closed(r, window, riga_dt):
-    if riga_dt.hour * 60 + riga_dt.minute < WINCLOSE.get(window, 99999):
+    _wc = WINCLOSE.get(window, 99999) + (c_k(riga_dt.date()) if window == 'C' else 0)
+    if riga_dt.hour * 60 + riga_dt.minute < _wc:
         return r
     if r.get('line_status') in ('watch', 'prep') and not r.get('signal'):
         r = dict(r)
