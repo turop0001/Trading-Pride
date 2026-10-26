@@ -1005,5 +1005,16 @@
       "m5": "state/shots/2026-10-26_EURUSD_C_m5.png",
       "h1": "state/shots/2026-10-26_EURUSD_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-26_GER40_C",
+    "date": "2026-10-26",
+    "symbol": "GER40",
+    "type": "C",
+    "side": "short",
+    "entry": 25493.9,
+    "stop": 25503.4,
+    "target": 25465.5,
+    "result": "сигнал Пульта в 15:20"
   }
 ]
