@@ -508,7 +508,7 @@ var st0=store('p_tab');show(secs[st0]?st0:'pult');
    (мониторинг/вход) 10:00-13:00, окно Типа C 16:30-18:30 — все пороги и подписи
    заданы в РИГСКИХ минутах и сравниваются с текущим ригским временем напрямую. */
 /* 26.10.2026: окно Типа C на час раньше (15:30–17:30) в недели, когда США на летнем времени, а Рига на зимнем (NY-открытие 9:30 NY = 15:30 Рига) */
-function tzOffMin(tz,d){try{var p=new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'longOffset'}).formatToParts(d).filter(function(x){return x.type==='timeZoneName';})[0].value;var mm=/GMT([+-])(\d{2}):?(\d{2})?/.exec(p);if(!mm)return 0;return (mm[1]==='-'?-1:1)*(parseInt(mm[2],10)*60+parseInt(mm[3]||'0',10));}catch(e){return null;}}
+function tzOffMin(tz,d){try{var p=new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'longOffset'}).formatToParts(d).filter(function(x){return x.type==='timeZoneName';})[0].value;var mm=/GMT([+-])(\d{1,2})(?::?(\d{2}))?/.exec(p);if(!mm)return 0;return (mm[1]==='-'?-1:1)*(parseInt(mm[2],10)*60+parseInt(mm[3]||'0',10));}catch(e){return null;}}
 function cK(d){var ny=tzOffMin('America/New_York',d),rg=tzOffMin('Europe/Riga',d);if(ny===null||rg===null)return 0;return (570-ny+rg)-990;}
 function hmm(x){return ('0'+Math.floor(x/60)).slice(-2)+':'+('0'+x%60).slice(-2);}
 var CK=cK(new Date());
