@@ -10,7 +10,7 @@
    "direction": "🔻 SHORT",
    "note": "ВЫНОС (хая бокса, ждём откат 20%)",
    "reasons": [],
-   "price": 4048.17,
+   "price": 4050.85,
    "boxH": 4031.72,
    "boxL": 3993.49,
    "prevH": null,
@@ -40,7 +40,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.11445,
+   "price": 1.11456,
    "boxH": 1.11557,
    "boxL": 1.11356,
    "prevH": null,
@@ -70,7 +70,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.3319,
+   "price": 1.33204,
    "boxH": 1.33345,
    "boxL": 1.33072,
    "prevH": null,
@@ -100,7 +100,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7702.4,
+   "price": 7703.9,
    "boxH": 7712.4,
    "boxL": 7669.9,
    "prevH": null,
@@ -130,7 +130,7 @@
    "direction": "▲ LONG",
    "note": "ВЫНОС (лоя бокса, ждём закрытия M10)",
    "reasons": [],
-   "price": 10690.6,
+   "price": 10691.7,
    "boxH": 10714.7,
    "boxL": 10668.6,
    "prevH": null,
@@ -156,16 +156,53 @@
    "date": "2026-10-27",
    "sym": "GER40",
    "window": "C",
-   "status": "prep",
+   "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВЫНОС (хая бокса, ждём откат 20%)",
+   "note": "ВХОД (16:50, 25581.2)",
    "reasons": [],
-   "price": 25581.2,
+   "price": 25583.2,
    "boxH": 25538.2,
    "boxL": 25361.2,
    "prevH": null,
    "prevL": null,
-   "signal": null,
+   "signal": {
+    "date": "2026-10-27",
+    "window": "C",
+    "time": "16:50",
+    "t_utc": "2026-10-27 14:50:00+00:00",
+    "entry": 25581.2,
+    "stop": 25598.8,
+    "tp": 25528.4,
+    "be_at": 25554.8,
+    "side": "short",
+    "rr": 3.0,
+    "trail": 0,
+    "end_utc": "2026-10-27 20:00:00+00:00",
+    "ck": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ],
+    "plus": [
+     11
+    ],
+    "worse": [],
+    "ext": 25597.2,
+    "prob": "средняя",
+    "struct": "50/50",
+    "sconf": "нет",
+    "sscore": 0.0,
+    "sv": 2,
+    "src": "MT5"
+   },
    "trendH1": {
     "tr": "боковик",
     "ratio": 0.26,
@@ -188,7 +225,7 @@
    "window": "C",
    "status": "entry",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (16:50, 0.70378)",
+   "note": "В СДЕЛКЕ",
    "reasons": [],
    "price": 0.70378,
    "boxH": 0.70375,
@@ -250,46 +287,11 @@
    "date": "2026-10-27",
    "window": "C",
    "time": "16:50",
-   "text": "изменилось: AUDUSD",
+   "text": "изменилось: GER40",
    "changed": [
-    "AUDUSD"
+    "GER40"
    ],
    "log": [
-    {
-     "date": "2026-10-27",
-     "time": "16:46",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-27",
-     "time": "16:46",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-27",
-     "time": "16:46",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-27",
-     "time": "16:46",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
-    {
-     "date": "2026-10-27",
-     "time": "16:46",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-10-27",
      "time": "16:46",
@@ -535,6 +537,43 @@
      "text": "изменилось: AUDUSD",
      "lines": [
       "🟢 AUDUSD (🔻 SHORT) — ВХОД в 16:50"
+     ]
+    },
+    {
+     "date": "2026-10-27",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-27",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-27",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-27",
+     "time": "16:50",
+     "window": "C",
+     "text": "без изменений",
+     "lines": []
+    },
+    {
+     "date": "2026-10-27",
+     "time": "16:50",
+     "window": "C",
+     "text": "изменилось: GER40",
+     "lines": [
+      "🟢 GER40 (🔻 SHORT) — ВХОД в 16:50"
      ]
     }
    ]
