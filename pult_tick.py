@@ -483,6 +483,29 @@ def _fix_c_gap_20261023(state):
         print('fix_c_gap failed:', e)
 
 
+def _fix_xau_20261027(state):
+    """27.10.2026 (разовая правка, идемпотентная): мост MT5 был offline 11:14–13:11, вход A по золоту (LONG 3994.910, SL 3987.943,
+    11:15 по Риге) не попал в Пульт, карточка стала СКИП. Вход добавлен вручную по индикатору, закрыт по TP +2R (4008.844).
+    Telegram/push не шлём. Любая ошибка игнорируется."""
+    try:
+        if lc.riga_now()[0].strftime('%Y-%m-%d') != '2026-10-27': return
+        a = state.get('XAUUSD_A')
+        if not a or a.get('line_status') == 'entry': return
+        e, s_ = 3994.910, 3987.943; tp = round(e + 2 * (e - s_), 3); N = 'ВХОД → TP 🎯 +2R'
+        sig = {'date': '2026-10-27', 'window': 'A', 'time': '11:15', 'entry': e, 'stop': s_, 'tp': tp, 'side': 'long', 'rr': 2, 'src': 'ручн.'}
+        a.update(signal=sig, line_status='entry', note=N, status_key=N, tg_note='ЗАКРЫТА - TP', reasons=[], ckf=[])
+        a.setdefault('why', []).append('Вход добавлен вручную по индикатору (мост MT5 был offline 11:14–13:11); закрыта по TP +2R.')
+        sd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state')
+        pdp = os.path.join(sd, 'pult_docs', 'pult__XAUUSD_A.json')
+        if os.path.exists(pdp):
+            d = json.load(open(pdp, encoding='utf-8')); d.update(status='entry', note=N, signal=sig, reasons=[])
+            json.dump(d, open(pdp, 'w', encoding='utf-8'), ensure_ascii=False)
+        _hist_add(None, {'id': '2026-10-27_XAUUSD_A', 'date': '2026-10-27', 'symbol': 'XAUUSD', 'type': 'A', 'side': 'long',
+                         'entry': e, 'stop': s_, 'target': tp, 'result': N})
+    except Exception as e:
+        print('fix_xau failed:', e)
+
+
 def _fix_a_20261022(state):
     """22.10.2026 (разовая правка, идемпотентная): компьютер был выключен до 13:26 по Риге — MT5 офлайн, окно A (10:00–13:00) не считалось,
     карточек за 22.10 не было. По полным свечам брокера (ExportM5_range, сервер = Рига) окно A пересчитано движком Пульта:
@@ -587,6 +610,7 @@ def main(send=True):
     _fix_uk100_20261021(state)
     _fix_c_20261021(state)
     _fix_a_20261022(state)
+    _fix_xau_20261027(state)
     _fix_gbpusd_c_20261023(state)
     _fix_c_gap_20261023(state)
     flags = state.get('_flags', {})
