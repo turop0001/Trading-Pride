@@ -1020,5 +1020,16 @@
       "m5": "state/shots/2026-10-26_GER40_C_m5.png",
       "h1": "state/shots/2026-10-26_GER40_C_h1.png"
     }
+  },
+  {
+    "id": "2026-10-27_XAUUSD_A",
+    "date": "2026-10-27",
+    "symbol": "XAUUSD",
+    "type": "A",
+    "side": "long",
+    "entry": 3994.91,
+    "stop": 3987.943,
+    "target": 4008.844,
+    "result": "ВХОД → TP 🎯 +2R"
   }
 ]
