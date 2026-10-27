@@ -1042,7 +1042,7 @@
     "stop": 0.70393,
     "target": 0.70332,
     "result": "ВХОД → SL −1R",
-    "autopsy": "",
+    "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа данных пока мало",
     "shots": {
       "m5": "state/shots/2026-10-27_AUDUSD_C_m5.png",
       "h1": "state/shots/2026-10-27_AUDUSD_C_h1.png"
@@ -1058,7 +1058,7 @@
     "stop": 25598.8,
     "target": 25528.4,
     "result": "ВХОД → SL −1R",
-    "autopsy": "",
+    "autopsy": "шла в плюс до +0.5R, стоп через 20 мин; после стопа данных пока мало",
     "shots": {
       "m5": "state/shots/2026-10-27_GER40_C_m5.png",
       "h1": "state/shots/2026-10-27_GER40_C_h1.png"
