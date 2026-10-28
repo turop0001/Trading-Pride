@@ -499,13 +499,6 @@
     },
     {
       "date": "2026-10-28",
-      "time": "17:17",
-      "window": "C",
-      "text": "без изменений",
-      "lines": []
-    },
-    {
-      "date": "2026-10-28",
       "time": "17:18",
       "window": "C",
       "text": "без изменений",
@@ -1014,6 +1007,13 @@
       "window": "—",
       "text": "отчёт дня отправлен",
       "lines": []
+    },
+    {
+      "date": "2026-10-28",
+      "time": "21:55",
+      "window": "—",
+      "text": "закрыта сделка окна A — карточка обновлена",
+      "lines": []
     }
   ],
   "_daily_summary": {
@@ -1191,7 +1191,7 @@
   },
   "_news": {
     "date": "2026-10-28",
-    "at": 1793208208.255713,
+    "at": 1793217313.19162,
     "items": [
       {
         "t": "14:30",
@@ -1750,15 +1750,22 @@
       ],
       "src": "MT5"
     },
-    "stop_now": 157.639,
-    "peak_r": 1.63,
-    "trail_moves": [],
-    "be_armed": false,
+    "stop_now": 157.871,
+    "peak_r": 2.05,
+    "trail_moves": [
+      {
+        "t": "20:20",
+        "lvl": 0.0,
+        "reach": 2.0,
+        "stop": 157.871
+      }
+    ],
+    "be_armed": true,
     "line_status": "entry",
     "direction": "▲ LONG",
-    "note": "В СДЕЛКЕ",
-    "status_key": "В СДЕЛКЕ",
-    "tg_note": "ВХОД",
+    "note": "ВХОД → БУ 0R (стоп в безубытке)",
+    "status_key": "ВХОД → БУ 0R (стоп в безубытке)",
+    "tg_note": "ЗАКРЫТА - БУ",
     "stale": false,
     "date": "2026-10-28",
     "trend_h1": {
@@ -1771,7 +1778,13 @@
       "ratio": -0.53,
       "pct": -0.3
     },
-    "trail_sent": 0
+    "trail_sent": 0,
+    "exit_r": 0.0,
+    "shots": {
+      "m5": "state/shots/2026-10-28_USDJPY_A_m5.png",
+      "h1": "state/shots/2026-10-28_USDJPY_A_h1.png"
+    },
+    "exit_time": "20:45"
   },
   "UK100_A": {
     "sym": "UK100",
