@@ -102,11 +102,11 @@ def build_update(date, window_label, time_str, changed_lines, unchanged_lines=No
 
 
 def build_signal(date, window_label, time_str, symbol, direction, entry, stop, target_2r, risk_pct, note='есть order flow', rr=2, trail=False, be_at=None, lstep=1, llag=1):
-    risk = f"Риск: {risk_pct}% (при просадке ≥5% от пика баланса — ×0,6)"
+    risk = "Риск: 1R"
     if trail:
         ls, lg = float(lstep), float(llag)
-        first = f"на +{ls:g}R стоп на вход (БУ)" if abs(ls - lg) < 1e-9 else f"на +{ls:g}R стоп на +{ls - lg:g}R"
-        rule = f"Лесенка {ls:g}/{lg:g}: {first}, дальше каждые +{ls:g}R стоп подтягивается на шаг (пришлю уведомление)"
+        first = f"на +{ls:g}R стоп в БУ" if abs(ls - lg) < 1e-9 else f"на +{ls:g}R стоп на +{ls - lg:g}R"
+        rule = f"Лесенка {ls:g}/{lg:g}: {first}, дальше каждые +{ls:g}R стоп подтягивается (пришлю уведомление)"
         return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} Рига)\n\n"
                 f"{E_ENTRY} {symbol} ({direction}):\n\n"
                 f"Вход {entry} · {time_str}\n"
