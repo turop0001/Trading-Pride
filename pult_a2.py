@@ -71,7 +71,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
     boxH, boxL = float(H[ai].max()), float(L[ai].min())
     out = dict(boxH=boxH, boxL=boxL, ck=[1], ckf=[], sd=0)
     wi = np.flatnonzero((rdate == today) & (rm >= WIN[0]) & (rm < WIN[1]))
-    sd = 0; start = e = None; ext = 0.0; sig = None; sw = None; at = None; lastsw = None
+    sd = 0; start = e = None; ext = 0.0; sig = None; sw = None; at = None; lastsw = None; latched = False
     for i in wi:
         if sd == 0:
             up = H[i] > boxH; dn = L[i] < boxL
@@ -86,6 +86,8 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         if not (at and at == at and at > 0): continue
         sw = ((ext - boxH) if sd == -1 else (boxL - ext)) / at
         lastsw = sw
+        # 28.10.2026: скип окончательный — как только вынос в ATR ушёл за MAXSW (до 13:00), день пропущен, поздний возврат в коридор входа не даёт
+        if sw >= MAXSW and rm[i] + 5 < WIN[1]: latched = True; break
         if sw < MINSW or sw >= MAXSW or rm[i] + 5 >= WIN[1]: continue
         found = False
         # 28.10.2026: берём ближайший к экстремуму FVG (самая поздняя свеча c из последних LB свечей выноса с зазором ≥ GAP ATR), а не самый ранний
@@ -107,7 +109,9 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         return out
     out.update(sd=sd, ext=ext, start=start, sw=lastsw, at=at, sweep_time=(d.index[start] + pd.Timedelta(hours=off)).strftime('%H:%M'), ck=[1, 2])
     if sig is None:
-        if nowm >= WIN[1]:
+        if latched:
+            out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR, день пропущен окончательно', ckf=[3])
+        elif nowm >= WIN[1]:
             if lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR', ckf=[3])
             elif lastsw is not None and lastsw < MINSW:
