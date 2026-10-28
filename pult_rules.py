@@ -1210,6 +1210,13 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
             if leg > 0 and nowm < wb:
                 e_ = ext + C_LVL * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + C_TPREF * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
+                _mn = C_COSTK * C_COST.get(sym, 0.0); _mx = C_MAXSTOP * atr_
+                if R_ < _mn:
+                    _why(res, f'Ордер пока не выставляется: стоп {R_:.{dec}f} меньше минимума {_mn:.{dec}f} (3 × спред+комиссия) — вынос мал, если не вырастет, будет скип')
+                elif R_ > _mx:
+                    _why(res, f'Ордер пока не выставляется: стоп {R_:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {_mx:.{dec}f}')
+                elif _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is not None:
+                    _why(res, 'Ордер пока не выставляется: встречный H1 FVG на пути 4R')
                 if C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
