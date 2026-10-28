@@ -101,20 +101,24 @@ def build_update(date, window_label, time_str, changed_lines, unchanged_lines=No
     return head + body + tail
 
 
-def build_signal(date, window_label, time_str, symbol, direction, entry, stop, target_2r, risk_pct, note='есть order flow', rr=2, trail=False, be_at=None):
+def build_signal(date, window_label, time_str, symbol, direction, entry, stop, target_2r, risk_pct, note='есть order flow', rr=2, trail=False, be_at=None, lstep=1, llag=1):
+    risk = f"Риск: {risk_pct}% (при просадке ≥5% от пика баланса — ×0,6)"
     if trail:
+        ls, lg = float(lstep), float(llag)
+        first = f"на +{ls:g}R стоп на вход (БУ)" if abs(ls - lg) < 1e-9 else f"на +{ls:g}R стоп на +{ls - lg:g}R"
+        rule = f"Лесенка {ls:g}/{lg:g}: {first}, дальше каждые +{ls:g}R стоп подтягивается на шаг (пришлю уведомление)"
         return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} Рига)\n\n"
                 f"{E_ENTRY} {symbol} ({direction}):\n\n"
                 f"Вход {entry} · {time_str}\n"
                 f"Стоп: {stop}\n"
-                f"{E_TARGET} Без тейка. БУ на +1R: {be_at}. Дальше стоп ступеньками — пришлю уведомление на каждом шаге. Выход в 22:00.\n"
-                f"{E_NEWS} Риск: {risk_pct}%")
+                f"{E_TARGET} Без тейка. {rule}: первый шаг {be_at}. Выход в 22:00.\n"
+                f"{E_NEWS} {risk}")
     return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} Рига)\n\n"
             f"{E_ENTRY} {symbol} ({direction}):\n\n"
             f"Вход {entry} · {time_str}\n"
             f"Стоп: {stop}\n"
             f"{E_TARGET} Цель {float(rr):g}R: {target_2r}\n"
-            f"{E_NEWS} Риск: {risk_pct}%")
+            f"{E_NEWS} {risk}")
 
 
 def build_tp_hit(symbol, direction, target_price, time_str, pct):

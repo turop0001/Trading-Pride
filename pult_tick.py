@@ -26,7 +26,7 @@ def mins(t): return t.hour * 60 + t.minute
 
 
 # 18.10.2026 (решение владельца): уведомления (Telegram, push) — только Тип C; Тип A считается и рисуется как раньше (карточки, state, аналитика), но не шлётся.
-NOTIFY_WIN = ('C',)
+NOTIFY_WIN = ('A', 'C')   # 28.10.2026: уведомления и по Типу A (v2.03), и по Типу C (v1.11)
 
 
 def push(title, body, tag=None, sticky=False):
@@ -224,10 +224,11 @@ def trail_notify(r, s, win, tgf, pushf, prev=None):
     n = 0
     for i, m in enumerate(mv):
         if i < sent or m.get('mkt'): continue
-        lv = int(m.get('lvl', 0)); st = m.get('stop')
+        lv = int(round(float(m.get('lvl', 0)))); st = m.get('stop')
+        rc = int(round(float(m.get('reach', lv + 1))))
         where = 'на вход (БУ)' if lv <= 0 else f'на +{lv}R'
         try:
-            tgf(win, f"\u26A0\uFE0F {s} ({r.get('direction')}) — цена прошла +{lv + 1}R. Переноси стоп {where}: {st}.")
+            tgf(win, f"\u26A0\uFE0F {s} ({r.get('direction')}) — цена прошла +{rc}R. Переноси стоп {where}: {st}.")
             pushf(win, f"{s} · стоп {where}", f"Переноси стоп на {st}", tag=f'{s}_{win}_tr{lv}', sticky=True)
             n += 1
         except Exception as e:
@@ -588,7 +589,7 @@ def _risk_pct_for(win):
     """21.10.2026: риск в сообщении сигнала. Стандарт 0,5% (решение владельца 18.10); у Типа C после 2 SL подряд по счёту
     (все инструменты вместе, БУ серию не меняет, TP сбрасывает) — 0,25% до первого TP. Серия берётся из state/history.json."""
     try:
-        if win != 'C': return 0.5
+        return 0.5   # 28.10.2026: C v1.11 без половинения после 2 SL (HalfRiskAfter2SL=false); при просадке ≥5% от пика баланса риск ×0,6 — см. подпись в сигнале
         hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
         st = 0
         for x in json.load(open(hp, encoding='utf-8')):
@@ -692,7 +693,7 @@ def main(send=True):
             except Exception as e:
                 print('history add failed:', e)
             tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], _risk_pct_for(win),
-                            note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2, trail=bool(sg.get('trail')), be_at=sg.get('be_at'))); did.append('signal')
+                            note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2, trail=bool(sg.get('trail')), be_at=sg.get('be_at'), lstep=sg.get('lstep') or 1, llag=sg.get('llag') or 1)); did.append('signal')
         return text, syms, changed
 
     text, syms, changed_lines = None, [], []

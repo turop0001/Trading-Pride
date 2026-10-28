@@ -338,6 +338,15 @@ def finalize_why(res):
             sk = [w for w in why if w.startswith('Скип')]
             if sk: res['why'] = sk
         return res
+    if sig.get('ver') == 2:
+        inn = f'вход {sig.get("time", "")} по {sig.get("entry", "")}, стоп {sig.get("stop", "")}, лесенка {sig.get("lstep", 1):g}/{sig.get("llag", 1):g} без TP'
+        xt = res.get('exit_time') or ''
+        if '→ TP' in note: res['why'] = [f'Закрыта по лесенке в плюсе{(" в " + xt) if xt else ""}: {inn}. {note.split("→")[-1].strip()}.']
+        elif '→ SL' in note: res['why'] = [f'Стоп{(" в " + xt) if xt else ""}: {inn}.' + (' Ход сделки: ' + str(res['autopsy']).rstrip('.') + '.' if res.get('autopsy') else '')]
+        elif '→ БУ' in note: res['why'] = [f'Закрыта в безубыток: {inn}.']
+        elif 'закрыта в 22:00' in note: res['why'] = [f'Закрыта по времени в 22:00 ({note.split("(")[-1].rstrip(")")}): {inn}.']
+        else: res['why'] = [f'В сделке: {inn}.']
+        return res
     win = sig.get('window') or 'A'
     names = _AMP_NAMES.get(win, _AMP_NAMES['A'])
     pl = [names[n] for n in (sig.get('plus') or []) if n in names]
@@ -389,7 +398,7 @@ def analyze(sym, d, window, now_utc, off, prev=None, h1=None):
     if window == 'C':
         return finalize_why(_analyze_C_instant(sym, d, now_utc, off, prev, h1))
     if window == 'A' and not LEGACY_A:
-        return finalize_why(_analyze_A_s1(sym, d, now_utc, off, prev, h1))
+        return finalize_why(_analyze_A_s2(sym, d, now_utc, off, prev, h1))
     dec = DEC.get(sym, 5)
     fmtp = lambda x: f"{x:.{dec}f}"
     d = _completed(d, now_utc, 5).copy()
@@ -667,6 +676,92 @@ def _prob_set(res, plus, worse, typ='A'):
     else: res['prob'] = 'высокая' if len(plus) >= 2 else 'средняя' if len(plus) == 1 else 'низкая'
 
 
+A_LATE_MIN = 15   # сигнал A старше N минут к моменту проверки — вход упущен (как в советнике: вход не позже 90 с после открытия свечи); replay аналитики ставит большое значение
+
+
+def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
+    """Тип A v2.03 (28.10.2026) = правила советника PultTraderAC_v1_06 (модуль pult_a2). Чек-лист A v2.03: 1 Азия 03:00–10:00; 2 вынос границы Азии 10:00–13:00;
+    3 вынос к сигналу 2,4–3,0 ATR; 4 инверсия M5 FVG выноса; 5 стоп ≥0,25 ATR (экстремум±0,5 ATR); 6 FB (хай/лой 2 прошлых дней дальше 3 ATR); 7 FAa (нет инвертированного H1 FVG в Азии); 8 вход до 13:00.
+    Выход: лесенка 2/2 без TP (+2R стоп в БУ, +4R в +2R …), 22:00 Рига."""
+    import pult_a2 as A2
+    dec = DEC.get(sym, 5)
+    fmtp = lambda x: f"{x:.{dec}f}"
+    dall = d[d.index <= pd.Timestamp(now_utc, tz='UTC')]
+    d = _completed(d, now_utc, 5).copy()
+    if len(d) < 50:
+        return dict(error='no_data')
+    nl = now_utc + dt.timedelta(hours=off)
+    today = nl.date(); nowm = nl.hour * 60 + nl.minute
+    loc = d.index + pd.Timedelta(hours=off)
+    d['rdate'] = [x.date() for x in loc]
+    d['rmin'] = [x.hour * 60 + x.minute for x in loc]
+    box = _box(d, today, 180, 600)
+    if len(box) < 10:
+        return dict(error='no_box')
+    boxH, boxL = float(box['High'].max()), float(box['Low'].min())
+    price = float(d['Close'].iloc[-1])
+    res = dict(sym=sym, window='A', price=round(price, dec), boxH=round(boxH, dec), boxL=round(boxL, dec),
+               reasons=[], checked_at=nl.strftime('%H:%M'), ck=[1], ckf=[], why=[], ckv=4, plus=[], worse=[], prob='—')
+    try:
+        ctx, liq = _hdr(res, d, h1, now_utc, off, today, price, boxH, boxL, fmtp, 600)
+    except Exception as e:
+        print('hdr A failed', sym, e)
+    if prev.get('signal') and prev['signal'].get('date') == str(today) and prev['signal'].get('window') == 'A':
+        sg = prev['signal']
+        sd = 1 if sg.get('side') == 'long' else -1
+        dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
+        res['why'] = list(sg.get('why') or [])
+        return _close_why(_track(res, d, sg, sd, dirc, fmtp, live=dall))
+    live_open = None
+    if len(dall) > len(d):
+        fo = dall[dall.index > d.index[-1]]
+        if len(fo): live_open = (fo.index[0], float(fo['Open'].iloc[0]))
+    r = A2.scan(d, today, off, nowm, _fvgs, live_open=live_open)
+    if r['st'] == 'nodata':
+        _why(res, 'Азия ещё не сформирована')
+        return _out(res, 'watch', '—', 'НАБЛЮДАЕМ (Азия формируется)')
+    res['boxH'], res['boxL'] = round(r['boxH'], dec), round(r['boxL'], dec)
+    res['ck'] = list(r.get('ck') or [1])
+    sd = r.get('sd') or 0
+    dirc = '—' if not sd else ('▲ LONG' if sd == 1 else '🔻 SHORT')
+    if sd:
+        res['extreme'] = round(r['ext'], dec)
+        _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}, к сигналу {r["sw"]:.2f} ATR (нужно {A2.MINSW:g}–{A2.MAXSW:g})', [2, 3])
+    if r['st'] == 'watch':
+        _why(res, 'Ждём вынос границы Азии (10:00–13:00)')
+        return _out(res, 'watch', '—', 'НАБЛЮДАЕМ' if nowm >= 600 else 'НАБЛЮДАЕМ (ждём 10:00)')
+    if r['st'] == 'skip':
+        res['ckf'] = list(r.get('ckf') or []); res['reasons'] = [r['why']]
+        _why(res, 'Скип: ' + r['why'], res['ckf'])
+        return _out(res, 'skip', dirc, f'СКИП ({r["why"]})')
+    if r['st'] == 'prep':
+        if r.get('sw') is not None and r['sw'] >= A2.MAXSW:
+            _why(res, f'Вынос {r["sw"]:.2f} ATR — больше {A2.MAXSW:g}: вход возможен только если вынос к сигналу окажется в окне {A2.MINSW:g}–{A2.MAXSW:g} ATR')
+        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}, ждём инверсию M5 FVG)')
+    if r['st'] == 'wait_entry':
+        return _out(res, 'prep', dirc, 'ВЫНОС (инверсия FVG есть, ждём свечу входа)')
+    # entry
+    t_in = r['t_in']
+    try:
+        late = (pd.Timestamp(now_utc, tz='UTC') - t_in).total_seconds() > A_LATE_MIN * 60
+    except Exception:
+        late = False
+    if late:
+        t = f'сигнал был в {(t_in + pd.Timedelta(hours=off)).strftime("%H:%M")} — вход упущен'
+        res['ckf'] = [8]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8])
+        return _out(res, 'skip', dirc, f'СКИП ({t})')
+    entry, stop, R = r['entry'], r['stop'], r['R']
+    end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
+    sig = dict(date=str(today), window='A', time=(t_in + pd.Timedelta(hours=off)).strftime('%H:%M'), t_utc=str(t_in),
+               entry=round(entry, dec), stop=round(stop, dec), tp=round(entry + sd * 4 * R, dec), side='long' if sd == 1 else 'short',
+               be_at=round(entry + sd * A2.LAD_STEP * R, dec), rr=4.0, trail=1, lstep=A2.LAD_STEP, llag=A2.LAD_LAG, ver=2,
+               end_utc=str(end_utc), ck=list(res['ck']), plus=[], worse=[], prob='—', sw=round(r['sw'], 2))
+    res['signal'] = sig; res['new_signal'] = True
+    _why(res, f'ВХОД {sig["time"]}: вынос {r["sw"]:.2f} ATR, инверсия M5 FVG, стоп {fmtp(stop)} (экстремум ± 0,5 ATR), лесенка 2/2 без TP; выполнены пункты ' + _nums(res['ck']))
+    sig['why'] = list(res.get('why') or [])
+    return _out(res, 'entry', dirc, f'ВХОД ({sig["time"]}, {fmtp(entry)})')
+
+
 def _analyze_A_s1(sym, d, now_utc, off, prev, h1):
     """Тип A (S1, правка 01.10.2026): без цепочки H1, цель 2R, встречный H1 FVG внутри 1:2 = СКИП,
     усилители (батут, ликвидность на пути ≤30% Азии, по тренду) и ухудшитель (ликвидность у стороны выноса).
@@ -842,7 +937,7 @@ def _close_why(res):
     """Причины и анализ ошибок при закрытии сделки (TP / SL / БУ / 22:00): что учтено, что нет."""
     sig = res.get('signal') or {}
     tg = res.get('tg_note') or ''
-    if not tg.startswith('ЗАКРЫТА') or not sig: return res
+    if not tg.startswith('ЗАКРЫТА') or not sig or sig.get('ver') == 2: return res
     ck, pl, wr = sig.get('ck') or [], sig.get('plus') or [], sig.get('worse') or []
     base = f'вероятность была {sig.get("prob", "—")}; выполнено: ' + _nums(ck)
     if wr: base += '; ухудшитель №' + _nums(wr)
@@ -863,7 +958,7 @@ def _close_why(res):
 
 def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
     """21.10.2026: решения Типа C — по закрытым M5 (без мигания), КРОМЕ момента входа: если вынос уже есть (по закрытым барам),
-    а формирующаяся свеча НЕ обновила экстремум выноса и уже дошла до уровня отката 20% — это необратимый факт (уровень считается от
+    а формирующаяся свеча НЕ обновила экстремум выноса и уже дошла до уровня отката 50% — это необратимый факт (уровень считается от
     закрытого экстремума), поэтому вход фиксируем сразу, не дожидаясь закрытия свечи (раньше сигнал опаздывал до 5 минут).
     Если формирующаяся свеча обновила экстремум — ждём её закрытия, как и прежде."""
     res = _analyze_C2(sym, d, now_utc, off, prev, h1)
@@ -880,10 +975,10 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
         short = 'SHORT' in str(res.get('direction') or '')
         # уровень отката 20% от закрытого экстремума (бокс — по закрытым барам); без предрасчёта pend (он не учитывает открытие свечи выше уровня)
         if short:
-            lvl_ = ext_ - 0.2 * (ext_ - float(res['boxH']))
+            lvl_ = ext_ - C_LVL * (ext_ - float(res['boxH']))
             ok = (ext_ - float(res['boxH'])) > 0 and fbH <= ext_ and fbL <= lvl_
         else:
-            lvl_ = ext_ + 0.2 * (float(res['boxL']) - ext_)
+            lvl_ = ext_ + C_LVL * (float(res['boxL']) - ext_)
             ok = (float(res['boxL']) - ext_) > 0 and fbL >= ext_ and fbH >= lvl_
         if not ok: return res
         now2 = (dall.index[-1] + pd.Timedelta(minutes=5, seconds=41)).tz_convert('UTC').tz_localize(None).to_pydatetime()
@@ -899,7 +994,10 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
 # 24.10.2026: издержки Типа C в единицах цены = минимальный спред + комиссия $6/лот (индексы без комиссии). Стоп меньше издержек — СКИП (k=1)
 C_COST = {'XAUUSD': 0.22, 'EURUSD': 0.00013, 'GBPUSD': 0.00014, 'AUDUSD': 0.00014, 'EURGBP': 0.000135, 'US500': 0.4, 'GER40': 0.8, 'UK100': 1.0}
 C_MAXSTOP = 0.7   # 24.10.2026: стоп не шире 0,7 ATR(M10) (было 1,0 с 23.10) — иначе СКИП; с 26.10.2026 нижний порог 0,25 ATR убран (остался спред+комиссия)
-C_TRAIL = False   # 23.10.2026: Тип C без TP — БУ на +1R, дальше стоп ступеньками по 1R (на +2R стоп +1R, на +3R стоп +2R …), выход 22:00
+C_TRAIL = True   # 23.10.2026: Тип C без TP — БУ на +1R, дальше стоп ступеньками по 1R (на +2R стоп +1R, на +3R стоп +2R …), выход 22:00
+C_LVL = 0.5   # 28.10.2026: уровень входа C = 50% длины выноса (C v1.11, было 20%)
+C_COSTK = 3.0   # 28.10.2026: стоп не меньше 3× (спред+комиссия) (C v1.11)
+C_TPREF = 4.0   # 28.10.2026: TP нет (лесенка 1/1); 4R — только для проверки встречного H1 FVG
 C_TF = 10   # 23.10.2026: Тип C — вынос, экстремум и пороги считаются по свечам M10 (вход по касанию и сопровождение — по M5)
 
 
@@ -997,7 +1095,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                 print('struct fix failed', sym, e)
         _prob_set(res, sg.get('plus') or [], [], 'C')
         return _close_why(_track(res, d, sg, sd, dirc, fmtp, live=dall))
-    # 21.10.2026: вынос, откат 20%, вход и скипы считаем ТОЛЬКО по закрытым M5 (как индикатор v37.1+; вход внутри незакрытой
+    # 21.10.2026: вынос, откат 50%, вход и скипы считаем ТОЛЬКО по закрытым M5 (как индикатор v37.1+; вход внутри незакрытой
     # свечи давал ложные входы и мигание СКИП→ВЫНОС→ВХОД). Формирующаяся свеча нужна только для цены и для слежения за стопом/целью.
     if len(dall) > len(d):
         res['price'] = round(float(dall['Close'].iloc[-1]), dec)
@@ -1063,7 +1161,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
         if g == g0: continue
         leg = lowB - ext
         if leg <= 0: continue
-        lvl = ext + 0.2 * leg
+        lvl = ext + C_LVL * leg
         if g <= ge: continue
         # 08.10.2026: вход ВСЕГДА на откате 20% длины выноса (вход по поглощению свечи выноса отменён)
         ok = H[g] >= lvl; mode = 'pb20'
@@ -1103,26 +1201,26 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     leg = lowB - ext
     if entry_g is None or leg <= 0:
         if nowm >= wb:
-            _w = 'откат 20%'
+            _w = 'откат 50%'
             res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
             return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
-        # 08.10.2026: расчётный отложенный ордер для советника MT5 (stop-ордер на уровне 20%); не выдаём, если сделка заведомо будет скипнута
+        # 08.10.2026: расчётный отложенный ордер для советника MT5 (stop-ордер на уровне 50%); не выдаём, если сделка заведомо будет скипнута
         try:
             if leg > 0 and nowm < wb:
-                e_ = ext + 0.2 * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + 3 * R_
+                e_ = ext + C_LVL * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + C_TPREF * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
-                if C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
+                if C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
             print('pend failed', sym, e)
-        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 20%)')
+        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 50%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
-        res['ckf'] = [5]; res['reasons'] = ['откат 20% после 18:30']; _why(res, 'Скип: откат ≥20% позже 18:30', [5])
+        res['ckf'] = [5]; res['reasons'] = ['откат 50% после 18:30']; _why(res, 'Скип: откат ≥50% позже 18:30', [5])
         return _out(res, 'skip', dirc, 'СКИП (вход позже 18:30)')
-    lvl = ext + 0.2 * leg
-    # 23.10.2026: вход по касанию 20% — свеча M5 внутри свечи M10, где уровень достигнут; цена входа = max(уровень, открытие этой M5)
+    lvl = ext + C_LVL * leg
+    # 23.10.2026: вход по касанию 50% — свеча M5 внутри свечи M10, где уровень достигнут; цена входа = max(уровень, открытие этой M5)
     t_bar = d.index[entry_g]
     sub5 = d5[(d5.index >= t_bar) & (d5.index < t_bar + pd.Timedelta(minutes=C_TF))]
     so = sub5['Open'].values.astype(float) * sd
@@ -1130,12 +1228,12 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     fi = next((j for j in range(len(sh)) if sh[j] >= lvl), None)
     if fi is None: entry = max(lvl, float(O[entry_g])); t_fill = t_bar
     else: entry = max(lvl, float(so[fi])); t_fill = sub5.index[fi]
-    stop_f = ext - 0.1 * (entry - ext)
+    stop_f = ext - 0.1 * (lvl - ext)
     R = entry - stop_f
-    tp_f = entry + 3 * R
+    tp_f = entry + C_TPREF * R
     atr_m = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
-    if R < C_COST.get(sym, 0.0):
-        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше спреда+комиссии ({C_COST.get(sym, 0.0):.{dec}f}) — не окупится'
+    if R < C_COSTK * C_COST.get(sym, 0.0):
+        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше {C_COSTK:g}× спреда+комиссии ({C_COSTK * C_COST.get(sym, 0.0):.{dec}f}) — не окупится'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
         return _out(res, 'skip', dirc, 'СКИП (стоп меньше спреда+комиссии)')
     # 26.10.2026: нижний порог 0,25 ATR(M10) убран (микростоп в день с узким выносом брал TP у владельца); остаётся порог спред+комиссия выше
@@ -1149,17 +1247,17 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     plus = res['plus']
     cf = _counter_fvg(F1, sd, entry_r, tp_r, t_bar + pd.Timedelta(minutes=C_TF))
     res['ck'] = sorted(set(res['ck'] + [5]))
-    _why(res, 'Откат ≥20% длины выноса достигнут', [5])
+    _why(res, 'Откат ≥50% длины выноса достигнут', [5])
     if cf is not None:
-        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} Рига) внутри цели 1:3'
+        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} Рига) внутри 4R'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8]); res['cfv'] = _cfv(cf, sd, entry_r, tp_r, off, dec)
-        return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG внутри цели 1:3)')
+        return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG на пути 4R)')
     t_in = t_fill      # M5-свеча касания (трекинг — со следующей свечи M5)
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
     sig = dict(date=str(today), window='C', time=(t_in + pd.Timedelta(hours=off, minutes=0)).strftime('%H:%M'), t_utc=str(t_in),
                entry=round(entry_r, dec), stop=round(stop_r, dec), tp=round(tp_r, dec), be_at=round(be_r, dec),
-               side='long' if sd == 1 else 'short', rr=3.0, trail=int(C_TRAIL), end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[], ext=round(sd * ext, dec),
+               side='long' if sd == 1 else 'short', rr=C_TPREF, trail=int(C_TRAIL), lstep=1.0, llag=1.0, ver=2, end_utc=str(end_utc), ck=list(res['ck']), plus=list(plus), worse=[], ext=round(sd * ext, dec),
                prob=res['prob'], struct=res['struct']['rec'], sconf=res['struct'].get('conf'), sscore=res['struct'].get('score'), sv=2)
     res['signal'] = sig; res['new_signal'] = True
     _why(res, f'ВХОД: вероятность закрытия цели {res["prob"]}; выполнены пункты ' + _nums(res['ck']))
@@ -1267,6 +1365,7 @@ def _track_trail(res, d, sig, sd, dirc, fmtp, live=None):
     if sig.get('ck'): res['ck'] = list(sig['ck']); res['ckf'] = []
     if sig.get('fx'): res['fx'] = sig['fx']
     e = float(sig['entry']); R = abs(e - float(sig['stop'])) or 1e-12
+    LS = float(sig.get('lstep') or 1.0); LG = float(sig.get('llag') or 1.0)
     t0 = pd.Timestamp(sig['t_utc'])
     end_utc = pd.Timestamp(sig['end_utc']) if sig.get('end_utc') else None
     closed = d[d.index > t0]
@@ -1285,14 +1384,14 @@ def _track_trail(res, d, sig, sd, dirc, fmtp, live=None):
         if hit(r, stop):
             out = True; xt = tl(ix); xr = lvl(stop); break
         hh = lvl(r['High'] if sd == 1 else r['Low']); best = max(best, hh)
-        k = int(best // 1)
-        if k >= 1:
-            ns = px(k - 1)
+        k = int(best // LS + 1e-9) * LS
+        if k >= LS:
+            ns = px(k - LG)
             if (ns > stop) if sd == 1 else (ns < stop):
                 cl = float(r['Close'])
                 if (cl <= ns) if sd == 1 else (cl >= ns):      # новый стоп не ниже закрытия — выходим по рынку
-                    out = True; xt = tl(ix); xr = lvl(cl); moves.append(dict(t=xt, lvl=k - 1, stop=round(cl, 8), mkt=1)); break
-                stop = ns; moves.append(dict(t=xt or tl(ix), lvl=k - 1, stop=round(ns, 8)))
+                    out = True; xt = tl(ix); xr = lvl(cl); moves.append(dict(t=xt, lvl=k - LG, reach=k, stop=round(cl, 8), mkt=1)); break
+                stop = ns; moves.append(dict(t=xt or tl(ix), lvl=k - LG, reach=k, stop=round(ns, 8)))
     if out is None and lv is not None:
         for ix, r in lv.iterrows():
             if hit(r, stop): out = True; xt = tl(ix); xr = lvl(stop); break

@@ -49,8 +49,9 @@ TICKERS = {
 # Инструменты по типу — Тип A торгует все 11 (с 17.10.2026: +AUDUSD, USDJPY, UK100, EURGBP; GER40 временно пропущен, см. комментарий выше),
 # Тип C с 18.10.2026 — 8 инструментов (XAUUSD, EURUSD, GBPUSD, US500, UK100, GER40, AUDUSD, EURGBP); раньше только 3 — раньше main() проверял ВСЕ TICKERS в обоих окнах.
 WINDOW_SYMBOLS = {
-    'A': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY', 'UK100', 'EURGBP'],
-    'C': ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'UK100', 'GER40', 'AUDUSD'],   # 26.10.2026: EURGBP из Типа C убран (худший по итогу за 5 лет: +234R из +3738R, просадка −6R, WR 57%); с 18.10.2026 было 8 инструментов
+    # 28.10.2026: правила A v2.03 / C v1.11 как в советнике PultTraderAC_v1_06: A — 9 инструментов, C — 4 инструмента
+    'A': ['EURUSD', 'GBPUSD', 'US500', 'GER40', 'AUDUSD', 'UK100', 'NAS100', 'US30', 'USDJPY'],
+    'C': ['GBPUSD', 'US500', 'UK100', 'GER40'],
 }
 
 # ПРОВЕРЕНО 26.09.2026: замена GC=F -> PAXG-USD резко снижает разницу со спотом

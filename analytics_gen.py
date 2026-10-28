@@ -130,9 +130,9 @@ def load(path=PATH):
     try:
         with open(path, encoding='utf-8') as f:
             j = json.load(f)
-        return {'A': list(j.get('A') or []), 'C': list(j.get('C') or [])}
+        return {'A': list(j.get('A') or []), 'C': list(j.get('C') or []), 'A_arch': list(j.get('A_arch') or []), 'C_arch': list(j.get('C_arch') or [])}
     except Exception:
-        return {'A': [], 'C': []}
+        return {'A': [], 'C': [], 'A_arch': [], 'C_arch': []}
 
 
 def upsert(rec, path=PATH, keep=KEEP):
@@ -189,7 +189,8 @@ def replay(typ, D, last_day, need, log=print, max_back=400):
     Каждый сигнал проверяется на моменте входа (+10 мин) — как в реальном времени."""
     res = []; day = last_day; tried = 0
     t_end = (14, 5) if typ == 'A' else (18, 35)
-    analyze = PR._analyze_A_s1 if typ == 'A' else PR._analyze_C2
+    analyze = PR._analyze_A_s2 if typ == 'A' else PR._analyze_C2   # 28.10.2026: A v2.03 / C v1.11
+    _late = PR.A_LATE_MIN; PR.A_LATE_MIN = 10 ** 6
     while len(res) < need and tried < max_back:
         tried += 1
         if day.weekday() < 5:
@@ -205,7 +206,7 @@ def replay(typ, D, last_day, need, log=print, max_back=400):
                 except Exception as e: log('ERR', s, day, e); continue
                 sig = r.get('signal')
                 if not sig: continue
-                nowc = pd.Timestamp(sig['t_utc']) + pd.Timedelta(minutes=10)
+                nowc = pd.Timestamp(sig['t_utc']) + pd.Timedelta(minutes=10 if typ == 'A' else 15)   # C: M10 с касанием закрывается позже M5 касания
                 dcz = df[(df.index < nowc) & (df.index >= nowc - pd.Timedelta(days=12))]
                 h1z = S1.h1_from_m5(df[(df.index < nowc) & (df.index >= nowc - pd.Timedelta(days=40))])
                 try: rz = analyze(s, dcz, nowc.tz_localize(None).to_pydatetime(), o, {}, h1z)
@@ -222,5 +223,6 @@ def replay(typ, D, last_day, need, log=print, max_back=400):
                 res.append(rec)
                 log('TRADE', typ, s, day, sig['side'], sig['time'], sig['entry'], out, R, xt)
         day -= dt.timedelta(days=1)
+    PR.A_LATE_MIN = _late
     res.sort(key=lambda x: (x['day'], x['tin'], x['sym']))
     return res[-need:] if len(res) > need else res
