@@ -1247,15 +1247,13 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     R = entry - stop_f
     tp_f = entry + C_TPREF * R
     atr_m = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
+    # 28.10.2026: все сработавшие причины скипа собираются вместе (карточка «Все причины» показывает каждую)
+    _sk = []   # (пункт, текст, статус)
     if R < C_COSTK * C_COST.get(sym, 0.0):
-        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} меньше {C_COSTK:g}× спреда+комиссии ({C_COSTK * C_COST.get(sym, 0.0):.{dec}f}) — не окупится'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
-        return _out(res, 'skip', dirc, 'СКИП (стоп меньше спреда+комиссии)')
+        _sk.append((9, f'стоп {R:.{dec}f} меньше {C_COSTK:g}× спреда+комиссии ({C_COSTK * C_COST.get(sym, 0.0):.{dec}f}) — не окупится', 'СКИП (стоп меньше спреда+комиссии)'))
     # 26.10.2026: нижний порог 0,25 ATR(M10) убран (микростоп в день с узким выносом брал TP у владельца); остаётся порог спред+комиссия выше
     if R > C_MAXSTOP * atr_m:
-        res['ckf'] = [9]; t = f'стоп {R:.{dec}f} больше 0,7 ATR(M10) — слишком широкий'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [9])
-        return _out(res, 'skip', dirc, 'СКИП (стоп слишком широкий)')
+        _sk.append((9, f'стоп {R:.{dec}f} больше 0,7 ATR(M10) — слишком широкий', 'СКИП (стоп слишком широкий)'))
     be_f = entry + (1.0 * R if C_TRAIL else 0.5 * (tp_f - entry))
     entry_r, stop_r, tp_r, be_r = sd * entry, sd * stop_f, sd * tp_f, sd * be_f
     _prob_set_C(res, F1, atr1, sd, ext, plus)
@@ -1264,9 +1262,12 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     res['ck'] = sorted(set(res['ck'] + [5]))
     _why(res, 'Откат ≥50% длины выноса достигнут', [5])
     if cf is not None:
-        res['ckf'] = [8]; t = f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} Рига) внутри 4R'
-        res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8]); res['cfv'] = _cfv(cf, sd, entry_r, tp_r, off, dec)
-        return _out(res, 'skip', dirc, 'СКИП (встречный H1 FVG на пути 4R)')
+        _sk.append((8, f'встречный H1 FVG {fmtp(cf["lo"])}–{fmtp(cf["hi"])} (H1 свеча {_cft(cf, off)} Рига) внутри 4R', 'СКИП (встречный H1 FVG на пути 4R)'))
+    if _sk:
+        res['ckf'] = sorted({n for n, _t, _s in _sk}); res['reasons'] = [t_ for _n, t_, _s in _sk]
+        for n_, t_, _s in _sk: _why(res, 'Скип: ' + t_, [n_])
+        if cf is not None: res['cfv'] = _cfv(cf, sd, entry_r, tp_r, off, dec)
+        return _out(res, 'skip', dirc, _sk[0][2])
     t_in = t_fill      # M5-свеча касания (трекинг — со следующей свечи M5)
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
     res['ck'] = sorted(set(res['ck'] + [6, 7, 8, 9, 10] + plus))
