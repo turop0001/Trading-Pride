@@ -1155,6 +1155,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
             if not (rg > 0 and abs(C[q] - O[q]) <= 0.25 * rg): k += 1
         return k
     entry_g = None; mode = 'pb20'
+    _inside_rej = False
     for g in range(g0, n):
         if d['rdate'].iloc[g] != today: continue
         if L[g] < ext:
@@ -1173,7 +1174,9 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
             _so = _s5['Open'].values.astype(float) * sd; _sh = (_s5['High'].values if sd == 1 else -_s5['Low'].values).astype(float)
             _fi = next((j for j in range(len(_sh)) if _sh[j] >= lvl), None)
             _e = max(lvl, float(O[g])) if _fi is None else max(lvl, float(_so[_fi]))
-            if _e > lowB: ok = False
+            if _e > lowB:
+                # 28.10.2026: касание 50% по цене ВНУТРИ бокса — скип (раньше ждали следующий откат; на истории вход после этого редок: ~4% без нового экстремума)
+                ok = False; _inside_rej = True; break
         if ok:
             entry_g = g; break
     # свечи выноса: от g0 до экстремума, доджи (тело ≤25% диапазона) не считаем
@@ -1199,6 +1202,10 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
         res['ckf'] = [7]; t = f'широкий M10 FVG ({wide[0]:.{dec}f} ≥ 2× средней свечи Лондона) перед экстремумом'
         res['reasons'] = [t]; _why(res, 'Скип: ' + t, [7])
         return _out(res, 'skip', dirc, 'СКИП (широкий M10 FVG перед экстремумом)')
+    if _inside_rej and entry_g is None:
+        t = 'откат 50% достигнут, но вход был бы внутри бокса Лондона (вход только вне бокса) — день пропущен'
+        res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
+        return _out(res, 'skip', dirc, 'СКИП (вход внутри бокса)')
     leg = lowB - ext
     if entry_g is None or leg <= 0:
         if nowm >= wb:
