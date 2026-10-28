@@ -1145,7 +1145,8 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     if ctx['rec'] == ('LONG' if sd == 1 else 'SHORT'): plus.append(12)
     ext = L[g0]; ge = g0
     res['ck'] = sorted(set(res['ck'] + [3]))
-    _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} лондонского бокса в {(d.index[g0] + pd.Timedelta(hours=off)).strftime("%H:%M")} → {"лонг" if sd == 1 else "шорт"}', [3])
+    _t0 = (d.index[g0] + pd.Timedelta(hours=off)); _t1 = _t0 + pd.Timedelta(minutes=10)
+    _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} лондонского бокса: закрытие M10 в {_t1.strftime("%H:%M")} (свеча {_t0.strftime("%H:%M")}–{_t1.strftime("%H:%M")}) → {"лонг" if sd == 1 else "шорт"}', [3])
     lim = min(n, idx.get(win.index[-1], n - 1) + 1) if len(win) else n
     def _nsw(a_, b_):
         k = 0
