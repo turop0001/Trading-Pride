@@ -1137,7 +1137,7 @@ renderHist();
     var keys=all.filter(function(k){return S[k].date===DAY;});
     $('repTitle').textContent='Отчёт дня · '+String(DAY||REPDAY).split('-').reverse().join('.')+(DAY&&DAY!==REPDAY?' (последний торговый день; сегодня проверок ещё не было)':'');
     var nS=0;all.forEach(function(k){var q=S[k];if(q.shots){var id=q.date+'_'+(q.sym||k.split('_')[0])+'_'+(q.window||k.split('_')[1]);if(!SHOTS[id]){SHOTS[id]=q.shots;nS++;}}});if(nS)redraw();
-    REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){if(a._e!==b._e)return a._e-b._e;var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;return a._s<b._s?-1:1;});
+    REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;if(a._e!==b._e)return a._e-b._e;return a._s<b._s?-1:1;});
     repSum();if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00).</div>';else if(!repBusy())renderRep();
     var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];
