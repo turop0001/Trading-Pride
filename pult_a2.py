@@ -139,18 +139,15 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         elif nowm >= WIN[1]:
             # 29.10.2026: простая причина. Вынос в карточке — на последнем моменте в коридоре (или на инверсии, если коридора не было)
             parts = []
-            if inv: parts.append(f'инверсия FVG M5 в {hm(inv[0])} была при недостаточном выносе ({fz(inv[1])} ATR, нужно 2,4–3,0)')
-            if cor and inv: parts.append(f'позже вынос вошёл в коридор ({fz(cor[0])} ATR в {hm(cor[1])}), новой инверсии FVG M5 не было')
-            elif cor: parts.append(f'вынос был в коридоре ({fz(cor[0])} ATR в {hm(cor[1])}), инверсии FVG M5 не было')
+            if cor: parts.append(f'вынос был в коридоре ({fz(cor[0])} ATR в {hm(cor[1])}), инверсии FVG M5 не было')
             if parts:
-                out.update(st='skip', why='; '.join(parts), short=('инверсия была при малом выносе' if inv else 'нет инверсии FVG M5 в коридоре'), ckf=[4] if cor else [3], ck=[1, 2, 3] if cor else [1, 2], sw=float(cor[0] if cor else inv[1]))
+                out.update(st='skip', why='; '.join(parts), short='нет инверсии FVG M5 в коридоре', ckf=[4], ck=[1, 2, 3], sw=float(cor[0]))
             elif lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR', ckf=[3])
             else:
                 out.update(st='skip', short='недостаточный вынос', why=f'недостаточный вынос: максимум {fz(maxsw)} ATR (нужно 2,4–3,0)', ckf=[3], sw=float(maxsw))
         else:
             out.update(st='prep', fvg_now=fvg_now)
-            if inv: out.update(inv_t=hm(inv[0]), inv_sw=float(inv[1]))
             if cor and not (lastsw is not None and MINSW <= lastsw < MAXSW): out.update(sw=cor[0])
         return out
     out.update(ck=[1, 2, 3, 4], sig=sig, sw=sw)
