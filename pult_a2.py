@@ -145,7 +145,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
             elif lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR', ckf=[3])
             else:
-                out.update(st='skip', short='недостаточный вынос', why=f'недостаточный вынос: максимум {fz(maxsw)} ATR', ckf=[3], sw=float(maxsw))
+                out.update(st='skip', short=f'вынос мал ({fz(maxsw)} ATR)', why=f'вынос мал: максимум {fz(maxsw)} ATR', ckf=[3], sw=float(maxsw))
         else:
             out.update(st='prep', fvg_now=fvg_now)
             if cor and not (lastsw is not None and MINSW <= lastsw < MAXSW): out.update(sw=cor[0])
