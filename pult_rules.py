@@ -774,7 +774,7 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
         res['ckf'] = list(r.get('ckf') or []); res['reasons'] = [r['why']]
         _why(res, 'Скип: ' + r['why'], res['ckf'])
         res['a_frozen'] = True
-        return _out(res, 'skip', dirc, f'СКИП ({r["why"]})')
+        return _out(res, 'skip', dirc, f'СКИП ({r.get("short") or r["why"]})')
     if r['st'] == 'prep':
         sw_ = r.get('sw'); inb = sw_ is not None and A2.MINSW <= sw_ < A2.MAXSW
         if inb:
