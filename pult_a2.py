@@ -72,7 +72,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
     out = dict(boxH=boxH, boxL=boxL, ck=[1], ckf=[], sd=0)
     wi = np.flatnonzero((rdate == today) & (rm >= WIN[0]) & (rm < WIN[1]))
     sd = 0; start = e = None; ext = 0.0; sig = None; sw = None; at = None; lastsw = None; latched = False
-    cor = None; maxsw = 0.0; fvg_now = False
+    cor = None; maxsw = 0.0; fvg_now = False; had_fvg = False
     for i in wi:
         if sd == 0:
             up = H[i] > boxH; dn = L[i] < boxL
@@ -98,7 +98,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         for c0 in range(e, max(e - LB, start - 2, 2) - 1, -1):
             g0 = (L[c0] - H[c0 - 2]) if sd == -1 else (L[c0 - 2] - H[c0])
             if g0 >= GAP * at and i > c0: tgt = c0; break
-        fvg_now = tgt is not None
+        fvg_now = tgt is not None; had_fvg = had_fvg or fvg_now
         for c in ([tgt] if tgt is not None else []):
             if sd == -1: gap = L[c] - H[c - 2]; lo = H[c - 2]
             else: gap = L[c - 2] - H[c]; lo = L[c - 2]
@@ -139,9 +139,13 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         elif nowm >= WIN[1]:
             # 29.10.2026: простая причина. Вынос в карточке — на последнем моменте в коридоре (или на инверсии, если коридора не было)
             parts = []
-            if cor: parts.append(f'вынос был в коридоре ({fz(cor[0])} ATR в {hm(cor[1])}), инверсии FVG M5 не было')
+            if cor:
+                if had_fvg: why_c, sh_c = 'FVG M5 был, закрытия за ним не было', 'FVG M5 был, закрытия за ним не было'
+                elif inv: why_c, sh_c = 'закрытие за FVG M5 было вне коридора', 'закрытие за FVG было вне коридора'
+                else: why_c, sh_c = 'в коридоре не было FVG M5', 'в коридоре не было FVG M5'
+                parts.append(f'вынос был в коридоре ({fz(cor[0])} ATR в {cor[1] and hm(cor[1])}): {why_c}')
             if parts:
-                out.update(st='skip', why='; '.join(parts), short='нет инверсии FVG M5 в коридоре', ckf=[4], ck=[1, 2, 3], sw=float(cor[0]))
+                out.update(st='skip', why='; '.join(parts), short=sh_c, ckf=[4], ck=[1, 2, 3], sw=float(cor[0]))
             elif lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR', ckf=[3])
             else:
