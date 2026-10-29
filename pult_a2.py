@@ -131,7 +131,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
             except Exception:
                 inv = None
             if inv:
-                out.update(st='skip', why=f'инверсия M5 FVG была в {(d.index[inv[0]] + pd.Timedelta(hours=off)).strftime("%H:%M")}, но вынос к сигналу {inv[1]:.2f} ATR — нужно {MINSW:g}–{MAXSW:g}', ckf=[3], ck=[1, 2])
+                out.update(st='skip', why=f'инверсия M5 FVG была в {(d.index[inv[0]] + pd.Timedelta(hours=off)).strftime("%H:%M")}, но вынос к сигналу {inv[1]:.2f} ATR — нужно {MINSW:g}–{MAXSW:g}', ckf=[3], ck=[1, 2], sw=float(inv[1]))   # в карточке — вынос на момент инверсии, а не по сжавшемуся к 13:00 ATR
             elif lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR', ckf=[3])
             elif lastsw is not None and lastsw < MINSW:
