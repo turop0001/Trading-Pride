@@ -1078,5 +1078,16 @@
       "m5": "state/shots/2026-10-28_USDJPY_A_m5.png",
       "h1": "state/shots/2026-10-28_USDJPY_A_h1.png"
     }
+  },
+  {
+    "id": "2026-10-29_GER40_C",
+    "date": "2026-10-29",
+    "symbol": "GER40",
+    "type": "C",
+    "side": "short",
+    "entry": 26068.5,
+    "stop": 26078.4,
+    "target": 26028.9,
+    "result": "сигнал Пульта в 15:40"
   }
 ]
