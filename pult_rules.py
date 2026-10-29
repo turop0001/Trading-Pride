@@ -776,7 +776,9 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
         res['a_frozen'] = True
         return _out(res, 'skip', dirc, f'СКИП ({r["why"]})')
     if r['st'] == 'prep':
-        if r.get('sw') is not None and r['sw'] >= A2.MAXSW:
+        if r.get('inv_t'):
+            _why(res, f'Инверсия M5 FVG была в {r["inv_t"]}, но вынос к сигналу {r["inv_sw"]:.2f} ATR — вне {A2.MINSW:g}–{A2.MAXSW:g}; ждём новую инверсию, когда вынос будет в коридоре', [3])
+        elif r.get('sw') is not None and r['sw'] >= A2.MAXSW:
             _why(res, f'Вынос {r["sw"]:.2f} ATR — больше {A2.MAXSW:g}: вход возможен только если вынос к сигналу окажется в окне {A2.MINSW:g}–{A2.MAXSW:g} ATR')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}, ждём инверсию M5 FVG)')
     if r['st'] == 'wait_entry':
