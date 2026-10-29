@@ -776,11 +776,16 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
         res['a_frozen'] = True
         return _out(res, 'skip', dirc, f'СКИП ({r["why"]})')
     if r['st'] == 'prep':
+        sw_ = r.get('sw'); inb = sw_ is not None and A2.MINSW <= sw_ < A2.MAXSW
+        if inb:
+            sub = 'ждём закрытие M5 за FVG' if r.get('fvg_now') else 'ждём FVG M5'
+        elif sw_ is not None and sw_ >= A2.MAXSW:
+            sub = f'вынос {sw_:.2f} ATR больше {A2.MAXSW:g}'.replace('.', ',', 1) if False else f'вынос больше {A2.MAXSW:g} ATR'
+        else:
+            sub = 'недостаточный вынос — ждём коридор'
         if r.get('inv_t'):
-            _why(res, f'Инверсия M5 FVG была в {r["inv_t"]}, но вынос к сигналу {r["inv_sw"]:.2f} ATR — вне {A2.MINSW:g}–{A2.MAXSW:g}; ждём новую инверсию, когда вынос будет в коридоре', [3])
-        elif r.get('sw') is not None and r['sw'] >= A2.MAXSW:
-            _why(res, f'Вынос {r["sw"]:.2f} ATR — больше {A2.MAXSW:g}: вход возможен только если вынос к сигналу окажется в окне {A2.MINSW:g}–{A2.MAXSW:g} ATR')
-        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}, ждём инверсию M5 FVG)')
+            _why(res, f'Инверсия FVG M5 в {r["inv_t"]} была при недостаточном выносе ({r["inv_sw"]:.2f} ATR); ждём новую, когда вынос будет {A2.MINSW:g}–{A2.MAXSW:g} ATR', [3])
+        return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}): {sub}')
     if r['st'] == 'wait_entry':
         return _out(res, 'prep', dirc, 'ВЫНОС (инверсия FVG есть, ждём свечу входа)')
     # entry

@@ -72,6 +72,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
     out = dict(boxH=boxH, boxL=boxL, ck=[1], ckf=[], sd=0)
     wi = np.flatnonzero((rdate == today) & (rm >= WIN[0]) & (rm < WIN[1]))
     sd = 0; start = e = None; ext = 0.0; sig = None; sw = None; at = None; lastsw = None; latched = False
+    cor = None; maxsw = 0.0; fvg_now = False
     for i in wi:
         if sd == 0:
             up = H[i] > boxH; dn = L[i] < boxL
@@ -88,6 +89,8 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         lastsw = sw
         # 28.10.2026: скип окончательный — как только вынос в ATR ушёл за MAXSW (до 13:00), день пропущен, поздний возврат в коридор входа не даёт
         if sw >= MAXSW and rm[i] + 5 < WIN[1]: latched = True; break
+        maxsw = max(maxsw, sw); fvg_now = False
+        if MINSW <= sw < MAXSW and rm[i] + 5 < WIN[1]: cor = (float(sw), int(i))   # последний момент в коридоре — на нём фиксируем вынос
         if sw < MINSW or sw >= MAXSW or rm[i] + 5 >= WIN[1]: continue
         found = False
         # 28.10.2026: берём ближайший к экстремуму FVG (самая поздняя свеча c из последних LB свечей выноса с зазором ≥ GAP ATR), а не самый ранний
@@ -95,6 +98,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         for c0 in range(e, max(e - LB, start - 2, 2) - 1, -1):
             g0 = (L[c0] - H[c0 - 2]) if sd == -1 else (L[c0 - 2] - H[c0])
             if g0 >= GAP * at and i > c0: tgt = c0; break
+        fvg_now = tgt is not None
         for c in ([tgt] if tgt is not None else []):
             if sd == -1: gap = L[c] - H[c - 2]; lo = H[c - 2]
             else: gap = L[c - 2] - H[c]; lo = L[c - 2]
@@ -126,22 +130,28 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
             if inv: break
     except Exception:
         inv = None
+    hm = lambda k: (d.index[k] + pd.Timedelta(hours=off)).strftime('%H:%M')
+    fz = lambda x: f'{x:.2f}'.replace('.', ',')
+    if cor: out.update(cor_sw=cor[0], cor_t=hm(cor[1]))
     if sig is None:
         if latched:
-            out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR, день пропущен окончательно', ckf=[3])
+            out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR — день пропущен окончательно', ckf=[3])
         elif nowm >= WIN[1]:
-            if inv:
-                out.update(st='skip', why=f'инверсия M5 FVG была в {(d.index[inv[0]] + pd.Timedelta(hours=off)).strftime("%H:%M")}, но вынос к сигналу {inv[1]:.2f} ATR — нужно {MINSW:g}–{MAXSW:g}', ckf=[3], ck=[1, 2], sw=float(inv[1]))   # в карточке — вынос на момент инверсии, а не по сжавшемуся к 13:00 ATR
+            # 29.10.2026: простая причина. Вынос в карточке — на последнем моменте в коридоре (или на инверсии, если коридора не было)
+            parts = []
+            if inv: parts.append(f'инверсия FVG M5 в {hm(inv[0])} была при недостаточном выносе ({fz(inv[1])} ATR, нужно 2,4–3,0)')
+            if cor and inv: parts.append(f'позже вынос вошёл в коридор ({fz(cor[0])} ATR в {hm(cor[1])}), новой инверсии FVG M5 не было')
+            elif cor: parts.append(f'вынос был в коридоре ({fz(cor[0])} ATR в {hm(cor[1])}), инверсии FVG M5 не было')
+            if parts:
+                out.update(st='skip', why='; '.join(parts), ckf=[4] if cor else [3], ck=[1, 2, 3] if cor else [1, 2], sw=float(cor[0] if cor else inv[1]))
             elif lastsw is not None and lastsw >= MAXSW:
-                out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR', ckf=[3])
-            elif lastsw is not None and lastsw < MINSW:
-                out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — меньше {MINSW:g} ATR', ckf=[3])
+                out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR', ckf=[3])
             else:
-                out.update(st='skip', why='инверсии M5 FVG выноса не было до 13:00', ckf=[4], ck=[1, 2, 3])
+                out.update(st='skip', why=f'недостаточный вынос: максимум {fz(maxsw)} ATR (нужно 2,4–3,0)', ckf=[3], sw=float(maxsw))
         else:
-            out.update(st='prep')
-            if inv:
-                out.update(inv_t=(d.index[inv[0]] + pd.Timedelta(hours=off)).strftime('%H:%M'), inv_sw=float(inv[1]), sw=float(inv[1]))
+            out.update(st='prep', fvg_now=fvg_now)
+            if inv: out.update(inv_t=hm(inv[0]), inv_sw=float(inv[1]))
+            if cor and not (lastsw is not None and MINSW <= lastsw < MAXSW): out.update(sw=cor[0])
         return out
     out.update(ck=[1, 2, 3, 4], sig=sig, sw=sw)
     if sig + 1 < n: entry = float(O[sig + 1]); t_in = d.index[sig + 1]
