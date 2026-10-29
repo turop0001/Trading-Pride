@@ -676,6 +676,28 @@ def _prob_set(res, plus, worse, typ='A'):
     else: res['prob'] = 'высокая' if len(plus) >= 2 else 'средняя' if len(plus) == 1 else 'низкая'
 
 
+def _m5_gaps(d, off, today, nowm, start_min=180, end_min=780, jump=15):
+    """29.10.2026: пропуски M5-свечей инструмента за сегодня в [start_min, min(сейчас, end_min)) по ригийскому времени.
+    Пропуск = между соседними закрытыми барами больше jump минут, либо нет баров с начала Азии, либо нет свежих баров до «сейчас».
+    Возвращает [(от_мин, до_мин), ...]; пусто — данные сплошные."""
+    stop = min(nowm, end_min)
+    loc = d.index + pd.Timedelta(hours=off)
+    ms = [x.hour * 60 + x.minute for x, y in zip(loc, loc) if x.date() == today and start_min <= x.hour * 60 + x.minute < stop]
+    if not ms:
+        return [(start_min, stop)] if stop - start_min > jump else []
+    out = []
+    if ms[0] - start_min > jump - 5: out.append((start_min, ms[0]))
+    for a, b in zip(ms, ms[1:]):
+        if b - a > jump: out.append((a + 5, b))
+    if stop - (ms[-1] + 5) > jump: out.append((ms[-1] + 5, stop))
+    return out
+
+
+def _gaps_txt(gaps):
+    h = lambda x: '%02d:%02d' % divmod(int(x), 60)
+    return ', '.join(f'{h(a)}–{h(b)}' for a, b in gaps[:3])
+
+
 A_LATE_MIN = 15   # сигнал A старше N минут к моменту проверки — вход упущен (как в советнике: вход не позже 90 с после открытия свечи); replay аналитики ставит большое значение
 
 
@@ -712,6 +734,20 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
         dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
         res['why'] = list(sg.get('why') or [])
         return _close_why(_track(res, d, sg, sd, dirc, fmtp, live=dall))
+    # 29.10.2026 (решение владельца): если у инструмента были пропуски M5-свечей (MT5 не был подключён / фид не доехал) — ничего не считаем:
+    # ни скипа, ни выноса, ни сигнала; пишем только «график не был доступен» и промежуток. Статус вернётся сам, когда свечи долетят.
+    # Только для живого режима (повтор аналитики по истории не трогаем).
+    try:
+        live_mode = (dt.datetime.utcnow() - now_utc.replace(tzinfo=None)).total_seconds() < 3 * 3600
+    except Exception:
+        live_mode = False
+    if live_mode and 600 <= nowm < 1320:
+        gaps = _m5_gaps(d, off, today, nowm)
+        if gaps:
+            txt = _gaps_txt(gaps)
+            res['gaps'] = [[a, b] for a, b in gaps]
+            _why(res, f'График не был доступен {txt} — вынос, скип и сигнал не считаем, пока свечи не восстановятся')
+            return _out(res, 'watch', '—', f'НАБЛЮДАЕМ — график не был доступен {txt}')
     live_open = None
     if len(dall) > len(d):
         fo = dall[dall.index > d.index[-1]]
