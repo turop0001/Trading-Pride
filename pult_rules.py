@@ -734,6 +734,10 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
         dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
         res['why'] = list(sg.get('why') or [])
         return _close_why(_track(res, d, sg, sd, dirc, fmtp, live=dall))
+    # 29.10.2026 (идея владельца): после скипа (или закрытия окна 13:00) карточка A замораживается — вынос/ATR/причины больше не пересчитываются
+    # (GBPUSD 29.10: к концу окна ATR сжался, вынос «вырос» до 2,68 ATR, хотя в момент инверсии был 1,71)
+    if prev.get('a_frozen') and prev.get('window') == 'A' and prev.get('date', str(today)) == str(today):
+        return dict(prev)
     # 29.10.2026 (решение владельца): если у инструмента были пропуски M5-свечей (MT5 не был подключён / фид не доехал) — ничего не считаем:
     # ни скипа, ни выноса, ни сигнала; пишем только «график не был доступен» и промежуток. Статус вернётся сам, когда свечи долетят.
     # Только для живого режима (повтор аналитики по истории не трогаем).
@@ -769,6 +773,7 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
     if r['st'] == 'skip':
         res['ckf'] = list(r.get('ckf') or []); res['reasons'] = [r['why']]
         _why(res, 'Скип: ' + r['why'], res['ckf'])
+        res['a_frozen'] = True
         return _out(res, 'skip', dirc, f'СКИП ({r["why"]})')
     if r['st'] == 'prep':
         if r.get('sw') is not None and r['sw'] >= A2.MAXSW:
@@ -784,7 +789,7 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
         late = False
     if late:
         t = f'сигнал был в {(t_in + pd.Timedelta(hours=off)).strftime("%H:%M")} — вход упущен'
-        res['ckf'] = [8]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8])
+        res['ckf'] = [8]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [8]); res['a_frozen'] = True
         return _out(res, 'skip', dirc, f'СКИП ({t})')
     entry, stop, R = r['entry'], r['stop'], r['R']
     end_utc = pd.Timestamp(dt.datetime.combine(today, dt.time(22, 0)) - dt.timedelta(hours=off), tz='UTC')
