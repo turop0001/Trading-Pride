@@ -140,10 +140,10 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
             # 29.10.2026: простая причина. Вынос в карточке — на последнем моменте в коридоре (или на инверсии, если коридора не было)
             parts = []
             if cor:
-                if had_fvg: why_c, sh_c = 'FVG M5 был, закрытия за ним не было', 'FVG M5 был, закрытия за ним не было'
-                elif inv: why_c, sh_c = 'закрытие за FVG M5 было вне коридора', 'закрытие за FVG было вне коридора'
-                else: why_c, sh_c = 'в коридоре не было FVG M5', 'в коридоре не было FVG M5'
-                parts.append(f'вынос был в коридоре ({fz(cor[0])} ATR в {cor[1] and hm(cor[1])}): {why_c}')
+                if inv: why_c, sh_c = 'FVG M5 был, но коридор ATR сместился', 'FVG M5 был, но коридор ATR сместился'
+                elif had_fvg: why_c, sh_c = 'FVG M5 был, закрытия за ним не было', 'FVG M5 был, закрытия за ним не было'
+                else: why_c, sh_c = 'нет FVG M5 у экстремума', 'нет FVG M5 у экстремума'
+                parts.append(f'{why_c} (вынос {fz(cor[0])} ATR)')
             if parts:
                 out.update(st='skip', why='; '.join(parts), short=sh_c, ckf=[4], ck=[1, 2, 3], sw=float(cor[0]))
             elif lastsw is not None and lastsw >= MAXSW:
