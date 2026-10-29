@@ -766,7 +766,7 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
     dirc = '—' if not sd else ('▲ LONG' if sd == 1 else '🔻 SHORT')
     if sd:
         res['extreme'] = round(r['ext'], dec)
-        _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}, к сигналу {r["sw"]:.2f} ATR (нужно {A2.MINSW:g}–{A2.MAXSW:g})', [2, 3])
+        _why(res, f'Вынос {"лоя" if sd == 1 else "хая"} Азии в {r["sweep_time"]}, к сигналу {r["sw"]:.2f} ATR', [2, 3])
     if r['st'] == 'watch':
         _why(res, 'Ждём вынос границы Азии (10:00–13:00)')
         return _out(res, 'watch', '—', 'НАБЛЮДАЕМ' if nowm >= 600 else 'НАБЛЮДАЕМ (ждём 10:00)')

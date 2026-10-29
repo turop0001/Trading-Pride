@@ -135,7 +135,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
     if cor: out.update(cor_sw=cor[0], cor_t=hm(cor[1]))
     if sig is None:
         if latched:
-            out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR — день пропущен окончательно', ckf=[3])
+            out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR', ckf=[3])
         elif nowm >= WIN[1]:
             # 29.10.2026: простая причина. Вынос в карточке — на последнем моменте в коридоре (или на инверсии, если коридора не было)
             parts = []
@@ -145,7 +145,7 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
             elif lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос больше {MAXSW:g} ATR', ckf=[3])
             else:
-                out.update(st='skip', short='недостаточный вынос', why=f'недостаточный вынос: максимум {fz(maxsw)} ATR (нужно 2,4–3,0)', ckf=[3], sw=float(maxsw))
+                out.update(st='skip', short='недостаточный вынос', why=f'недостаточный вынос: максимум {fz(maxsw)} ATR', ckf=[3], sw=float(maxsw))
         else:
             out.update(st='prep', fvg_now=fvg_now)
             if cor and not (lastsw is not None and MINSW <= lastsw < MAXSW): out.update(sw=cor[0])
