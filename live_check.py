@@ -50,7 +50,8 @@ TICKERS = {
 # Тип C с 18.10.2026 — 8 инструментов (XAUUSD, EURUSD, GBPUSD, US500, UK100, GER40, AUDUSD, EURGBP); раньше только 3 — раньше main() проверял ВСЕ TICKERS в обоих окнах.
 WINDOW_SYMBOLS = {
     # 28.10.2026: правила A v2.03 / C v1.11 как в советнике PultTraderAC_v1_06: A — 9 инструментов, C — 4 инструмента
-    'A': ['EURUSD', 'GBPUSD', 'US500', 'GER40', 'AUDUSD', 'UK100', 'NAS100', 'US30', 'USDJPY'],
+    # 29.10.2026 (советник v1_13): в A отключены GBPUSD и US500 (MT5 v1_09: A без них +152R/DD 4,6% вместо +151R/6,0%)
+    'A': ['EURUSD', 'GER40', 'AUDUSD', 'UK100', 'NAS100', 'US30', 'USDJPY'],
     'C': ['GBPUSD', 'US500', 'UK100', 'GER40'],
 }
 

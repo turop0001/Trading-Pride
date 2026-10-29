@@ -112,7 +112,27 @@ def scan(d, today, off, nowm, fvgs, live_open=None):
         if latched:
             out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR, день пропущен окончательно', ckf=[3])
         elif nowm >= WIN[1]:
-            if lastsw is not None and lastsw >= MAXSW:
+            # 29.10.2026: причина скипа точнее — была ли инверсия ближайшего M5 FVG, но вынос к её моменту был вне 2,4–3,0 ATR (GBPUSD 29.10: инверсия 11:35 при выносе 1,7 ATR)
+            inv = None
+            try:
+                for i in wi:
+                    if i < start or not (atr[i] == atr[i] and atr[i] > 0) or rm[i] + 5 >= WIN[1]: continue
+                    x = np.nan_to_num(H[start:i + 1].max() if sd == -1 else L[start:i + 1].min())
+                    ei = start + int(np.argmax(H[start:i + 1]) if sd == -1 else np.argmin(L[start:i + 1]))
+                    sw_i = ((x - boxH) if sd == -1 else (boxL - x)) / atr[i]
+                    for c0 in range(ei, max(ei - LB, start - 2, 2) - 1, -1):
+                        g0 = (L[c0] - H[c0 - 2]) if sd == -1 else (L[c0 - 2] - H[c0])
+                        if g0 >= GAP * atr[i] and i > c0:
+                            lo = H[c0 - 2] if sd == -1 else L[c0 - 2]
+                            ok = (C[i] < lo and not (c0 + 1 < i and C[c0 + 1:i].min() < lo)) if sd == -1 else (C[i] > lo and not (c0 + 1 < i and C[c0 + 1:i].max() > lo))
+                            if ok and not (MINSW <= sw_i < MAXSW): inv = (i, sw_i)
+                            break
+                    if inv: break
+            except Exception:
+                inv = None
+            if inv:
+                out.update(st='skip', why=f'инверсия M5 FVG была в {(d.index[inv[0]] + pd.Timedelta(hours=off)).strftime("%H:%M")}, но вынос к сигналу {inv[1]:.2f} ATR — нужно {MINSW:g}–{MAXSW:g}', ckf=[3], ck=[1, 2])
+            elif lastsw is not None and lastsw >= MAXSW:
                 out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — больше {MAXSW:g} ATR', ckf=[3])
             elif lastsw is not None and lastsw < MINSW:
                 out.update(st='skip', why=f'вынос {lastsw:.2f} ATR — меньше {MINSW:g} ATR', ckf=[3])
