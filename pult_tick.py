@@ -16,7 +16,7 @@ import sys, os, json, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import live_check as lc
 from notify import (send_telegram, fmt_line, build_window_open, build_window_closed,
-                    build_update, build_signal, build_daily_summary, build_weekly)
+                    build_update, build_signal, build_daily_summary, build_weekly, build_order, build_order_cancel)
 
 EVENTS = [(600, 'openA'), (780, 'closeA'), (990, 'openC'), (1110, 'closeC'), (1140, 'summary'), (1320, 'final')]
 ALL_A = ['XAUUSD', 'EURUSD', 'GBPUSD', 'US500', 'NAS100', 'US30', 'GER40', 'AUDUSD', 'USDJPY', 'UK100', 'EURGBP']
@@ -165,6 +165,10 @@ def _tg(r, closed=False):
     note = re.sub(r'\s*\(.*\)\s*$', '', str(note or '')).strip()
     if closed and ls in ('watch', 'prep') and not r.get('signal'):
         return 'skip', 'СКИП'
+    pd_ = r.get('pend') or {}
+    if ls == 'prep' and pd_.get('entry') is not None and note.startswith('ВЫНОС'):
+        # 30.10.2026: пока лимитка не сработала — в чате «выставить», а не «вход»
+        note = f"ВЫНОС — выставляем {'BUY' if pd_.get('side') == 'long' else 'SELL'} LIMIT ордер {pd_['entry']}"
     sg = r.get('signal') or {}
     if sg.get('time'):
         if note.startswith('ЗАКРЫТА'):
@@ -636,7 +640,7 @@ def main(send=True):
 
     def check_and_update(win, first):
         res = analyze_window(state, win, today)
-        changed, unchanged, syms, sigs = [], [], [], []
+        changed, unchanged, syms, sigs, orders = [], [], [], [], []
         for s, r in res.items():
             p = state.get(f'{s}_{win}', {})
             if p.get('date') != today: p = {}
@@ -656,6 +660,13 @@ def main(send=True):
                     pushw(win, f"{s} · тип {win} — {tgnote}", str(r.get('direction') or ''), tag=f'{s}_{win}')
             else:
                 unchanged.append(line)
+            if win == 'C':
+                # 30.10.2026: ордер Типа C — отдельным сообщением ДО входа (выставить / обновить / снять)
+                _pn, _po = r.get('pend') or {}, p.get('pend') or {}
+                if _pn.get('entry') is not None and (_pn.get('entry'), _pn.get('stop')) != (_po.get('entry'), _po.get('stop')):
+                    orders.append(('set', r, _pn, bool(_po.get('entry') is not None)))
+                elif _po.get('entry') is not None and _pn.get('entry') is None and ls != 'entry' and not str(tgnote).startswith(('ВХОД', 'В СДЕЛКЕ', 'ЗАКРЫТА')):
+                    orders.append(('cancel', r, _po, str(tgnote)))
             if r.pop('new_signal', False): sigs.append(r)
             # 08.10.2026: цена дошла до уровня БУ (по формирующейся свече MT5) — один раз шлём «переноси стоп»
             if (r.get('signal') or {}).get('trail'):
@@ -684,6 +695,16 @@ def main(send=True):
             text = ('изменилось: ' + ', '.join(syms)) if syms else 'без изменений'
             if changed:
                 tgw(win, build_update(dstr, win, t, changed, unchanged)); did.append('update')
+        for kind_, r_, pe_, x_ in orders:
+            try:
+                _k2 = lc.c_k(riga.date()); _until = '%02d:%02d' % divmod(1110 + _k2, 60)
+                if kind_ == 'set':
+                    tgw(win, build_order(dstr, win, t, r_['sym'], r_['direction'], pe_.get('side'), pe_['entry'], pe_['stop'], until=_until, update=x_))
+                else:
+                    tgw(win, build_order_cancel(dstr, win, t, r_['sym'], r_['direction'], pe_.get('side'), pe_['entry'], x_))
+                did.append('order_' + kind_)
+            except Exception as e:
+                print('order msg failed:', e)
         for r in sigs:
             sg = r['signal']
             try:

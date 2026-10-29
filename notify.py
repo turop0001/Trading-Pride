@@ -124,7 +124,7 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
         rule = f"Лесенка {ls:g}/{lg:g}: {first}, дальше каждые +{ls:g}R стоп подтягивается (пришлю уведомление)"
         return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
                 f"{E_ENTRY} {symbol} ({direction}):\n\n"
-                f"Вход {entry} · {time_str}\n"
+                f"{'Вход по лимитке' if window_label == 'C' else 'Вход'} {entry} · {time_str}\n"
                 f"Стоп: {stop}\n"
                 f"{E_TARGET} Без тейка. {rule}: первый шаг {be_at}. Выход в 22:00.\n"
                 f"{E_NEWS} {risk}")
@@ -134,6 +134,31 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
             f"Стоп: {stop}\n"
             f"{E_TARGET} Цель {float(rr):g}R: {target_2r}\n"
             f"{E_NEWS} {risk}")
+
+
+def build_order(date, window_label, time_str, symbol, direction, side, entry, stop, lstep=1, llag=1, until='18:30', update=False):
+    """30.10.2026 (решение владельца): для Типа C ДО входа — «Выставляем SELL/BUY LIMIT ордер» + цифры; «ВХОД» только когда лимитка сработала."""
+    kind = 'BUY' if side == 'long' else 'SELL'
+    ls, lg = float(lstep), float(llag)
+    first = f"на +{ls:g}R стоп в БУ" if abs(ls - lg) < 1e-9 else f"на +{ls:g}R стоп на +{ls - lg:g}R"
+    verb = 'Обновляем' if update else 'Выставляем'
+    return (f"{E_BELL} ОРДЕР · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
+            f"{E_PREP} {symbol} ({direction}) — {verb} {kind} LIMIT ордер\n\n"
+            f"Цена: {entry}\n"
+            f"Стоп: {stop}\n"
+            f"{E_TARGET} Без тейка. Лесенка {ls:g}/{lg:g}: {first}. Выход в 22:00.\n"
+            f"Ордер действует до {until}.\n"
+            f"{E_NEWS} Риск: 1R")
+
+
+def build_order_cancel(date, window_label, time_str, symbol, direction, side, entry, reason):
+    """30.10.2026: отмена ордера — без красного кружка (красный только для SL)."""
+    kind = 'BUY' if side == 'long' else 'SELL'
+    why = str(reason or '').strip()
+    why = 'правила больше не проходят' if why in ('', 'СКИП') else why
+    return (f"{E_BELL} ОРДЕР · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
+            f"{E_SKIP} {symbol} ({direction}) — Отменяем {kind} LIMIT ордер {entry}\n\n"
+            f"Причина: {why}")
 
 
 def build_tp_hit(symbol, direction, target_price, time_str, pct):
