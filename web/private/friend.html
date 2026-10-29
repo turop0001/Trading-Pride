@@ -193,7 +193,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 <div class="wrap">
   <div class="hdr">
     <div class="brand">Сигналы <span>дня</span></div>
-    <div class="clock"><small>Рига</small><b id="clk">--:--:--</b></div>
+    <div class="clock"><small id="tzl">UTC+3</small><b id="clk">--:--:--</b></div>
     <div class="winbox"><span class="clock"><small>Окно</small></span><span class="wt" id="win">--</span><span class="tbadge" id="wbadge"></span></div>
     <span class="pill off" id="pill">…</span>
   </div>
@@ -213,6 +213,8 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 "use strict";
 function $(id){return document.getElementById(id);}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+function TZL(){try{var p=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Riga',timeZoneName:'longOffset'}).formatToParts(new Date()).filter(function(x){return x.type==='timeZoneName';})[0].value;var m=/GMT([+-])(\d+)/.exec(p);return m?'UTC'+m[1]+parseInt(m[2],10):'UTC+3';}catch(e){return 'UTC+3';}}
+(function(){var e=document.getElementById('tzl');if(e)e.textContent=TZL();})();
 var ASIA='03:00–10:00',LON='11:00–16:25',WA='10:00–13:00',WC='16:30–18:30';
 function setWin(t,type,cls,pill){$('win').textContent=t;var b=$('wbadge');b.textContent=type?'Тип '+type:'';b.className='tbadge '+(type||'');b.style.display=type?'':'none';var p=$('pill');p.className='pill '+cls;p.textContent=pill;}
 
@@ -243,7 +245,7 @@ function rigaMinutesNow(){
 }
 function winRank(w){var cFirst=rigaMinutesNow()>=780;if(cFirst)return w==='C'?0:1;return w==='A'?0:1;}
 var CK={
- A:{title:'Тип A',when:WA+' Рига',items:[
+ A:{title:'Тип A',when:WA+' '+TZL(),items:[
   ['base','Азия 03:00–10:00 сформирована; инструмент из списка (EURUSD, GBPUSD, US500, GER40, AUDUSD, UK100, NAS100, US30, USDJPY)','с 28.10.2026 Тип A v2.03 — те же правила, что в советнике PultTraderAC_v1_09; 9 инструментов, XAUUSD и EURGBP из A убраны.'],
   ['base','Вынос границы Азии в окне 10:00–13:00 (тенью или телом) только с одной стороны','лонг — лой свечи ниже лоя Азии, шорт — хай выше хая; если обе стороны сняты одной свечой — скип дня. Экстремум выноса растёт, пока цена обновляет его.'],
   ['base','Вынос к моменту сигнала от 2,4 до 3,0 ATR(M5, 14)','меньше 2,4 или не меньше 3,0 — сигнала нет; если до 13:00 вынос не попал в окно — скип дня (было 1,93–2,5 ATR).'],
@@ -253,7 +255,7 @@ var CK={
   ['skip','FAa: нет инвертированного H1 FVG по направлению сделки (≥0,5 ATR(H1)) с инверсией внутри 00:00–10:00 сегодня','есть — скип дня по инструменту.'],
   ['skip','Вход случился до 13:00 и это первый вход по инструменту за день','после SL/БУ/TP повторного входа нет.']],
   mng:'<b>После входа:</b> без тейка, лесенка 2/2: на +2R стоп переносим на вход (БУ), на +4R — на +2R, на +6R — на +4R и так далее; остаток закрываем по рынку в 22:00. Риск 0,5% на сделку (при просадке баланса ≥5% от пика новые сделки идут с риском ×0,6). Последние сделки по новым правилам — вкладка «Аналитика сделок». Старая логика (1,93–2,5 ATR, цель 2R, усилители) — в архиве аналитики.'},
- C:{title:'Тип C',when:WC+' Рига',items:[
+ C:{title:'Тип C',when:WC+' '+TZL(),items:[
   ['base','Инструмент из списка (GBPUSD, US500, GER40, UK100)','с 28.10.2026 Тип C v1.11 как в советнике: 4 инструмента (XAUUSD, EURUSD, AUDUSD, EURGBP отключены); сигналы по свечам M10.'],
   ['base','Бокс Лондона 11:00–16:25 сформирован','границы бокса — хай и лой 11:00–16:25.'],
   ['base','Вынос границы бокса в окне 16:30–18:30 (только закрытием M10-свечи телом за границей бокса; тень не считается, с 26.10.2026): вниз → лонг, вверх → шорт','вчерашний Лондон не важен; вынос одной тенью без закрытия за границей — не вынос.'],
@@ -408,7 +410,7 @@ function renderRep(){
   }
   function renderNews(N){var el=$('repNews');if(!el)return;if(!N||N.err&&!(N.items||[]).length){el.style.display='none';return;}
     var it=N.items||[];el.style.display='flex';
-    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня (Рига)</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
+    el.innerHTML='<span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Красные новости сегодня ('+TZL()+')</span>'+(it.length?it.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.82rem"><span style="width:9px;height:9px;border-radius:50%;background:#d93025;display:inline-block"></span><b>'+x.t+'</b> '+x.cur+' · '+String(x.title).replace(/</g,'&lt;')+'</span>';}).join(''):'<span style="font-size:.85rem;color:var(--muted)">нет (USD / EUR / GBP)</span>');}
   function applyState(S){
     if(!S||S.error){$('repNote').textContent='Ошибка загрузки данных: '+((S&&S.error)||'нет ответа');return;}
     try{renderNews(S._news);}catch(e){console.log('news',e);}

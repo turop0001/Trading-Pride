@@ -7,6 +7,21 @@ python3 -c "from sys import path; path.insert(0,'/home/claude/ts/full'); from no
 Формат сообщений — по образцу, который пользователь прислал 26.09.2026 (структура + эмодзи).
 """
 import json, os, urllib.request, urllib.parse
+import datetime as _dt
+try:
+    from zoneinfo import ZoneInfo as _ZI
+except Exception:
+    _ZI = None
+
+
+def _tz():
+    """29.10.2026 (решение владельца): в сообщениях вместо «Рига» — пояс UTC+2 (зима) / UTC+3 (лето)."""
+    try:
+        h = int(_dt.datetime.now(_ZI('Europe/Riga')).utcoffset().total_seconds() // 3600)
+    except Exception:
+        h = 3
+    return f'UTC+{h}'
+
 
 # ПЕРЕНОС НА GITHUB ACTIONS (29.09.2026): токен и chat_id теперь берутся из переменных
 # окружения (GitHub Secrets: TG_BOT_TOKEN, TG_CHAT_ID, необязательно TG_THREAD_ID) —
@@ -62,7 +77,7 @@ def fmt_line(status, symbol, direction, note):
 # промпт report-задачи. "Итог дня" появляется только в build_daily_summary (после закрытия
 # ОБОИХ окон, вечером). Новости даём отдельной строкой только если сам пользователь просит.
 def build_window_open(date, window_label, window_range, lines, next_label=None, next_time=None):
-    head = f"{E_BELL} Отчёт· {date} · Окно {window_label} ({window_range} Рига) открыто {E_OPEN}\n\n"
+    head = f"{E_BELL} Отчёт· {date} · Окно {window_label} ({window_range} {_tz()}) открыто {E_OPEN}\n\n"
     body = "\n".join(lines)
     tail = ""
     if next_label and next_time:
@@ -73,7 +88,7 @@ def build_window_open(date, window_label, window_range, lines, next_label=None, 
 def build_window_closed(date, window_label, window_range, lines, next_label=None, next_time=None,
                          trades=0, pct=0.0, end_time=None):
     """Отчёт закрытия окна без сделок (или с ними — lines уже готовые строки по инструментам)."""
-    head = f"{E_BELL} Отчёт · {date} · Окно {window_label} ({window_range} Рига) закрыто {E_CLOSED}\n\n"
+    head = f"{E_BELL} Отчёт · {date} · Окно {window_label} ({window_range} {_tz()}) закрыто {E_CLOSED}\n\n"
     sign = '+' if pct > 0 else ('-' if pct < 0 else '')
     head += f"{E_CHART} Итог окна {window_label}: {trades} сделок, {sign}{abs(pct):.1f}% депозита\n\n"
     if end_time:
@@ -93,7 +108,7 @@ def build_update(date, window_label, time_str, changed_lines, unchanged_lines=No
     (это и есть сама суть "Обновления"). unchanged_lines — остальные, группой "Без изменений:"
     (испр. 28.09.2026: раньше заголовок группы был "Наблюдаем", хотя туда попадали и скип-строки —
     неточно; по образцу пользователя правильный заголовок именно "Без изменений:")."""
-    head = f"{E_CHART} Обновление · окно {window_label} · {date} ({time_str} Рига)\n\n"
+    head = f"{E_CHART} Обновление · окно {window_label} · {date} ({time_str} {_tz()})\n\n"
     body = "\n".join(changed_lines)
     tail = ""
     if unchanged_lines:
@@ -107,13 +122,13 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
         ls, lg = float(lstep), float(llag)
         first = f"на +{ls:g}R стоп в БУ" if abs(ls - lg) < 1e-9 else f"на +{ls:g}R стоп на +{ls - lg:g}R"
         rule = f"Лесенка {ls:g}/{lg:g}: {first}, дальше каждые +{ls:g}R стоп подтягивается (пришлю уведомление)"
-        return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} Рига)\n\n"
+        return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
                 f"{E_ENTRY} {symbol} ({direction}):\n\n"
                 f"Вход {entry} · {time_str}\n"
                 f"Стоп: {stop}\n"
                 f"{E_TARGET} Без тейка. {rule}: первый шаг {be_at}. Выход в 22:00.\n"
                 f"{E_NEWS} {risk}")
-    return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} Рига)\n\n"
+    return (f"{E_BELL} СИГНАЛ · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
             f"{E_ENTRY} {symbol} ({direction}):\n\n"
             f"Вход {entry} · {time_str}\n"
             f"Стоп: {stop}\n"
@@ -122,7 +137,7 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
 
 
 def build_tp_hit(symbol, direction, target_price, time_str, pct):
-    return (f"{E_ENTRY} {symbol} ({direction}) — TP {E_TARGET} +2R по {target_price} ({time_str} Рига)\n"
+    return (f"{E_ENTRY} {symbol} ({direction}) — TP {E_TARGET} +2R по {target_price} ({time_str} {_tz()})\n"
             f"{E_MONEY} Итог: {pct:+.1f}% депозита")
 
 
@@ -173,7 +188,7 @@ def build_weekly(mon, fri, items):
         if not p: continue
         rows[t].append((d, it.get('symbol'), it.get('side'), p[0], p[1]))
     out = [f"{E_CHART} Недельный отчёт · {mon.strftime('%d.%m')} \u2013 {fri.strftime('%d.%m.%Y')}",
-           "(пятница, 22:00 Рига · риск 1% на сделку)", ""]
+           f"(пятница, 22:00 {_tz()} · риск 1% на сделку)", ""]
     tot_n = tot_tp = tot_sl = tot_be = 0
     tot_r = 0.0
     for t in ('A', 'C'):
