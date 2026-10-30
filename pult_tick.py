@@ -802,7 +802,7 @@ def main(send=True):
                 sections.append((w, main_l, []))
             sections_n = [x for x in sections if x[0] in NOTIFY_WIN]
             total_n = sum(result_of({s: state.get(f'{s}_{x[0]}', {}) for s in syms_of(x[0]) if state.get(f'{s}_{x[0]}', {}).get('date') == today})[1] for x in sections_n)
-            tg(build_daily_summary(dstr, sections_n, total_n).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + ' (тип C)', 1))
+            tg(build_daily_summary(dstr, sections_n, total_n).replace('Отчёт дня · ' + dstr, 'Отчёт дня · ' + dstr + ' (тип A + C)', 1))
             flags['summary'] = True; did.append('summary'); text = text or 'отчёт дня отправлен'
             # ДОБАВЛЕНО 29.09.2026: сохраняем отчёт дня в state (коммитится в репозиторий вместе
             # с остальным state) — нужно странице Vercel, чтобы показывать тот же итог дня, что
