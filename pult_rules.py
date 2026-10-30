@@ -1205,7 +1205,20 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     for g in range(g0, n):
         if d['rdate'].iloc[g] != today: continue
         if L[g] < ext:
-            ext = L[g]; ge = g; continue
+            # 30.10.2026: пессимистично, как тики советника: если в этой же M5, где достигнут уровень входа, (или позже в M10) обновлён экстремум —
+            # ордер уже сработал, вход состоялся (дальше трекинг выбьет по стопу); если экстремум обновился в M5 ДО касания — ордер снят, как раньше
+            _pess = False; _lg0 = lowB - ext
+            if g > ge and _lg0 > 0:
+                _lv0 = ext + C_LVL * _lg0
+                if H[g] >= _lv0:
+                    _tb0 = d.index[g]; _s50 = d5[(d5.index >= _tb0) & (d5.index < _tb0 + pd.Timedelta(minutes=C_TF))]
+                    _sh0 = (_s50['High'].values if sd == 1 else -_s50['Low'].values).astype(float)
+                    _sl0 = (_s50['Low'].values if sd == 1 else -_s50['High'].values).astype(float)
+                    _jt = next((j for j in range(len(_sh0)) if _sh0[j] >= _lv0), None)
+                    _jn = next((j for j in range(len(_sl0)) if _sl0[j] < ext), None)
+                    _pess = _jt is not None and (_jn is None or _jn >= _jt)
+            if not _pess:
+                ext = L[g]; ge = g; continue
         if g == g0: continue
         leg = lowB - ext
         if leg <= 0: continue
@@ -1449,7 +1462,20 @@ def _track_trail(res, d, sig, sd, dirc, fmtp, live=None):
     stop = float(sig['stop']); best = 0.0; moves = []; out = None; xt = None; xr = None
     tl = lambda ix: ix.tz_convert('Europe/Riga').strftime('%H:%M') if ix.tzinfo else None
     def hit(r, st): return (r['Low'] <= st) if sd == 1 else (r['High'] >= st)
-    for ix, r in closed.iterrows():
+    # 30.10.2026 (тип C): свеча входа. Порядок тиков внутри M5 неизвестен — считаем худший: если максимум против нас пробил стоп → SL сразу;
+    # лесенку двигаем по максимуму в нашу сторону, но по НОВОМУ стопу минимум этой свечи не проверяем (он мог быть до входа)
+    if sig.get('window') == 'C' and t0 in d.index:
+        r0 = d.loc[t0]
+        if hit(r0, stop):
+            out = True; xt = tl(t0); xr = lvl(stop)
+        else:
+            best = max(best, lvl(r0['High'] if sd == 1 else r0['Low']))
+            k0 = int(best // LS + 1e-9) * LS
+            if k0 >= LS:
+                ns0 = px(k0 - LG)
+                if (ns0 > stop) if sd == 1 else (ns0 < stop):
+                    stop = ns0; moves.append(dict(t=tl(t0), lvl=k0 - LG, reach=k0, stop=round(ns0, 8)))
+    for ix, r in (closed.iterrows() if out is None else []):
         if hit(r, stop):
             out = True; xt = tl(ix); xr = lvl(stop); break
         hh = lvl(r['High'] if sd == 1 else r['Low']); best = max(best, hh)
@@ -1461,6 +1487,8 @@ def _track_trail(res, d, sig, sd, dirc, fmtp, live=None):
                 if (cl <= ns) if sd == 1 else (cl >= ns):      # новый стоп не ниже закрытия — выходим по рынку
                     out = True; xt = tl(ix); xr = lvl(cl); moves.append(dict(t=xt, lvl=k - LG, reach=k, stop=round(cl, 8), mkt=1)); break
                 stop = ns; moves.append(dict(t=xt or tl(ix), lvl=k - LG, reach=k, stop=round(ns, 8)))
+                if sig.get('window') == 'C' and hit(r, stop):     # 30.10.2026: порядок в M5 неизвестен — после подтяжки стопа по максимуму проверяем минимум (худший случай)
+                    out = True; xt = tl(ix); xr = lvl(stop); break
     if out is None and lv is not None:
         for ix, r in lv.iterrows():
             if hit(r, stop): out = True; xt = tl(ix); xr = lvl(stop); break
