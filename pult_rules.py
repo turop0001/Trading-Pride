@@ -1299,9 +1299,9 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
             print('pend failed', sym, e)
         if _wide_hold:
             # 30.10.2026: как советник и индикатор — расчётный ордер не проходит фильтры → СКИП (первая причина в статусе, все — в «Все причины»);
-            # не окончательно: на каждой M10 пересчитывается, если фильтры пройдены, карточка вернётся в ВЫНОС. В Telegram остаётся ВЫНОС.
+            # не окончательно: на каждой M10 пересчитывается, если фильтры пройдены, карточка вернётся в ВЫНОС. В Telegram — СКИП.
             res['hold'] = True; res['ckf'] = sorted({n for n, _t, _s in _wide_hold}); res['reasons'] = [t_ for _n, t_, _s in _wide_hold]
-            return _out(res, 'skip', dirc, _wide_hold[0][2], tg='ВЫНОС')
+            return _out(res, 'skip', dirc, _wide_hold[0][2])
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 50%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
         res['ckf'] = [5]; res['reasons'] = ['откат 50% после 18:30']; _why(res, 'Скип: откат ≥50% позже 18:30', [5])
