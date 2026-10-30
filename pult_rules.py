@@ -1041,6 +1041,7 @@ def _analyze_C_instant(sym, d, now_utc, off, prev, h1):
 C_COST = {'XAUUSD': 0.22, 'EURUSD': 0.00013, 'GBPUSD': 0.00014, 'AUDUSD': 0.00014, 'EURGBP': 0.000135, 'US500': 0.4, 'GER40': 0.8, 'UK100': 1.0}
 C_MAXSTOP = 0.7   # 24.10.2026: стоп не шире 0,7 ATR(M10) (было 1,0 с 23.10) — иначе СКИП; с 26.10.2026 нижний порог 0,25 ATR убран (остался спред+комиссия)
 C_TRAIL = True   # 23.10.2026: Тип C без TP — БУ на +1R, дальше стоп ступеньками по 1R (на +2R стоп +1R, на +3R стоп +2R …), выход 22:00
+C_BUYSP = {'US500': 0.5, 'GER40': 1.3, 'UK100': 1.5}   # 30.10.2026: типичный спред на покупку (ask = bid + спред): советник не ставит BUY STOP, если ask уже на/выше уровня (19.10 GER40 17:00); для продаж сравнение по bid
 C_LVL = 0.5   # 28.10.2026: уровень входа C = 50% длины выноса (C v1.11, было 20%)
 C_COSTK = 3.0   # 28.10.2026: стоп не меньше 3× (спред+комиссия) (C v1.11)
 C_TPREF = 4.0   # 28.10.2026: TP нет (лесенка 1/1); 4R — только для проверки встречного H1 FVG
@@ -1217,6 +1218,9 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                     _jt = next((j for j in range(len(_sh0)) if _sh0[j] >= _lv0), None)
                     _jn = next((j for j in range(len(_sl0)) if _sl0[j] < ext), None)
                     _pess = _jt is not None and (_jn is None or _jn >= _jt)
+                    # ордер вообще не ставился (к закрытию предыдущей M10 ask уже на/выше уровня) — «вход» невозможен, экстремум просто обновляется
+                    _so0 = (_s50['Open'].values if sd == 1 else -_s50['Open'].values).astype(float)
+                    if _pess and len(_so0) > 0 and float(_so0[0]) + (C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0) >= _lv0: _pess = False
             if not _pess:
                 ext = L[g]; ge = g; continue
         if g == g0: continue
@@ -1304,7 +1308,8 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     else: entry = max(lvl, float(so[fi])); t_fill = sub5.index[fi]
     # 30.10.2026: как в советнике — если к закрытию M10 (открытие первой M5 следующей M10) цена уже за уровнем отката, stop-ордер не ставится
     # (мгновенный вход по рынку выключен) и день пропущен; раньше Пульт/индикатор брали такой вход по открытию M5 (гэп через уровень)
-    _gap0 = (len(so) > 0 and float(so[0]) >= lvl) if fi is not None else (float(O[entry_g]) >= lvl)
+    _bsp = C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0   # 30.10.2026: покупка — по ask (bid + спред), продажа — по bid
+    _gap0 = (len(so) > 0 and float(so[0]) + _bsp >= lvl) if fi is not None else (float(O[entry_g]) + _bsp >= lvl)
     if _gap0:
         t = 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится (как в советнике), вход упущен'
         res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
