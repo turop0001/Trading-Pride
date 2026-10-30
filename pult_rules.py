@@ -1283,23 +1283,25 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                 e_ = ext + C_LVL * leg; s_ = ext - 0.1 * (e_ - ext); R_ = e_ - s_; t_ = e_ + C_TPREF * R_
                 atr_ = float((d['High'] - d['Low']).iloc[-15:-1].mean())
                 _mn = C_COSTK * C_COST.get(sym, 0.0); _mx = C_MAXSTOP * atr_
+                _cfp = _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5))
+                # порядок как в советнике: стоп шире → стоп меньше спреда+комиссии → встречный H1 FVG; все сработавшие собираются
+                if R_ > _mx:
+                    _wide_hold = _wide_hold or []; _wide_hold.append((9, f'стоп {R_:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {_mx:.{dec}f} — слишком широкий ({R_ / atr_:.2f} ATR)', f'СКИП (стоп слишком широкий: {R_ / atr_:.2f} ATR)'))
                 if R_ < _mn:
-                    _why(res, f'Ордер пока не выставляется: стоп {R_:.{dec}f} меньше минимума {_mn:.{dec}f} (3 × спред+комиссия) — вынос мал, если не вырастет, будет скип')
-                elif R_ > _mx:
-                    _why(res, f'Ордер пока не выставляется: стоп {R_:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {_mx:.{dec}f}')
-                    _wide_hold = (R_, _mx)
-                elif _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is not None:
-                    _why(res, 'Ордер пока не выставляется: встречный H1 FVG на пути 4R')
+                    _wide_hold = _wide_hold or []; _wide_hold.append((9, f'стоп {R_:.{dec}f} меньше {_mn:.{dec}f} (3 × спред+комиссия) — не окупится; если вынос вырастет, пересчитаем', 'СКИП (стоп меньше спреда+комиссии)'))
+                if _cfp is not None:
+                    _wide_hold = _wide_hold or []; _wide_hold.append((8, 'встречный H1 FVG на пути 4R', 'СКИП (встречный H1 FVG на пути 4R)'))
+                for _n, _tx, _st in (_wide_hold or []): _why(res, 'Ордер пока не выставляется: ' + _tx)
                 if C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
             print('pend failed', sym, e)
         if _wide_hold:
-            # 30.10.2026: как советник и индикатор — стоп по расчётному уровню шире лимита → СКИП (стоп слишком широкий); не окончательный:
-            # на каждой M10 пересчитывается, если стоп снова уложится в лимит, карточка вернётся в ВЫНОС. В Telegram остаётся ВЫНОС.
-            res['hold'] = True; res['ckf'] = [9]
-            return _out(res, 'skip', dirc, f'СКИП (стоп слишком широкий: {_wide_hold[0] / (_wide_hold[1] / C_MAXSTOP):.2f} ATR)', tg='ВЫНОС')
+            # 30.10.2026: как советник и индикатор — расчётный ордер не проходит фильтры → СКИП (первая причина в статусе, все — в «Все причины»);
+            # не окончательно: на каждой M10 пересчитывается, если фильтры пройдены, карточка вернётся в ВЫНОС. В Telegram остаётся ВЫНОС.
+            res['hold'] = True; res['ckf'] = sorted({n for n, _t, _s in _wide_hold}); res['reasons'] = [t_ for _n, t_, _s in _wide_hold]
+            return _out(res, 'skip', dirc, _wide_hold[0][2], tg='ВЫНОС')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 50%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
         res['ckf'] = [5]; res['reasons'] = ['откат 50% после 18:30']; _why(res, 'Скип: откат ≥50% позже 18:30', [5])
@@ -1319,12 +1321,20 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     _gap0 = (len(so) > 0 and float(so[0]) + _bsp >= lvl) if fi is not None else (float(O[entry_g]) + _bsp >= lvl)
     if _gap0:
         t = 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится (как в советнике), вход упущен'
-        # 30.10.2026: советник сначала проверяет стоп и пишет «стоп слишком широкий» — главной причиной ставим её, остальные добавляем
+        # 30.10.2026: советник сначала проверяет стоп/спред/встречный FVG по расчётному уровню и только потом — касание: главной причиной ставим их
         _stw = lvl - (ext - 0.1 * (lvl - ext)); _atw = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
+        _pg = []
         if _atw > 0 and _stw > C_MAXSTOP * _atw:
-            tw = f'стоп {_stw:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {C_MAXSTOP * _atw:.{dec}f} — слишком широкий ({_stw / _atw:.2f} ATR)'
-            res['ckf'] = [9]; res['reasons'] = [tw, t]; _why(res, 'Скип: ' + tw, [9]); _why(res, 'Скип: ' + t, [5])
-            return _out(res, 'skip', dirc, f'СКИП (стоп слишком широкий: {_stw / _atw:.2f} ATR)')
+            _pg.append((9, f'стоп {_stw:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {C_MAXSTOP * _atw:.{dec}f} — слишком широкий ({_stw / _atw:.2f} ATR)', f'СКИП (стоп слишком широкий: {_stw / _atw:.2f} ATR)'))
+        if _stw < C_COSTK * C_COST.get(sym, 0.0):
+            _pg.append((9, f'стоп {_stw:.{dec}f} меньше {C_COSTK:g}× спреда+комиссии ({C_COSTK * C_COST.get(sym, 0.0):.{dec}f}) — не окупится', 'СКИП (стоп меньше спреда+комиссии)'))
+        if _counter_fvg(F1, sd, sd * lvl, sd * (lvl + C_TPREF * _stw), t_bar + pd.Timedelta(minutes=C_TF)) is not None:
+            _pg.append((8, 'встречный H1 FVG на пути 4R', 'СКИП (встречный H1 FVG на пути 4R)'))
+        if _pg:
+            res['ckf'] = sorted({n for n, _t, _s in _pg}); res['reasons'] = [t_ for _n, t_, _s in _pg] + [t]
+            for n_, t_, _s in _pg: _why(res, 'Скип: ' + t_, [n_])
+            _why(res, 'Скип: ' + t, [5])
+            return _out(res, 'skip', dirc, _pg[0][2])
         res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
         return _out(res, 'skip', dirc, 'СКИП (цена уже за уровнем отката)')
     stop_f = ext - 0.1 * (lvl - ext)
