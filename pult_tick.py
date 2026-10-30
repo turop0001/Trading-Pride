@@ -326,7 +326,7 @@ def final_check(state, today, dstr, off, tg, did, final=True):
                ("\U0001F514 Обновление по сделкам · " + dstr + " (UTC+3)")
         for u_ in upd: push('Сделка закрыта', u_[:140])
         tg(head + "\n\n" + "\n".join(upd)
-           + f"\n\n\U0001F3AF Итог дня: {sign}{abs(total):.1f}% депозита")
+           + (f"\n\n\U0001F3AF Итог дня: {sign}{abs(total):.1f}% депозита" if round(total, 1) != 0 else "\n\n\U0001F3AF Итог дня: безубыток (0,0% депозита)"))
         ds = state.get('_daily_summary') or {}
         ds['total_pct'] = total; state['_daily_summary'] = ds
         did.append('final')

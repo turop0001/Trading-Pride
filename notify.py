@@ -177,7 +177,12 @@ def build_daily_summary(date, sections, total_pct):
             out.append(", ".join(watch))
         out.append("")
     sign = '+' if total_pct > 0 else ('-' if total_pct < 0 else '')
-    out.append(f"{E_TARGET} Итог дня: {sign}{abs(total_pct):.1f}% депозита")
+    if round(total_pct, 1) == 0:
+        # 31.10.2026: нулевой итог — «Безубыток», если сделки были; если входов не было вообще — «сделок не было»
+        _traded = any(('ЗАКРЫТА' in l or 'ВХОД' in l or 'В СДЕЛКЕ' in l or 'БУ' in l) for _l, ls, _w in sections for l in ls)
+        out.append(f"{E_TARGET} Итог дня: " + ("безубыток (0,0% депозита)" if _traded else "сделок не было (0,0%)"))
+    else:
+        out.append(f"{E_TARGET} Итог дня: {sign}{abs(total_pct):.1f}% депозита")
     return "\n".join(out)
 
 # --- Недельный отчёт (утверждён пользователем 06.10.2026): пятница 22:00 Рига, риск 1% на сделку, отдельно Тип A и C ---
