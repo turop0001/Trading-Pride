@@ -1100,15 +1100,16 @@ function liveCard(x){
     if(x.signal.be_at)rows.push(['Стоп в БУ при',String(x.signal.be_at)+(function(){var e=parseFloat(x.signal.entry),t=parseFloat(x.signal.tp),b=parseFloat(x.signal.be_at);return (isFinite(e)&&isFinite(t)&&t!==e&&isFinite(b))?' ('+Math.round((b-e)/(t-e)*100)+'% пути)':'';})()]);
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
+  if(x.mt5_missed)rows.push(['MT5',x.mt5_missed]);
   rows.push(['Проверено',(x.price!=null?x.price+' · ':'')+(x.checked||'—')]);
   return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:curR};
 }
 function mt5Check(){
   fetch('/api/feed',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
     var e=document.getElementById('mt5St');if(!e)return;
-    var age=Math.round(Date.now()/1000-(j.upd||0)),ok=j.upd&&age<=180;
+    var age=Math.round(Date.now()/1000-(j.upd||0)),ok=j.upd&&age<=300;
     var mx=0;try{var v=j.lastM5||{};Object.keys(v).forEach(function(k){if(v[k]>mx)mx=v[k];});}catch(x){}
-    e.textContent=' '+(ok?'MT5 работает корректно (данные '+age+' с назад)':'MT5 не отвечает'+(j.upd?' ('+Math.round(age/60)+' мин)':'')+' — данные Yahoo');
+    var M=window.__mt5||{};var gp=(M.gaps||[]).map(function(g){return g.from+'–'+g.to+' ('+g.min+' мин)';}).join(', ');e.textContent=' '+(ok?'MT5 работает корректно (данные '+age+' с назад)'+(gp?' · простой сегодня: '+gp:''):'MT5 не отвечает'+(M.online===false&&M.since?' с '+M.since:'')+(j.upd?' ('+Math.round(age/60)+' мин)':'')+' — анализ приостановлен, карточки не обновляются');
     var c=ok?'#2fb36b':'#e5484d';e.style.color=c;var dot=document.createElement('span');dot.style.cssText='display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 4px 0 10px;vertical-align:middle;background:'+c+';box-shadow:0 0 0 3px '+c+'33';e.insertBefore(dot,e.firstChild);
   }).catch(function(){var e=document.getElementById('mt5St');if(e){e.textContent=' MT5: статус недоступен';e.style.color='#e5484d';}});
 }
@@ -1391,7 +1392,7 @@ renderHist();
     var nS=0;all.forEach(function(k){var q=S[k];if(q.shots){var id=q.date+'_'+(q.sym||k.split('_')[0])+'_'+(q.window||k.split('_')[1]);if(!SHOTS[id]){SHOTS[id]=q.shots;nS++;}}});if(nS)redraw();
     REP=keys.map(function(k){return toLive(k,S[k]);}).sort(function(a,b){var ra=winRank(a._w),rb=winRank(b._w);if(ra!==rb)return ra-rb;if(a._e!==b._e)return a._e-b._e;return a._s<b._s?-1:1;});
     repSum();if(!REP.length)$('rep').innerHTML='<div class="empty">Сегодня проверок ещё не было — карточки появятся с открытием окна A (10:00).</div>';else if(!repBusy())renderRep();
-    var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
+    window.__mt5=S._mt5||{};var log=(S._log||[]).map(function(r){return {date:r.date,time:r.time,window:(r.window&&r.window!=='—')?r.window:'закрыто',text:stripBias(r.text)};});
     var last=log[log.length-1];
     if(last){renderLive({date:last.date,time:last.time,window:last.window,text:last.text,log:log.filter(function(r){return r.date===last.date;})});}
     else $('liveLine').textContent='Проверок пока не было.';

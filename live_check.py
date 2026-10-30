@@ -273,9 +273,24 @@ def mt5_frame(ticker, tf='M5', max_age_h=None):
     return d
 
 
-def mt5_online(max_min=15):
-    """True, если советник MT5 присылает свежие свечи (хотя бы по одному инструменту последний M5-бар не старше max_min минут)."""
+MT5_OFFLINE_MIN = 5   # 30.10.2026 (решение владельца): MT5 молчит дольше 5 минут -> Пульт ничего не считает и не шлёт
+
+
+def mt5_feed_ts():
+    """Время (epoch) последней отправки свечей советником в фид (поле upd файла live.json); None, если неизвестно."""
+    _feed()
+    for name in ('live', 'hist'):
+        u = (_FEED['parts'].get(name) or {}).get('upd')
+        if u: return float(u)
+    return None
+
+
+def mt5_online(max_min=MT5_OFFLINE_MIN):
+    """True, если советник MT5 присылает свежие данные: последняя отправка в фид (upd) не старше max_min минут.
+    Если upd недоступен — прежняя проверка по времени последнего M5-бара (с запасом на формирующуюся свечу)."""
     import time
+    ts = mt5_feed_ts()
+    if ts: return time.time() - ts <= max_min * 60
     data = _feed()
     best = 0
     for sym, tfs in ((data or {}).get('syms') or {}).items():

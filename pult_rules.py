@@ -778,7 +778,7 @@ def _analyze_A_s2(sym, d, now_utc, off, prev, h1):
     if r['st'] == 'prep':
         sw_ = r.get('sw'); inb = sw_ is not None and A2.MINSW <= sw_ < A2.MAXSW
         if inb:
-            sub = 'ждём закрытие M5 за FVG' if r.get('fvg_now') else 'ждём FVG M5'
+            sub = 'ждём закрытие M5 за FVG' if r.get('fvg_now') else 'нет FVG M5 — ждём появления'
         elif sw_ is not None and sw_ >= A2.MAXSW:
             sub = f'вынос {sw_:.2f} ATR больше {A2.MAXSW:g}'.replace('.', ',', 1) if False else f'вынос больше {A2.MAXSW:g} ATR'
         else:

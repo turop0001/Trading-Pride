@@ -629,14 +629,53 @@ def main(send=True):
 
     # 20.10.2026 (решение владельца): MT5 выключен (нет свежих свечей советника) -> никаких сигналов, карточек и сообщений
     # в Telegram/push до его включения; окно открывается отчётом, когда свечи появятся. Yahoo как запасной путь отключён (live_check.MT5_ONLY).
-    if wd < 5 and 600 <= m < 1320 and lc.MT5_ONLY and not lc.mt5_online():
+    if wd < 5 and 600 <= m < 1320 and lc.MT5_ONLY:
+        import time as _tm
         st_ = state.get('_mt5') or {}
-        state['_mt5'] = {'online': False, 'since': st_.get('since') if st_.get('online') is False else t, 'date': today, 'checked': t}
-        lc.save_state(state)
-        print('MT5 OFFLINE - ждём включения советника, сигналов нет'); print('NEXT_MIN: 1')
-        return
-    if (state.get('_mt5') or {}).get('online') is False:
-        state['_mt5'] = {'online': True, 'since': t, 'date': today}
+        if not lc.mt5_online():
+            _ts = lc.mt5_feed_ts()
+            _hm = lambda e: (dt.datetime.utcfromtimestamp(e) + dt.timedelta(hours=off)).strftime('%H:%M')
+            if st_.get('online') is False and st_.get('date') == today:
+                nm = dict(st_); nm['checked'] = t
+            else:   # начало простоя: отсчёт от последней отправки советника, а не от момента обнаружения
+                since_ts = _ts or _tm.time()
+                nm = {'online': False, 'since': _hm(since_ts), 'since_ts': since_ts, 'date': today, 'checked': t,
+                      'gaps': [g for g in (st_.get('gaps') or []) if g.get('date') == today]}
+            # пуш: при начале простоя и не чаще раза в 30 минут (в Telegram — не шлём, решение владельца)
+            if _tm.time() - (st_.get('push_at') or 0) >= 1800 or st_.get('online') is not False:
+                push('MT5 не отвечает', f"с {nm['since']} — анализ приостановлен, карточки не обновляются", tag='mt5_status')
+                nm['push_at'] = _tm.time()
+            else:
+                nm['push_at'] = st_.get('push_at')
+            if st_.get('online') is not False or st_.get('date') != today:
+                _lg = state.get('_log', [])
+                _lg.append({'date': today, 'time': t, 'window': window or '—', 'text': f"MT5 не отвечает с {nm['since']} — анализ приостановлен", 'lines': []})
+                state['_log'] = _lg[-60:]
+            state['_mt5'] = nm
+            lc.save_state(state)
+            print('MT5 OFFLINE - ждём включения советника, сигналов нет'); print('NEXT_MIN: 1')
+            return
+        if st_.get('online') is False and st_.get('since_ts'):
+            # MT5 вернулся: фиксируем простой, пересчитываем карточки по истории MT5 БЕЗ уведомлений о пропущенном
+            _gm = max(1, int((_tm.time() - st_['since_ts']) // 60))
+            _gap = {'date': today, 'from': st_.get('since'), 'to': t, 'min': _gm}
+            _gaps = [g for g in (st_.get('gaps') or []) if g.get('date') == today] + [_gap]
+            state['_mt5'] = {'online': True, 'since': t, 'date': today, 'gaps': _gaps, 'silent_pending': True,
+                             'gap_txt': f"MT5 не было {_gm} мин ({_gap['from']}–{t})"}
+            push('MT5 снова на связи', f"простой {_gm} мин ({_gap['from']}–{t}), карточки пересчитаны", tag='mt5_status')
+            _lg = state.get('_log', [])
+            _lg.append({'date': today, 'time': t, 'window': window or '—', 'text': f"MT5 снова на связи: простой {_gm} мин ({_gap['from']}–{t}), карточки пересчитаны", 'lines': []})
+            state['_log'] = _lg[-60:]
+        elif (st_.get('online') is False) or (st_.get('date') != today):
+            state['_mt5'] = {'online': True, 'since': st_.get('since') or t, 'date': today, 'gaps': [g for g in (st_.get('gaps') or []) if g.get('date') == today]}
+    _tgw_open = lambda w_, x: send_telegram(x) if (send and w_ in NOTIFY_WIN) else None   # отчёт открытия окна уходит и после простоя
+    _silent = bool((state.get('_mt5') or {}).get('silent_pending'))
+    _gap_txt = (state.get('_mt5') or {}).get('gap_txt', '')
+    if _silent:
+        # возврат MT5: уведомления за время простоя не шлём, события помечаем на карточках как «пропущено»
+        tg = lambda x: print('[тихо: возобновление MT5]')
+        pushw = lambda w_, *a_, **k_: None
+        state['_mt5'].pop('silent_pending', None)
 
     def check_and_update(win, first):
         res = analyze_window(state, win, today)
@@ -667,7 +706,11 @@ def main(send=True):
                     orders.append(('set', r, _pn, bool(_po.get('entry') is not None)))
                 elif _po.get('entry') is not None and _pn.get('entry') is None and ls != 'entry' and not str(tgnote).startswith(('ВХОД', 'В СДЕЛКЕ', 'ЗАКРЫТА')):
                     orders.append(('cancel', r, _po, str(tgnote)))
-            if r.pop('new_signal', False): sigs.append(r)
+            if _silent and p and (ls, r_dir, tgnote) != (p_ls, p_dir, p_tgnote) and str(tgnote).startswith(('ВХОД', 'В СДЕЛКЕ', 'ВЫНОС', 'ЗАКРЫТА', 'СКИП')):
+                r['mt5_missed'] = 'пропущено, ' + _gap_txt.replace('MT5 не было', 'MT5 не работал').replace(' мин (', ' мин (')
+            elif p.get('mt5_missed') and p.get('date') == today:
+                r['mt5_missed'] = p['mt5_missed']
+            if r.pop('new_signal', False) and not _silent: sigs.append(r)
             # 08.10.2026: цена дошла до уровня БУ (по формирующейся свече MT5) — один раз шлём «переноси стоп»
             if (r.get('signal') or {}).get('trail'):
                 if str(r.get('note', '')).startswith('В СДЕЛКЕ'):
@@ -690,7 +733,7 @@ def main(send=True):
             nxt = ('C', _h(990 + _k)) if (win == 'A' and lc.C_ENABLED) else (None, None)
             txt = build_window_open(dstr, win, '10:00–13:00' if win == 'A' else _h(990 + _k) + '–' + _h(1110 + _k), lines_for(win, res), *nxt)
             if win == 'C': txt = txt + "\n\n⏰ Следующее — отчёт дня, 19:00."
-            tgw(win, txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
+            (_tgw_open if _silent else tgw)(win, txt); did.append('open' + win); text = 'отчёт открытия окна отправлен'
         else:
             text = ('изменилось: ' + ', '.join(syms)) if syms else 'без изменений'
             if changed:
