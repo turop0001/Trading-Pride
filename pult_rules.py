@@ -1289,6 +1289,13 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     fi = next((j for j in range(len(sh)) if sh[j] >= lvl), None)
     if fi is None: entry = max(lvl, float(O[entry_g])); t_fill = t_bar
     else: entry = max(lvl, float(so[fi])); t_fill = sub5.index[fi]
+    # 30.10.2026: как в советнике — если к закрытию M10 (открытие первой M5 следующей M10) цена уже за уровнем отката, stop-ордер не ставится
+    # (мгновенный вход по рынку выключен) и день пропущен; раньше Пульт/индикатор брали такой вход по открытию M5 (гэп через уровень)
+    _gap0 = (len(so) > 0 and float(so[0]) >= lvl) if fi is not None else (float(O[entry_g]) >= lvl)
+    if _gap0:
+        t = 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится (как в советнике), вход упущен'
+        res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
+        return _out(res, 'skip', dirc, 'СКИП (цена уже за уровнем отката)')
     stop_f = ext - 0.1 * (lvl - ext)
     R = entry - stop_f
     tp_f = entry + C_TPREF * R
