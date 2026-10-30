@@ -1323,7 +1323,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
         _stw = lvl - (ext - 0.1 * (lvl - ext)); _atw = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
         if _atw > 0 and _stw > C_MAXSTOP * _atw:
             tw = f'стоп {_stw:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {C_MAXSTOP * _atw:.{dec}f} — слишком широкий ({_stw / _atw:.2f} ATR)'
-            res['ckf'] = [5, 9]; res['reasons'] = [tw, t]; _why(res, 'Скип: ' + tw, [9]); _why(res, 'Скип: ' + t, [5])
+            res['ckf'] = [9]; res['reasons'] = [tw, t]; _why(res, 'Скип: ' + tw, [9]); _why(res, 'Скип: ' + t, [5])
             return _out(res, 'skip', dirc, f'СКИП (стоп слишком широкий: {_stw / _atw:.2f} ATR)')
         res['ckf'] = [5]; res['reasons'] = [t]; _why(res, 'Скип: ' + t, [5])
         return _out(res, 'skip', dirc, 'СКИП (цена уже за уровнем отката)')
