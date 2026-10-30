@@ -1276,6 +1276,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
             res['ckf'] = [5]; res['reasons'] = [f'{_w} не случилось до 18:30']; _why(res, f'Скип: {_w} не случилось до 18:30', [5])
             return _out(res, 'skip', dirc, f'СКИП ({_w} не случилось до 18:30)')
         _prob_set_C(res, F1, atr1, sd, ext, plus)
+        _wide_hold = None
         # 08.10.2026: расчётный отложенный ордер для советника MT5 (stop-ордер на уровне 50%); не выдаём, если сделка заведомо будет скипнута
         try:
             if leg > 0 and nowm < wb:
@@ -1286,6 +1287,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                     _why(res, f'Ордер пока не выставляется: стоп {R_:.{dec}f} меньше минимума {_mn:.{dec}f} (3 × спред+комиссия) — вынос мал, если не вырастет, будет скип')
                 elif R_ > _mx:
                     _why(res, f'Ордер пока не выставляется: стоп {R_:.{dec}f} больше {C_MAXSTOP:g} ATR(M10) = {_mx:.{dec}f}')
+                    _wide_hold = (R_, _mx)
                 elif _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is not None:
                     _why(res, 'Ордер пока не выставляется: встречный H1 FVG на пути 4R')
                 if C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
@@ -1293,6 +1295,11 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
             print('pend failed', sym, e)
+        if _wide_hold:
+            # 30.10.2026: как советник и индикатор — стоп по расчётному уровню шире лимита → СКИП (стоп слишком широкий); не окончательный:
+            # на каждой M10 пересчитывается, если стоп снова уложится в лимит, карточка вернётся в ВЫНОС. В Telegram остаётся ВЫНОС.
+            res['hold'] = True; res['ckf'] = [9]
+            return _out(res, 'skip', dirc, f'СКИП (стоп слишком широкий: {_wide_hold[0] / (_wide_hold[1] / C_MAXSTOP):.2f} ATR)', tg='ВЫНОС')
         return _out(res, 'prep', dirc, f'ВЫНОС ({"лоя" if sd == 1 else "хая"} бокса, ждём откат 50%)')
     if (d['rmin'].iloc[entry_g]) >= wb:
         res['ckf'] = [5]; res['reasons'] = ['откат 50% после 18:30']; _why(res, 'Скип: откат ≥50% позже 18:30', [5])
