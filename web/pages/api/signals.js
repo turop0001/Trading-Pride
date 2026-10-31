@@ -3,7 +3,7 @@
 import { readJson } from '../../lib/gh';
 
 export default async function handler(req, res) {
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, s-maxage=3'); // 31.10.2026: кэш 3 с на CDN — мост опрашивает каждые 3 с; состояние пишется раз в минуту, задержки практически нет
   try {
     const { data } = await readJson('state/pult_state.json', {}, 'state');
     const now = Date.now();

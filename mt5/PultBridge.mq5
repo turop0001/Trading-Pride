@@ -20,7 +20,7 @@
 //|   первого TP (на новом демо Tickmill истории сделок нет, серия считалась 0)               |
 //+------------------------------------------------------------------+
 #property copyright "Trading Pride"
-#property version   "1.26"
+#property version   "1.27"
 #include <Trade/Trade.mqh>
 
 input string SignalsURL      = "https://trading-pride-three.vercel.app/api/signals";
@@ -125,6 +125,17 @@ bool InFastWindow()
    return (m>=390 && m<=690) || (m>=780 && m<=960);
 }
 int FeedNow() { return InFastWindow() ? MathMin(FastFeedSec,FeedSec) : FeedSec; }
+
+// v1.27 (31.10.2026): выходные — рынок закрыт (пт 22:00 UTC … вс 22:00 UTC): свечи не шлём и сигналы не опрашиваем.
+// Экономит лимит CPU сайта; на торговлю не влияет (окон A/C в это время нет). Управление открытыми позициями продолжается.
+bool MarketClosedWeekend()
+{
+   MqlDateTime g; TimeToStruct(TimeGMT(), g);
+   if(g.day_of_week==6) return true;
+   if(g.day_of_week==5 && g.hour>=22) return true;
+   if(g.day_of_week==0 && g.hour<22) return true;
+   return false;
+}
 
 string PsymOf(const string bsym) { for(int k=0;k<11;k++) if(BrokerSym(NAMES[k])==bsym) return NAMES[k]; return ""; }
 
@@ -264,8 +275,10 @@ void SendFeed()
 
 void OnTimer()
 {
-   SendFeed();
+   bool wkClosed=MarketClosedWeekend();
+   if(!wkClosed) SendFeed();
    if(TradeEnabled) ManageTrades();
+   if(wkClosed) return;   // v1.27: выходные — сигналы не опрашиваем
    datetime nowT=TimeLocal();
    if(nowT-lastPoll<PollSec) return;
    lastPoll=nowT;
