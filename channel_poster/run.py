@@ -74,15 +74,32 @@ def collect():
     return rows[:45]
 
 
+ONLY = os.environ.get('CP_ONLY', '')
+
+
 def plan(today):
     """Какие 2 поста писать: будни = новость + (умное/смешное/мотивация по кругу); выходные = две не-новости."""
+    if ONLY in CATS: return [ONLY]
     rot = ['smart', 'humor', 'motiv']
     n = today.toordinal()
     if today.weekday() < 5: return ['news', rot[n % 3]]
     return [rot[n % 3], rot[(n + 1) % 3]]
 
 
+def lessons():
+    """Замечания владельца к отклонённым черновикам + удачные опубликованные: учим стиль."""
+    try: d, _ = load_drafts()
+    except Exception: return ''
+    rej = [v for v in sorted(d.values(), key=lambda v: v.get('ts', ''))[-40:] if v.get('status') == 'rejected' and v.get('reason')][-8:]
+    ok = [v for v in sorted(d.values(), key=lambda v: v.get('ts', ''))[-40:] if v.get('status') == 'published'][-2:]
+    out = ''
+    if rej: out += '\nЗАМЕЧАНИЯ ВЛАДЕЛЬЦА К ПРОШЛЫМ ЧЕРНОВИКАМ (обязательно учти, не повторяй ошибки):\n' + '\n'.join('- %s (было: «%s…»)' % (v['reason'], v['text'][:60].replace('\n', ' ')) for v in rej)
+    if ok: out += '\nЭТИ ПОСТЫ ВЛАДЕЛЕЦ ОДОБРИЛ (ориентир по тону и длине, не копируй):\n' + '\n---\n'.join(v['text'] for v in ok)
+    return out
+
+
 def ask_llm(cats, rows, today):
+    extra = lessons()
     src = '\n'.join('[%s] %s' % (cat, t) for v, cat, t in rows) or '(источники сегодня пусты)'
     want = '\n'.join('%d) %s' % (i + 1, CATS[c]) for i, c in enumerate(cats))
     prompt = f"""Ты редактор телеграм-канала @trading_pride (трейдинг: форекс, индексы, акции; без крипты). Дата: {today}.
@@ -112,6 +129,8 @@ def ask_llm(cats, rows, today):
 - Для КАЖДОГО поста добавь "media": {{"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}}. Новости и умное: photo или video. Смешное: gif. Мотивация: photo или video. Не уверен: card.
 - Для КАЖДОГО поста добавь "card": надпись для запасной картинки: "title" (2–6 слов, без эмодзи, суть) и "sub" (до 6 слов, можно пусто).
 Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке.
+
+{extra}
 
 СЫРЬЁ:
 {src}"""

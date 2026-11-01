@@ -8,6 +8,9 @@ on:
       dry:
         description: 'Только показать черновики (1) или отправить на одобрение (0)'
         default: '1'
+      cat:
+        description: 'Только эта рубрика (news/smart/humor/motiv), для замены поста'
+        default: ''
 
 permissions:
   contents: write
@@ -37,5 +40,6 @@ jobs:
           PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           GIPHY_KEY: ${{ secrets.GIPHY_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CP_ONLY: ${{ github.event.inputs.cat }}
           CP_DRY: ${{ github.event.inputs.dry || '0' }}
         run: python channel_poster/run.py

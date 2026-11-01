@@ -44,6 +44,7 @@ function statsText(data, days, title, subs) {
 }
 async function subsCount() { try { const r = await tg('getChatMemberCount', { chat_id: CHANNEL() }); return r.ok ? r.result : null; } catch (e) { return null; } }
 const MK = { photo: ['sendPhoto', 'photo'], video: ['sendVideo', 'video'], animation: ['sendAnimation', 'animation'] };
+const REASONS = { none: 'Без причины', ai: 'Звучит как ИИ', facts: 'Неточные факты', topic: 'Не по теме', long: 'Слишком длинно', pic: 'Картинка не подходит' };
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const htmlText = (t) => { const i = t.indexOf('\n'); return i < 0 ? '<b>' + esc(t) + '</b>' : '<b>' + esc(t.slice(0, i)) + '</b>' + esc(t.slice(i)); };
 async function send(chat, text, kb) { return tg('sendMessage', { chat_id: chat, text: text.slice(0, 4000), reply_markup: kb || MENU }); }
@@ -65,11 +66,11 @@ async function showSources(chat) {
   Object.keys(groups).forEach((g) => { const l = ch.filter((c) => c.cat === g); if (l.length) s += `\n${groups[g]}\n` + l.map((c) => `• @${c.u}${c.reach_pct ? ' · охват ' + c.reach_pct + '%' : ''}`).join('\n') + '\n'; });
   return send(chat, s, BACK);
 }
-async function generate(chat) {
+async function generate(chat, only) {
   const repo = process.env.GH_REPO || 'turop0001/Trading-Pride';
   const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST',
-    headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: { dry: '0' } }) });
-  return send(chat, r.status === 204 ? '⏳ Запустил подготовку постов. Готовлю черновики, это 1–3 минуты. Когда закончу, напишу «✅ Готово».' : `Не получилось запустить (код ${r.status}). Запустите вручную: GitHub → Actions → «Черновики постов» → Run workflow.`, BACK);
+    headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: only ? { dry: '0', cat: only } : { dry: '0' } }) });
+  return send(chat, r.status === 204 ? (only ? '⏳ Пишу замену. Пришлю новый черновик через 1–3 минуты.' : '⏳ Запустил подготовку постов. Готовлю черновики, это 1–3 минуты. Когда закончу, напишу «✅ Готово».') : `Не получилось запустить (код ${r.status}). Запустите вручную: GitHub → Actions → «Черновики постов» → Run workflow.`, BACK);
 }
 
 async function menuAction(chat, act) {
@@ -106,6 +107,16 @@ export default async function handler(req, res) {
     if (msg) {
       if (String(msg.from && msg.from.id) !== owner) { await tg('sendMessage', { chat_id: msg.chat.id, text: 'Этот бот работает только с владельцем канала.\n\nВаш Telegram id: ' + (msg.from && msg.from.id) + '\nЕсли вы владелец, впишите это число в CP_OWNER_ID (GitHub и Vercel) и сделайте Redeploy.' }); return res.status(200).send('ok'); }
       const cmd = String(msg.text || '').split(/[\s@]/)[0].toLowerCase();
+      if (msg.text && !msg.text.startsWith('/')) {
+        const { data: dd, sha: ss } = await readJson('channel/drafts.json', {}, 'state');
+        const wid = Object.keys(dd || {}).find((k) => dd[k].await_reason);
+        if (wid) {
+          const w = dd[wid]; w.reason = msg.text.slice(0, 300); delete w.await_reason;
+          await writeJson('channel/drafts.json', dd, ss, 'channel: причина ' + wid, 'state', true).catch(() => {});
+          await tg('sendMessage', { chat_id: msg.chat.id, text: '✍️ Причину записал, учту в следующих постах.', reply_markup: { inline_keyboard: [[{ text: '🔄 Прислать замену', callback_data: 'rp:' + wid }], [{ text: '⬅️ В меню', callback_data: 'm:menu' }]] } });
+          return res.status(200).send('ok');
+        }
+      }
       const map = { '/start': 'start', '/menu': 'menu', '/help': 'help', '/drafts': 'drafts', '/stats': 'stats', '/week': 'week', '/gen': 'gen', '/sources': 'src' };
       if (cmd === '/start') await send(msg.chat.id, 'Здравствуйте!\n\n' + HELP, MENU);
       else if (map[cmd]) await menuAction(msg.chat.id, map[cmd]);
@@ -115,7 +126,7 @@ export default async function handler(req, res) {
     const cb = upd.callback_query;
     if (!cb) return res.status(200).send('ok');
     if (String(cb.from && cb.from.id) !== owner) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Нет доступа' }); return res.status(200).send('ok'); }
-    const [act, id] = String(cb.data || '').split(':');
+    const [act, id, arg] = String(cb.data || '').split(':');
     if (act === 'm') { const T = { gen: '⏳ Запускаю…', drafts: '📝 Загружаю…', stats: '📊 Считаю…', week: '🗓 Считаю…', src: '📚 Открываю…' }; await tg('answerCallbackQuery', { callback_query_id: cb.id, text: T[id] || '' }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
     const { data, sha } = await readJson('channel/drafts.json', {}, 'state');
     const d = data && data[id];
@@ -125,9 +136,27 @@ export default async function handler(req, res) {
     const toast = (text, alert) => tg('answerCallbackQuery', { callback_query_id: cb.id, text, show_alert: !!alert });
     if (act === 'x') { await toast('Это статус, нажимать не нужно'); return res.status(200).send('ok'); }
     if (!d) { await toast('Черновик не найден'); return res.status(200).send('ok'); }
+    if (act === 'rr' && d.status === 'rejected') {
+      if (arg === 'custom') {
+        Object.keys(data).forEach((k) => { delete data[k].await_reason; }); d.await_reason = true;
+        await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ждёт причину', 'state', true).catch(() => {});
+        await toast('✍️ Напиши причину следующим сообщением');
+        await tg('sendMessage', { chat_id: cb.message.chat.id, text: '✍️ Напиши причину одним сообщением. Я запомню и учту в следующих постах.' });
+        return res.status(200).send('ok');
+      }
+      d.reason = arg === 'none' ? '' : REASONS[arg] || arg; d.reason_code = arg;
+      await edit('❌ Отклонено' + (d.reason ? ' · ' + d.reason : ''), [{ text: '🔄 Прислать замену', callback_data: 'rp:' + id }, { text: '↩️ Вернуть', callback_data: 'un:' + id }]);
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' причина', 'state', true).catch(() => {});
+      await toast(d.reason ? 'Причина записана' : 'Отклонено без причины'); return res.status(200).send('ok');
+    }
+    if (act === 'rp') {
+      if (d.replaced) { await toast('Замену уже заказывали'); return res.status(200).send('ok'); }
+      d.replaced = true; await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' замена', 'state', true).catch(() => {});
+      await edit('⏳ Пишу замену…'); await toast('⏳ Пишу замену…'); await generate(cb.message.chat.id, d.cat); return res.status(200).send('ok');
+    }
     if (act === 'un') {
       if (d.status !== 'rejected') { await toast('Вернуть можно только отклонённый'); return res.status(200).send('ok'); }
-      d.status = 'pending'; await mk(BTN);
+      d.status = 'pending'; delete d.reason; delete d.await_reason; await mk(BTN);
       await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' pending', 'state', true).catch(() => {});
       await toast('↩️ Вернул в ожидание'); return res.status(200).send('ok');
     }
@@ -141,7 +170,8 @@ export default async function handler(req, res) {
       const ch = CHANNEL().replace(/^@/, ''), link = /^\w+$/.test(ch) && d.msg_id ? [{ text: '🔗 Открыть в канале', url: `https://t.me/${ch}/${d.msg_id}` }] : null;
       await edit('✅ Опубликовано ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' }), link);
     } else if (act === 'rj') {
-      d.status = 'rejected'; await edit('❌ Отклонено', [{ text: '↩️ Вернуть', callback_data: 'un:' + id }]);
+      d.status = 'rejected'; d.rej = new Date().toISOString();
+      await mk([[{ text: '❌ Отклонено. Почему?', callback_data: 'x:' + id }], ...Object.entries(REASONS).reduce((a, [k, v], i) => { (i % 2 ? a[a.length - 1] : a[a.push([]) - 1]).push({ text: v, callback_data: 'rr:' + id + ':' + k }); return a; }, []), [{ text: '✍️ Своя причина', callback_data: 'rr:' + id + ':custom' }, { text: '↩️ Вернуть', callback_data: 'un:' + id }]]);
     } else return res.status(200).send('ok');
     await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ' + d.status, 'state', true).catch(() => {});
     await toast(d.status === 'published' ? '✅ Опубликовано в канал' : '❌ Отклонено');
