@@ -1,0 +1,37 @@
+name: Черновики постов для @trading_pride
+
+on:
+  schedule:
+    - cron: '0 5 * * *'      # раз в день 05:00 UTC; GitHub может опоздать на 5–20 мин
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: 'Только показать черновики (1) или отправить на одобрение (0)'
+        default: '1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: channel-posts
+  cancel-in-progress: false
+
+jobs:
+  drafts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Черновики
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CP_BOT_TOKEN: ${{ secrets.CP_BOT_TOKEN }}
+          CP_OWNER_ID: ${{ secrets.CP_OWNER_ID }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CP_DRY: ${{ github.event.inputs.dry || '0' }}
+        run: python channel_poster/run.py

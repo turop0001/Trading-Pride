@@ -1,0 +1,122 @@
+{
+ "_note": "Замер 01.11.2026 (measure.py): оставлены каналы про мировые рынки с активностью и охватом; тексты не копируются, только темы/факты. Крипто и локальные российские темы отфильтровываются в промпте.",
+ "channels": [
+  {
+   "u": "WalterBloomberg",
+   "cat": "news",
+   "note": "EN, мировые макро-заголовки",
+   "subs": 33538,
+   "posts_per_day": 57.0,
+   "median_views": 3665,
+   "reach_pct": 10.9
+  },
+  {
+   "u": "financialjuice",
+   "cat": "news",
+   "note": "EN, заголовки ЦБ и макростатистики",
+   "subs": 8279,
+   "posts_per_day": 61.3,
+   "median_views": 474,
+   "reach_pct": 5.7
+  },
+  {
+   "u": "TheKobeissiLetter",
+   "cat": "news",
+   "note": "EN, громкие рыночные новости",
+   "subs": 11024,
+   "posts_per_day": 13.5,
+   "median_views": 2330,
+   "reach_pct": 21.1
+  },
+  {
+   "u": "bloomberg_ru",
+   "cat": "news",
+   "note": "Bloomberg на русском",
+   "subs": 14813,
+   "posts_per_day": 21.5,
+   "median_views": 741,
+   "reach_pct": 5.0
+  },
+  {
+   "u": "headlines_for_traders",
+   "cat": "news",
+   "note": "новости для трейдеров (смесь, фильтруем)",
+   "subs": 114737,
+   "posts_per_day": 21.7,
+   "median_views": 11200,
+   "reach_pct": 9.8
+  },
+  {
+   "u": "markettwits",
+   "cat": "news",
+   "note": "лента по рынкам (смесь, фильтруем)",
+   "subs": 340200,
+   "posts_per_day": 93.7,
+   "median_views": 43700,
+   "reach_pct": 12.8
+  },
+  {
+   "u": "thewallstreetpro",
+   "cat": "analysis",
+   "note": "макро США/Азия",
+   "subs": 46512,
+   "posts_per_day": 15.2,
+   "median_views": 7675,
+   "reach_pct": 16.5
+  },
+  {
+   "u": "truecon",
+   "cat": "analysis",
+   "note": "макро и ФРС",
+   "subs": 26568,
+   "posts_per_day": 1.2,
+   "median_views": 4575,
+   "reach_pct": 17.2
+  },
+  {
+   "u": "yivashchenko",
+   "cat": "analysis",
+   "note": "мировая экономика, США",
+   "subs": 28313,
+   "posts_per_day": 0.8,
+   "median_views": 6285,
+   "reach_pct": 22.2
+  },
+  {
+   "u": "RationalAnswer",
+   "cat": "edu",
+   "note": "инвестиции простым языком",
+   "subs": 108287,
+   "posts_per_day": 0.6,
+   "median_views": 24950,
+   "reach_pct": 23.0
+  },
+  {
+   "u": "uiartemzvezdin",
+   "cat": "edu",
+   "note": "обучение трейдингу",
+   "subs": 76291,
+   "posts_per_day": 3.0,
+   "median_views": 8140,
+   "reach_pct": 10.7
+  },
+  {
+   "u": "sttonks",
+   "cat": "humor",
+   "note": "мемы",
+   "subs": 4479,
+   "posts_per_day": 2.1,
+   "median_views": 1140,
+   "reach_pct": 25.5
+  },
+  {
+   "u": "investmemes",
+   "cat": "humor",
+   "note": "мемы",
+   "subs": 6369,
+   "posts_per_day": 1.4,
+   "median_views": 1350,
+   "reach_pct": 21.2
+  }
+ ]
+}
