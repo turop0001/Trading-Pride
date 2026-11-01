@@ -47,10 +47,11 @@ const MK = { photo: ['sendPhoto', 'photo'], video: ['sendVideo', 'video'], anima
 const REASONS = { none: 'Без причины', ai: 'Звучит как ИИ', facts: 'Неточные факты', topic: 'Не по теме', long: 'Слишком длинно', pic: 'Картинка не подходит' };
 // Слоты публикации по МСК: 10:00 и 19:00 (UTC 07:00 и 16:00). Берём ближайший свободный.
 const SLOTS_UTC = [7, 16];
-function nextSlot(data) {
+function nextSlot(data, cat) {
+  const hours = cat === 'news' ? SLOTS_UTC : [16];   // новости: любой ближайший слот; остальное только вечером 19:00
   const taken = new Set(Object.values(data || {}).filter((x) => x.status === 'scheduled' && x.at).map((x) => x.at));
   const now = Date.now() + 10 * 60000;
-  for (let day = 0; day < 6; day++) for (const h of SLOTS_UTC) {
+  for (let day = 0; day < 6; day++) for (const h of hours) {
     const t = new Date(); t.setUTCDate(t.getUTCDate() + day); t.setUTCHours(h, 0, 0, 0);
     const iso = t.toISOString();
     if (t.getTime() > now && !taken.has(iso)) return iso;
@@ -183,7 +184,7 @@ export default async function handler(req, res) {
       await toast('↩️ Снял с очереди'); return res.status(200).send('ok');
     }
     if (act === 'ap') {
-      const at = nextSlot(data);
+      const at = nextSlot(data, d.cat);
       d.status = 'scheduled'; d.at = at; d.owner_chat = cb.message.chat.id; d.owner_mid = cb.message.message_id;
       await edit('🕒 Выйдет ' + slotLabel(at), [{ text: '▶️ Сейчас', callback_data: 'pn:' + id }, { text: '↩️ Снять', callback_data: 'us:' + id }]);
       await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' запланирован', 'state', true).catch(() => {});

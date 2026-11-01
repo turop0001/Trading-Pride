@@ -20,7 +20,9 @@ GH = os.environ.get('GITHUB_TOKEN', '')
 DRAFTS = 'channel/drafts.json'
 BRANCH = 'state'
 CATS = {'news': 'ХАЙПОВАЯ НОВОСТЬ про рынки/трейдинг', 'smart': 'УМНАЯ МЫСЛЬ про трейдинг (механика рынка, риск, дисциплина)',
-        'humor': 'СМЕШНОЕ про трейдинг (своя шутка/ситуация, не копия мема)', 'motiv': 'МОТИВАЦИЯ для развития и польза (конкретный совет/привычка)'}
+        'humor': 'СМЕШНОЕ про трейдинг (своя шутка/ситуация, не копия мема)', 'motiv': 'МОТИВАЦИЯ для развития и польза (конкретный совет/привычка)',
+        'story': 'ИСТОРИЯ или РАЗБОР: короткий жизненный случай из трейдинга/рынка (типичная ошибка новичка, как сработал или не сработал приём, момент из истории рынка), в конце вопрос к читателям'}
+MODE = os.environ.get('CP_MODE', '')   # urgent: проверка срочных новостей днём
 
 
 def http(url, data=None, headers=None, method=None, timeout=40):
@@ -78,12 +80,18 @@ ONLY = os.environ.get('CP_ONLY', '')
 
 
 def plan(today):
-    """Какие 2 поста писать: будни = новость + (умное/смешное/мотивация по кругу); выходные = две не-новости."""
+    """Утро (слот 10:00 МСК) = ВСЕГДА новость. Вечер (19:00) = по кругу смешное / умное / мотивация / история."""
     if ONLY in CATS: return [ONLY]
-    rot = ['smart', 'humor', 'motiv']
-    n = today.toordinal()
-    if today.weekday() < 5: return ['news', rot[n % 3]]
-    return [rot[n % 3], rot[(n + 1) % 3]]
+    if MODE == 'urgent': return ['news']
+    rot = ['humor', 'smart', 'motiv', 'story']
+    return ['news', rot[today.toordinal() % 4]]
+
+
+def recent_topics():
+    try: d, _ = load_drafts()
+    except Exception: return ''
+    xs = [v for v in sorted(d.values(), key=lambda v: v.get('ts', ''))[-10:] if v.get('status') != 'rejected' or not v.get('reason')]
+    return '\n'.join('- ' + v['text'].split('\n')[0][:90] for v in xs[-8:])
 
 
 def lessons():
@@ -100,8 +108,15 @@ def lessons():
 
 def ask_llm(cats, rows, today):
     extra = lessons()
+    wd = today.weekday()
+    if 'news' in cats:
+        extra += '\nНОВОСТЬ ДНЯ: ' + ('СРОЧНО. Пиши, только если есть действительно срочное мировое событие, о котором пишут минимум 3 источника или оно набрало взрывной охват и двигает форекс или индексы. Если такого нет, верни {"posts":[]}.' if MODE == 'urgent' else 'суббота: итоги недели на рынках и главное, что запомнилось.' if wd == 5 else 'воскресенье: что ждёт рынки на новой неделе (заседания ЦБ, ключевые данные, отчёты), только то, что есть в сырье, иначе общие ориентиры без выдуманных дат.' if wd == 6 else 'самая громкая мировая новость за ночь и утро.')
+    seen = recent_topics()
+    if seen: extra += '\nТЕМЫ, КОТОРЫЕ УЖЕ БЫЛИ В ПОСЛЕДНИЕ ДНИ (не повторяй, бери другое):\n' + seen
     src = '\n'.join('[%s] %s' % (cat, t) for v, cat, t in rows) or '(источники сегодня пусты)'
-    want = '\n'.join('%d) %s' % (i + 1, CATS[c]) for i, c in enumerate(cats))
+    def q(i, c):   # живой вопрос к читателям: в историях всегда, в остальных примерно в каждом третьем посте
+        return c == 'story' or (today.toordinal() + i) % 3 == 0
+    want = '\n'.join('%d) %s%s' % (i + 1, CATS[c], ' [В КОНЦЕ ВОПРОС: ' + ('ответ смайлом-реакцией. Задай один конкретный вопрос из ситуации поста и сразу дай 2–3 варианта ответа смайлами, каждый со своим смыслом. Пример: «Было такое? 🔥 да, постоянно / 😅 пару раз / 😎 я по плану»' if True else 'ответ в комментариях (у канала есть группа обсуждения). Задай один конкретный вопрос из ситуации поста, на который легко ответить парой слов, и позови написать в комментариях естественно, без казёнщины. Пример: «а твой самый глупый слив какой был? расскажи в комментах»') + '. Не «а как вы думаете?»]' if q(i, c) else ' [без вопроса в конце]') for i, c in enumerate(cats))
     prompt = f"""Ты редактор телеграм-канала @trading_pride (трейдинг: форекс, индексы, акции; без крипты). Дата: {today}.
 Ниже — темы и обрывки из популярных трейдинг-каналов за сутки. Это ТОЛЬКО сырьё для понимания, что обсуждают сегодня.
 Напиши {len(cats)} ОРИГИНАЛЬНЫХ поста на русском:
@@ -121,7 +136,7 @@ def ask_llm(cats, rows, today):
 - Перечисления ровно из трёх пунктов ради красоты.
 - Однострочные «выводы» в конце типа «вот что важно», «и это меняет всё», «вывод простой».
 - Канцелярит и пафос: «ключевой», «важно отметить», «в современном мире», «давайте разберёмся», «стоит обратить внимание», «играет важную роль», «на фоне», «в условиях».
-- Обращение «друзья», «коллеги», «дорогие трейдеры», и риторический вопрос в конце каждого поста (максимум в одном из двух).
+- Обращение «друзья», «коллеги», «дорогие трейдеры», и дежурные вопросы вроде «а как вы думаете?», «что скажете?». Вопрос в конце бывает только там, где это указано у поста, он про конкретную ситуацию.
 - Заголовок-крючок в стиле «Всё, что нужно знать о…».
 Примеры тона (свои, не копируй дословно):
   Новость: «🏦 ФРС опять никуда не торопится\nСтавку оставили как есть, и доллар сначала дёрнулся вниз, а потом вернулся обратно. Powell сказал, что ждёт ещё данных по инфляции. Для нас это значит: на ближайших свечах будет шумно, но направление пока не выбрано.»
@@ -284,12 +299,12 @@ def main():
     today = dt.datetime.now(dt.timezone.utc).date()
     print('Читаю каналы (только темы):'); rows = collect()
     cats = plan(today); print('План:', cats, '· сырья:', len(rows))
-    posts = []
+    posts = []; ask_ok = True
     if API_KEY:
         try:
             for _ in range(3):
                 posts = [p for p in ask_llm(cats, rows, today) if valid(p)]
-                if len(posts) == len(cats): break
+                if len(posts) == len(cats) or (MODE == 'urgent' and not ask_ok): break
         except urllib.error.HTTPError as e:
             body = e.read().decode('utf-8', 'replace')[:300]
             print('Ошибка API Anthropic:', e.code, body)
@@ -306,14 +321,16 @@ def main():
             raise SystemExit(1)
     else:
         print('НЕТ ANTHROPIC_API_KEY — черновики не сгенерированы')
+    if MODE == 'urgent' and not posts: print('Срочного нет'); return
     if not posts: print('Нет годных черновиков — выходим'); return
     for p in posts: print('\n--- %s ---\n%s' % (p['cat'], p['text']))
     if DRY: print('\nCP_DRY=1: ничего не отправлено'); return
     if not (TOKEN and OWNER): print('НЕТ CP_BOT_TOKEN/CP_OWNER_ID'); return
     drafts, sha = load_drafts()
+    if MODE == 'urgent' and any(v.get('urgent') and v.get('ts', '')[:10] == today.isoformat() for v in drafts.values()): print('Срочная за сегодня уже была'); return
     for i, p in enumerate(posts):
-        did = '%s-%d' % (today.strftime('%Y%m%d'), i + 1)
-        drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
+        did = '%s-%s%d' % (today.strftime('%Y%m%d'), 'u' if MODE == 'urgent' else '', i + 1)
+        drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'urgent': MODE == 'urgent', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
         kb = {'inline_keyboard': [[{'text': '✅ Опубликовать', 'callback_data': 'ap:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
         try:
             got = find_media(p.get('media'), p['cat'])
@@ -330,7 +347,7 @@ def main():
             print('! картинка не вышла, шлю текстом:', str(e)[:120])
             tg('sendMessage', {'chat_id': OWNER, 'text': 'Черновик %s · %s\n\n%s' % (did, p['cat'], p['text']), 'reply_markup': kb})
     save_drafts(drafts, sha)
-    try: tg('sendMessage', {'chat_id': OWNER, 'text': '✅ Готово: %d черновика выше. Нажми «Опубликовать» или «Отклонить» под каждым.' % len(posts)})
+    try: tg('sendMessage', {'chat_id': OWNER, 'text': ('🚨 Срочная новость. Если хочешь выпустить сразу, нажми «Опубликовать», затем «▶️ Сейчас».' if MODE == 'urgent' else '✅ Готово: %d черновика выше. Нажми «Опубликовать» или «Отклонить» под каждым.' % len(posts))})
     except Exception: pass
     print('Отправлено на одобрение:', len(posts))
 

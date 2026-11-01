@@ -1,0 +1,46 @@
+name: Срочные новости для @trading_pride
+
+on:
+  schedule:
+    - cron: '30 9,13 * * 1-5'   # 12:30 и 16:30 МСК по будням: проверка срочных новостей
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: 'Только показать черновики (1) или отправить на одобрение (0)'
+        default: '1'
+      cat:
+        description: 'Только эта рубрика (news/smart/humor/motiv), для замены поста'
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: channel-urgent
+  cancel-in-progress: false
+
+jobs:
+  drafts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pillow
+      - name: Срочные
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CP_BOT_TOKEN: ${{ secrets.CP_BOT_TOKEN }}
+          CP_OWNER_ID: ${{ secrets.CP_OWNER_ID }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          GIPHY_KEY: ${{ secrets.GIPHY_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CP_ONLY: ${{ github.event.inputs.cat }}
+          CP_MODE: urgent
+          CP_DRY: ${{ github.event.inputs.dry || '0' }}
+        run: python channel_poster/run.py
