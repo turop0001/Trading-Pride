@@ -1,0 +1,33 @@
+name: Публикация постов @trading_pride по расписанию
+
+on:
+  schedule:
+    - cron: '3 7 * * *'     # 10:03 МСК
+    - cron: '3 16 * * *'    # 19:03 МСК
+    - cron: '33 7 * * *'    # страховка на случай задержки
+    - cron: '33 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: channel-posts
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Опубликовать, что пора
+        env:
+          CP_BOT_TOKEN: ${{ secrets.CP_BOT_TOKEN }}
+          CP_OWNER_ID: ${{ secrets.CP_OWNER_ID }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python channel_poster/publish_due.py

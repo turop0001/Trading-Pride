@@ -9,7 +9,7 @@ const TOK = () => process.env.CP_BOT_TOKEN || '';
 const CHANNEL = () => process.env.CP_CHANNEL || '@trading_pride';
 const tg = (m, body) => fetch(`https://api.telegram.org/bot${TOK()}/${m}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.json());
 const CAT = { news: '📰 Новости', smart: '🧠 Умное', humor: '😄 Смешное', motiv: '🚀 Мотивация' };
-const ST = { pending: '⏳ ждёт решения', published: '✅ опубликован', rejected: '❌ отклонён' };
+const ST = { pending: '⏳ ждёт решения', published: '✅ опубликован', rejected: '❌ отклонён', scheduled: '🕒 запланирован' };
 
 const MENU = { inline_keyboard: [
   [{ text: '📝 Черновики', callback_data: 'm:drafts' }, { text: '📊 Статистика', callback_data: 'm:stats' }],
@@ -45,6 +45,22 @@ function statsText(data, days, title, subs) {
 async function subsCount() { try { const r = await tg('getChatMemberCount', { chat_id: CHANNEL() }); return r.ok ? r.result : null; } catch (e) { return null; } }
 const MK = { photo: ['sendPhoto', 'photo'], video: ['sendVideo', 'video'], animation: ['sendAnimation', 'animation'] };
 const REASONS = { none: 'Без причины', ai: 'Звучит как ИИ', facts: 'Неточные факты', topic: 'Не по теме', long: 'Слишком длинно', pic: 'Картинка не подходит' };
+// Слоты публикации по МСК: 10:00 и 19:00 (UTC 07:00 и 16:00). Берём ближайший свободный.
+const SLOTS_UTC = [7, 16];
+function nextSlot(data) {
+  const taken = new Set(Object.values(data || {}).filter((x) => x.status === 'scheduled' && x.at).map((x) => x.at));
+  const now = Date.now() + 10 * 60000;
+  for (let day = 0; day < 6; day++) for (const h of SLOTS_UTC) {
+    const t = new Date(); t.setUTCDate(t.getUTCDate() + day); t.setUTCHours(h, 0, 0, 0);
+    const iso = t.toISOString();
+    if (t.getTime() > now && !taken.has(iso)) return iso;
+  }
+}
+function slotLabel(iso) {
+  const f = (d, o) => new Date(d).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow', ...o });
+  const day = f(iso, {}) === f(Date.now(), {}) ? 'сегодня' : f(iso, {}) === f(Date.now() + 864e5, {}) ? 'завтра' : f(iso, { day: 'numeric', month: 'long' });
+  return day + ' в ' + new Date(iso).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }) + ' МСК';
+}
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const htmlText = (t) => { const i = t.indexOf('\n'); return i < 0 ? '<b>' + esc(t) + '</b>' : '<b>' + esc(t.slice(0, i)) + '</b>' + esc(t.slice(i)); };
 async function send(chat, text, kb) { return tg('sendMessage', { chat_id: chat, text: text.slice(0, 4000), reply_markup: kb || MENU }); }
@@ -160,13 +176,25 @@ export default async function handler(req, res) {
       await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' pending', 'state', true).catch(() => {});
       await toast('↩️ Вернул в ожидание'); return res.status(200).send('ok');
     }
-    if (d.status !== 'pending') { await toast('Уже обработан: ' + (ST[d.status] || d.status)); return res.status(200).send('ok'); }
+    if (d.status !== 'pending' && !(d.status === 'scheduled' && (act === 'pn' || act === 'us'))) { await toast('Уже обработан: ' + (ST[d.status] || d.status)); return res.status(200).send('ok'); }
+    if (act === 'us') {
+      d.status = 'pending'; delete d.at; await mk(BTN);
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' снят с очереди', 'state', true).catch(() => {});
+      await toast('↩️ Снял с очереди'); return res.status(200).send('ok');
+    }
     if (act === 'ap') {
+      const at = nextSlot(data);
+      d.status = 'scheduled'; d.at = at; d.owner_chat = cb.message.chat.id; d.owner_mid = cb.message.message_id;
+      await edit('🕒 Выйдет ' + slotLabel(at), [{ text: '▶️ Сейчас', callback_data: 'pn:' + id }, { text: '↩️ Снять', callback_data: 'us:' + id }]);
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' запланирован', 'state', true).catch(() => {});
+      await toast('🕒 Запланировал: ' + slotLabel(at)); return res.status(200).send('ok');
+    }
+    if (act === 'pn') {
       await toast('⏳ Публикую…'); await edit('⏳ Публикую…');
       const cap = htmlText(d.text);
       const r = d.photo ? await tg((MK[d.kind] || MK.photo)[0], { chat_id: CHANNEL(), [(MK[d.kind] || MK.photo)[1]]: d.photo, caption: cap.slice(0, 1024), parse_mode: 'HTML' }) : await tg('sendMessage', { chat_id: CHANNEL(), text: cap, parse_mode: 'HTML' });
       if (!r.ok) { await mk(BTN); await toast('⚠️ Не опубликовано: ' + String(r.description || '').slice(0, 150), true); return res.status(200).send('ok'); }
-      d.status = 'published'; d.pub = new Date().toISOString(); d.msg_id = r.result && r.result.message_id;
+      delete d.at; d.status = 'published'; d.pub = new Date().toISOString(); d.msg_id = r.result && r.result.message_id;
       const ch = CHANNEL().replace(/^@/, ''), link = /^\w+$/.test(ch) && d.msg_id ? [{ text: '🔗 Открыть в канале', url: `https://t.me/${ch}/${d.msg_id}` }] : null;
       await edit('✅ Опубликовано ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' }), link);
     } else if (act === 'rj') {
