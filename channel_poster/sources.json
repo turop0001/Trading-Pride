@@ -117,6 +117,30 @@
    "posts_per_day": 1.4,
    "median_views": 1350,
    "reach_pct": 21.2
+  },
+  {
+   "u": "oleg_artemyev_live",
+   "cat": "news",
+   "note": "рынки, трейдинг live",
+   "subs": 26300,
+   "median_views": 6000,
+   "reach_pct": 22.8
+  },
+  {
+   "u": "INSTARDING",
+   "cat": "smart",
+   "note": "трейдинг, идеи",
+   "subs": 94700,
+   "median_views": 15000,
+   "reach_pct": 15.8
+  },
+  {
+   "u": "SANCHO_DT",
+   "cat": "smart",
+   "note": "трейдинг, идеи",
+   "subs": 65700,
+   "median_views": 22000,
+   "reach_pct": 33.5
   }
  ]
 }

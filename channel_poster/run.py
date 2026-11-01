@@ -96,13 +96,15 @@ def ask_llm(cats, rows, today):
 - Новость: только факты, которые есть в сырье (лучше в нескольких источниках); никаких выдуманных цифр, дат, имён. Нет уверенности — выбери другую тему или сформулируй осторожно («пишут о…»). Добавь 1 нейтральную строку «что это значит для трейдера», без прогнозов цены.
 - Никаких призывов купить/продать, гарантий, «сигналов», обещаний дохода.
 - Без ссылок, без @упоминаний, без названий чужих каналов.
-- 350–900 символов, живой тон, абзацы по 1–3 предложения, максимум 2 эмодзи, без markdown-разметки (обычный текст).
+- ФОРМАТ как у лучших телеграм-каналов: КОРОТКО, 250–600 символов. Первая строка — цепляющий заголовок-крючок (до 70 символов, с одним уместным эмодзи в начале). Дальше 2–4 короткие строки/абзаца по 1–2 предложения, в начале ключевых строк уместные эмодзи по смыслу (📉📈🏦🛢🥇⚠️💡🔥😅 и т.п.), всего 3–6 эмодзи на пост, без перебора. Живой разговорный тон, без воды и канцелярита. Разметку (markdown/HTML/звёздочки) не используй.
+- Для КАЖДОГО поста добавь "media": {"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}. Новости/умное: photo или video; смешное: gif; мотивация: photo или video; если не уверен — card.
+- Для КАЖДОГО поста добавь "card": короткая надпись для картинки — "title" (2–6 слов, КАПСОМ не нужно, без эмодзи, цепляет суть) и "sub" (до 6 слов, можно пусто).
 - Смешное — своя ситуация из жизни трейдера (стоп, спред, «ещё одна свеча»), добрый юмор, без оскорблений.
-Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"..."}}]}} — ровно {len(cats)} поста в том же порядке.
+Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке.
 
 СЫРЬЁ:
 {src}"""
-    body = json.dumps({'model': MODEL, 'max_tokens': 2500, 'messages': [{'role': 'user', 'content': prompt}]}).encode()
+    body = json.dumps({'model': MODEL, 'max_tokens': 3000, 'messages': [{'role': 'user', 'content': prompt}]}).encode()
     resp = json.loads(http('https://api.anthropic.com/v1/messages', body, {'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json'}, 'POST', 120))
     txt = ''.join(b.get('text', '') for b in resp.get('content', []))
     j = json.loads(txt[txt.find('{'):txt.rfind('}') + 1])
@@ -114,7 +116,110 @@ BAD = re.compile(r'https?://|t\.me|@\w|гарантир|100\s*%\s*прибыл|�
 
 def valid(p):
     t = p.get('text', '')
-    return p.get('cat') in CATS and 200 <= len(t) <= 1100 and not BAD.search(t)
+    return p.get('cat') in CATS and 200 <= len(t) <= 800 and not BAD.search(t) and sum(1 for ch in t if ord(ch) > 0x2000) >= 2 and 2 <= len((p.get('card') or {}).get('title', '')) <= 60
+
+
+PALETTE = {'news': ((10, 25, 60), (30, 90, 200), 'НОВОСТИ РЫНКА'), 'smart': ((20, 20, 40), (90, 50, 160), 'ТРЕЙДЕРУ НА ЗАМЕТКУ'),
+           'humor': ((70, 30, 10), (230, 120, 30), 'ТРЕЙДЕРСКИЙ ЮМОР'), 'motiv': ((6, 50, 45), (20, 160, 120), 'РОСТ И ДИСЦИПЛИНА')}
+
+
+def make_card(cat, card, path):
+    """Оригинальная картинка 1080x1080: градиент по рубрике + крупный заголовок + свечной узор. Без чужих изображений."""
+    from PIL import Image, ImageDraw, ImageFont
+    import random
+    a, b, tag = PALETTE.get(cat, PALETTE['news']); W = 1080
+    img = Image.new('RGB', (W, W)); px = img.load()
+    for y in range(W):
+        for x in range(W):
+            k = (x + y) / (2 * W); px[x, y] = tuple(int(a[i] + (b[i] - a[i]) * k) for i in range(3))
+    d = ImageDraw.Draw(img, 'RGBA'); rnd = random.Random(card.get('title', ''))
+    price = 880; x0 = 60
+    for i in range(16):   # декоративные свечи
+        o = price; price += rnd.randint(-45, 38); price = max(740, min(980, price)); h = abs(price - o) + 20
+        top = min(o, price) - 10; col = (255, 255, 255, 70) if price <= o else (255, 255, 255, 38)
+        d.line([(x0 + 24, top - 30), (x0 + 24, top + h + 30)], fill=(255, 255, 255, 60), width=3)
+        d.rectangle([x0, top, x0 + 48, top + h], fill=col); x0 += 63
+    def font(sz, bold=True):
+        for f in ('/usr/share/fonts/truetype/dejavu/DejaVuSans%s.ttf' % ('-Bold' if bold else ''), '/usr/share/fonts/dejavu/DejaVuSans%s.ttf' % ('-Bold' if bold else '')):
+            if os.path.exists(f): return ImageFont.truetype(f, sz)
+        return ImageFont.load_default()
+    d.rounded_rectangle([60, 70, 60 + 22 * len(tag) + 50, 140], 35, fill=(255, 255, 255, 40))
+    d.text((85, 83), tag, font=font(34), fill=(255, 255, 255, 235))
+    title = card.get('title', '').strip(); sz = 120
+    while sz > 56:
+        f = font(sz); lines = []; cur = ''
+        for w in title.split():
+            t = (cur + ' ' + w).strip()
+            if d.textlength(t, font=f) <= W - 130: cur = t
+            else: lines.append(cur); cur = w
+        lines.append(cur)
+        if len(lines) <= 4 and all(d.textlength(l, font=f) <= W - 130 for l in lines): break
+        sz -= 8
+    y = 230
+    for l in lines:
+        d.text((64, y + 4), l, font=f, fill=(0, 0, 0, 90)); d.text((60, y), l, font=f, fill='white'); y += int(sz * 1.18)
+    sub = (card.get('sub') or '').strip()
+    if sub: d.text((60, y + 20), sub, font=font(46, False), fill=(255, 255, 255, 215))
+    d.text((60, 1005), '@trading_pride', font=font(36), fill=(255, 255, 255, 200))
+    img.save(path, 'PNG')
+
+
+PIXABAY = os.environ.get('PIXABAY_KEY', ''); PEXELS = os.environ.get('PEXELS_KEY', ''); GIPHY = os.environ.get('GIPHY_KEY', '')
+
+
+def find_media(m, cat):
+    """Лицензионные площадки: Pexels (фото/видео, свободная лицензия) и Giphy API. Нет ключа/результата -> None (будет карточка)."""
+    import urllib.parse
+    typ, q = (m or {}).get('type', 'card'), urllib.parse.quote((m or {}).get('query', '') or 'trading')
+    try:
+        if typ == 'gif' and GIPHY:
+            r = json.loads(http('https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=12&rating=pg-13&lang=en' % (GIPHY, q)))['data']
+            for g in r:
+                u = g['images'].get('downsized_large', {}).get('url') or g['images']['original']['url']
+                if int(g['images'].get('downsized_large', {}).get('size', 0) or 0) < 15000000: return ('animation', u)
+        if typ == 'video' and PIXABAY:
+            for v in json.loads(http('https://pixabay.com/api/videos/?key=%s&q=%s&per_page=10&safesearch=true' % (PIXABAY, q)))['hits']:
+                if v.get('duration', 99) > 25: continue
+                m = v['videos'].get('medium') or v['videos'].get('small')
+                if m and m.get('size', 0) < 18000000: return ('video', m['url'])
+        if typ in ('photo', 'video') and PIXABAY:
+            h = json.loads(http('https://pixabay.com/api/?key=%s&q=%s&image_type=photo&orientation=horizontal&safesearch=true&per_page=10' % (PIXABAY, q)))['hits']
+            if h: return ('photo', h[0]['largeImageURL'])
+        if typ == 'video' and PEXELS:
+            r = json.loads(http('https://api.pexels.com/videos/search?query=%s&per_page=8&size=medium&orientation=landscape' % q, headers={'Authorization': PEXELS}))['videos']
+            for v in r:
+                if v.get('duration', 99) > 25: continue
+                fs = [f for f in v['video_files'] if f.get('file_type') == 'video/mp4' and 600 <= (f.get('width') or 0) <= 1300]
+                if fs: return ('video', sorted(fs, key=lambda f: f['width'])[-1]['link'])
+        if typ in ('photo', 'video') and PEXELS:
+            r = json.loads(http('https://api.pexels.com/v1/search?query=%s&per_page=8&orientation=landscape' % q, headers={'Authorization': PEXELS}))['photos']
+            if r: return ('photo', r[0]['src']['large'])
+    except Exception as e:
+        print('! медиа не найдено:', str(e)[:100])
+    return None
+
+
+def send_url_media(chat, kind, url, caption, kb):
+    f = {'photo': 'photo', 'video': 'video', 'animation': 'animation'}[kind]
+    p = {'chat_id': chat, f: url, 'caption': caption[:1024], 'parse_mode': 'HTML', 'reply_markup': kb}
+    if kind == 'video': p['supports_streaming'] = True
+    r = tg('send' + kind.capitalize(), p)['result']
+    return r['photo'][-1]['file_id'] if kind == 'photo' else r[kind]['file_id']
+
+
+def html_text(t):
+    t = html.escape(t, quote=False); l = t.split('\n', 1)
+    return '<b>' + l[0] + '</b>' + ('\n' + l[1] if len(l) > 1 else '')
+
+
+def send_photo(chat, path, caption, kb):
+    import uuid
+    bd = uuid.uuid4().hex; parts = []
+    def fld(n, v): parts.append(('--%s\r\nContent-Disposition: form-data; name="%s"\r\n\r\n%s\r\n' % (bd, n, v)).encode())
+    fld('chat_id', chat); fld('caption', caption[:1024]); fld('parse_mode', 'HTML'); fld('reply_markup', json.dumps(kb))
+    parts.append(('--%s\r\nContent-Disposition: form-data; name="photo"; filename="c.png"\r\nContent-Type: image/png\r\n\r\n' % bd).encode() + open(path, 'rb').read() + b'\r\n')
+    parts.append(('--%s--\r\n' % bd).encode())
+    return json.loads(http('https://api.telegram.org/bot%s/sendPhoto' % TOKEN, b''.join(parts), {'Content-Type': 'multipart/form-data; boundary=' + bd}, 'POST', 60))
 
 
 def gh(method, path, data=None):
@@ -170,8 +275,21 @@ def main():
     for i, p in enumerate(posts):
         did = '%s-%d' % (today.strftime('%Y%m%d'), i + 1)
         drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
-        tg('sendMessage', {'chat_id': OWNER, 'text': 'Черновик %s · %s\n\n%s' % (did, p['cat'], p['text']),
-                           'reply_markup': {'inline_keyboard': [[{'text': '✅ Опубликовать', 'callback_data': 'ap:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}})
+        kb = {'inline_keyboard': [[{'text': '✅ Опубликовать', 'callback_data': 'ap:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
+        try:
+            got = find_media(p.get('media'), p['cat'])
+            if got:
+                try:
+                    drafts[did]['photo'] = send_url_media(OWNER, got[0], got[1], html_text(p['text']), kb); drafts[did]['kind'] = got[0]
+                except Exception as e:
+                    print('! стоковое медиа не отправилось, делаю карточку:', str(e)[:100]); got = None
+            if not got:
+                png = '/tmp/card_%s.png' % did; make_card(p['cat'], p['card'], png)
+                r = send_photo(OWNER, png, html_text(p['text']), kb)
+                drafts[did]['photo'] = r['result']['photo'][-1]['file_id']; drafts[did]['kind'] = 'photo'
+        except Exception as e:
+            print('! картинка не вышла, шлю текстом:', str(e)[:120])
+            tg('sendMessage', {'chat_id': OWNER, 'text': 'Черновик %s · %s\n\n%s' % (did, p['cat'], p['text']), 'reply_markup': kb})
     save_drafts(drafts, sha)
     print('Отправлено на одобрение:', len(posts))
 

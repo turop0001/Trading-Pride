@@ -25,6 +25,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - run: pip install pillow
       - name: Черновики
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -32,6 +33,9 @@ jobs:
           CP_OWNER_ID: ${{ secrets.CP_OWNER_ID }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          GIPHY_KEY: ${{ secrets.GIPHY_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CP_DRY: ${{ github.event.inputs.dry || '0' }}
         run: python channel_poster/run.py

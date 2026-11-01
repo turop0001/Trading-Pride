@@ -43,14 +43,18 @@ function statsText(data, days, title, subs) {
   return s;
 }
 async function subsCount() { try { const r = await tg('getChatMemberCount', { chat_id: CHANNEL() }); return r.ok ? r.result : null; } catch (e) { return null; } }
+const MK = { photo: ['sendPhoto', 'photo'], video: ['sendVideo', 'video'], animation: ['sendAnimation', 'animation'] };
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const htmlText = (t) => { const i = t.indexOf('\n'); return i < 0 ? '<b>' + esc(t) + '</b>' : '<b>' + esc(t.slice(0, i)) + '</b>' + esc(t.slice(i)); };
 async function send(chat, text, kb) { return tg('sendMessage', { chat_id: chat, text: text.slice(0, 4000), reply_markup: kb || MENU }); }
 
 async function showDrafts(chat, data) {
   const pend = Object.keys(data || {}).filter((id) => data[id].status === 'pending').sort();
   if (!pend.length) return send(chat, '📝 Черновиков, ждущих решения, нет.\n\nНовые приходят ежедневно утром. Можно запросить сейчас: /gen');
   for (const id of pend) {
-    await tg('sendMessage', { chat_id: chat, text: `Черновик ${id} · ${CAT[data[id].cat] || data[id].cat}\n\n${data[id].text}`.slice(0, 4000),
-      reply_markup: { inline_keyboard: [[{ text: '✅ Опубликовать', callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]] } });
+    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать', callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
+    if (data[id].photo) await tg((MK[data[id].kind] || MK.photo)[0], { chat_id: chat, [(MK[data[id].kind] || MK.photo)[1]]: data[id].photo, caption: htmlText(data[id].text).slice(0, 1024), parse_mode: 'HTML', reply_markup: kb });
+    else await tg('sendMessage', { chat_id: chat, text: `Черновик ${id} · ${CAT[data[id].cat] || data[id].cat}\n\n${data[id].text}`.slice(0, 4000), reply_markup: kb });
   }
 }
 async function showSources(chat) {
@@ -103,7 +107,7 @@ export default async function handler(req, res) {
       if (String(msg.from && msg.from.id) !== owner) { await tg('sendMessage', { chat_id: msg.chat.id, text: 'Этот бот работает только с владельцем канала.\n\nВаш Telegram id: ' + (msg.from && msg.from.id) + '\nЕсли вы владелец, впишите это число в CP_OWNER_ID (GitHub и Vercel) и сделайте Redeploy.' }); return res.status(200).send('ok'); }
       const cmd = String(msg.text || '').split(/[\s@]/)[0].toLowerCase();
       const map = { '/start': 'start', '/menu': 'menu', '/help': 'help', '/drafts': 'drafts', '/stats': 'stats', '/week': 'week', '/gen': 'gen', '/sources': 'src' };
-      if (cmd === '/start') await send(msg.chat.id, 'Здравствуйте! Я бот-редактор канала @trading_pride.\n\n' + HELP, MENU);
+      if (cmd === '/start') await send(msg.chat.id, 'Здравствуйте!\n\n' + HELP, MENU);
       else if (map[cmd]) await menuAction(msg.chat.id, map[cmd]);
       else await send(msg.chat.id, 'Выберите действие в меню или отправьте /help.', MENU);
       return res.status(200).send('ok');
@@ -119,7 +123,7 @@ export default async function handler(req, res) {
     if (!d) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Черновик не найден' }); return res.status(200).send('ok'); }
     if (d.status !== 'pending') { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Уже обработан: ' + (ST[d.status] || d.status) }); return res.status(200).send('ok'); }
     if (act === 'ap') {
-      const r = await tg('sendMessage', { chat_id: CHANNEL(), text: d.text });
+      const r = d.photo ? await tg((MK[d.kind] || MK.photo)[0], { chat_id: CHANNEL(), [(MK[d.kind] || MK.photo)[1]]: d.photo, caption: htmlText(d.text).slice(0, 1024), parse_mode: 'HTML' }) : await tg('sendMessage', { chat_id: CHANNEL(), text: htmlText(d.text), parse_mode: 'HTML' });
       if (!r.ok) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Не опубликовано: ' + String(r.description || '').slice(0, 150), show_alert: true }); return res.status(200).send('ok'); }
       d.status = 'published'; d.pub = new Date().toISOString(); d.msg_id = r.result && r.result.message_id; await edit('✅ Опубликовано');
     } else if (act === 'rj') { d.status = 'rejected'; await edit('❌ Отклонено'); } else return res.status(200).send('ok');
