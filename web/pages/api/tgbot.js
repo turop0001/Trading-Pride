@@ -69,7 +69,7 @@ async function generate(chat) {
   const repo = process.env.GH_REPO || 'turop0001/Trading-Pride';
   const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST',
     headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: { dry: '0' } }) });
-  return send(chat, r.status === 204 ? '⚡ Запустил подготовку постов. Черновики придут сюда через 1–3 минуты.' : `Не получилось запустить (код ${r.status}). Запустите вручную: GitHub → Actions → «Черновики постов» → Run workflow.`, BACK);
+  return send(chat, r.status === 204 ? '⏳ Запустил подготовку постов. Готовлю черновики, это 1–3 минуты. Когда закончу, напишу «✅ Готово».' : `Не получилось запустить (код ${r.status}). Запустите вручную: GitHub → Actions → «Черновики постов» → Run workflow.`, BACK);
 }
 
 async function menuAction(chat, act) {
@@ -116,19 +116,35 @@ export default async function handler(req, res) {
     if (!cb) return res.status(200).send('ok');
     if (String(cb.from && cb.from.id) !== owner) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Нет доступа' }); return res.status(200).send('ok'); }
     const [act, id] = String(cb.data || '').split(':');
-    if (act === 'm') { await tg('answerCallbackQuery', { callback_query_id: cb.id }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
+    if (act === 'm') { const T = { gen: '⏳ Запускаю…', drafts: '📝 Загружаю…', stats: '📊 Считаю…', week: '🗓 Считаю…', src: '📚 Открываю…' }; await tg('answerCallbackQuery', { callback_query_id: cb.id, text: T[id] || '' }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
     const { data, sha } = await readJson('channel/drafts.json', {}, 'state');
     const d = data && data[id];
-    const edit = (t) => tg('editMessageReplyMarkup', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: { inline_keyboard: [[{ text: t, callback_data: 'x:' + id }]] } });
-    if (!d) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Черновик не найден' }); return res.status(200).send('ok'); }
-    if (d.status !== 'pending') { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Уже обработан: ' + (ST[d.status] || d.status) }); return res.status(200).send('ok'); }
+    const BTN = [[{ text: '✅ Опубликовать', callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]];
+    const mk = (rows) => tg('editMessageReplyMarkup', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: { inline_keyboard: rows } });
+    const edit = (t, extra) => mk([[{ text: t, callback_data: 'x:' + id }], ...(extra ? [extra] : [])]);
+    const toast = (text, alert) => tg('answerCallbackQuery', { callback_query_id: cb.id, text, show_alert: !!alert });
+    if (act === 'x') { await toast('Это статус, нажимать не нужно'); return res.status(200).send('ok'); }
+    if (!d) { await toast('Черновик не найден'); return res.status(200).send('ok'); }
+    if (act === 'un') {
+      if (d.status !== 'rejected') { await toast('Вернуть можно только отклонённый'); return res.status(200).send('ok'); }
+      d.status = 'pending'; await mk(BTN);
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' pending', 'state', true).catch(() => {});
+      await toast('↩️ Вернул в ожидание'); return res.status(200).send('ok');
+    }
+    if (d.status !== 'pending') { await toast('Уже обработан: ' + (ST[d.status] || d.status)); return res.status(200).send('ok'); }
     if (act === 'ap') {
-      const r = d.photo ? await tg((MK[d.kind] || MK.photo)[0], { chat_id: CHANNEL(), [(MK[d.kind] || MK.photo)[1]]: d.photo, caption: htmlText(d.text).slice(0, 1024), parse_mode: 'HTML' }) : await tg('sendMessage', { chat_id: CHANNEL(), text: htmlText(d.text), parse_mode: 'HTML' });
-      if (!r.ok) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Не опубликовано: ' + String(r.description || '').slice(0, 150), show_alert: true }); return res.status(200).send('ok'); }
-      d.status = 'published'; d.pub = new Date().toISOString(); d.msg_id = r.result && r.result.message_id; await edit('✅ Опубликовано');
-    } else if (act === 'rj') { d.status = 'rejected'; await edit('❌ Отклонено'); } else return res.status(200).send('ok');
+      await toast('⏳ Публикую…'); await edit('⏳ Публикую…');
+      const cap = htmlText(d.text);
+      const r = d.photo ? await tg((MK[d.kind] || MK.photo)[0], { chat_id: CHANNEL(), [(MK[d.kind] || MK.photo)[1]]: d.photo, caption: cap.slice(0, 1024), parse_mode: 'HTML' }) : await tg('sendMessage', { chat_id: CHANNEL(), text: cap, parse_mode: 'HTML' });
+      if (!r.ok) { await mk(BTN); await toast('⚠️ Не опубликовано: ' + String(r.description || '').slice(0, 150), true); return res.status(200).send('ok'); }
+      d.status = 'published'; d.pub = new Date().toISOString(); d.msg_id = r.result && r.result.message_id;
+      const ch = CHANNEL().replace(/^@/, ''), link = /^\w+$/.test(ch) && d.msg_id ? [{ text: '🔗 Открыть в канале', url: `https://t.me/${ch}/${d.msg_id}` }] : null;
+      await edit('✅ Опубликовано ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' }), link);
+    } else if (act === 'rj') {
+      d.status = 'rejected'; await edit('❌ Отклонено', [{ text: '↩️ Вернуть', callback_data: 'un:' + id }]);
+    } else return res.status(200).send('ok');
     await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ' + d.status, 'state', true).catch(() => {});
-    await tg('answerCallbackQuery', { callback_query_id: cb.id, text: d.status === 'published' ? 'Опубликовано в канал' : 'Отклонено' });
+    await toast(d.status === 'published' ? '✅ Опубликовано в канал' : '❌ Отклонено');
   } catch (e) { console.error('tgbot', e); }
   res.status(200).send('ok');
 }

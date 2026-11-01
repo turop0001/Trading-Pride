@@ -24,7 +24,8 @@ CATS = {'news': 'ХАЙПОВАЯ НОВОСТЬ про рынки/трейди�
 
 
 def http(url, data=None, headers=None, method=None, timeout=40):
-    req = urllib.request.Request(url, data=data, headers=headers or {}, method=method)
+    h = {'User-Agent': 'Mozilla/5.0 (compatible; TradingPrideBot/1.0)'}; h.update(headers or {})
+    req = urllib.request.Request(url, data=data, headers=h, method=method)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode('utf-8', 'replace')
 
@@ -108,7 +109,7 @@ def ask_llm(cats, rows, today):
 Примеры тона (свои, не копируй дословно):
   Новость: «🏦 ФРС опять никуда не торопится\nСтавку оставили как есть, и доллар сначала дёрнулся вниз, а потом вернулся обратно. Powell сказал, что ждёт ещё данных по инфляции. Для нас это значит: на ближайших свечах будет шумно, но направление пока не выбрано.»
   Смешное: «😅 Поставил стоп. Цена подошла, выбила, развернулась и улетела без меня\nЗнакомо? Рынок как будто читает мой терминал. Утешаю себя тем, что хоть депозит остался при мне.»
-- Для КАЖДОГО поста добавь "media": {"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}. Новости и умное: photo или video. Смешное: gif. Мотивация: photo или video. Не уверен: card.
+- Для КАЖДОГО поста добавь "media": {{"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}}. Новости и умное: photo или video. Смешное: gif. Мотивация: photo или video. Не уверен: card.
 - Для КАЖДОГО поста добавь "card": надпись для запасной картинки: "title" (2–6 слов, без эмодзи, суть) и "sub" (до 6 слов, можно пусто).
 Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке.
 
@@ -183,7 +184,10 @@ def find_media(m, cat):
     typ, q = (m or {}).get('type', 'card'), urllib.parse.quote((m or {}).get('query', '') or 'trading')
     try:
         if typ == 'gif' and GIPHY:
-            r = json.loads(http('https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=12&rating=pg-13&lang=en' % (GIPHY, q)))['data']
+            r = []
+            for qq in (q, urllib.parse.quote(urllib.parse.unquote(q).split()[0]), 'trading', 'money'):
+                r = json.loads(http('https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=12&rating=pg-13&lang=en' % (GIPHY, qq)))['data']
+                if r: break
             for g in r:
                 u = g['images'].get('downsized_large', {}).get('url') or g['images']['original']['url']
                 if int(g['images'].get('downsized_large', {}).get('size', 0) or 0) < 15000000: return ('animation', u)
@@ -275,6 +279,12 @@ def main():
                 try: tg('sendMessage', {'chat_id': OWNER, 'text': 'Автопостинг: не удалось написать черновики (код %s). %s' % (e.code, hint)})
                 except Exception: pass
             return
+        except Exception as e:
+            print('Ошибка при написании постов:', repr(e)[:300])
+            if TOKEN and OWNER and not DRY:
+                try: tg('sendMessage', {'chat_id': OWNER, 'text': 'Автопостинг: сбой при написании постов (%s). Напишу в чат Claude, исправлю.' % repr(e)[:150]})
+                except Exception: pass
+            raise SystemExit(1)
     else:
         print('НЕТ ANTHROPIC_API_KEY — черновики не сгенерированы')
     if not posts: print('Нет годных черновиков — выходим'); return
@@ -301,6 +311,8 @@ def main():
             print('! картинка не вышла, шлю текстом:', str(e)[:120])
             tg('sendMessage', {'chat_id': OWNER, 'text': 'Черновик %s · %s\n\n%s' % (did, p['cat'], p['text']), 'reply_markup': kb})
     save_drafts(drafts, sha)
+    try: tg('sendMessage', {'chat_id': OWNER, 'text': '✅ Готово: %d черновика выше. Нажми «Опубликовать» или «Отклонить» под каждым.' % len(posts)})
+    except Exception: pass
     print('Отправлено на одобрение:', len(posts))
 
 
