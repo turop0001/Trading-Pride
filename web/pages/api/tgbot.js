@@ -96,11 +96,11 @@ export default async function handler(req, res) {
   }
   if (req.method !== 'POST') return res.status(405).send('POST only');
   if (!process.env.CP_WEBHOOK_SECRET || req.headers['x-telegram-bot-api-secret-token'] !== process.env.CP_WEBHOOK_SECRET) return res.status(403).send('bad secret');
-  const upd = req.body || {}, owner = String(process.env.CP_OWNER_ID || '');
+  const upd = req.body || {}, owner = String(process.env.CP_OWNER_ID || '').replace(/\D/g, '');   // только цифры: лишние пробелы/переводы строк в значении не мешают
   try {
     const msg = upd.message;
     if (msg) {
-      if (String(msg.from && msg.from.id) !== owner) { await tg('sendMessage', { chat_id: msg.chat.id, text: 'Этот бот работает только с владельцем канала.' }); return res.status(200).send('ok'); }
+      if (String(msg.from && msg.from.id) !== owner) { await tg('sendMessage', { chat_id: msg.chat.id, text: 'Этот бот работает только с владельцем канала.\n\nВаш Telegram id: ' + (msg.from && msg.from.id) + '\nЕсли вы владелец, впишите это число в CP_OWNER_ID (GitHub и Vercel) и сделайте Redeploy.' }); return res.status(200).send('ok'); }
       const cmd = String(msg.text || '').split(/[\s@]/)[0].toLowerCase();
       const map = { '/start': 'start', '/menu': 'menu', '/help': 'help', '/drafts': 'drafts', '/stats': 'stats', '/week': 'week', '/gen': 'gen', '/sources': 'src' };
       if (cmd === '/start') await send(msg.chat.id, 'Здравствуйте! Я бот-редактор канала @trading_pride.\n\n' + HELP, MENU);
