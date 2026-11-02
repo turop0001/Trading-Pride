@@ -168,7 +168,7 @@ def _tg(r, closed=False):
     pd_ = r.get('pend') or {}
     if ls == 'prep' and pd_.get('entry') is not None and note.startswith('ВЫНОС'):
         # 30.10.2026: пока лимитка не сработала — в чате «выставить», а не «вход»
-        note = f"ВЫНОС — выставляем {'BUY' if pd_.get('side') == 'long' else 'SELL'} LIMIT ордер {pd_['entry']}"
+        note = f"ВЫНОС — выставляем {'BUY' if pd_.get('side') == 'long' else 'SELL'} STOP ордер {pd_['entry']}"
     sg = r.get('signal') or {}
     if sg.get('time'):
         if note.startswith('ЗАКРЫТА'):

@@ -137,13 +137,13 @@ def build_signal(date, window_label, time_str, symbol, direction, entry, stop, t
 
 
 def build_order(date, window_label, time_str, symbol, direction, side, entry, stop, lstep=1, llag=1, until='18:30', update=False):
-    """30.10.2026 (решение владельца): для Типа C ДО входа — «Выставляем SELL/BUY LIMIT ордер» + цифры; «ВХОД» только когда лимитка сработала."""
+    """30.10.2026 (решение владельца): для Типа C ДО входа — «Выставляем SELL/BUY STOP ордер» + цифры; «ВХОД» только когда лимитка сработала."""
     kind = 'BUY' if side == 'long' else 'SELL'
     ls, lg = float(lstep), float(llag)
     first = f"на +{ls:g}R стоп в БУ" if abs(ls - lg) < 1e-9 else f"на +{ls:g}R стоп на +{ls - lg:g}R"
     verb = 'Обновляем' if update else 'Выставляем'
     return (f"{E_BELL} ОРДЕР · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
-            f"{E_PREP} {symbol} ({direction}) — {verb} {kind} LIMIT ордер\n\n"
+            f"{E_PREP} {symbol} ({direction}) — {verb} {kind} STOP ордер\n\n"
             f"Цена: {entry}\n"
             f"Стоп: {stop}\n"
             f"{E_TARGET} Без тейка. Лесенка {ls:g}/{lg:g}: {first}. Выход в 22:00.\n"
@@ -157,7 +157,7 @@ def build_order_cancel(date, window_label, time_str, symbol, direction, side, en
     why = str(reason or '').strip()
     why = 'правила больше не проходят' if why in ('', 'СКИП') else why
     return (f"{E_BELL} ОРДЕР · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
-            f"{E_SKIP} {symbol} ({direction}) — Отменяем {kind} LIMIT ордер {entry}\n\n"
+            f"{E_SKIP} {symbol} ({direction}) — Отменяем {kind} STOP ордер {entry}\n\n"
             f"Причина: {why}")
 
 
