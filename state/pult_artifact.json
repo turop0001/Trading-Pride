@@ -10,7 +10,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 1.34251,
+   "price": 1.34264,
    "boxH": 1.34481,
    "boxL": 1.34012,
    "prevH": null,
@@ -40,7 +40,7 @@
    "direction": "—",
    "note": "НАБЛЮДАЕМ",
    "reasons": [],
-   "price": 7629.1,
+   "price": 7627.7,
    "boxH": 7628.9,
    "boxL": 7602.9,
    "prevH": null,
@@ -66,11 +66,11 @@
    "date": "2026-11-02",
    "sym": "UK100",
    "window": "C",
-   "status": "entry",
+   "status": "skip",
    "direction": "🔻 SHORT",
-   "note": "ВХОД (17:00, 10760.2)",
+   "note": "ВХОД → SL −1R",
    "reasons": [],
-   "price": 10759.4,
+   "price": 10760.6,
    "boxH": 10755.9,
    "boxL": 10703.3,
    "prevH": null,
@@ -168,13 +168,6 @@
     "UK100"
    ],
    "log": [
-    {
-     "date": "2026-11-02",
-     "time": "17:06",
-     "window": "C",
-     "text": "без изменений",
-     "lines": []
-    },
     {
      "date": "2026-11-02",
      "time": "17:06",
@@ -449,6 +442,15 @@
      "lines": [
       "⚠️ UK100 (🔻 SHORT) — ВЫНОС",
       "🟢 UK100 (🔻 SHORT) — ВХОД в 17:00"
+     ]
+    },
+    {
+     "date": "2026-11-02",
+     "time": "17:10",
+     "window": "C",
+     "text": "изменилось: UK100",
+     "lines": [
+      "🔴 UK100 (🔻 SHORT) — ЗАКРЫТА - SL в 17:00"
      ]
     }
    ]

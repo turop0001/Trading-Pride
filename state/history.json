@@ -1104,6 +1104,11 @@
     "entry": 10760.2,
     "stop": 10765.0,
     "target": 10741.1,
-    "result": "сигнал Пульта в 17:00"
+    "result": "ВХОД → SL −1R",
+    "autopsy": "",
+    "shots": {
+      "m5": "state/shots/2026-11-02_UK100_C_m5.png",
+      "h1": "state/shots/2026-11-02_UK100_C_h1.png"
+    }
   }
 ]
