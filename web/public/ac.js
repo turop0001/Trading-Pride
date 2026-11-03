@@ -7,7 +7,7 @@ var DECM={XAUUSD:2,EURUSD:5,GBPUSD:5,US500:1,NAS100:1,US30:0,GER40:1,AUDUSD:5,US
 function dec(s){return DECM[s]!=null?DECM[s]:5}
 function px(v,s){return Number(v).toFixed(dec(s))}
 var CFG={A:{rr:2,b0:'03:00',b1:'09:55',s0:'10:00',bn:'Азия'},C:{rr:3,b0:'11:00',b1:'16:25',s0:'16:30',bn:'бокс'}};
-function RT(c){return c.res==='TP'?'TP +'+c.rr+'R':c.res==='SL'?'SL −1R':c.res==='BE'?'БУ 0R':'22:00 '+(c.R>=0?'+':'−')+Math.abs(c.R).toFixed(2)+'R'}
+function RT(c){return c.res==='TP'?'TP +'+(c.xp!=null?+Number(c.R).toFixed(2):c.rr)+'R':c.res==='SL'?'SL −1R':c.res==='BE'?'БУ 0R':'22:00 '+(c.R>=0?'+':'−')+Math.abs(c.R).toFixed(2)+'R'}
 function rcls(c){return c.res==='TP'?'w':c.res==='SL'?'l':c.res==='BE'?'b':'no'}
 function fd(d){return d.split('-').reverse().join('.')}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]})}
@@ -76,7 +76,7 @@ function m5chart(c,zoom,ci){
    s_+=`<text class="halo" x="${bx}" y="${y(c.boxH)+14}" style="fill:var(--a-asia);font-weight:700;font-size:11px">${c.bn} хай ${px(c.boxH,s)}</text><text class="halo" x="${bx}" y="${y(c.boxL)-7}" style="fill:var(--a-asia);font-weight:700;font-size:11px">${c.bn} лой ${px(c.boxL,s)}</text>`}
   s_+='</g>';
   // вход / выход: кружки на графике, подписи в верхней полосе
-  const ye=c.res==='TP'?c.tp:c.res==='SL'?c.stop:c.res==='BE'?c.entry:B[iX][3];
+  const ye=c.xp!=null?c.xp:c.res==='TP'?c.tp:c.res==='SL'?c.stop:c.res==='BE'?c.entry:B[iX][3];
   const col=c.res==='TP'?'var(--a-tp)':c.res==='SL'?'var(--a-sl)':c.res==='BE'?'var(--a-be)':'var(--a-muted)';
   s_+=`<line x1="${x(iE)}" x2="${x(iE)}" y1="${T}" y2="${PL}" stroke="var(--a-entry)" stroke-width="1.2" stroke-dasharray="2 3"/><circle cx="${x(iE)}" cy="${y(c.entry)}" r="6" fill="var(--a-entry)" stroke="var(--a-panel)" stroke-width="2"/><circle cx="${x(iX)}" cy="${y(ye)}" r="5.5" fill="${col}" stroke="var(--a-panel)" stroke-width="2"/>`;
   const l1=`ВХОД ${c.tin} · ${px(c.entry,s)}`,w1=l1.length*7+16,x1c=Math.min(W-R-w1,Math.max(L,x(iE)-w1/2));
@@ -177,7 +177,7 @@ function summ(list,typ,statsEl,tblEl,cards){
   var sg=function(v){return (v>=0?'+':'−')+Math.abs(v).toFixed(2)};
   var q=[['Сделок',n,''],['TP',tp,'w'],typ==='C'?['БУ',be,'b']:['22:00',t22,'no'],['SL',sl,'l'],['Доля TP',Math.round(100*tp/n)+'%',''],['Итог',sg(cum)+'R',cum>=0?'w':'l'],['При риске 1%',sg(cum)+'%',cum>=0?'w':'l'],['Просадка',(dd===0?'0':'−'+Math.abs(dd).toFixed(2))+'R',''],['Серия SL',ms,'']];
   statsEl.innerHTML=q.map(function(x){return '<div class="c2st"><b class="'+x[2]+'">'+x[1]+'</b><span>'+x[0]+'</span></div>'}).join('');
-  tblEl.innerHTML='<thead><tr><th>#</th><th>Пара</th><th>Дата</th><th>Сторона</th><th>Вход</th><th>Выход</th><th>Итог</th><th>Оценка</th></tr></thead><tbody>'+D.map(function(c,i){return '<tr class="go" data-i="'+i+'"><td class="n">'+typ+c.k+'</td><td>'+c.sym+'</td><td class="n">'+fd(c.day)+'</td><td>'+(c.side==='long'?'LONG':'SHORT')+'</td><td class="n">'+c.tin+' · '+px(c.entry,c.sym)+'</td><td class="n">'+c.xt+'</td><td class="'+rcls(c)+'">'+RT(c)+'</td><td>'+esc(c.prob||'—')+'</td></tr>'}).join('')+'</tbody>';
+  tblEl.innerHTML='<thead><tr><th>#</th><th>Пара</th><th>Дата</th><th>Сторона</th><th>Вход</th><th>Выход</th><th>Итог</th><th>Оценка</th></tr></thead><tbody>'+D.map(function(c,i){return '<tr class="go" data-i="'+i+'"><td class="n">'+typ+c.k+'</td><td>'+c.sym+'</td><td class="n">'+fd(c.day)+'</td><td>'+(c.side==='long'?'LONG':'SHORT')+'</td><td class="n">'+c.tin+' · '+px(c.entry,c.sym)+'</td><td class="n">'+c.xt+'</td><td class="'+rcls(c)+'">'+RT(c)+'</td><td>'+esc(c.prob||'—')+'</td></tr>'}).reverse().join('')+'</tbody>';
   tblEl.querySelectorAll('tr.go').forEach(function(r){r.onclick=function(){var el=cards[+r.dataset.i];if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}});
   return {typ:typ,n:n,tp:tp,sl:sl,be:be,t22:t22,cum:cum,dd:dd,ms:ms,from:D[0].day,to:D[D.length-1].day};
 }
@@ -200,7 +200,7 @@ function mountTab(root,data,api){
   var q=function(s){return root.querySelector(s)};
   [['A',A],['C',C]].forEach(function(p){var typ=p[0],list=p[1],host=q('.cards'+typ);
     if(!list.length)host.innerHTML='<div class="empty">Пока нет закрытых сделок Типа '+typ+'. Они появятся здесь после закрытия первой сделки.</div>';
-    var els=list.map(function(c){var el=cardEl(c,{api:api});host.appendChild(el);return el});
+    var els=list.map(function(c){return cardEl(c,{api:api})});els.slice().reverse().forEach(function(el){host.appendChild(el)});   /* 03.11.2026: новые сделки выше */
     p.push(summ(list,typ,q('.stats'+typ),q('.sum'+typ),els));
   });
   var SA=[].concat([]),sg=function(v){return (v>=0?'+':'−')+Math.abs(v).toFixed(2)+'R'};

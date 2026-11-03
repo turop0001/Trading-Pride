@@ -504,7 +504,7 @@ def _migrate_v115():
                 json.dump(base + tail, open(hp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
         if os.path.exists(ap) and os.path.exists(an):
             a = json.load(open(ap, encoding='utf-8'))
-            if a.get('rules') != 'v1_15':
+            if a.get('rules') != 'v1_15b':
                 n = json.load(open(an, encoding='utf-8'))
                 late = {k: [r for r in (a.get(k) or []) if str(r.get('day', '')) > '2026-10-31'] for k in ('A', 'C')}
                 for k in ('A', 'C'): n[k] = (n.get(k) or []) + late[k]
