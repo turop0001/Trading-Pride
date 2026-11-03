@@ -148,6 +148,7 @@ details.pxc{border:1px solid var(--border);border-radius:10px;background:var(--s
 .pxd{margin-top:8px;display:flex;flex-direction:column;gap:3px}.pxd div{font-size:12.5px;font-weight:400;color:var(--muted)}.pxd div.on{color:var(--text);font-weight:600}
 
 .st.be{background:var(--be-bg);color:var(--be);border:1px solid var(--be)}
+.ordbx{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:var(--surface-2);font-weight:400}.ordbx .ob-ic{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}.ordbx .ob-t{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;opacity:.8}.ordbx .ob-b{font-size:22px;font-weight:700;line-height:1.2;margin-top:2px}.ordbx .ob-s{font-size:15px;color:var(--muted);margin-top:3px;line-height:1.35}.ordbx.go{background:var(--long-bg);border-color:var(--long)}.ordbx.go .ob-ic{background:var(--long);color:#fff}.ordbx.go .ob-t,.ordbx.go .ob-b{color:var(--long)}.ordbx.no .ob-ic{background:var(--off-bg);color:var(--off);border:1px solid var(--border)}.ordbx.cx{background:var(--short-bg);border-color:var(--short)}.ordbx.cx .ob-ic{background:var(--short);color:#fff}.ordbx.cx .ob-t{color:var(--short)}
 .rgrid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 14px;font-size:17px;line-height:1.45}
 @media (max-width:560px){.rgrid{grid-template-columns:1fr;gap:2px}.rgrid span{margin-top:8px;font-size:15px}}
 @media (max-width:560px){.chead{flex-wrap:wrap;row-gap:8px}.chead h3{font-size:20px}.chead .st{margin-left:0;font-size:15px;padding:5px 12px;max-width:100%;white-space:normal}.card,.rgrid>*{min-width:0}.rgrid,.rgrid span{overflow-wrap:anywhere}.pxp{max-width:100%}html,body{overflow-x:hidden}}
@@ -1074,8 +1075,11 @@ function liveCard(x){
   if(x.status==='prep'&&x.pend&&x.pend.entry!=null&&!x.signal&&/^ВЫНОС/.test(stn))stn='ВЫНОС — выставляем '+(x.pend.side==='short'?'SELL':'BUY')+' STOP ордер '+x.pend.entry+' (ждём откат 50%)';
   rows.push(['Статус',stn]);
   if(x.window==='C'&&!x.signal){var ord_='';
-    if(x.status==='prep'&&x.pend&&x.pend.entry!=null){var pq=x.pend,lq=lotsRow(x.sym,pq.entry,pq.stop,x.window);ord_='<b>СТАВИМ ОРДЕР</b> '+(pq.side==='short'?'SELL':'BUY')+' STOP '+pq.entry+' · стоп '+pq.stop+(lq?' · лот '+lq:'');}
-    else if(x.status==='skip'){var rs_=(x.reasons&&x.reasons[0])||stn;ord_=(x.order_cancel?'<b>ОРДЕР ОТМЕНЁН</b>':'<b>ОРДЕР НЕ СТАВИМ</b> · СКИП')+' — '+escA(String(rs_));}
+    var ob=function(cls,ic,ttl,big,sub){return '<div class="ordbx '+cls+'"><div class="ob-ic">'+ic+'</div><div class="ob-tx"><div class="ob-t">'+ttl+'</div>'+(big?'<div class="ob-b">'+big+'</div>':'')+(sub?'<div class="ob-s">'+sub+'</div>':'')+'</div></div>';};
+    if(x.status==='prep'&&x.pend&&x.pend.entry!=null){var pq=x.pend,lq=lotsRow(x.sym,pq.entry,pq.stop,x.window);
+      ord_=ob('go','&#9654;','Ставим ордер',(pq.side==='short'?'SELL':'BUY')+' STOP · '+pq.entry,'стоп '+pq.stop+(lq?' &nbsp;·&nbsp; лот '+escA(lq):''));}
+    else if(x.status==='skip'){var rs_=String((x.reasons&&x.reasons[0])||stn).replace(/\s*\(как в советнике\)/,'').replace(/^СКИП\s*\(?/,'');
+      ord_=x.order_cancel?ob('cx','&#10005;','Ордер отменён','',escA(rs_)):ob('no','&#8212;','Ордер не ставим','',escA(rs_));}
     if(ord_)rows.push(['Ордер',ord_]);}
   /* структура: Swing (главная) и Sub (внутренняя) + рекомендация; только контекст, не правило входа */
   if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
@@ -1146,7 +1150,7 @@ function renderRep(){
     var stc=c.st,stt=c.stT;if(c.res)stc=c.res.toLowerCase();if(c.res==='TP')stt+=' ✅';if(my&&my.open){stc='trade';stt='В сделке';}/* 05.10.2026: «Закрыл» только пишет в журнал; плашка возвращается к статусу Пульта (MT5) — «Закрыта · TP/SL» только по MT5 */
     top.appendChild(el('span','st '+stc,stt));card.appendChild(top);
     var g=el('div','rgrid');c.rows.forEach(function(r){g.appendChild(el('span',null,r[0]));var bEl=el('b',null,null);
-      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<div class="px')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
+      if(typeof r[1]==='string'&&(r[1].indexOf('<a ')===0||r[1].indexOf('<img ')===0||r[1].indexOf('<span class="nar')===0||r[1].indexOf('<span class="stchip')===0||r[1].indexOf('<div class="px')===0||r[1].indexOf('<div class="ordbx')===0||r[1].indexOf('<span class="fxl')===0||r[1].indexOf('<a class="shots')===0)){bEl.innerHTML=r[1];}
       else if(typeof r[1]==='string'&&r[0]==='Нарратив'&&/→ итог/.test(r[1])){
         bEl.innerHTML=r[1].replace(/→ итог (LONG|SHORT|50\/50)/,function(m,v){var cls=v==='LONG'?'long':v==='SHORT'?'short':'side';return '→ <span class="outb '+cls+'">итог '+v+'</span>';});
       }

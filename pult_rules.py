@@ -1304,7 +1304,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                         _o_ = sd * float(d['Open'].iloc[-1]) + (C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0)
                         if _o_ >= e_:
                             _gapnow = True
-                            _wide_hold = _wide_hold or []; _wide_hold.append((5, 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится (как в советнике), вход упущен', 'СКИП (цена уже за уровнем отката)'))
+                            _wide_hold = _wide_hold or []; _wide_hold.append((5, 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится, вход упущен', 'СКИП (цена уже за уровнем отката)'))
                 except Exception: pass
                 for _n, _tx, _st in (_wide_hold or []): _why(res, 'Ордер пока не выставляется: ' + _tx)
                 if not _gapnow and C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
@@ -1335,7 +1335,7 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     _bsp = C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0   # 30.10.2026: покупка — по ask (bid + спред), продажа — по bid
     _gap0 = (len(so) > 0 and float(so[0]) + _bsp >= lvl) if fi is not None else (float(O[entry_g]) + _bsp >= lvl)
     if _gap0:
-        t = 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится (как в советнике), вход упущен'
+        t = 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится, вход упущен'
         # 30.10.2026: советник сначала проверяет стоп/спред/встречный FVG по расчётному уровню и только потом — касание: главной причиной ставим их
         _stw = lvl - (ext - 0.1 * (lvl - ext)); _atw = float((d['High'] - d['Low']).iloc[max(0, entry_g - 14):entry_g].mean())
         _pg = []
