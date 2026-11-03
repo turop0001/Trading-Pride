@@ -1296,8 +1296,18 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                     _wide_hold = _wide_hold or []; _wide_hold.append((9, f'стоп {R_:.{dec}f} меньше {_mn:.{dec}f} (3 × спред+комиссия) — не окупится; если вынос вырастет, пересчитаем', 'СКИП (стоп меньше спреда+комиссии)'))
                 if _cfp is not None:
                     _wide_hold = _wide_hold or []; _wide_hold.append((8, 'встречный H1 FVG на пути 4R', 'СКИП (встречный H1 FVG на пути 4R)'))
+                # 03.11.2026: как советник на закрытии M10 — если первая M5 новой M10 уже открылась за уровнем отката (ask = bid + спред), ордер не ставится, день пропущен
+                _gapnow = False
+                try:
+                    _tl = d.index[-1]
+                    if _tl.minute % C_TF == 0 and not (prev or {}).get('pend') and not (prev or {}).get('signal'):
+                        _o_ = sd * float(d['Open'].iloc[-1]) + (C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0)
+                        if _o_ >= e_:
+                            _gapnow = True
+                            _wide_hold = _wide_hold or []; _wide_hold.append((5, 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится (как в советнике), вход упущен', 'СКИП (цена уже за уровнем отката)'))
+                except Exception: pass
                 for _n, _tx, _st in (_wide_hold or []): _why(res, 'Ордер пока не выставляется: ' + _tx)
-                if C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
+                if not _gapnow and C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:

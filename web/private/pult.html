@@ -1073,6 +1073,10 @@ function liveCard(x){
   if(x.status==='skip'&&x.ckf&&x.ckf.length&&!/→ (TP|SL)/.test(x.note||''))stn+=' · пункт №'+x.ckf.join(', ');
   if(x.status==='prep'&&x.pend&&x.pend.entry!=null&&!x.signal&&/^ВЫНОС/.test(stn))stn='ВЫНОС — выставляем '+(x.pend.side==='short'?'SELL':'BUY')+' STOP ордер '+x.pend.entry+' (ждём откат 50%)';
   rows.push(['Статус',stn]);
+  if(x.window==='C'&&!x.signal){var ord_='';
+    if(x.status==='prep'&&x.pend&&x.pend.entry!=null){var pq=x.pend,lq=lotsRow(x.sym,pq.entry,pq.stop,x.window);ord_='<b>СТАВИМ ОРДЕР</b> '+(pq.side==='short'?'SELL':'BUY')+' STOP '+pq.entry+' · стоп '+pq.stop+(lq?' · лот '+lq:'');}
+    else if(x.status==='skip'){var rs_=(x.reasons&&x.reasons[0])||stn;ord_=(x.order_cancel?'<b>ОРДЕР ОТМЕНЁН</b>':'<b>ОРДЕР НЕ СТАВИМ</b> · СКИП')+' — '+escA(String(rs_));}
+    if(ord_)rows.push(['Ордер',ord_]);}
   /* структура: Swing (главная) и Sub (внутренняя) + рекомендация; только контекст, не правило входа */
   if(x.struct){var rc=x.struct.rec||'50/50',rcls=rc==='LONG'?'long':rc==='SHORT'?'short':'side';
     rows.push(['Структура','<div class="pxp st3">'+trPill('Swing',x.struct.swing)+trPill('Sub',x.struct.sub)+'<span class="pl rec '+rcls+'"><i>Рекомендация</i> '+(rc==='50/50'?'БОКОВИК · нет подтверждённого тренда':rc+(x.struct.conf?' · '+x.struct.conf:''))+'</span></div>']);
@@ -1101,7 +1105,7 @@ function liveCard(x){
     if(x.signal.be_at)rows.push(['Стоп в БУ при',String(x.signal.be_at)+(function(){var e=parseFloat(x.signal.entry),t=parseFloat(x.signal.tp),b=parseFloat(x.signal.be_at);return (isFinite(e)&&isFinite(t)&&t!==e&&isFinite(b))?' ('+Math.round((b-e)/(t-e)*100)+'% пути)':'';})()]);
     if(!isT&&!isS&&x.status==='entry'&&x.price!=null){var en=parseFloat(x.signal.entry),sl=parseFloat(x.signal.stop),pr=parseFloat(x.price),rk=Math.abs(en-sl);
       if(rk>0&&isFinite(pr)){var cr=Math.round((es==='short'?en-pr:pr-en)/rk*100)/100;curR=(cr>0?'+':'')+String(cr)+'R';}}}
-  if(!x.signal&&x.status==='prep'&&x.pend&&x.pend.entry!=null){var pd_=x.pend;rows.push(['Ордер',(pd_.side==='short'?'SELL':'BUY')+' STOP '+pd_.entry+' · выставить сейчас']);rows.push(['Стоп',String(pd_.stop)]);var lr_=lotsRow(x.sym,pd_.entry,pd_.stop,x.window);if(lr_)rows.push(['Лот на ордер',lr_]);if(pd_.tp!=null)rows.push(['Цель 4R',String(pd_.tp)]);}
+  if(!x.signal&&x.status==='prep'&&x.pend&&x.pend.entry!=null){var pd_=x.pend;rows.push(['Стоп',String(pd_.stop)]);var lr_=lotsRow(x.sym,pd_.entry,pd_.stop,x.window);if(lr_)rows.push(['Лот на ордер',lr_]);if(pd_.tp!=null)rows.push(['Цель 4R',String(pd_.tp)]);}
   if(x.mt5_missed)rows.push(['MT5',x.mt5_missed]);
   rows.push(['Проверено',(x.price!=null?x.price+' · ':'')+(x.checked||'—')]);
   return {s:x.sym,t:x.window,dir:es||'side',eside:es,st:m[0],stT:m[1],rows:rows,c:false,curR:curR};

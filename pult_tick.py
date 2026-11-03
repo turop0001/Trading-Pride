@@ -705,7 +705,10 @@ def main(send=True):
                 if _pn.get('entry') is not None and (_pn.get('entry'), _pn.get('stop')) != (_po.get('entry'), _po.get('stop')):
                     orders.append(('set', r, _pn, bool(_po.get('entry') is not None)))
                 elif _po.get('entry') is not None and _pn.get('entry') is None and ls != 'entry' and not str(tgnote).startswith(('ВХОД', 'В СДЕЛКЕ', 'ЗАКРЫТА')):
-                    orders.append(('cancel', r, _po, str(tgnote)))
+                    _cr = str(tgnote)
+                    if (r.get('reasons') or []) and _cr.startswith('СКИП'): _cr = _cr + ' — ' + str(r['reasons'][0])
+                    r['order_cancel'] = _cr
+                    orders.append(('cancel', r, _po, _cr))
             if _silent and p and (ls, r_dir, tgnote) != (p_ls, p_dir, p_tgnote) and str(tgnote).startswith(('ВХОД', 'В СДЕЛКЕ', 'ВЫНОС', 'ЗАКРЫТА', 'СКИП')):
                 r['mt5_missed'] = 'пропущено, ' + _gap_txt.replace('MT5 не было', 'MT5 не работал').replace(' мин (', ' мин (')
             elif p.get('mt5_missed') and p.get('date') == today:
