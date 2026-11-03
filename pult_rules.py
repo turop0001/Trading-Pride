@@ -1218,6 +1218,11 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                     _jt = next((j for j in range(len(_sh0)) if _sh0[j] >= _lv0), None)
                     _jn = next((j for j in range(len(_sl0)) if _sl0[j] < ext), None)
                     _pess = _jt is not None and (_jn is None or _jn >= _jt)
+                    # 03.11.2026: касание уровня и новый экстремум в ОДНОЙ M5 — порядок неизвестен; считаем, что первым наступает то, что ближе к открытию M5
+                    # (UK100 02.11: открытие 10763.6, до нового хая 1.0, до уровня 3.35 — советник по тикам снял ордер, входа не было)
+                    if _jt is not None and _jn is not None and _jn == _jt and len(_s50) > _jt:
+                        _o1 = float(_s50['Open'].values[_jt]) * (1 if sd == 1 else -1)
+                        _pess = (_lv0 - _o1) <= (_o1 - ext)
                     # ордер вообще не ставился (к закрытию предыдущей M10 ask уже на/выше уровня) — «вход» невозможен, экстремум просто обновляется
                     _so0 = (_s50['Open'].values if sd == 1 else -_s50['Open'].values).astype(float)
                     if _pess and len(_so0) > 0 and float(_so0[0]) + (C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0) >= _lv0: _pess = False
