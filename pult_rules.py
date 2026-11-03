@@ -1530,7 +1530,10 @@ def _track_trail(res, d, sig, sd, dirc, fmtp, live=None):
                 if (cl <= ns) if sd == 1 else (cl >= ns):      # новый стоп не ниже закрытия — выходим по рынку
                     out = True; xt = tl(ix); xr = lvl(cl); moves.append(dict(t=xt, lvl=k - LG, reach=k, stop=round(cl, 8), mkt=1)); break
                 stop = ns; moves.append(dict(t=xt or tl(ix), lvl=k - LG, reach=k, stop=round(ns, 8)))
-                if sig.get('window') == 'C' and hit(r, stop):     # 30.10.2026: порядок в M5 неизвестен — после подтяжки стопа по максимуму проверяем минимум (худший случай)
+                # 03.11.2026: порядок в M5 — «ближе к открытию свечи происходит первым» (как в Пульте при касании/экстремуме): подтянутый стоп бьётся против хода только если
+                # выгодный экстремум свечи ближе к её открытию, чем невыгодный; иначе невыгодный был раньше подтяжки (US500 08.10: советник остался в сделке, Пульт закрыл по БУ)
+                _fav = ((r['High'] - r['Open']) if sd == 1 else (r['Open'] - r['Low'])); _adv = ((r['Open'] - r['Low']) if sd == 1 else (r['High'] - r['Open']))
+                if sig.get('window') == 'C' and hit(r, stop) and _fav < _adv:
                     out = True; xt = tl(ix); xr = lvl(stop); break
     if out is None and lv is not None:
         for ix, r in lv.iterrows():

@@ -156,7 +156,7 @@ def build_order_cancel(date, window_label, time_str, symbol, direction, side, en
     kind = 'BUY' if side == 'long' else 'SELL'
     why = str(reason or '').strip()
     why = 'правила больше не проходят' if why in ('', 'СКИП') else why
-    return (f"{E_BELL} ОРДЕР · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
+    return (f"{E_BELL} ОТМЕНА ОРДЕРА · тип {window_label} · {date} ({time_str} {_tz()})\n\n"
             f"{E_SKIP} {symbol} ({direction}) — Отменяем {kind} STOP ордер {entry}\n\n"
             f"Причина: {why}")
 

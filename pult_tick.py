@@ -488,6 +488,31 @@ def _fix_c_gap_20261023(state):
         print('fix_c_gap failed:', e)
 
 
+def _migrate_v115():
+    """03.11.2026 (разовая, идемпотентная): история сделок и аналитика сентября–октября — по отчёту советника v1_15 (MT5).
+    Прежние записи сохранены в state/history_prezhnie_pravila.json и state/analytics_prezhnie_pravila.json (пометка «прежние правила»).
+    Работающий цикл держит свои копии файлов, поэтому подмена идёт здесь, на его стороне. Записи после 31.10.2026 не трогаем."""
+    try:
+        sd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state')
+        hp, ap = os.path.join(sd, 'history.json'), os.path.join(sd, 'analytics.json')
+        hn, an = os.path.join(sd, '_hist_v115.json'), os.path.join(sd, '_an_v115.json')
+        if os.path.exists(hp) and os.path.exists(hn):
+            h = json.load(open(hp, encoding='utf-8'))
+            if any(x.get('date', '') <= '2026-10-31' and x.get('src') != 'EA v1_15' for x in h):
+                base = [x for x in json.load(open(hn, encoding='utf-8')) if x.get('date', '') <= '2026-10-31']
+                tail = [x for x in h if x.get('date', '') > '2026-10-31']
+                json.dump(base + tail, open(hp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        if os.path.exists(ap) and os.path.exists(an):
+            a = json.load(open(ap, encoding='utf-8'))
+            if a.get('rules') != 'v1_15':
+                n = json.load(open(an, encoding='utf-8'))
+                late = {k: [r for r in (a.get(k) or []) if str(r.get('day', '')) > '2026-10-31'] for k in ('A', 'C')}
+                for k in ('A', 'C'): n[k] = (n.get(k) or []) + late[k]
+                json.dump(n, open(ap, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    except Exception as e:
+        print('migrate v1_15 failed:', e)
+
+
 def _fix_xau_20261027(state):
     """27.10.2026 (разовая правка, идемпотентная): мост MT5 был offline 11:14–13:11, вход A по золоту (LONG 3994.910, SL 3987.943,
     11:15 по Риге) не попал в Пульт, карточка стала СКИП. Вход добавлен вручную по индикатору, закрыт по TP +2R (4008.844).
@@ -616,6 +641,7 @@ def main(send=True):
     _fix_c_20261021(state)
     _fix_a_20261022(state)
     _fix_xau_20261027(state)
+    _migrate_v115()
     _fix_gbpusd_c_20261023(state)
     _fix_c_gap_20261023(state)
     flags = state.get('_flags', {})

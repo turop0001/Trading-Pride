@@ -1,0 +1,1170 @@
+[
+ {
+  "id": "2026-10-02_US500_A",
+  "date": "2026-10-02",
+  "symbol": "US500",
+  "type": "A",
+  "side": "short",
+  "entry": 7697.4,
+  "stop": 7707.1,
+  "target": 7678.0,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.7R, стоп через 3 ч 0 мин; после стопа данных пока мало",
+  "shots": {
+   "m5": "state/shots/2026-10-02_US500_A_m5.png",
+   "h1": "state/shots/2026-10-02_US500_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-02_EURUSD_C",
+  "date": "2026-10-02",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.12804,
+  "stop": 1.12857,
+  "target": 1.12698,
+  "result": "ВХОД → TP 🎯 +2R",
+  "shots": {
+   "m5": "state/shots/2026-10-02_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-02_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-02_GBPUSD_C",
+  "date": "2026-10-02",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.32405,
+  "stop": 1.32485,
+  "target": 1.32244,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.2R, стоп через 20 мин; после стопа цель не достигнута, цена ушла дальше против на 1.9R",
+  "shots": {
+   "m5": "state/shots/2026-10-02_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-02_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-05_GER40_A",
+  "date": "2026-10-05",
+  "symbol": "GER40",
+  "type": "A",
+  "side": "long",
+  "entry": 25202.4,
+  "stop": 25143.9,
+  "target": 25319.4,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.8R, стоп через 1 ч 5 мин; после стопа цель не достигнута",
+  "shots": {
+   "m5": "state/shots/2026-10-05_GER40_A_m5.png",
+   "h1": "state/shots/2026-10-05_GER40_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-05_XAUUSD_A",
+  "date": "2026-10-05",
+  "symbol": "XAUUSD",
+  "type": "A",
+  "side": "short",
+  "entry": 4165.89,
+  "stop": 4171.72,
+  "target": 4154.24,
+  "result": "ВХОД → TP 🎯 +2R",
+  "shots": {
+   "m5": "state/shots/2026-10-05_XAUUSD_A_m5.png",
+   "h1": "state/shots/2026-10-05_XAUUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-05_GBPUSD_C",
+  "date": "2026-10-05",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.31979,
+  "stop": 1.31942,
+  "target": 1.32053,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 2R достигнута в 17:00 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-05_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-05_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-05_XAUUSD_C",
+  "date": "2026-10-05",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 4139.06,
+  "stop": 4130.74,
+  "target": 4155.69,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.1R, стоп через 1 ч 35 мин; после стопа данных пока мало; D1 против входа",
+  "shots": {
+   "m5": "state/shots/2026-10-05_XAUUSD_C_m5.png",
+   "h1": "state/shots/2026-10-05_XAUUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-06_XAUUSD_A",
+  "date": "2026-10-06",
+  "symbol": "XAUUSD",
+  "type": "A",
+  "side": "short",
+  "entry": 4152.12,
+  "stop": 4157.9,
+  "target": 4140.55,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.4R, стоп через 25 мин; после стопа цель не достигнута, цена ушла дальше против на 1.5R",
+  "shots": {
+   "m5": "state/shots/2026-10-06_XAUUSD_A_m5.png",
+   "h1": "state/shots/2026-10-06_XAUUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-07_US500_A",
+  "date": "2026-10-07",
+  "symbol": "US500",
+  "type": "A",
+  "side": "long",
+  "entry": 7819.7,
+  "stop": 7816.6,
+  "target": 7825.9,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 7.1R",
+  "shots": {
+   "m5": "state/shots/2026-10-07_US500_A_m5.png",
+   "h1": "state/shots/2026-10-07_US500_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-07_XAUUSD_A",
+  "date": "2026-10-07",
+  "symbol": "XAUUSD",
+  "type": "A",
+  "side": "long",
+  "entry": 4127.94,
+  "stop": 4123.62,
+  "target": 4136.59,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 25 мин; после стопа цель не достигнута, цена ушла дальше против на 4.3R",
+  "shots": {
+   "m5": "state/shots/2026-10-07_XAUUSD_A_m5.png",
+   "h1": "state/shots/2026-10-07_XAUUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-07_NAS100_A",
+  "date": "2026-10-07",
+  "symbol": "NAS100",
+  "type": "A",
+  "side": "long",
+  "entry": 31113.2,
+  "stop": 31071.0,
+  "target": 31197.7,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 40 мин; после стопа данных пока мало",
+  "shots": {
+   "m5": "state/shots/2026-10-07_NAS100_A_m5.png",
+   "h1": "state/shots/2026-10-07_NAS100_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-07_US30_A",
+  "date": "2026-10-07",
+  "symbol": "US30",
+  "type": "A",
+  "side": "long",
+  "entry": 51424.0,
+  "stop": 51387.0,
+  "target": 51498.0,
+  "result": "ВХОД → TP 🎯 +2R",
+  "shots": {
+   "m5": "state/shots/2026-10-07_US30_A_m5.png",
+   "h1": "state/shots/2026-10-07_US30_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-08_GBPUSD_C",
+  "date": "2026-10-08",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.32126,
+  "stop": 1.32158,
+  "target": 1.3203,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-08_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-08_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-08_XAUUSD_C",
+  "date": "2026-10-08",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 4131.4,
+  "stop": 4134.01,
+  "target": 4123.58,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-08_XAUUSD_C_m5.png",
+   "h1": "state/shots/2026-10-08_XAUUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-08_EURUSD_C",
+  "date": "2026-10-08",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.12002,
+  "stop": 1.12015,
+  "target": 1.11962,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 20.5R",
+  "shots": {
+   "m5": "state/shots/2026-10-08_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-08_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-12_XAUUSD_A",
+  "date": "2026-10-12",
+  "symbol": "XAUUSD",
+  "type": "A",
+  "side": "long",
+  "entry": 4176.54,
+  "stop": 4172.08,
+  "target": 4185.46,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.5R, стоп через 35 мин; после стопа цель не достигнута, цена ушла дальше против на 1.7R",
+  "shots": {
+   "m5": "state/shots/2026-10-12_XAUUSD_A_m5.png",
+   "h1": "state/shots/2026-10-12_XAUUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-12_US30_A",
+  "date": "2026-10-12",
+  "symbol": "US30",
+  "type": "A",
+  "side": "long",
+  "entry": 51709.0,
+  "stop": 51657.0,
+  "target": 51814.0,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.6R, стоп через 30 мин; после стопа цель не достигнута",
+  "shots": {
+   "m5": "state/shots/2026-10-12_US30_A_m5.png",
+   "h1": "state/shots/2026-10-12_US30_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-12_US500_A",
+  "date": "2026-10-12",
+  "symbol": "US500",
+  "type": "A",
+  "side": "long",
+  "entry": 7820.8,
+  "stop": 7814.9,
+  "target": 7832.4,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.3R, стоп через 25 мин; после стопа цель не достигнута, цена ушла дальше против на 1.3R",
+  "shots": {
+   "m5": "state/shots/2026-10-12_US500_A_m5.png",
+   "h1": "state/shots/2026-10-12_US500_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-12_NAS100_A",
+  "date": "2026-10-12",
+  "symbol": "NAS100",
+  "type": "A",
+  "side": "long",
+  "entry": 30875.2,
+  "stop": 30820.6,
+  "target": 30984.5,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 1 ч 15 мин; после стопа данных пока мало",
+  "shots": {
+   "m5": "state/shots/2026-10-12_NAS100_A_m5.png",
+   "h1": "state/shots/2026-10-12_NAS100_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-12_EURUSD_C",
+  "date": "2026-10-12",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.11737,
+  "stop": 1.11723,
+  "target": 1.1178,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 49% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-12_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-12_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-12_GBPUSD_C",
+  "date": "2026-10-12",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.3228,
+  "stop": 1.3226,
+  "target": 1.32339,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 51% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-12_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-12_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-13_EURUSD_A",
+  "date": "2026-10-13",
+  "symbol": "EURUSD",
+  "type": "A",
+  "side": "short",
+  "entry": 1.11881,
+  "stop": 1.11977,
+  "target": 1.1169,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.4R, стоп через 5 ч 30 мин; после стопа данных пока мало",
+  "shots": {
+   "m5": "state/shots/2026-10-13_EURUSD_A_m5.png",
+   "h1": "state/shots/2026-10-13_EURUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-13_US500_A",
+  "date": "2026-10-13",
+  "symbol": "US500",
+  "type": "A",
+  "side": "short",
+  "entry": 7807.3,
+  "stop": 7811.1,
+  "target": 7799.8,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.2R, стоп через 40 мин; после стопа цель 2R достигнута в 13:45 — стоп выбило; D1 против входа",
+  "shots": {
+   "m5": "state/shots/2026-10-13_US500_A_m5.png",
+   "h1": "state/shots/2026-10-13_US500_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-13_EURUSD_C",
+  "date": "2026-10-13",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.1203,
+  "stop": 1.12045,
+  "target": 1.11984,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-13_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-13_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-13_GBPUSD_C",
+  "date": "2026-10-13",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.32533,
+  "stop": 1.32544,
+  "target": 1.32498,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-13_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-13_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-13_XAUUSD_C",
+  "date": "2026-10-13",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 4174.32,
+  "stop": 4172.58,
+  "target": 4179.53,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 6.4R",
+  "shots": {
+   "m5": "state/shots/2026-10-13_XAUUSD_C_m5.png",
+   "h1": "state/shots/2026-10-13_XAUUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-14_US30_A",
+  "date": "2026-10-14",
+  "symbol": "US30",
+  "type": "A",
+  "side": "short",
+  "entry": 51839.0,
+  "stop": 51876.0,
+  "target": 51763.0,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.3R, стоп через 20 мин; после стопа цель не достигнута, цена ушла дальше против на 2.5R",
+  "shots": {
+   "m5": "state/shots/2026-10-14_US30_A_m5.png",
+   "h1": "state/shots/2026-10-14_US30_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-14_EURUSD_A",
+  "date": "2026-10-14",
+  "symbol": "EURUSD",
+  "type": "A",
+  "side": "long",
+  "entry": 1.11955,
+  "stop": 1.11928,
+  "target": 1.12009,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 2.8R",
+  "shots": {
+   "m5": "state/shots/2026-10-14_EURUSD_A_m5.png",
+   "h1": "state/shots/2026-10-14_EURUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-14_GBPUSD_C",
+  "date": "2026-10-14",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.31658,
+  "stop": 1.31606,
+  "target": 1.31813,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-14_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-14_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-14_EURUSD_C",
+  "date": "2026-10-14",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.11152,
+  "stop": 1.11129,
+  "target": 1.11221,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 51% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-14_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-14_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-15_US30_A",
+  "date": "2026-10-15",
+  "symbol": "US30",
+  "type": "A",
+  "side": "short",
+  "entry": 51715.0,
+  "stop": 51763.0,
+  "target": 51620.0,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 3.4R",
+  "shots": {
+   "m5": "state/shots/2026-10-15_US30_A_m5.png",
+   "h1": "state/shots/2026-10-15_US30_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-15_GER40_A",
+  "date": "2026-10-15",
+  "symbol": "GER40",
+  "type": "A",
+  "side": "short",
+  "entry": 25269.6,
+  "stop": 25320.9,
+  "target": 25166.9,
+  "result": "ВХОД → TP 🎯 +2R",
+  "shots": {
+   "m5": "state/shots/2026-10-15_GER40_A_m5.png",
+   "h1": "state/shots/2026-10-15_GER40_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-15_GBPUSD_A",
+  "date": "2026-10-15",
+  "symbol": "GBPUSD",
+  "type": "A",
+  "side": "short",
+  "entry": 1.32582,
+  "stop": 1.32703,
+  "target": 1.3234,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 55 мин; после стопа цель не достигнута, цена ушла дальше против на 1.5R",
+  "shots": {
+   "m5": "state/shots/2026-10-15_GBPUSD_A_m5.png",
+   "h1": "state/shots/2026-10-15_GBPUSD_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-16_GBPUSD_C",
+  "date": "2026-10-16",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.3348,
+  "stop": 1.33503,
+  "target": 1.33411,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 18:20 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-16_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-16_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-19_XAUUSD_C",
+  "date": "2026-10-19",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 4151.58,
+  "stop": 4142.88,
+  "target": 4177.68,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.4R, стоп через 1 ч 55 мин; после стопа цель не достигнута, цена ушла дальше против на 1.7R",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-19_US500_C",
+  "date": "2026-10-19",
+  "symbol": "US500",
+  "type": "C",
+  "side": "long",
+  "entry": 7686.6,
+  "stop": 7681.6,
+  "target": 7701.4,
+  "result": "ВХОД → TP 🎯 +3R",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-19_AUDUSD_C",
+  "date": "2026-10-19",
+  "symbol": "AUDUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 0.69914,
+  "stop": 0.69932,
+  "target": 0.69861,
+  "result": "ВХОД → TP 🎯 +3R",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-19_EURGBP_C",
+  "date": "2026-10-19",
+  "symbol": "EURGBP",
+  "type": "C",
+  "side": "short",
+  "entry": 0.84249,
+  "stop": 0.84255,
+  "target": 0.84232,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "",
+  "shots": {
+   "m5": "state/shots/2026-10-19_EURGBP_C_m5.png",
+   "h1": "state/shots/2026-10-19_EURGBP_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-19_UK100_C",
+  "date": "2026-10-19",
+  "symbol": "UK100",
+  "type": "C",
+  "side": "long",
+  "entry": 10742.9,
+  "stop": 10739.9,
+  "target": 10751.8,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 51% пути)",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-19_GER40_C",
+  "date": "2026-10-19",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "long",
+  "entry": 25237.3,
+  "stop": 25220.8,
+  "target": 25286.8,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.8R, стоп через 15 мин; после стопа цель 3R достигнута в 18:25 — стоп выбило",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_GBPUSD_C",
+  "date": "2026-10-20",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.33926,
+  "stop": 1.33957,
+  "target": 1.33834,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-20_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-20_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_XAUUSD_C",
+  "date": "2026-10-20",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 4129.03,
+  "stop": 4135.1,
+  "target": 4110.81,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.3R, стоп через 30 мин; после стопа цель 3R достигнута в 04:05 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-20_XAUUSD_C_m5.png",
+   "h1": "state/shots/2026-10-20_XAUUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_EURUSD_C",
+  "date": "2026-10-20",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 1.12339,
+  "stop": 1.12366,
+  "target": 1.12257,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.0R, стоп через 15 мин; после стопа цель 3R достигнута в 19:20 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-20_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-20_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_GER40_C",
+  "date": "2026-10-20",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "short",
+  "entry": 25218.5,
+  "stop": 25232.8,
+  "target": 25175.6,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель не достигнута, цена ушла дальше против на 22.1R",
+  "shots": {
+   "m5": "state/shots/2026-10-20_GER40_C_m5.png",
+   "h1": "state/shots/2026-10-20_GER40_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_UK100_C",
+  "date": "2026-10-20",
+  "symbol": "UK100",
+  "type": "C",
+  "side": "short",
+  "entry": 10719.2,
+  "stop": 10727.7,
+  "target": 10693.8,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-20_UK100_C_m5.png",
+   "h1": "state/shots/2026-10-20_UK100_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_AUDUSD_C",
+  "date": "2026-10-20",
+  "symbol": "AUDUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 0.69998,
+  "stop": 0.70017,
+  "target": 0.69942,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.7R, стоп через 20 мин; после стопа цель 3R достигнута в 00:00 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-20_AUDUSD_C_m5.png",
+   "h1": "state/shots/2026-10-20_AUDUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-20_EURGBP_C",
+  "date": "2026-10-20",
+  "symbol": "EURGBP",
+  "type": "C",
+  "side": "long",
+  "entry": 0.83884,
+  "stop": 0.83856,
+  "target": 0.83967,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.0R, стоп через 15 мин; после стопа цель 3R достигнута в 17:25 — стоп выбило; H1 и D1 против входа",
+  "shots": {
+   "m5": "state/shots/2026-10-20_EURGBP_C_m5.png",
+   "h1": "state/shots/2026-10-20_EURGBP_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-21_US500_A",
+  "date": "2026-10-21",
+  "symbol": "US500",
+  "type": "A",
+  "side": "long",
+  "entry": 7719.1,
+  "stop": 7713.2,
+  "target": 7730.8,
+  "result": "ВХОД → TP 🎯 +2R",
+  "shots": {
+   "m5": "state/shots/2026-10-21_US500_A_m5.png",
+   "h1": "state/shots/2026-10-21_US500_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-21_NAS100_A",
+  "date": "2026-10-21",
+  "symbol": "NAS100",
+  "type": "A",
+  "side": "long",
+  "entry": 29588.5,
+  "stop": 29534.8,
+  "target": 29696.1,
+  "result": "ВХОД → TP 🎯 +2R",
+  "shots": {
+   "m5": "state/shots/2026-10-21_NAS100_A_m5.png",
+   "h1": "state/shots/2026-10-21_NAS100_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-21_AUDUSD_C",
+  "date": "2026-10-21",
+  "symbol": "AUDUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 0.70241,
+  "stop": 0.7022,
+  "target": 0.70304,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +1.0R, стоп через 25 мин; после стопа цель не достигнута, цена ушла дальше против на 2.6R",
+  "shots": {
+   "m5": "state/shots/2026-10-21_AUDUSD_C_m5.png",
+   "h1": "state/shots/2026-10-21_AUDUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-21_EURGBP_C",
+  "date": "2026-10-21",
+  "symbol": "EURGBP",
+  "type": "C",
+  "side": "short",
+  "entry": 0.83895,
+  "stop": 0.83906,
+  "target": 0.83862,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 48% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-21_EURGBP_C_m5.png",
+   "h1": "state/shots/2026-10-21_EURGBP_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-21_GER40_C",
+  "date": "2026-10-21",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "short",
+  "entry": 25687.0,
+  "stop": 25714.5,
+  "target": 25604.5,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-21_GER40_C_m5.png",
+   "h1": "state/shots/2026-10-21_GER40_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-21_GBPUSD_C",
+  "date": "2026-10-21",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.33824,
+  "stop": 1.33808,
+  "target": 1.33874,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-21_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-21_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_US30_A",
+  "date": "2026-10-22",
+  "symbol": "US30",
+  "type": "A",
+  "side": "long",
+  "entry": 52524.0,
+  "stop": 52468.0,
+  "target": 52637.0,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.4R, стоп через 30 мин; после стопа цель не достигнута, цена ушла дальше против на 1.6R",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_US500_C",
+  "date": "2026-10-22",
+  "symbol": "US500",
+  "type": "C",
+  "side": "short",
+  "entry": 7697.0,
+  "stop": 7699.4,
+  "target": 7689.7,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-22_US500_C_m5.png",
+   "h1": "state/shots/2026-10-22_US500_C_h1.png"
+  },
+  "autopsy": "порог БУ пройден внутри входной свечи (16:36), цена вернулась на вход и закрыла сделку в 16:39 по БУ; после этого цена дошла до цели",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_GER40_C",
+  "date": "2026-10-22",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "short",
+  "entry": 25540.2,
+  "stop": 25553.4,
+  "target": 25500.6,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 17:05 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-22_GER40_C_m5.png",
+   "h1": "state/shots/2026-10-22_GER40_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_UK100_C",
+  "date": "2026-10-22",
+  "symbol": "UK100",
+  "type": "C",
+  "side": "short",
+  "entry": 10758.1,
+  "stop": 10763.4,
+  "target": 10742.3,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 17:30 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-22_UK100_C_m5.png",
+   "h1": "state/shots/2026-10-22_UK100_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_EURGBP_C",
+  "date": "2026-10-22",
+  "symbol": "EURGBP",
+  "type": "C",
+  "side": "long",
+  "entry": 0.83745,
+  "stop": 0.83724,
+  "target": 0.83808,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.5R, стоп через 20 мин; после стопа цель 3R достигнута в 17:40 — стоп выбило; H1 и D1 против входа",
+  "shots": {
+   "m5": "state/shots/2026-10-22_EURGBP_C_m5.png",
+   "h1": "state/shots/2026-10-22_EURGBP_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_XAUUSD_C",
+  "date": "2026-10-22",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 4062.9,
+  "stop": 4054.21,
+  "target": 4088.97,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 15 мин; после стопа цель не достигнута, цена ушла дальше против на 2.1R",
+  "shots": {
+   "m5": "state/shots/2026-10-22_XAUUSD_C_m5.png",
+   "h1": "state/shots/2026-10-22_XAUUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-22_GBPUSD_C",
+  "date": "2026-10-22",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.3363,
+  "stop": 1.33596,
+  "target": 1.33732,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 18:15 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-22_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-22_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-23_UK100_A",
+  "date": "2026-10-23",
+  "symbol": "UK100",
+  "type": "A",
+  "side": "long",
+  "entry": 10696.5,
+  "stop": 10683.9,
+  "target": 10721.7,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.4R, стоп через 55 мин; после стопа цель не достигнута, цена ушла дальше против на 2.9R",
+  "shots": {
+   "m5": "state/shots/2026-10-23_UK100_A_m5.png",
+   "h1": "state/shots/2026-10-23_UK100_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-23_EURGBP_C",
+  "date": "2026-10-23",
+  "symbol": "EURGBP",
+  "type": "C",
+  "side": "short",
+  "entry": 0.83745,
+  "stop": 0.83752,
+  "target": 0.83725,
+  "result": "ВХОД → БУ 0R (стоп в безубытке после 50% пути)",
+  "shots": {
+   "m5": "state/shots/2026-10-23_EURGBP_C_m5.png",
+   "h1": "state/shots/2026-10-23_EURGBP_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-26_XAUUSD_C",
+  "date": "2026-10-26",
+  "symbol": "XAUUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 4002.55,
+  "stop": 4001.04,
+  "target": 4007.07,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 16:10 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-26_XAUUSD_C_m5.png",
+   "h1": "state/shots/2026-10-26_XAUUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-26_US500_C",
+  "date": "2026-10-26",
+  "symbol": "US500",
+  "type": "C",
+  "side": "short",
+  "entry": 7659.9,
+  "stop": 7663.7,
+  "target": 7648.6,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-26_US500_C_m5.png",
+   "h1": "state/shots/2026-10-26_US500_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-26_GBPUSD_C",
+  "date": "2026-10-26",
+  "symbol": "GBPUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.33403,
+  "stop": 1.33386,
+  "target": 1.33453,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 3R достигнута в 15:30 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-26_GBPUSD_C_m5.png",
+   "h1": "state/shots/2026-10-26_GBPUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-26_EURUSD_C",
+  "date": "2026-10-26",
+  "symbol": "EURUSD",
+  "type": "C",
+  "side": "long",
+  "entry": 1.11752,
+  "stop": 1.11735,
+  "target": 1.11802,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-26_EURUSD_C_m5.png",
+   "h1": "state/shots/2026-10-26_EURUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-26_GER40_C",
+  "date": "2026-10-26",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "short",
+  "entry": 25493.9,
+  "stop": 25503.4,
+  "target": 25465.5,
+  "result": "ВХОД → TP 🎯 +3R",
+  "shots": {
+   "m5": "state/shots/2026-10-26_GER40_C_m5.png",
+   "h1": "state/shots/2026-10-26_GER40_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-27_XAUUSD_A",
+  "date": "2026-10-27",
+  "symbol": "XAUUSD",
+  "type": "A",
+  "side": "long",
+  "entry": 3994.91,
+  "stop": 3987.943,
+  "target": 4008.844,
+  "result": "ВХОД → TP 🎯 +2R",
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-27_AUDUSD_C",
+  "date": "2026-10-27",
+  "symbol": "AUDUSD",
+  "type": "C",
+  "side": "short",
+  "entry": 0.70378,
+  "stop": 0.70393,
+  "target": 0.70332,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа данных пока мало",
+  "shots": {
+   "m5": "state/shots/2026-10-27_AUDUSD_C_m5.png",
+   "h1": "state/shots/2026-10-27_AUDUSD_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-27_GER40_C",
+  "date": "2026-10-27",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "short",
+  "entry": 25581.2,
+  "stop": 25598.8,
+  "target": 25528.4,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "шла в плюс до +0.5R, стоп через 20 мин; после стопа данных пока мало",
+  "shots": {
+   "m5": "state/shots/2026-10-27_GER40_C_m5.png",
+   "h1": "state/shots/2026-10-27_GER40_C_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-28_USDJPY_A",
+  "date": "2026-10-28",
+  "symbol": "USDJPY",
+  "type": "A",
+  "side": "long",
+  "entry": 157.871,
+  "stop": 157.639,
+  "target": 158.799,
+  "result": "ВХОД → БУ 0R (стоп в безубытке)",
+  "shots": {
+   "m5": "state/shots/2026-10-28_USDJPY_A_m5.png",
+   "h1": "state/shots/2026-10-28_USDJPY_A_h1.png"
+  },
+  "rules": "прежние правила"
+ },
+ {
+  "id": "2026-10-29_GER40_C",
+  "date": "2026-10-29",
+  "symbol": "GER40",
+  "type": "C",
+  "side": "short",
+  "entry": 26068.5,
+  "stop": 26078.4,
+  "target": 26028.9,
+  "result": "ВХОД → SL −1R",
+  "autopsy": "сразу пошла против входа, стоп через 10 мин; после стопа цель 4R достигнута в 16:10 — стоп выбило",
+  "shots": {
+   "m5": "state/shots/2026-10-29_GER40_C_m5.png",
+   "h1": "state/shots/2026-10-29_GER40_C_h1.png"
+  },
+  "rules": "прежние правила"
+ }
+]
