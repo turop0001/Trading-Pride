@@ -1,1 +1,1 @@
-{"date": "2026-11-03", "sym": "GER40", "window": "A", "status": "skip", "direction": "—", "note": "СКИП (вход не случился до 13:00)", "reasons": [], "price": 25800.3, "boxH": 25859.7, "boxL": 25646.8, "prevH": null, "prevL": null, "signal": null, "checked": "12:59"}
+{"date": "2026-11-06", "sym": "GER40", "window": "A", "status": "skip", "direction": "▲ LONG", "note": "СКИП (вынос больше 3 ATR)", "reasons": ["вынос больше 3 ATR"], "price": 25773.3, "boxH": 26209.2, "boxL": 25924.3, "prevH": null, "prevL": null, "signal": null, "checked": "12:25"}
