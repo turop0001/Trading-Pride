@@ -51,8 +51,9 @@ TICKERS = {
 WINDOW_SYMBOLS = {
     # 28.10.2026: правила A v2.03 / C v1.11 как в советнике PultTraderAC_v1_06: A — 9 инструментов, C — 4 инструмента
     # 29.10.2026 (советник v1_13): в A отключены GBPUSD и US500 (MT5 v1_09: A без них +152R/DD 4,6% вместо +151R/6,0%)
-    'A': ['EURUSD', 'GER40', 'AUDUSD', 'UK100', 'NAS100', 'US30', 'USDJPY'],
-    'C': ['GBPUSD', 'US500', 'UK100', 'GER40'],
+    # 06.11.2026 (советник v1_19): в A отключён и GER40 (DE40), в C убран GBPUSD
+    'A': ['EURUSD', 'AUDUSD', 'UK100', 'NAS100', 'US30', 'USDJPY'],
+    'C': ['US500', 'UK100', 'GER40'],
 }
 
 # ПРОВЕРЕНО 26.09.2026: замена GC=F -> PAXG-USD резко снижает разницу со спотом
@@ -371,6 +372,22 @@ def check_instrument(sym, ticker, window, prev=None):
     d = fetch(ticker)
     if d is None: return {'sym': sym, 'error': 'no_data'}
     riga_dt, off = riga_now()
+    if window == 'A' and riga_dt.weekday() == 2 and not ((prev or {}).get('signal') or {}).get('date') == riga_dt.strftime('%Y-%m-%d'):
+        # 06.11.2026 (советник v1_19, A_NoWednesday): тип A по средам не торгуется
+        return {'sym': sym, 'window': window, 'line_status': 'skip', 'direction': '—', 'note': 'СКИП (среда — тип A не торгуем)',
+                'status_key': 'wed', 'stale': False, 'reasons': ['Среда: тип A не торгуется (правило советника v1_19)'],
+                'checked_at': riga_dt.strftime('%H:%M'), 'price': round(float(d['Close'].iloc[-1]), 5), 'ck': [], 'ckf': [1]}
+    if window == 'C':
+        import pandas as pd
+        # 06.11.2026 (советник v1_19): D1-фильтр типа C — закрытия D1 из фида MT5 (сегодняшний бар не входит)
+        try:
+            dd1 = mt5_frame(ticker, 'D1', max_age_h=72)
+            if dd1 is not None and len(dd1):
+                loc = dd1.index + pd.Timedelta(hours=off)
+                cs = pd.Series(dd1['Close'].values, index=[x.date() for x in loc])
+                pult_rules.D1C[sym] = cs[cs.index < riga_dt.date()]
+        except Exception as e:
+            print('D1 недоступен:', sym, str(e)[:100])
     if is_stale(d):
         return {'sym': sym, 'window': window, 'line_status': 'skip', 'direction': '—',
                 'note': 'СКИП (нет свежих данных у источника)', 'status_key': 'stale', 'stale': True,

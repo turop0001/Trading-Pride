@@ -614,22 +614,23 @@ def _fix_us500_be_20261022(state, tg):
         print('fix_us500 failed:', e)
 
 
-def _risk_pct_for(win):
-    """21.10.2026: риск в сообщении сигнала. Стандарт 0,5% (решение владельца 18.10); у Типа C после 2 SL подряд по счёту
-    (все инструменты вместе, БУ серию не меняет, TP сбрасывает) — 0,25% до первого TP. Серия берётся из state/history.json."""
+def _risk_pct_for(win, sym=None):
+    """06.11.2026 (советник v1_19): риск A 1,5% (USDJPY ×1,5), C 0,75%; после 3 SL подряд по общей серии A+C
+    (БУ серию не меняет, плюс сбрасывает) — ×0,5 до первой сделки в плюс. Серия берётся из state/history.json."""
+    base = 1.5 if win == 'A' else 0.75
+    if win == 'A' and sym == 'USDJPY': base *= 1.5
     try:
-        return 0.5   # 28.10.2026: C v1.11 без половинения после 2 SL (HalfRiskAfter2SL=false); при просадке ≥5% от пика баланса риск ×0,6 — см. подпись в сигнале
         hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
+        h = sorted(json.load(open(hp, encoding='utf-8')), key=lambda x: x.get('date', ''))
         st = 0
-        for x in json.load(open(hp, encoding='utf-8')):
-            if x.get('type') != 'C': continue
+        for x in h:
             r = x.get('result') or ''
             if 'ВХОД →' not in r: continue
-            if 'TP' in r: st = 0
-            elif 'SL' in r: st += 1
-        return 0.25 if st >= 2 else 0.5
+            if 'SL' in r: st += 1
+            elif 'TP' in r: st = 0
+        return round(base * (0.5 if st >= 3 else 1.0), 3)
     except Exception:
-        return 0.5
+        return base
 
 
 def main(send=True):
@@ -785,7 +786,7 @@ def main(send=True):
                                  'result': f"сигнал Пульта в {sg.get('time')}"})
             except Exception as e:
                 print('history add failed:', e)
-            tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], _risk_pct_for(win),
+            tgw(win, build_signal(dstr, win, sg['time'], r['sym'], r['direction'], sg['entry'], sg['stop'], sg['tp'], _risk_pct_for(win, r['sym']),
                             note='по правилам Пульта — проверь график', rr=sg.get('rr') or 2, trail=bool(sg.get('trail')), be_at=sg.get('be_at'), lstep=sg.get('lstep') or 1, llag=sg.get('llag') or 1)); did.append('signal')
         return text, syms, changed
 

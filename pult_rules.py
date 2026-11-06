@@ -62,6 +62,18 @@ import pandas as pd
 
 BOX = {'A': (180, 600), 'C': (660, 990)}      # минуты Риги: Азия 03:00-10:00, Лондон 11:00-16:25 включая свечу 16:25 (с 26.10.2026; правый край 16:30)
 WIN = {'A': (600, 780), 'C': (990, 1110)}     # окна входа 10:00-13:00 (с 16.10.2026, было до 14:00), 16:30-18:30
+
+# 06.11.2026 (советник v1_19, C_D1Filter): тип C торгуется только по D1-тренду — знак (закрытие вчера − среднее N последних закрытий D1,
+# включая вчерашнее) должен совпасть с направлением сделки. Закрытия D1 кладёт live_check (фид MT5), сегодняшний бар не входит.
+D1F = {'GER40': 50, 'US500': 10, 'UK100': 10}
+D1C = {}
+
+
+def d1_trend(sym, n):
+    s = D1C.get(sym)
+    if s is None or len(s) < n: return None
+    dv = float(s.iloc[-1]) - float(s.iloc[-n:].mean())
+    return 1 if dv > 0 else (-1 if dv < 0 else 0)
 def c_shift(day):
     """Сдвиг окна Типа C в минутах (0 или −60): NY открывается в 9:30 по Нью-Йорку; в обычные недели это 16:30 по Риге."""
     from zoneinfo import ZoneInfo
@@ -251,6 +263,13 @@ def _analyze_C(sym, d, now_utc, off, prev):
         ext, sd = dn[-1], 1
     bias = 'long' if sd == 1 else 'short'
     dirc = '▲ LONG' if sd == 1 else '🔻 SHORT'
+    _n1 = D1F.get(sym)
+    if _n1 and not (prev.get('signal') and prev['signal'].get('date') == str(today)):
+        _tr = d1_trend(sym, _n1)
+        if _tr is not None and _tr * sd <= 0:
+            res['ckf'] = [1]
+            _why(res, f'D1-тренд {_n1} дн. против направления выноса (закрытие вчера {"ниже" if sd == 1 else "выше"} средней)')
+            return _out(res, 'skip', dirc, f'СКИП (D1-тренд {_n1} дн. против)')
     res['ck'] = [1, 2] + ([3] if (up and dn) else [])
 
     extreme = float(AL[ext] if sd == 1 else AH[ext])
