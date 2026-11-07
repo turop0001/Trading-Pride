@@ -615,9 +615,13 @@ def _fix_us500_be_20261022(state, tg):
 
 
 def _risk_pct_for(win, sym=None):
-    """06.11.2026 (советник v1_19): риск A 1,5% (USDJPY ×1,5), C 0,75%; после 3 SL подряд по общей серии A+C
-    (БУ серию не меняет, плюс сбрасывает) — ×0,5 до первой сделки в плюс. Серия берётся из state/history.json."""
-    base = 1.5 if win == 'A' else 0.75
+    """07.11.2026: профиль риска по итогам MT5-тестов. ЧЕЛЛЕНДЖ (советник v1_21, по умолчанию): A 2% (USDJPY ×1,5), C 1%.
+    ФАНДЕД (советник v1_19f, переменная окружения PULT_RISK_PROFILE=funded): A 1,5% (USDJPY ×1,5), C 0,7%.
+    После 3 SL подряд по общей серии A+C (БУ серию не меняет, плюс сбрасывает) — ×0,5 до первой сделки в плюс. Серия — из state/history.json."""
+    if os.environ.get('PULT_RISK_PROFILE', 'challenge').lower() == 'funded':
+        base = 1.5 if win == 'A' else 0.7
+    else:
+        base = 2.0 if win == 'A' else 1.0
     if win == 'A' and sym == 'USDJPY': base *= 1.5
     try:
         hp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state', 'history.json')
