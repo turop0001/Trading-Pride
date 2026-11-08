@@ -1064,6 +1064,7 @@ C_BUYSP = {'US500': 0.5, 'GER40': 1.3, 'UK100': 1.5}   # 30.10.2026: типич�
 C_LVL = 0.5   # 28.10.2026: уровень входа C = 50% длины выноса (C v1.11, было 20%)
 C_COSTK = 3.0   # 28.10.2026: стоп не меньше 3× (спред+комиссия) (C v1.11)
 C_TPREF = 4.0   # 28.10.2026: TP нет (лесенка 1/1); 4R — только для проверки встречного H1 FVG
+C_BLOCK = (1020, 30)   # 08.11.2026: слот без входов C 17:00–17:29 Рига (= 10:00–10:29 Нью-Йорк, выход данных США); сдвигается вместе с окном C (как советник C_BlockFrom/C_BlockLen). MT5: ΣR 47,7→62,2, DD 12,0→8,4R
 C_TF = 10   # 23.10.2026: Тип C — вынос, экстремум и пороги считаются по свечам M10 (вход по касанию и сопровождение — по M5)
 
 
@@ -1326,7 +1327,9 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
                             _wide_hold = _wide_hold or []; _wide_hold.append((5, 'к закрытию M10 цена уже за уровнем отката 50% — ордер не ставится, вход упущен', 'СКИП (цена уже за уровнем отката)'))
                 except Exception: pass
                 for _n, _tx, _st in (_wide_hold or []): _why(res, 'Ордер пока не выставляется: ' + _tx)
-                if not _gapnow and C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
+                _kC = wa - WIN['C'][0]; _inslot = C_BLOCK[1] > 0 and C_BLOCK[0] + _kC <= nowm < C_BLOCK[0] + C_BLOCK[1] + _kC
+                if _inslot: _why(res, 'Ордер не ставится: слот без входов C %02d:%02d–%02d:%02d' % (*divmod(C_BLOCK[0] + _kC, 60), *divmod(C_BLOCK[0] + C_BLOCK[1] + _kC, 60)))
+                if not _inslot and not _gapnow and C_COSTK * C_COST.get(sym, 0.0) <= R_ <= C_MAXSTOP * atr_ and _counter_fvg(F1, sd, sd * e_, sd * t_, d.index[-1] + pd.Timedelta(minutes=5)) is None:
                     res['pend'] = dict(side='long' if sd == 1 else 'short', entry=round(sd * e_, dec), stop=round(sd * s_, dec),
                                        tp=round(sd * t_, dec), be_at=round(sd * (e_ + (1.0 if C_TRAIL else 1.5) * R_), dec), ext=round(sd * ext, dec), trail=int(C_TRAIL))
         except Exception as e:
@@ -1349,6 +1352,12 @@ def _analyze_C2_core(sym, d, now_utc, off, prev, h1, form=False):
     fi = next((j for j in range(len(sh)) if sh[j] >= lvl), None)
     if fi is None: entry = max(lvl, float(O[entry_g])); t_fill = t_bar
     else: entry = max(lvl, float(so[fi])); t_fill = sub5.index[fi]
+    # 08.11.2026: слот без входов C — касание 50% в 17:00–17:29 Риги (10:00–10:29 Нью-Йорк): день пропущен (как советник C_BlockFrom/C_BlockLen)
+    _kC = wa - WIN['C'][0]; _tfm = (t_fill + pd.Timedelta(hours=off)); _tfm = _tfm.hour * 60 + _tfm.minute
+    if C_BLOCK[1] > 0 and C_BLOCK[0] + _kC <= _tfm < C_BLOCK[0] + C_BLOCK[1] + _kC:
+        _bt = '%02d:%02d–%02d:%02d' % (*divmod(C_BLOCK[0] + _kC, 60), *divmod(C_BLOCK[0] + C_BLOCK[1] + _kC, 60))
+        res['ckf'] = [5]; res['reasons'] = [f'касание 50% в слоте без входов {_bt}']; _why(res, f'Скип: касание 50% в слоте без входов {_bt} (выход данных США)', [5])
+        return _out(res, 'skip', dirc, f'СКИП (слот без входов {_bt})')
     # 30.10.2026: как в советнике — если к закрытию M10 (открытие первой M5 следующей M10) цена уже за уровнем отката, stop-ордер не ставится
     # (мгновенный вход по рынку выключен) и день пропущен; раньше Пульт/индикатор брали такой вход по открытию M5 (гэп через уровень)
     _bsp = C_BUYSP.get(sym, 0.0) if sd == 1 else 0.0   # 30.10.2026: покупка — по ask (bid + спред), продажа — по bid
