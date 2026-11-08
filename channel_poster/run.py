@@ -331,7 +331,7 @@ def main():
     for i, p in enumerate(posts):
         did = '%s-%s%d' % (today.strftime('%Y%m%d'), 'u' if MODE == 'urgent' else '', i + 1)
         drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'urgent': MODE == 'urgent', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
-        kb = {'inline_keyboard': [[{'text': '✅ Опубликовать', 'callback_data': 'ap:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
+        kb = {'inline_keyboard': [[{'text': '✅ Опубликовать' + (' · утро 10:00' if p['cat'] == 'news' else ' · вечер 19:00'), 'callback_data': 'ap:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
         try:
             got = find_media(p.get('media'), p['cat'])
             if got:

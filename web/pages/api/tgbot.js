@@ -48,7 +48,7 @@ const REASONS = { none: 'Без причины', ai: 'Звучит как ИИ',
 // Слоты публикации по МСК: 10:00 и 19:00 (UTC 07:00 и 16:00). Берём ближайший свободный.
 const SLOTS_UTC = [7, 16];
 function nextSlot(data, cat) {
-  const hours = cat === 'news' ? SLOTS_UTC : [16];   // новости: любой ближайший слот; остальное только вечером 19:00
+  const hours = cat === 'news' ? [7] : [16];   // новости — утренний слот 10:00 МСК, остальное — вечерний 19:00 МСК
   const taken = new Set(Object.values(data || {}).filter((x) => x.status === 'scheduled' && x.at).map((x) => x.at));
   const now = Date.now() + 10 * 60000;
   for (let day = 0; day < 6; day++) for (const h of hours) {
@@ -62,6 +62,7 @@ function slotLabel(iso) {
   const day = f(iso, {}) === f(Date.now(), {}) ? 'сегодня' : f(iso, {}) === f(Date.now() + 864e5, {}) ? 'завтра' : f(iso, { day: 'numeric', month: 'long' });
   return day + ' в ' + new Date(iso).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }) + ' МСК';
 }
+const slotTag = (cat) => (cat === 'news' ? ' · утро 10:00' : ' · вечер 19:00');
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const htmlText = (t) => { const i = t.indexOf('\n'); return i < 0 ? '<b>' + esc(t) + '</b>' : '<b>' + esc(t.slice(0, i)) + '</b>' + esc(t.slice(i)); };
 async function send(chat, text, kb) { return tg('sendMessage', { chat_id: chat, text: text.slice(0, 4000), reply_markup: kb || MENU }); }
@@ -70,7 +71,7 @@ async function showDrafts(chat, data) {
   const pend = Object.keys(data || {}).filter((id) => data[id].status === 'pending').sort();
   if (!pend.length) return send(chat, '📝 Черновиков, ждущих решения, нет.\n\nНовые приходят ежедневно утром. Можно запросить сейчас: /gen');
   for (const id of pend) {
-    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать', callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
+    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать' + slotTag(data[id].cat), callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
     if (data[id].photo) await tg((MK[data[id].kind] || MK.photo)[0], { chat_id: chat, [(MK[data[id].kind] || MK.photo)[1]]: data[id].photo, caption: htmlText(data[id].text).slice(0, 1024), parse_mode: 'HTML', reply_markup: kb });
     else await tg('sendMessage', { chat_id: chat, text: `Черновик ${id} · ${CAT[data[id].cat] || data[id].cat}\n\n${data[id].text}`.slice(0, 4000), reply_markup: kb });
   }
@@ -147,7 +148,7 @@ export default async function handler(req, res) {
     if (act === 'm') { const T = { gen: '⏳ Запускаю…', drafts: '📝 Загружаю…', stats: '📊 Считаю…', week: '🗓 Считаю…', src: '📚 Открываю…' }; await tg('answerCallbackQuery', { callback_query_id: cb.id, text: T[id] || '' }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
     const { data, sha } = await readJson('channel/drafts.json', {}, 'state');
     const d = data && data[id];
-    const BTN = [[{ text: '✅ Опубликовать', callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]];
+    const BTN = [[{ text: '✅ Опубликовать' + slotTag(d && d.cat), callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]];
     const mk = (rows) => tg('editMessageReplyMarkup', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: { inline_keyboard: rows } });
     const edit = (t, extra) => mk([[{ text: t, callback_data: 'x:' + id }], ...(extra ? [extra] : [])]);
     const toast = (text, alert) => tg('answerCallbackQuery', { callback_query_id: cb.id, text, show_alert: !!alert });
