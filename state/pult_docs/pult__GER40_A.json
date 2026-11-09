@@ -1,1 +1,1 @@
-{"date": "2026-11-06", "sym": "GER40", "window": "A", "status": "skip", "direction": "▲ LONG", "note": "СКИП (вынос больше 3 ATR)", "reasons": ["вынос больше 3 ATR"], "price": 25773.3, "boxH": 26209.2, "boxL": 25924.3, "prevH": null, "prevL": null, "signal": null, "checked": "12:25"}
+{"date": "2026-11-09", "sym": "GER40", "window": "A", "status": "skip", "direction": "—", "note": "СКИП (нет данных TradingView — смотреть вручную)", "reasons": [], "price": null, "boxH": null, "boxL": null, "prevH": null, "prevL": null, "signal": null, "checked": "13:00"}
