@@ -18,7 +18,7 @@ DRY = os.environ.get('CP_DRY', '') == '1'
 REPO = os.environ.get('GITHUB_REPOSITORY', 'turop0001/Trading-Pride')
 GH = os.environ.get('GITHUB_TOKEN', '')
 DRAFTS = 'channel/drafts.json'
-BRANCH = 'state'
+BRANCH = 'channel'   # не 'state': state_sync.py пересобирает ту ветку одним force-push-коммитом и стирал очередь (09.11.2026)
 CATS = {'news': 'ХАЙПОВАЯ НОВОСТЬ про рынки/трейдинг', 'smart': 'УМНАЯ МЫСЛЬ про трейдинг (механика рынка, риск, дисциплина)',
         'humor': 'СМЕШНОЕ про трейдинг (своя шутка/ситуация, не копия мема)', 'motiv': 'МОТИВАЦИЯ для развития и польза (конкретный совет/привычка)',
         'story': 'ИСТОРИЯ или РАЗБОР: короткий жизненный случай из трейдинга/рынка (типичная ошибка новичка, как сработал или не сработал приём, момент из истории рынка), в конце вопрос к читателям'}
@@ -297,6 +297,9 @@ def tg(method, payload):
 
 def main():
     today = dt.datetime.now(dt.timezone.utc).date()
+    if MODE != 'urgent' and os.environ.get('GITHUB_EVENT_NAME') == 'schedule':
+        dd, _ = load_drafts()   # запоздавший запуск по расписанию (или после будильника /api/chtick): сегодняшние черновики уже есть — не дублировать
+        if any(not v.get('urgent') and v.get('ts', '')[:10] == today.isoformat() for v in dd.values()): print('Черновики за сегодня уже есть'); return
     print('Читаю каналы (только темы):'); rows = collect()
     cats = plan(today); print('План:', cats, '· сырья:', len(rows))
     posts = []; ask_ok = True

@@ -1,5 +1,5 @@
 // Бот-редактор канала @trading_pride (01.11.2026): меню, черновики на одобрение, отчёты и статистика по запросу.
-// Черновики: ветка `state`, channel/drafts.json (создаёт channel_poster/run.py в GitHub Actions).
+// Черновики: ветка `channel` (отдельная: ветку state state_sync.py пересобирает force-push'ом и стирал очередь), channel/drafts.json (создаёт channel_poster/run.py в GitHub Actions).
 // Окружение Vercel: CP_BOT_TOKEN, CP_OWNER_ID (команды и кнопки принимаются только от владельца), CP_CHANNEL, CP_WEBHOOK_SECRET, GH_TOKEN.
 // Один раз: /api/tgbot?setup=1&k=<ключ Пульта> — регистрирует веб-хук, команды и описание бота.
 import { keyOk } from '../../lib/auth';
@@ -96,7 +96,7 @@ async function menuAction(chat, act) {
   if (act === 'help') return send(chat, HELP, BACK);
   if (act === 'src') return showSources(chat);
   if (act === 'gen') return generate(chat);
-  const { data } = await readJson('channel/drafts.json', {}, 'state');
+  const { data } = await readJson('channel/drafts.json', {}, 'channel');
   if (act === 'drafts') return showDrafts(chat, data);
   if (act === 'stats') return send(chat, statsText(data, 30, 'Статистика за 30 дней', await subsCount()), BACK);
   if (act === 'week') return send(chat, statsText(data, 7, 'Отчёт за 7 дней', await subsCount()), BACK);
@@ -126,11 +126,11 @@ export default async function handler(req, res) {
       if (String(msg.from && msg.from.id) !== owner) { await tg('sendMessage', { chat_id: msg.chat.id, text: 'Этот бот работает только с владельцем канала.\n\nВаш Telegram id: ' + (msg.from && msg.from.id) + '\nЕсли вы владелец, впишите это число в CP_OWNER_ID (GitHub и Vercel) и сделайте Redeploy.' }); return res.status(200).send('ok'); }
       const cmd = String(msg.text || '').split(/[\s@]/)[0].toLowerCase();
       if (msg.text && !msg.text.startsWith('/')) {
-        const { data: dd, sha: ss } = await readJson('channel/drafts.json', {}, 'state');
+        const { data: dd, sha: ss } = await readJson('channel/drafts.json', {}, 'channel');
         const wid = Object.keys(dd || {}).find((k) => dd[k].await_reason);
         if (wid) {
           const w = dd[wid]; w.reason = msg.text.slice(0, 300); delete w.await_reason;
-          await writeJson('channel/drafts.json', dd, ss, 'channel: причина ' + wid, 'state', true).catch(() => {});
+          await writeJson('channel/drafts.json', dd, ss, 'channel: причина ' + wid, 'channel', true).catch(() => {});
           await tg('sendMessage', { chat_id: msg.chat.id, text: '✍️ Причину записал, учту в следующих постах.', reply_markup: { inline_keyboard: [[{ text: '🔄 Прислать замену', callback_data: 'rp:' + wid }], [{ text: '⬅️ В меню', callback_data: 'm:menu' }]] } });
           return res.status(200).send('ok');
         }
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
     if (String(cb.from && cb.from.id) !== owner) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Нет доступа' }); return res.status(200).send('ok'); }
     const [act, id, arg] = String(cb.data || '').split(':');
     if (act === 'm') { const T = { gen: '⏳ Запускаю…', drafts: '📝 Загружаю…', stats: '📊 Считаю…', week: '🗓 Считаю…', src: '📚 Открываю…' }; await tg('answerCallbackQuery', { callback_query_id: cb.id, text: T[id] || '' }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
-    const { data, sha } = await readJson('channel/drafts.json', {}, 'state');
+    const { data, sha } = await readJson('channel/drafts.json', {}, 'channel');
     const d = data && data[id];
     const BTN = [[{ text: '✅ Опубликовать' + slotTag(d && d.cat), callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]];
     const mk = (rows) => tg('editMessageReplyMarkup', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: { inline_keyboard: rows } });
@@ -157,38 +157,38 @@ export default async function handler(req, res) {
     if (act === 'rr' && d.status === 'rejected') {
       if (arg === 'custom') {
         Object.keys(data).forEach((k) => { delete data[k].await_reason; }); d.await_reason = true;
-        await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ждёт причину', 'state', true).catch(() => {});
+        await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ждёт причину', 'channel', true).catch(() => {});
         await toast('✍️ Напиши причину следующим сообщением');
         await tg('sendMessage', { chat_id: cb.message.chat.id, text: '✍️ Напиши причину одним сообщением. Я запомню и учту в следующих постах.' });
         return res.status(200).send('ok');
       }
       d.reason = arg === 'none' ? '' : REASONS[arg] || arg; d.reason_code = arg;
       await edit('❌ Отклонено' + (d.reason ? ' · ' + d.reason : ''), [{ text: '🔄 Прислать замену', callback_data: 'rp:' + id }, { text: '↩️ Вернуть', callback_data: 'un:' + id }]);
-      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' причина', 'state', true).catch(() => {});
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' причина', 'channel', true).catch(() => {});
       await toast(d.reason ? 'Причина записана' : 'Отклонено без причины'); return res.status(200).send('ok');
     }
     if (act === 'rp') {
       if (d.replaced) { await toast('Замену уже заказывали'); return res.status(200).send('ok'); }
-      d.replaced = true; await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' замена', 'state', true).catch(() => {});
+      d.replaced = true; await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' замена', 'channel', true).catch(() => {});
       await edit('⏳ Пишу замену…'); await toast('⏳ Пишу замену…'); await generate(cb.message.chat.id, d.cat); return res.status(200).send('ok');
     }
     if (act === 'un') {
       if (d.status !== 'rejected') { await toast('Вернуть можно только отклонённый'); return res.status(200).send('ok'); }
       d.status = 'pending'; delete d.reason; delete d.await_reason; await mk(BTN);
-      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' pending', 'state', true).catch(() => {});
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' pending', 'channel', true).catch(() => {});
       await toast('↩️ Вернул в ожидание'); return res.status(200).send('ok');
     }
     if (d.status !== 'pending' && !(d.status === 'scheduled' && (act === 'pn' || act === 'us'))) { await toast('Уже обработан: ' + (ST[d.status] || d.status)); return res.status(200).send('ok'); }
     if (act === 'us') {
       d.status = 'pending'; delete d.at; await mk(BTN);
-      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' снят с очереди', 'state', true).catch(() => {});
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' снят с очереди', 'channel', true).catch(() => {});
       await toast('↩️ Снял с очереди'); return res.status(200).send('ok');
     }
     if (act === 'ap') {
       const at = nextSlot(data, d.cat);
       d.status = 'scheduled'; d.at = at; d.owner_chat = cb.message.chat.id; d.owner_mid = cb.message.message_id;
       await edit('🕒 Выйдет ' + slotLabel(at), [{ text: '▶️ Сейчас', callback_data: 'pn:' + id }, { text: '↩️ Снять', callback_data: 'us:' + id }]);
-      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' запланирован', 'state', true).catch(() => {});
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' запланирован', 'channel', true).catch(() => {});
       await toast('🕒 Запланировал: ' + slotLabel(at)); return res.status(200).send('ok');
     }
     if (act === 'pn') {
@@ -203,7 +203,7 @@ export default async function handler(req, res) {
       d.status = 'rejected'; d.rej = new Date().toISOString();
       await mk([[{ text: '❌ Отклонено. Почему?', callback_data: 'x:' + id }], ...Object.entries(REASONS).reduce((a, [k, v], i) => { (i % 2 ? a[a.length - 1] : a[a.push([]) - 1]).push({ text: v, callback_data: 'rr:' + id + ':' + k }); return a; }, []), [{ text: '✍️ Своя причина', callback_data: 'rr:' + id + ':custom' }, { text: '↩️ Вернуть', callback_data: 'un:' + id }]]);
     } else return res.status(200).send('ok');
-    await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ' + d.status, 'state', true).catch(() => {});
+    await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' ' + d.status, 'channel', true).catch(() => {});
     await toast(d.status === 'published' ? '✅ Опубликовано в канал' : '❌ Отклонено');
   } catch (e) { console.error('tgbot', e); }
   res.status(200).send('ok');

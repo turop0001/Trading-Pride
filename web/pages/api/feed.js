@@ -8,6 +8,7 @@
 //   (раз в минуту, маленький — чтобы репозиторий не раздувался). Читатель склеивает оба.
 import { keyOk } from '../../lib/auth';
 import { readBig, writeJson, ensureBranch } from '../../lib/gh';
+import { channelTick } from '../../lib/chtick';
 
 export const config = { api: { bodyParser: { sizeLimit: '4mb' } } };
 const KEEP = { M5: 12 * 24 * 12, H1: 24 * 40, D1: 60 }; // ~12 дней M5, 40 дней H1, 60 D1
@@ -67,6 +68,7 @@ export default async function handler(req, res) {
     try {
       const full = Object.values(inc).some((o) => (o.M5 || []).length > 200);
       let wd = '';
+      if (!full && attempt === 0 && new Date().getUTCMinutes() % 2 === 0) { try { await Promise.race([channelTick(), new Promise((r) => setTimeout(r, 6000))]); } catch (e) {} }   // будильник канала @trading_pride (09.11.2026)
       if (!full && attempt === 0) { try { wd = await Promise.race([watchdog(), new Promise((r) => setTimeout(() => r('timeout'), 4000))]); } catch (e) { wd = 'err'; } }
       const PATH = full ? HIST : LIVE, keep = full ? KEEP : KEEP_LIVE;
       let cur = await readBig(PATH, { syms: {} }, BR);
