@@ -71,7 +71,7 @@ async function showDrafts(chat, data) {
   const pend = Object.keys(data || {}).filter((id) => data[id].status === 'pending').sort();
   if (!pend.length) return send(chat, '📝 Черновиков, ждущих решения, нет.\n\nНовые приходят ежедневно утром. Можно запросить сейчас: /gen');
   for (const id of pend) {
-    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать' + slotTag(data[id].cat), callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
+    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать' + slotTag(data[id].cat), callback_data: 'ap:' + id }], [{ text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
     if (data[id].photo) await tg((MK[data[id].kind] || MK.photo)[0], { chat_id: chat, [(MK[data[id].kind] || MK.photo)[1]]: data[id].photo, caption: htmlText(data[id].text).slice(0, 1024), parse_mode: 'HTML', reply_markup: kb });
     else await tg('sendMessage', { chat_id: chat, text: `Черновик ${id} · ${CAT[data[id].cat] || data[id].cat}\n\n${data[id].text}`.slice(0, 4000), reply_markup: kb });
   }
@@ -148,7 +148,7 @@ export default async function handler(req, res) {
     if (act === 'm') { const T = { gen: '⏳ Запускаю…', drafts: '📝 Загружаю…', stats: '📊 Считаю…', week: '🗓 Считаю…', src: '📚 Открываю…' }; await tg('answerCallbackQuery', { callback_query_id: cb.id, text: T[id] || '' }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
     const { data, sha } = await readJson('channel/drafts.json', {}, 'channel');
     const d = data && data[id];
-    const BTN = [[{ text: '✅ Опубликовать' + slotTag(d && d.cat), callback_data: 'ap:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]];
+    const BTN = [[{ text: '✅ Опубликовать' + slotTag(d && d.cat), callback_data: 'ap:' + id }], [{ text: '❌ Отклонить', callback_data: 'rj:' + id }]];
     const mk = (rows) => tg('editMessageReplyMarkup', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: { inline_keyboard: rows } });
     const edit = (t, extra) => mk([[{ text: t, callback_data: 'x:' + id }], ...(extra ? [extra] : [])]);
     const toast = (text, alert) => tg('answerCallbackQuery', { callback_query_id: cb.id, text, show_alert: !!alert });
