@@ -11,6 +11,10 @@
     {
       "path": "/api/prices",
       "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/chtick",
+      "schedule": "40 3 * * *"
     }
   ]
 }

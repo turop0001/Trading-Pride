@@ -4,6 +4,7 @@ import { channelTick } from '../../lib/chtick';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  if (!keyOk(req)) return res.status(403).send('bad key');
+  const cron = String(req.headers['user-agent'] || '').startsWith('vercel-cron');   // Vercel Cron (ежедневный запуск в vercel.json); tick идемпотентен
+  if (!cron && !keyOk(req)) return res.status(403).send('bad key');
   try { return res.status(200).json(await channelTick()); } catch (e) { return res.status(500).send('ERR ' + String(e.message || e)); }
 }

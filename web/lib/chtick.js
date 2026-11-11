@@ -2,7 +2,7 @@
 // GitHub-cron опаздывал на 4–8 часов (черновики приходили в 14:00 МСК, посты выходили не в 10:00/19:00).
 // Эту функцию дёргает /api/feed (MT5 шлёт свечи каждую минуту) и /api/chtick; всё идемпотентно, расписание GitHub остаётся запасным.
 //  1) публикует одобренные посты (status=scheduled), чьё время `at` наступило; перед отправкой «занимает» пост (status=publishing с sha) — двойной публикации нет;
-//  2) если сегодня (UTC, после 05:30) черновиков ещё нет — запускает channel_posts.yml.
+//  2) если сегодня (после 06:30 МСК) нет утреннего или вечернего черновика — запускает channel_posts.yml именно для недостающего, при повторе пишет владельцу.
 import { readJson, writeJson } from './gh';
 
 const CP = () => process.env.CP_BOT_TOKEN || '';
@@ -51,17 +51,35 @@ async function publishDue(data, sha, now) {
   return { done };
 }
 
+// Утро (слот 10:00 МСК) = новость; вечер (19:00 МСК) = ротация humor/smart/motiv/story, как в channel_poster/run.py.
+// Цель (11.11.2026): каждое утро к 07:00 МСК оба черновика у владельца. Окно проверки с 06:30 МСК (03:30 UTC); не хватает одного из двух — дозаказываем именно его.
+const ROT = ['humor', 'smart', 'motiv', 'story'];
+const eveningCat = (now) => ROT[(Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / 86400000) + 719163) % 4];
+async function alertOwner(data, text) {
+  const chat = process.env.CP_OWNER_ID || (Object.values(data).find((x) => x.owner_chat) || {}).owner_chat;
+  if (chat) { try { await tg('sendMessage', { chat_id: chat, text }); } catch (e) {} }
+}
+
 async function ensureDrafts(data, now) {
   const h = now.getUTCHours() + now.getUTCMinutes() / 60;
-  if (h < 5.5 || h >= 15) return 'off';
+  if (h < 3.5 || h >= 15) return 'off';
   const today = now.toISOString().slice(0, 10);
-  if (Object.values(data).some((x) => !x.urgent && String(x.ts || '').slice(0, 10) === today)) return 'have';
-  const since = new Date(now.getTime() - 40 * 60e3).toISOString();
-  const r = await fetch(`https://api.github.com/repos/${repo()}/actions/workflows/channel_posts.yml/runs?created=%3E%3D${since}&per_page=3`, { headers: ghh(), cache: 'no-store' });
+  const mine = Object.values(data).filter((x) => !x.urgent && String(x.ts || '').slice(0, 10) === today);
+  const needNews = !mine.some((x) => x.cat === 'news');
+  const needEve = !mine.some((x) => x.cat !== 'news');
+  if (!needNews && !needEve) return 'have';
+  const r = await fetch(`https://api.github.com/repos/${repo()}/actions/workflows/channel_posts.yml/runs?created=%3E%3D${today}&per_page=20`, { headers: ghh(), cache: 'no-store' });
   if (!r.ok) return 'api' + r.status;
-  if (((await r.json()).workflow_runs || []).length) return 'running';
-  const d = await fetch(`https://api.github.com/repos/${repo()}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST', headers: { ...ghh(), 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: { dry: '0' } }) });
-  return d.status === 204 ? 'dispatched' : 'dispatch' + d.status;
+  const runs = (await r.json()).workflow_runs || [];
+  if (runs.some((x) => x.status !== 'completed')) return 'running';                                   // запуск уже идёт
+  const last = runs.reduce((m, x) => Math.max(m, new Date(x.updated_at).getTime()), 0);
+  if (last && now.getTime() - last < 8 * 60e3) return 'wait';                                          // дать данным подтянуться после завершённого запуска
+  if (runs.length >= 6) return 'limit';                                                                // не больше 6 запусков в сутки
+  const only = needNews && needEve ? '' : needNews ? 'news' : eveningCat(now);
+  const d = await fetch(`https://api.github.com/repos/${repo()}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST', headers: { ...ghh(), 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: only ? { dry: '0', cat: only } : { dry: '0' } }) });
+  if (d.status !== 204) return 'dispatch' + d.status;
+  if (runs.length >= 1 || h >= 4.5) await alertOwner(data, '⚠️ К 07:30 МСК черновики на сегодня не готовы' + (only ? ' (не хватает: ' + (only === 'news' ? 'утренней новости' : 'вечернего поста') + ')' : '') + '. Запустил подготовку повторно, пришлю через 1–3 минуты.');
+  return 'dispatched' + (only ? ':' + only : '');
 }
 
 export async function channelTick() {
