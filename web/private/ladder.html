@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="theme-color" content="#0d1117"><link rel="icon" type="image/svg+xml" href="/ladder-icon.svg?v=2"><link rel="apple-touch-icon" href="/ladder-180.png?v=2"><style>:root{color-scheme:dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="theme-color" content="#0d1117"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"><link rel="icon" type="image/svg+xml" href="/ladder-icon.svg?v=2"><link rel="apple-touch-icon" href="/ladder-180.png?v=2"><style>:root{color-scheme:dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Пульт лестницы</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -192,66 +192,29 @@ table{font-size:14.5px}th{font-size:12.5px;padding:9px 10px}td{padding:10px 10px
 .ic b{font-size:15px;overflow-wrap:anywhere}
 @media(max-width:480px){.indg{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* ===== сайт: на всю ширину, плоский вид ===== */
+/* ===== сайт: на всю ширину, цветные карточки сохранены, терминальный характер ===== */
 :root{--r:6px}
-body{font-size:14px;padding-inline:clamp(12px,2vw,32px)}
+body{font-family:"IBM Plex Sans",Inter,system-ui,sans-serif;font-size:14.5px;padding-inline:clamp(12px,2vw,32px)}
+.mono,.num{font-family:"IBM Plex Mono","JetBrains Mono",ui-monospace,Menlo,monospace}
 .wrap,.hrow,nav{max-width:none}
 header{margin-inline:calc(-1*clamp(12px,2vw,32px));padding:10px clamp(12px,2vw,32px)}
-.brand{font-weight:600;letter-spacing:0}
-.brand i{box-shadow:none;width:8px;height:8px}
-.hrow{gap:8px 28px}
-.hrow .kpi{background:none;border:0;border-left:1px solid var(--line);border-radius:0;padding:0 0 0 14px}
-.hrow .kpi:first-of-type{border-left:0;padding-left:0}
-.kpi small{font-size:11.5px;text-transform:none;letter-spacing:0;font-weight:500}
-.kpi b{font-size:17px;font-weight:600}
-nav{margin-top:8px;gap:0;border-bottom:1px solid var(--line)}
-nav button,nav button.on{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--mut);padding:8px 16px;margin-bottom:-1px;font-size:14px;font-weight:500}
-nav button.on{color:var(--fg);border-bottom-color:var(--acc);background:none}
-main{margin-top:14px}
-.grid{grid-template-columns:minmax(360px,26%) minmax(0,1fr);gap:14px}
+.brand i{box-shadow:none;border-radius:2px;width:11px;height:11px}
+.hrow .kpi{border-radius:var(--r);border-left-width:4px}
+nav button{border-radius:var(--r)}
+.grid{grid-template-columns:minmax(380px,28%) minmax(0,1fr);gap:16px}
 @media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr)}}
-.col{gap:14px}
-.card{border-radius:var(--r);border:1px solid var(--line);border-top:1px solid var(--line);box-shadow:none;padding:14px 16px}
-.card h3,.card h3::before{all:unset}
-.card h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:14px;font-weight:600;color:var(--fg)}
-.chip{border-radius:4px;padding:2px 8px;font-size:12.5px;font-weight:600;border:0;letter-spacing:0}
-.c-ch1{background:var(--bluebg)}.c-ch2{background:var(--warnbg)}.c-fund{background:var(--upbg)}.c-burn{background:var(--dnbg)}.c-gold{background:var(--goldbg)}.c-acc{background:var(--accbg)}.c-done{background:var(--bg2)}
-.btn,input,select,textarea{border-radius:var(--r)}
-.btn{padding:8px 14px;font-size:14px}.btn.sm{padding:5px 10px;font-size:13px}
-input,select,textarea{padding:8px 10px;font-size:14px}
-.seg{border-radius:var(--r)}.seg button{font-size:14px;padding:9px 6px}
-.stats{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.stat{border:1px solid var(--line);border-left:1px solid var(--line);border-radius:var(--r);padding:10px 12px;background:none}
-.stat small{font-size:12px}.stat b{font-size:19px;font-weight:600}
-.pipe .p,.pipe .p1,.pipe .p2,.pipe .p3,.pipe .p4{background:none;border:1px solid var(--line);color:var(--fg);border-radius:var(--r);padding:12px 8px}
-.pipe .p:not(:last-child)::after{display:none}
-.pipe .p b{font-size:26px;font-weight:600}.pipe .p small{color:var(--mut);font-weight:500}
-.pipe .p1 b{color:var(--blue)}.pipe .p2 b{color:var(--warn)}.pipe .p3 b{color:var(--up)}.pipe .p4 b{color:var(--gold)}
-.goal i{border-radius:2px;height:8px}.goal i.on{background:var(--up)}
-.accs{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.acc,.acc.s-ch1,.acc.s-ch2,.acc.s-fund{border:1px solid var(--line);border-left:1px solid var(--line);background:var(--bg2);border-radius:var(--r);padding:12px 14px;gap:8px}
-.acc.s-burn,.acc.s-done{opacity:.6}
-.acc .t b{font-size:15px;font-weight:600}.acc .t .mono{font-size:16px;font-weight:600}
-.bar{height:6px;border-radius:3px}.bar>i,.bar.up>i{background:var(--acc)}.bar.dd>i{background:var(--dn)}
-.kv{font-size:13.5px;padding:2px 0}
-.plan,.plan.L,.plan.S{background:none;border-radius:var(--r);padding:12px 14px}
-.dirbar,.dirbar.L,.dirbar.S{background:none;padding:0 0 10px;border-bottom:1px solid var(--line);border-radius:0;font-size:15px;font-weight:600}
-.dirbar span:first-child{font-size:17px}
-.leg{border-left:0;border-bottom:1px solid var(--line);background:none;border-radius:0;padding:10px 0;margin:0;gap:10px 16px}
-.leg:last-of-type{border-bottom:0}
-.leg .big{background:none;color:var(--fg);padding:0;font-size:22px;font-weight:600}
-.leg b.mono{font-size:15px}
-.open,.open.L,.open.S{border-left:0;border:1px solid var(--line);border-radius:var(--r);background:none;padding:10px 12px}
-.ind{background:none;border:1px solid var(--line);border-radius:var(--r)}
-.ic{background:var(--bg2);border-radius:var(--r)}
-.steps li::before,.steps li.hot::before,.steps li.warnS::before{width:24px;height:24px;font-size:12.5px}
-.steps li{font-size:14px;grid-template-columns:26px minmax(0,1fr)}
-.lbars{height:130px}.lbars .b i{border-radius:3px 3px 0 0}
-.rg i{background:var(--acc);opacity:.6}
-table{font-size:13.5px}th{font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;padding:7px 10px}td{padding:8px 10px}
-.drop{border-radius:var(--r)}
-.toast{border-radius:var(--r);box-shadow:none}
-@media (max-width:640px){body{padding-inline:12px}header{margin-inline:-12px;padding-inline:12px}.hrow .kpi{border-left:0;padding-left:0}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.accs{grid-template-columns:minmax(0,1fr)}.leg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.leg>div:first-child{grid-column:1/-1}}
+.card{border-radius:var(--r);border-top-width:4px;box-shadow:none;padding:16px 18px}
+.card h3{font-size:12.5px;letter-spacing:.1em}
+.card h3::before{border-radius:0;width:10px;height:10px}
+.chip{border-radius:var(--r)}
+.btn,input,select,textarea,.seg,.drop,.acc,.stat,.open,.leg,.dirbar,.plan,.ind,.ic,.toast{border-radius:var(--r)}
+.pipe .p{border-radius:var(--r)}
+.pipe .p b{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.accs{grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.goal i,.bar,.bar>i{border-radius:1px}
+.lbars .b i{border-radius:2px 2px 0 0}
+@media (max-width:640px){body{padding-inline:12px}header{margin-inline:-12px;padding-inline:12px}}
 </style>
 </head><body>
 
@@ -708,10 +671,53 @@ function bind(){
 }
 document.addEventListener("paste",e=>{if(tab!=="pult"||!sample||!canImg)return;const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image"));if(it){e.preventDefault();readShot(it.getAsFile())}});
 
+
+// ───────── сайт: синхронизация между устройствами + распознавание скрина через сервер
+sample={};canImg=true;
+const KEY=(location.pathname.match(/\/l\/([^\/?#]+)/)||[])[1]||(new URLSearchParams(location.search).get("k")||"");
+const HD={"x-pult-key":KEY,"content-type":"application/json"};
+let rev=0,pushT=null,dirty=false,busy=false,synced=false;
+function setSync(t,c){const e=$("#hSync");if(e){e.textContent=t;e.className="chip "+c}}
+const _saveLocal=save;
+save=function(){_saveLocal();dirty=true;clearTimeout(pushT);pushT=setTimeout(pushRemote,1200);setSync("не сохранено","c-ch2")};
+async function pushRemote(){if(busy){pushT=setTimeout(pushRemote,800);return}
+ busy=true;dirty=false;
+ try{const js=JSON.parse(JSON.stringify(S));delete js.rr;
+  const r=await fetch("/api/ladder",{method:"POST",headers:HD,body:JSON.stringify({state:js,base:rev})});
+  if(r.status===401){setSync("нет доступа","c-burn");busy=false;return}
+  const j=await r.json();
+  if(j.conflict){rev=j.rev;if(j.state&&j.state.v){load(j.state);_saveLocal();render();toast("Подтянуто с другого устройства")}setSync("синхронизировано","c-fund")}
+  else if(j.ok){rev=j.rev;if(!dirty)setSync("синхронизировано","c-fund")}
+  else setSync("ошибка: "+(j.error||"?"),"c-burn")}
+ catch(e){setSync("нет связи — локально","c-ch2");dirty=true}
+ busy=false}
+async function pullRemote(){if(dirty||busy)return;
+ try{const r=await fetch("/api/ladder",{headers:HD,cache:"no-store"});
+  if(r.status===401){setSync("нет доступа","c-burn");return}
+  const j=await r.json();if(j.error){setSync("ошибка: "+j.error,"c-burn");return}
+  if(!j.state){ if(!synced){synced=true;rev=j.rev||0;pushRemote()}return }
+  synced=true;
+  if(j.rev!==rev){const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&rev)return;
+   rev=j.rev;if(j.state.v){load(j.state);_saveLocal();render()}}
+  setSync("синхронизировано","c-fund")}
+ catch(e){setSync("нет связи — локально","c-ch2")}}
+function siteSync(){pullRemote();setInterval(pullRemote,20000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)pullRemote()});window.addEventListener("focus",pullRemote)}
+function shrink(blob){return new Promise((ok,no)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.85))};im.onerror=()=>no(new Error("img"));im.src=u})}
+readShot=async function(blob){const stt=$("#imgSt");stt.textContent="Читаю скрин…";
+ try{const img=await shrink(blob);
+  const r=await fetch("/api/ladder-shot",{method:"POST",headers:HD,body:JSON.stringify({image:img,syms:SYMS})});
+  const j=await r.json();
+  if(j.error==="nokey"){stt.textContent="Распознавание не включено: в Vercel нужна переменная ANTHROPIC_API_KEY. Пока впиши вручную.";return}
+  if(j.error){stt.textContent="Не удалось прочитать скрин: "+j.error;return}
+  const x=j.r||{};
+  if(x.entry){draft={sym:SYMS.includes(x.sym)?x.sym:draft.sym,dir:x.dir==="S"?"S":"L",e:String(x.entry),sl:String(x.sl??""),tp:String(x.tp??""),note:x.note||""};plan=buildPlan();render();
+   $("#imgSt").textContent="Заполнено со скрина — проверь цифры перед входом."+(x.note?" Примечание: "+x.note:"")}
+  else stt.textContent="Не нашёл параметров на скрине — впиши вручную."}
+ catch(e){stt.textContent="Не удалось прочитать скрин (нет связи или файл не картинка)."}};
 // ───────── старт
 try{const t=localStorage.getItem("pult_tab");if(t)tab=t;const ls=localStorage.getItem("pult_state");if(ls)load(JSON.parse(ls))}catch(e){}
 $("#bUndo").onclick=doUndo;
-render();
+render();siteSync();
 (async()=>{if(!window.claude)return;
  try{sample=await claude.use("sample");if(sample){const lim=await sample.limits();canImg=!!(lim&&lim.images)}}catch(e){sample=null}
  try{db=await claude.use("db")}catch(e){db=null}
