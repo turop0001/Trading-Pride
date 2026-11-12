@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="theme-color" content="#0d1117"><link rel="icon" href="/icon.svg"><style>:root{color-scheme:dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Пульт лестницы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#0d1117;--bg2:#131a23;--card:#161e29;--line:#253041;--fg:#e6edf5;--mut:#8b9bb0;--dim:#5d6b7e;--acc:#3fb6a8;--accbg:rgba(63,182,168,.13);--up:#2fbf71;--upbg:rgba(47,191,113,.13);--dn:#ef5b6b;--dnbg:rgba(239,91,107,.13);--warn:#e8a33d;--warnbg:rgba(232,163,61,.14);--blue:#5b9cf0;--bluebg:rgba(91,156,240,.14);--gold:#d9b44a;--goldbg:rgba(217,180,74,.14);color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3f5f8;--bg2:#e9edf2;--card:#ffffff;--line:#d8dee7;--fg:#141b24;--mut:#55657a;--dim:#8796a8;--acc:#13867a;--accbg:rgba(19,134,122,.10);--up:#178a4f;--upbg:rgba(23,138,79,.10);--dn:#c9374a;--dnbg:rgba(201,55,74,.09);--warn:#b26b00;--warnbg:rgba(178,107,0,.10);--blue:#2f6fcf;--bluebg:rgba(47,111,207,.10);--gold:#9a7a12;--goldbg:rgba(154,122,18,.11);color-scheme:light}}
+:root[data-theme="light"]{--bg:#f3f5f8;--bg2:#e9edf2;--card:#ffffff;--line:#d8dee7;--fg:#141b24;--mut:#55657a;--dim:#8796a8;--acc:#13867a;--accbg:rgba(19,134,122,.10);--up:#178a4f;--upbg:rgba(23,138,79,.10);--dn:#c9374a;--dnbg:rgba(201,55,74,.09);--warn:#b26b00;--warnbg:rgba(178,107,0,.10);--blue:#2f6fcf;--bluebg:rgba(47,111,207,.10);--gold:#9a7a12;--goldbg:rgba(154,122,18,.11);color-scheme:light}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif;padding-inline:16px;padding-block:0 40px}
+.mono,.num{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:10px 16px}
+.hrow{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.brand{font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--acc);display:inline-block;box-shadow:0 0 0 4px var(--accbg)}
+.kpi{display:flex;flex-direction:column;line-height:1.15}
+.kpi small{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.kpi b{font-size:16px}
+.sp{flex:1}
+nav{display:flex;gap:4px;flex-wrap:wrap;max-width:1240px;margin:10px auto 0}
+nav button{background:none;border:1px solid transparent;color:var(--mut);padding:6px 12px;border-radius:8px;font:inherit;font-weight:500;cursor:pointer}
+nav button.on{background:var(--card);border-color:var(--line);color:var(--fg)}
+main{margin-top:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.card h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:600;display:flex;align-items:center;gap:8px}
+.card h3 .sp{flex:1}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
+input,select,textarea{background:var(--bg2);border:1px solid var(--line);color:var(--fg);border-radius:8px;padding:8px 10px;font:inherit;min-width:0;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.btn{background:var(--bg2);border:1px solid var(--line);color:var(--fg);border-radius:8px;padding:8px 12px;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#04130f}
+.btn.up{background:var(--upbg);border-color:transparent;color:var(--up)}
+.btn.dn{background:var(--dnbg);border-color:transparent;color:var(--dn)}
+.btn.sm{padding:4px 9px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:var(--bg2);border:0;color:var(--mut);padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.seg button.on.L{background:var(--upbg);color:var(--up)}
+.seg button.on.S{background:var(--dnbg);color:var(--dn)}
+.seg button.on.N{background:var(--accbg);color:var(--acc)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.c-ch1{background:var(--bluebg);color:var(--blue)}.c-ch2{background:var(--warnbg);color:var(--warn)}.c-fund{background:var(--upbg);color:var(--up)}.c-burn{background:var(--dnbg);color:var(--dn)}.c-done{background:var(--bg2);color:var(--mut)}.c-gold{background:var(--goldbg);color:var(--gold)}.c-acc{background:var(--accbg);color:var(--acc)}
+.mut{color:var(--mut)}.dim{color:var(--dim)}.up{color:var(--up)}.dn{color:var(--dn)}.warn{color:var(--warn)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;color:var(--mut);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.r,th.r{text-align:right}
+.acc{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg2);display:flex;flex-direction:column;gap:7px;min-width:0}
+.accs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.acc .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.acc .t b{font-size:14px}
+.bar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;position:relative}
+.bar>i{position:absolute;inset:0 auto 0 0;background:var(--acc);border-radius:4px}
+.bar.dd>i{background:var(--dn)}
+.kv{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}
+.kv span:first-child{color:var(--mut)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;align-items:start;counter-increment:s}
+.steps li::before{content:counter(s);width:24px;height:24px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--mut)}
+.steps li.hot::before{background:var(--acc);color:#04130f;border-color:var(--acc)}
+.steps li.warnS::before{background:var(--warn);color:#1a1000;border-color:var(--warn)}
+.steps li small{display:block;color:var(--mut)}
+.plan{border:1px solid var(--acc);border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,var(--accbg),transparent 70%)}
+.leg{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,.8fr));gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.leg:last-child{border-bottom:0}
+.leg .big{font-size:20px;font-weight:700}
+@media (max-width:520px){.leg{grid-template-columns:1fr 1fr}}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:12px;text-align:center;color:var(--mut);font-size:12.5px;cursor:pointer}
+.drop.hov{border-color:var(--acc);color:var(--acc)}
+.ladder{display:flex;gap:6px;flex-wrap:wrap}
+.ladder span{padding:4px 9px;border-radius:7px;background:var(--bg2);border:1px solid var(--line);font-size:12px}
+.ladder span.on{border-color:var(--acc);color:var(--acc);font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--card);border:1px solid var(--acc);color:var(--fg);padding:10px 16px;border-radius:10px;z-index:20;max-width:min(92vw,520px);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:15;display:grid;place-items:center;padding:16px}
+.modal .card{width:min(560px,100%);max-height:90vh;overflow:auto}
+.big2{font-size:26px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat small{color:var(--mut);font-size:11.5px;display:block}
+.stat b{font-size:18px}
+.note{font-size:12px;color:var(--mut)}
+.empty{color:var(--mut);padding:10px 0}
+h2{font-size:15px;margin:0}
+
+/* ===== v4: цвета и инфографика ===== */
+:root{--c1:#5b9cf0;--c2:#e8a33d;--cf:#2fbf71;--cx:#ef5b6b;--cg:#d9b44a}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--c1:#2f6fcf;--c2:#b26b00;--cf:#178a4f;--cx:#c9374a;--cg:#9a7a12}}
+:root[data-theme="light"]{--c1:#2f6fcf;--c2:#b26b00;--cf:#178a4f;--cx:#c9374a;--cg:#9a7a12}
+.hrow .kpi{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--k,var(--acc));border-radius:10px;padding:6px 12px}
+.card{border-top:3px solid var(--cc,var(--line));box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.card h3{color:var(--cc,var(--mut))}
+.card h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--cc,var(--mut));display:inline-block}
+[data-k=sig]{--cc:var(--acc)}[data-k=open]{--cc:var(--warn)}[data-k=lad]{--cc:var(--cg)}[data-k=steps]{--cc:var(--blue)}[data-k=accs]{--cc:var(--c1)}[data-k=stat]{--cc:var(--cf)}[data-k=cash]{--cc:var(--up)}[data-k=set]{--cc:var(--mut)}[data-k=fc]{--cc:var(--cg)}[data-k=pipe]{--cc:var(--c1)}
+.seg{display:flex;width:100%}.seg button{flex:1;padding:9px 6px}
+.seg button.on.L{background:var(--up);color:#04130f}.seg button.on.S{background:var(--dn);color:#fff}
+.acc{border-left:4px solid var(--sc,var(--line))}
+.acc.s-ch1{--sc:var(--c1);background:linear-gradient(90deg,var(--bluebg),transparent 55%),var(--bg2)}
+.acc.s-ch2{--sc:var(--c2);background:linear-gradient(90deg,var(--warnbg),transparent 55%),var(--bg2)}
+.acc.s-fund{--sc:var(--cf);background:linear-gradient(90deg,var(--upbg),transparent 55%),var(--bg2)}
+.acc.s-burn{--sc:var(--cx);opacity:.7}.acc.s-done{--sc:var(--dim);opacity:.7}
+.bar{height:8px}.bar.dd>i{background:linear-gradient(90deg,var(--warn),var(--dn))}
+.bar.up>i{background:linear-gradient(90deg,var(--acc),var(--up))}
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;position:relative}
+.pipe .p{border-radius:12px;padding:10px 8px;text-align:center;border:1px solid var(--line);position:relative}
+.pipe .p b{display:block;font-size:26px;line-height:1.1}
+.pipe .p small{font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.pipe .p1{background:var(--bluebg);color:var(--blue);border-color:transparent}.pipe .p2{background:var(--warnbg);color:var(--warn);border-color:transparent}.pipe .p3{background:var(--upbg);color:var(--up);border-color:transparent}.pipe .p4{background:var(--goldbg);color:var(--gold);border-color:transparent}
+.pipe .p:not(:last-child)::after{content:"›";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:20px;z-index:1}
+.goal{display:flex;gap:4px;margin-top:12px}.goal i{flex:1;height:10px;border-radius:3px;background:var(--line)}.goal i.on{background:linear-gradient(90deg,var(--gold),var(--up))}
+.lbars{display:flex;gap:8px;align-items:flex-end;height:120px;padding-top:6px}
+.lbars .b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;min-width:0}
+.lbars .b i{width:100%;border-radius:6px 6px 2px 2px;background:var(--bc,var(--acc));min-height:6px}
+.lbars .b span{font-size:11px;color:var(--mut)}.lbars .b b{font-size:12px}
+.lbars .b.cur i{outline:2px solid var(--fg);outline-offset:1px}
+.dirbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;margin-bottom:10px;font-weight:700}
+.dirbar.L{background:var(--upbg);color:var(--up)}.dirbar.S{background:var(--dnbg);color:var(--dn)}
+.plan.L{border-color:var(--up);background:linear-gradient(180deg,var(--upbg),transparent 60%)}.plan.S{border-color:var(--dn);background:linear-gradient(180deg,var(--dnbg),transparent 60%)}
+.leg{border-left:4px solid var(--sc,var(--line));padding-left:10px;margin-bottom:6px;border-bottom:0;background:var(--card);border-radius:8px;padding-block:8px}
+.leg .big{background:var(--accbg);color:var(--acc);border-radius:8px;padding:2px 10px;display:inline-block}
+.open{border-left:4px solid var(--sc);border-radius:8px;background:var(--bg2);padding:10px 12px;margin-bottom:8px}
+.open.L{--sc:var(--up)}.open.S{--sc:var(--dn)}
+.steps li::before{background:var(--bluebg);color:var(--blue);border-color:transparent}
+.steps li.hot::before{background:var(--acc);color:#04130f}
+.steps li.warnS::before{background:var(--warn);color:#1a1000}
+.stat{border-left:3px solid var(--sk,var(--line))}
+.stat.g{--sk:var(--up)}.stat.r{--sk:var(--dn)}.stat.b{--sk:var(--blue)}.stat.y{--sk:var(--gold)}
+.rg{position:relative;height:12px;border-radius:6px;background:var(--bg2);border:1px solid var(--line);margin:8px 0 4px}
+.rg i{position:absolute;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,var(--c1),var(--up));opacity:.75}
+.rg em{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--fg);border-radius:2px}
+nav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
+nav button{white-space:nowrap;flex:0 0 auto}nav button.on{background:var(--acc);border-color:var(--acc);color:#04130f}
+.pipe .p small{text-transform:none;letter-spacing:0;font-size:12px}
+@media (max-width:640px){header{position:static}nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding-block:6px}.hrow{gap:8px}.hrow .kpi{padding:5px 9px}.kpi b{font-size:15px}.hrow .brand{width:100%}.pipe .p b{font-size:22px}}
+
+/* ===== v8: крупные таблетки и ровная сетка ===== */
+body{font-size:15px}
+.chip{font-size:13.5px;font-weight:700;padding:5px 12px;border-radius:999px;line-height:1.2;border:1px solid transparent;letter-spacing:.01em}
+.c-ch1{background:color-mix(in srgb,var(--blue) 24%,transparent);color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent)}
+.c-ch2{background:color-mix(in srgb,var(--warn) 24%,transparent);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.c-fund{background:color-mix(in srgb,var(--up) 24%,transparent);color:var(--up);border-color:color-mix(in srgb,var(--up) 45%,transparent)}
+.c-burn{background:color-mix(in srgb,var(--dn) 24%,transparent);color:var(--dn);border-color:color-mix(in srgb,var(--dn) 45%,transparent)}
+.c-gold{background:color-mix(in srgb,var(--gold) 24%,transparent);color:var(--gold);border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+.c-acc{background:color-mix(in srgb,var(--acc) 22%,transparent);color:var(--acc);border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
+.c-done{background:var(--bg2);color:var(--mut);border-color:var(--line)}
+.hrow .kpi{padding:8px 16px}.kpi small{font-size:12px}.kpi b{font-size:19px}
+nav button{font-size:15px;padding:9px 16px;font-weight:600}
+.card{padding:16px 18px}.card h3{font-size:14px;margin-bottom:14px}
+.f{gap:12px}
+label{font-size:13px;gap:6px}
+input,select,textarea{padding:10px 12px;font-size:15px}
+.btn{padding:10px 16px;font-size:14.5px}.btn.sm{padding:7px 13px;font-size:13.5px}
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{padding:12px 14px}.stat small{font-size:12.5px;margin-bottom:2px}.stat b{font-size:21px}
+.pipe .p{padding:14px 8px}.pipe .p b{font-size:30px}.pipe .p small{font-size:13px;font-weight:600}
+.accs{grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.acc{padding:14px 16px;gap:10px}
+.acc .t{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center}
+.acc .t b{font-size:16px}
+.acc .t .mono{font-size:17px;font-weight:700;text-align:right}
+.acc .t .sp{display:none}
+.acc .t .chips{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.kv{font-size:14px;padding:3px 0;align-items:baseline}
+.kv span:last-child{font-weight:600}
+.bar{height:10px;border-radius:5px}
+.lbars{height:150px}.lbars .b b{font-size:14px;font-weight:700}.lbars .b span{font-size:13px}
+.lbars .b i{border-radius:8px 8px 3px 3px}
+.dirbar{padding:12px 16px;font-size:16px}.dirbar span:first-child{font-size:22px}
+.leg{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,.8fr));gap:10px 14px;align-items:center;padding:12px 14px}
+.leg .big{font-size:26px;padding:4px 14px}
+.leg .note{font-size:13px}
+.leg b.mono{font-size:17px}
+.steps li{grid-template-columns:30px minmax(0,1fr);font-size:15px}
+.steps li::before{width:28px;height:28px;font-size:14px}
+.steps li small{font-size:13px;margin-top:2px}
+table{font-size:14.5px}th{font-size:12.5px;padding:9px 10px}td{padding:10px 10px}
+.open{padding:14px 16px}
+.seg button{font-size:15px;padding:11px 8px}
+.dirbar{flex-wrap:wrap;gap:6px 10px}.dirbar .chip{max-width:100%;white-space:normal}.card h3{flex-wrap:wrap}select{max-width:100%;text-overflow:ellipsis}.leg>div{min-width:0}.chip{max-width:100%}
+@media (max-width:640px){.leg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.leg>div:first-child{grid-column:1/-1}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.accs{grid-template-columns:minmax(0,1fr)}}
+.ind{margin:10px 0;padding:10px 12px;border:1px solid var(--bd,#8884);border-radius:12px;background:color-mix(in srgb,var(--c2,#7c5cff) 8%,transparent)}
+.indg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.ic{padding:7px 9px;border-radius:10px;background:color-mix(in srgb,currentColor 6%,transparent);min-width:0}
+.ic b{font-size:15px;overflow-wrap:anywhere}
+@media(max-width:480px){.indg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== сайт: на всю ширину, плоский вид ===== */
+:root{--r:6px}
+body{font-size:14px;padding-inline:clamp(12px,2vw,32px)}
+.wrap,.hrow,nav{max-width:none}
+header{margin-inline:calc(-1*clamp(12px,2vw,32px));padding:10px clamp(12px,2vw,32px)}
+.brand{font-weight:600;letter-spacing:0}
+.brand i{box-shadow:none;width:8px;height:8px}
+.hrow{gap:8px 28px}
+.hrow .kpi{background:none;border:0;border-left:1px solid var(--line);border-radius:0;padding:0 0 0 14px}
+.hrow .kpi:first-of-type{border-left:0;padding-left:0}
+.kpi small{font-size:11.5px;text-transform:none;letter-spacing:0;font-weight:500}
+.kpi b{font-size:17px;font-weight:600}
+nav{margin-top:8px;gap:0;border-bottom:1px solid var(--line)}
+nav button,nav button.on{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--mut);padding:8px 16px;margin-bottom:-1px;font-size:14px;font-weight:500}
+nav button.on{color:var(--fg);border-bottom-color:var(--acc);background:none}
+main{margin-top:14px}
+.grid{grid-template-columns:minmax(360px,26%) minmax(0,1fr);gap:14px}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{gap:14px}
+.card{border-radius:var(--r);border:1px solid var(--line);border-top:1px solid var(--line);box-shadow:none;padding:14px 16px}
+.card h3,.card h3::before{all:unset}
+.card h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:14px;font-weight:600;color:var(--fg)}
+.chip{border-radius:4px;padding:2px 8px;font-size:12.5px;font-weight:600;border:0;letter-spacing:0}
+.c-ch1{background:var(--bluebg)}.c-ch2{background:var(--warnbg)}.c-fund{background:var(--upbg)}.c-burn{background:var(--dnbg)}.c-gold{background:var(--goldbg)}.c-acc{background:var(--accbg)}.c-done{background:var(--bg2)}
+.btn,input,select,textarea{border-radius:var(--r)}
+.btn{padding:8px 14px;font-size:14px}.btn.sm{padding:5px 10px;font-size:13px}
+input,select,textarea{padding:8px 10px;font-size:14px}
+.seg{border-radius:var(--r)}.seg button{font-size:14px;padding:9px 6px}
+.stats{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-left:1px solid var(--line);border-radius:var(--r);padding:10px 12px;background:none}
+.stat small{font-size:12px}.stat b{font-size:19px;font-weight:600}
+.pipe .p,.pipe .p1,.pipe .p2,.pipe .p3,.pipe .p4{background:none;border:1px solid var(--line);color:var(--fg);border-radius:var(--r);padding:12px 8px}
+.pipe .p:not(:last-child)::after{display:none}
+.pipe .p b{font-size:26px;font-weight:600}.pipe .p small{color:var(--mut);font-weight:500}
+.pipe .p1 b{color:var(--blue)}.pipe .p2 b{color:var(--warn)}.pipe .p3 b{color:var(--up)}.pipe .p4 b{color:var(--gold)}
+.goal i{border-radius:2px;height:8px}.goal i.on{background:var(--up)}
+.accs{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.acc,.acc.s-ch1,.acc.s-ch2,.acc.s-fund{border:1px solid var(--line);border-left:1px solid var(--line);background:var(--bg2);border-radius:var(--r);padding:12px 14px;gap:8px}
+.acc.s-burn,.acc.s-done{opacity:.6}
+.acc .t b{font-size:15px;font-weight:600}.acc .t .mono{font-size:16px;font-weight:600}
+.bar{height:6px;border-radius:3px}.bar>i,.bar.up>i{background:var(--acc)}.bar.dd>i{background:var(--dn)}
+.kv{font-size:13.5px;padding:2px 0}
+.plan,.plan.L,.plan.S{background:none;border-radius:var(--r);padding:12px 14px}
+.dirbar,.dirbar.L,.dirbar.S{background:none;padding:0 0 10px;border-bottom:1px solid var(--line);border-radius:0;font-size:15px;font-weight:600}
+.dirbar span:first-child{font-size:17px}
+.leg{border-left:0;border-bottom:1px solid var(--line);background:none;border-radius:0;padding:10px 0;margin:0;gap:10px 16px}
+.leg:last-of-type{border-bottom:0}
+.leg .big{background:none;color:var(--fg);padding:0;font-size:22px;font-weight:600}
+.leg b.mono{font-size:15px}
+.open,.open.L,.open.S{border-left:0;border:1px solid var(--line);border-radius:var(--r);background:none;padding:10px 12px}
+.ind{background:none;border:1px solid var(--line);border-radius:var(--r)}
+.ic{background:var(--bg2);border-radius:var(--r)}
+.steps li::before,.steps li.hot::before,.steps li.warnS::before{width:24px;height:24px;font-size:12.5px}
+.steps li{font-size:14px;grid-template-columns:26px minmax(0,1fr)}
+.lbars{height:130px}.lbars .b i{border-radius:3px 3px 0 0}
+.rg i{background:var(--acc);opacity:.6}
+table{font-size:13.5px}th{font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;padding:7px 10px}td{padding:8px 10px}
+.drop{border-radius:var(--r)}
+.toast{border-radius:var(--r);box-shadow:none}
+@media (max-width:640px){body{padding-inline:12px}header{margin-inline:-12px;padding-inline:12px}.hrow .kpi{border-left:0;padding-left:0}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.accs{grid-template-columns:minmax(0,1fr)}.leg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.leg>div:first-child{grid-column:1/-1}}
+</style>
+</head><body>
+
+
+<header><div class="hrow">
+  <div class="brand"><i></i>Пульт лестницы</div>
+  <div class="kpi" style="--k:var(--up)"><small>Касса</small><b class="num" id="hCash">$0</b></div>
+  <div class="kpi" style="--k:var(--blue)"><small>WR / RR</small><b class="num" id="hWR">—</b></div>
+  <div class="kpi" id="kEV" style="--k:var(--up)"><small>EV на сделку</small><b class="num" id="hEV">—</b></div>
+  <div class="kpi" style="--k:var(--gold)"><small>Цель Ф 100k</small><b class="num" id="hGoal">0/10</b></div>
+  <div class="sp"></div>
+  <button class="btn sm" id="bUndo" hidden>↶ Отменить</button><span class="chip c-done" id="hSync">локально</span>
+</div>
+<nav id="nav"></nav></header>
+
+<div class="wrap"><main id="main"></main></div>
+<div id="layer"></div>
+
+<script>
+// ───────── константы
+const SYMS=["EURUSD","GBPUSD","AUDUSD","USDJPY","EURGBP","XAUUSD","US500","NAS100","GER40","US30","UK100"];
+const TIERS=[10000,25000,50000,100000];
+const STAGE={ch1:"Ch этап 1",ch2:"Ch этап 2",fund:"Ф",burn:"сгорел",done:"закрыт"};
+const DEF={v:1,
+ set:{wrM:60,rrM:1,auto:true,minAuto:12,base:1,cap:4.9,fundRisk:1,payPct:5,payDays:10,lag:2,sigs:1,pool:2,goalN:10,goalSize:100000,gbp:1.3225,eur:1.08,defFirm:"FundingPips"},
+ firms:{
+  "FTMO":{t1:10,t2:5,dd:10,ddd:5,split:80,pd:10,grp:"ftmo"},
+  "FundingPips":{t1:8,t2:5,dd:10,ddd:5,split:80,pd:10,grp:"fp"},
+  "FundedNext":{t1:8,t2:5,dd:10,ddd:5,split:80,pd:10,grp:"fp"},
+  "The5ers":{t1:8,t2:5,dd:10,ddd:5,split:80,pd:10,grp:"ftmo"}},
+ prices:{10000:100,25000:200,50000:300,100000:500},
+ strats:[{id:"main",name:"Сигналы канала (лестница)",risk:1,ladder:true}],cash:0,cashLog:[],accs:[],trades:[],chain:{step:1,loss:0},ptr:0,seq:1};
+let S=JSON.parse(JSON.stringify(DEF));
+let tab="pult",draft={sym:"XAUUSD",dir:"L",e:"",sl:"",tp:"",note:""},plan=null,fc=null,undo=[],ovr=null,curStrat=null;
+let db=null,sample=null,canImg=false,saveT=null;
+
+// ───────── утилиты
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const usd=(x,d=0)=>(x<0?"−$":"$")+Math.abs(x).toLocaleString("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=(x,d=1)=>(x>0?"+":"")+x.toFixed(d)+"%";
+const kk=s=>s>=1000?(s/1000)+"k":s;
+const today=()=>new Date().toISOString().slice(0,10);
+const fmtD=d=>d?new Date(d).toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit"}):"—";
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+function wdays(a,b){let n=0,d=new Date(a),e=new Date(b);while(d<e){d.setDate(d.getDate()+1);const w=d.getDay();if(w&&w<6)n++}return n}
+function addWd(a,n){const d=new Date(a);while(n>0){d.setDate(d.getDate()+1);const w=d.getDay();if(w&&w<6)n--}return d.toISOString().slice(0,10)}
+function toast(t){document.querySelectorAll(".toast").forEach(x=>x.remove());const el=document.createElement("div");el.className="toast";el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),3800)}
+const F=a=>S.firms[a.firm]||S.firms.FTMO;
+const active=()=>S.accs.filter(a=>a.stage==="ch1"||a.stage==="ch2").sort((x,y)=>x.id-y.id);
+const funded=()=>S.accs.filter(a=>a.stage==="fund");
+const tgt=a=>a.stage==="ch1"?F(a).t1:a.stage==="ch2"?F(a).t2:S.set.payPct;
+const STR=()=>S.strats&&S.strats.length?S.strats:DEF.strats;
+const ladderStrat=()=>STR().find(x=>x.ladder)||STR()[0];
+const strat=id=>STR().find(x=>x.id===id)||ladderStrat();
+const accStrat=a=>strat(a.strat);
+const floorBal=a=>a.size*(1-F(a).dd/100);
+const pdays=a=>F(a).pd??S.set.payDays;
+function dayPnl(a){const d=today();return S.trades.filter(t=>t.status==="closed"&&(t.closed||"").slice(0,10)===d).reduce((s,t)=>s+t.legs.filter(l=>l.acc===a.id).reduce((x,l)=>x+(l.pnl||0),0),0)}
+function room(a){const tot=a.bal-floorBal(a),day=a.size*F(a).ddd/100+Math.min(0,dayPnl(a));return{tot,day,min:Math.min(tot,day)}}
+function snap(label){const js=JSON.parse(JSON.stringify(S));delete js.rr;undo.push({label,js});if(undo.length>15)undo.shift()}
+function doUndo(){const u=undo.pop();if(!u)return;load(u.js);plan=null;save();render();toast("Отменено: "+u.label)}
+// разбор текста сигнала из чата (без Claude)
+const ALIAS=[[/XAU\/?USD|GOLD|ЗОЛОТ|XAU/i,"XAUUSD"],[/NAS\s?100|NASDAQ|US\s?100|USTEC|NDX|НАСДАК/i,"NAS100"],[/US\s?500|SPX|S&P|SP500/i,"US500"],[/GER\s?40|DAX|DE\s?40|GER30|ДАКС/i,"GER40"],[/US\s?30|DOW|DJ30|DJI/i,"US30"],[/UK\s?100|FTSE/i,"UK100"],[/EUR\/?USD/i,"EURUSD"],[/GBP\/?USD/i,"GBPUSD"],[/AUD\/?USD/i,"AUDUSD"],[/USD\/?JPY/i,"USDJPY"],[/EUR\/?GBP/i,"EURGBP"]];
+function parseText(t){const T=" "+t.replace(/(?<![\d.,])(\d{1,3}) (\d{3})(?!\d)/g,"$1$2").replace(/(\d),(\d{3})(?!\d)/g,"$1$2").replace(/(\d),(\d)/g,"$1.$2")+" ",o={};const N="[^0-9\\n]{0,24}?(\\d+(?:\\.\\d+)?)";
+ for(const[r,v]of ALIAS)if(r.test(T)){o.sym=v;break}
+ if(/(?<![a-zа-я])(buy|long|покупк\S*|лонг|бай)(?![a-zа-я])/i.test(T))o.dir="L";else if(/(?<![a-zа-я])(sell|short|продаж\S*|шорт|селл)(?![a-zа-я])/i.test(T))o.dir="S";
+ const g=re=>{const m=T.match(new RegExp(re+N,"i"));return m?m[m.length-1]:null};
+ o.e=g("(?<![a-zа-я])(?:entry|enter|вход|цена входа|price|@|buy|sell|long|short|покупка|продажа)(?:\\s*(?:at|по|zone|зона))?");
+ o.sl=g("(?<![a-zа-я])(?:sl|s\\/l|stop\\s?loss|стоп-?лосс)")||g("(?<![a-zа-я])(?:stop|стоп)");
+ o.tp=g("(?<![a-zа-я])(?:tp|t\\/p|take(?:\\s?profit)?|тейк|цель|target)(?:\\s?1(?![\\d.]))?");
+ if(!o.dir&&o.e&&o.sl)o.dir=+o.sl<+o.e?"L":"S";return o}
+
+// ───────── WR / RR (авто по закрытым сделкам или вручную)
+function stats(){
+ const lid=ladderStrat().id;const cl=S.trades.filter(t=>t.status==="closed"&&(t.strat||lid)===lid);
+ const tp=cl.filter(t=>t.res==="tp").length,sl=cl.filter(t=>t.res==="sl").length,be=cl.filter(t=>t.res==="be").length;
+ const n=tp+sl;const rrs=cl.filter(t=>t.res!=="be").map(t=>t.rr);
+ const wrA=n?tp/n*100:null,rrA=rrs.length?rrs.reduce((a,b)=>a+b,0)/rrs.length:null;
+ const useAuto=S.set.auto&&n>=S.set.minAuto;
+ const wr=useAuto?wrA:S.set.wrM,rr=useAuto?rrA:S.set.rrM;
+ return{tp,sl,be,n,wrA,rrA,wr,rr,useAuto,ev:(wr/100)*rr-(1-wr/100)};
+}
+
+// ───────── размер контракта и лот (как в калькуляторе Pine)
+function cs(sym,firm){const g=(S.firms[firm]||{}).grp||"ftmo",ft=g==="ftmo";
+ if(["EURUSD","GBPUSD","AUDUSD","USDJPY","EURGBP"].includes(sym))return 100000;
+ return {UK100:.9,XAUUSD:100,US500:ft?1:50,NAS100:ft?1:20,GER40:ft?1:25,US30:ft?1:5}[sym]??null}
+function lotFor(sym,firm,e,sl,riskUsd){const c=cs(sym,firm),d=Math.abs(e-sl);if(!c||!d)return null;
+ const q=sym==="USDJPY"?1/e:(sym==="UK100"||sym==="EURGBP")?S.set.gbp:1;
+ return Math.floor(riskUsd/(d*c*q)*100+1e-6)/100}
+
+// ───────── множитель серии: m = (k·base + Σпотерь)/k, потолок cap
+function mult(k){const m=(k*S.set.base+S.chain.loss)/k;return Math.min(S.set.cap,Math.max(S.set.base,m))}
+
+// ───────── план входа по сигналу
+function buildPlan(){
+ const e=+draft.e,sl=+draft.sl,tp=+draft.tp,sym=draft.sym,dir=draft.dir;
+ if(!(e>0&&sl>0&&tp>0))return{err:"Заполни вход, стоп и тейк"};
+ if(dir==="L"&&!(sl<e&&tp>e)||dir==="S"&&!(sl>e&&tp<e))return{err:"Стоп и тейк не по направлению сделки"};
+ const sg=strat(curStrat||ladderStrat().id),k=Math.abs(tp-e)/Math.abs(e-sl),legs=[],warns=[];
+ const act=active(),openCh=S.trades.filter(t=>t.status==="open"&&t.legs.some(l=>l.ch)).length;let ci=-1;
+ if(act.length&&sg.ladder){
+  ci=act.findIndex(x=>x.id===ovr);if(ci<0)ci=(S.ptr+openCh)%act.length;const a=act[ci];
+  let m=openCh?S.set.base:mult(k);
+  if(openCh)warns.push("Уже открыта сделка серии — этот сигнал идёт на следующий Ch с базовым риском "+S.set.base+"%.");
+  let r$=a.size*m/100;const rm=room(a);
+  if(r$>rm.min*0.95){warns.push(`${a.name}: риск урезан до ${rm.day<rm.tot?"дневного":"общего"} запаса просадки (${usd(Math.max(0,rm.min*0.95))}).`);r$=Math.max(0,rm.min*0.95);m=r$/a.size*100}
+  legs.push({acc:a.id,ch:true,risk:+m.toFixed(2),usd:r$,lot:lotFor(sym,a.firm,e,sl,r$)});
+ }
+ funded().filter(a=>accStrat(a).id===sg.id).forEach(a=>{const rp=a.risk??sg.risk;let r$=a.size*rp/100;const rm=room(a);if(r$>rm.min*0.95){r$=Math.max(0,rm.min*0.95);warns.push(a.name+": риск урезан до запаса просадки.")}legs.push({acc:a.id,ch:false,risk:+(r$/a.size*100).toFixed(2),usd:r$,lot:lotFor(sym,a.firm,e,sl,r$)})});
+ if(!legs.length)return{err:sg.ladder?"Нет активных счетов — добавь Ch во вкладке «Счета»":"Нет Ф на стратегии «"+sg.name+"» — назначь счёт: Счета → Править → Стратегия"};
+ legs.forEach(l=>{if(l.lot===null)warns.push("Для "+sym+" нет размера контракта — проверь символ.");else if(l.lot<0.01)warns.push(acc(l.acc).name+": лот меньше 0.01 — стоп слишком широкий для риска.")});
+ // что дальше
+ let nxt="";if(sg.ladder&&act.length&&!openCh){const nA=act[(ci+1)%act.length];
+  const mSL=Math.min(S.set.cap,(k*S.set.base+S.chain.loss+legs[0].risk)/k);
+  nxt=`Если <b class="dn">SL</b> → следующий сигнал на <b>${esc(nA.name)}</b> риск <b>${mSL.toFixed(2)}%</b> (шаг ${S.chain.step+1}). Если <b class="up">TP</b> → <b>${esc(nA.name)}</b> риск <b>${S.set.base}%</b>.`}
+ return{strat:sg.id,sname:sg.name,sym,dir,e,sl,tp,rr:k,legs,warns:[...new Set(warns)],nxt,step:act.length&&!openCh?S.chain.step:null};
+}
+const acc=id=>S.accs.find(a=>a.id===id)||{name:"?",size:0};
+
+function takePlan(){if(!plan||plan.err)return;snap("запись сделки "+plan.sym);
+ const act=active();if(ovr&&plan.step!=null){const i=act.findIndex(x=>x.id===ovr);if(i>=0)S.ptr=i}ovr=null;
+ S.trades.unshift({id:S.seq++,t:new Date().toISOString(),sym:plan.sym,dir:plan.dir,e:plan.e,sl:plan.sl,tp:plan.tp,strat:plan.strat,rr:plan.rr,step:plan.legs.some(l=>l.ch)?plan.step:null,legs:plan.legs.map(l=>({...l,pnl:null})),status:"open",note:draft.note||""});
+ plan=null;draft={...draft,e:"",sl:"",tp:"",note:""};save();render();toast("Сделка записана. Отметь результат, когда закроется.")}
+
+// ───────── закрытие сделки и переходы этапов
+function closeTrade(id,res,manual){const t=S.trades.find(x=>x.id===id);if(!t||t.status!=="open")return;
+ snap("закрытие "+t.sym+" "+res.toUpperCase());t.res=res;t.status="closed";t.closed=new Date().toISOString();const ev=[];
+ t.legs.forEach(l=>{const a=S.accs.find(x=>x.id===l.acc);
+  l.pnl=manual&&manual[l.acc]!=null?manual[l.acc]:res==="tp"?l.usd*t.rr:res==="sl"?-l.usd:0;
+  if(!a||!(a.stage==="ch1"||a.stage==="ch2"||a.stage==="fund"))return;
+  a.bal+=l.pnl;a.trades=(a.trades||0)+1;ev.push(...stageCheck(a))});
+ if(t.step!=null){ if(res==="sl"){S.chain.loss+=(t.legs.find(l=>l.ch)||{risk:0}).risk;S.chain.step++}
+  else if(res==="tp"){S.chain.loss=0;S.chain.step=1}
+  const n=active().length||1;S.ptr=(S.ptr+1)%Math.max(1,n)}
+ S.ptr=S.ptr%Math.max(1,active().length);
+ save();render();if(ev.length)toast(ev.join(" · "))}
+function stageCheck(a){const f=F(a),out=[];
+ if(a.bal<=floorBal(a)+0.01){a.stage="burn";a.endAt=today();out.push(a.name+" сгорел");return out}
+ if(a.stage==="ch1"&&a.bal>=a.size*(1+f.t1/100)){a.stage="ch2";a.bal=a.size;a.stageAt=today();out.push(a.name+" прошёл этап 1 → этап 2")}
+ else if(a.stage==="ch2"&&a.bal>=a.size*(1+f.t2/100)){a.stage="fund";a.bal=a.size;a.fundAt=today();a.stageAt=today();out.push(a.name+" → ФАНДЕД ")}
+ return out}
+
+// ───────── выводы
+function payInfo(a){const f=F(a),prof=a.bal-a.size,from=a.lastPay||a.fundAt||today(),wd=wdays(from,today()),need=Math.max(0,pdays(a)-wd);
+ return{prof,pct:prof/a.size*100,amt:Math.max(0,prof*f.split/100),need,date:addWd(from,pdays(a)),ok:prof>=a.size*S.set.payPct/100&&need===0,okProf:prof>=a.size*S.set.payPct/100}}
+function reqPay(id){const a=acc(id),p=payInfo(a);if(p.amt<=0)return;snap("запрос вывода");
+ a.pend={amt:Math.round(p.amt),at:today(),eta:addWd(today(),S.set.lag)};a.bal=a.size;a.lastPay=today();save();render();toast("Вывод "+usd(a.pend.amt)+" запрошен — жди ~"+fmtD(a.pend.eta))}
+function gotPay(id){const a=acc(id);if(!a.pend)return;snap("получение вывода");S.cash+=a.pend.amt;a.paid=(a.paid||0)+a.pend.amt;
+ S.cashLog.unshift({t:today(),amt:a.pend.amt,note:"Вывод "+a.name});a.pend=null;save();render();toast("Касса пополнена")}
+
+// ───────── что покупать
+function buyAdvice(){const act=active(),need=S.set.pool-act.length,gs=S.set.goalSize;
+ const fN=funded().filter(a=>a.size>=gs).length;if(fN>=S.set.goalN)return{done:true};
+ if(need<=0)return{need:0};
+ const tiers=TIERS.filter(t=>t<=gs).sort((a,b)=>b-a);const best=tiers.find(t=>S.prices[t]<=S.cash);
+ return{need,best,price:best?S.prices[best]:S.prices[10000],short:best?0:S.prices[10000]-S.cash}}
+function buy(firm,size,price,stage,bal){snap("добавление счёта");const n=S.accs.filter(a=>a.firm===firm&&a.size===size).length+1;
+ const short={"FTMO":"FTMO","FundingPips":"FP","FundedNext":"FN","The5ers":"5ers"}[firm]||firm;
+ const a={id:S.seq++,name:`${short}-${kk(size)} #${n}`,firm,size,stage:stage||"ch1",bal:bal??size,opened:today(),stageAt:today(),cost:price||0,trades:0};
+ if(a.stage==="fund")a.fundAt=today();
+ if(price>0){S.cash-=price;S.cashLog.unshift({t:today(),amt:-price,note:"Покупка "+a.name})}
+ S.accs.push(a);save();render();toast("Добавлен "+a.name)}
+
+// ───────── следующие шаги
+function nextSteps(){const L=[],adv=buyAdvice();
+ S.trades.filter(t=>t.status==="open").forEach(t=>L.push({c:"hot",h:`Открыта сделка ${t.sym} ${t.dir==="L"?"LONG":"SHORT"} — отметь результат`,s:t.legs.map(l=>acc(l.acc).name+" "+l.lot+" лот").join(" · ")}));
+ S.accs.filter(a=>a.pend).forEach(a=>L.push({c:"hot",h:`Ожидается вывод ${usd(a.pend.amt)} с ${a.name}`,s:"Ориентир поступления "+fmtD(a.pend.eta)+" — нажми «Получено», когда придёт"}));
+ funded().forEach(a=>{const p=payInfo(a);if(p.ok)L.push({c:"hot",h:`Запроси вывод с ${a.name}: ${usd(p.amt)}`,s:`Профит ${pct(p.pct)} · срок выполнен`});
+  else if(p.okProf)L.push({c:"",h:`${a.name}: профит есть (${pct(p.pct)}), вывод с ${fmtD(p.date)}`,s:`Осталось ${p.need} торговых дн.`})});
+ if(adv.done)L.push({c:"hot",h:"Цель достигнута: "+S.set.goalN+" Ф по "+kk(S.set.goalSize),s:"Новые Ch больше не покупаем"});
+ else if(adv.need>0){if(adv.best)L.push({c:"hot",h:`Купи Ch ${kk(adv.best)} (${usd(adv.price)})`,s:`В пуле ${active().length}/${S.set.pool} · самый крупный, что позволяет касса ${usd(S.cash)}`});
+  else L.push({c:"warnS",h:`Нужен новый Ch — не хватает ${usd(adv.short)}`,s:`Пополни кассу или дождись вывода (Ch 10k = ${usd(S.prices[10000])})`})}
+ const act=active();if(act.length&&!S.trades.some(t=>t.status==="open"&&t.legs.some(l=>l.ch))){const a=act[S.ptr%act.length];
+  L.push({c:"",h:`Следующий сигнал → ${a.name}, риск ≈${mult(S.rr()).toFixed(2)}% (шаг ${S.chain.step}, при RR ${S.rr().toFixed(2)})`,s:"Ф на этой стратегии — по "+ladderStrat().risk+"% (остальные Ф — по своим стратегиям)"})}
+ act.forEach(a=>{const left=a.size*(1+tgt(a)/100)-a.bal;L.push({c:"",h:`${a.name} (${STAGE[a.stage]}): до цели ${usd(left)}`,s:`Запас просадки ${usd(a.bal-floorBal(a))} · на сегодня ${usd(room(a).day)}`})});
+ return L}
+S.rr=()=>stats().rr||1;
+
+// ───────── Монте-Карло прогноз от текущего состояния
+function forecast(N=500){const st=stats(),wr=st.wr/100,rrv=st.rr,sg=S.set.sigs,H=1300,R=[];
+ const nowCh=active().map(a=>a.id);const passHits={};nowCh.forEach(i=>passHits[i]=0);
+ for(let p=0;p<N;p++){let cash=S.cash,ptr=S.ptr,loss=S.chain.loss,id=1e6;
+  let A=S.accs.filter(a=>["ch1","ch2","fund"].includes(a.stage)).map(a=>({id:a.id,firm:a.firm,size:a.size,stage:a.stage,bal:a.bal,last:a.stage==="fund"?-wdays(a.lastPay||a.fundAt||today(),today()):0}));
+  const pend=S.accs.filter(a=>a.pend).map(a=>({d:Math.max(0,wdays(today(),a.pend.eta)),amt:a.pend.amt}));
+  let fF=null,fP=null,fG=null,fNext=null;
+  for(let d=0;d<H;d++){
+   for(let i=pend.length-1;i>=0;i--)if(pend[i].d<=d){cash+=pend[i].amt;pend.splice(i,1);if(fP===null)fP=d}
+   const g=S.set.goalSize;if(A.filter(a=>a.stage==="fund"&&a.size>=g).length>=S.set.goalN){fG=d;break}
+   let ch=A.filter(a=>a.stage!=="fund");
+   while(ch.length<S.set.pool){const t=TIERS.filter(x=>x<=g).sort((a,b)=>b-a).find(x=>S.prices[x]<=cash);if(!t)break;cash-=S.prices[t];const na={id:id++,firm:S.set.defFirm,size:t,stage:"ch1",bal:t,last:0};A.push(na);ch.push(na)}
+   for(let s=0;s<sg;s++){const win=Math.random()<wr;
+    ch=A.filter(a=>a.stage!=="fund");
+    if(ch.length){const a=ch[ptr%ch.length],f=S.firms[a.firm]||S.firms.FTMO;let m=Math.min(S.set.cap,(rrv*S.set.base+loss)/rrv);
+     let r=a.size*m/100;const room=a.bal-a.size*(1-f.dd/100);if(r>room*.98){r=room*.98;m=r/a.size*100}
+     a.bal+=win?r*rrv:-r;loss=win?0:loss+m;ptr++;
+     if(a.bal<=a.size*(1-f.dd/100)+.01){a.stage="x"}
+     else if(a.stage==="ch1"&&a.bal>=a.size*(1+f.t1/100)){a.stage="ch2";a.bal=a.size}
+     else if(a.stage==="ch2"&&a.bal>=a.size*(1+f.t2/100)){a.stage="fund";a.bal=a.size;a.last=d;if(fF===null)fF=d;if(a.id in passHits)passHits[a.id]++}
+    }
+    A.filter(a=>a.stage==="fund").forEach(a=>{const f=S.firms[a.firm]||S.firms.FTMO,r=a.size*S.set.fundRisk/100;a.bal+=win?r*rrv:-r;
+     if(a.bal<=a.size*(1-f.dd/100)+.01)a.stage="x";
+     else if(a.bal-a.size>=a.size*S.set.payPct/100&&d-a.last>=(f.pd??S.set.payDays)){pend.push({d:d+S.set.lag,amt:(a.bal-a.size)*f.split/100});a.bal=a.size;a.last=d}});
+    A=A.filter(a=>a.stage!=="x");
+   }
+  }
+  R.push({fF,fP,fG})}
+ const med=k=>{const v=R.map(r=>r[k]).filter(x=>x!==null).sort((a,b)=>a-b);const q=x=>v.length?v[Math.min(v.length-1,Math.floor(v.length*x))]:null;return{p:v.length/N,m:q(.5),lo:q(.25),hi:q(.75)}};
+ const pa={};nowCh.forEach(i=>pa[i]=passHits[i]/N);
+ return{fF:med("fF"),fP:med("fP"),fG:med("fG"),pa,wr:st.wr,rr:rrv,N}}
+const wk=d=>d===null?"—":(d/5).toFixed(d<50?1:0)+" нед";
+const rng=o=>{if(o.lo===null)return"";const mx=Math.max(o.hi*1.15,1),P=x=>Math.min(100,x/mx*100);return `<div class="rg"><i style="left:${P(o.lo)}%;width:${Math.max(2,P(o.hi)-P(o.lo))}%"></i><em style="left:${P(o.m)}%"></em></div><small>50% путей: ${wk(o.lo)} – ${wk(o.hi)}</small>`};
+
+// ───────── сохранение
+function save(){fc=null;clearTimeout(saveT);saveT=setTimeout(async()=>{const js=JSON.parse(JSON.stringify(S));delete js.rr;
+ if(db){try{await db.doc("pult/state").set(js);$("#hSync").textContent="сохранено";$("#hSync").className="chip c-fund"}catch(e){$("#hSync").textContent="ошибка сохранения";$("#hSync").className="chip c-burn"}}
+ try{localStorage.setItem("pult_state",JSON.stringify(js))}catch(e){}},500)}
+function load(obj){const r=S.rr;const ov=(obj&&obj.v)||0;S=Object.assign(JSON.parse(JSON.stringify(DEF)),obj||{});S.set=Object.assign({},DEF.set,S.set);S.firms=Object.assign({},DEF.firms,S.firms);if(ov<2&&S.firms.FundedNext)S.firms.FundedNext.grp="fp";S.v=2;S.rr=r}
+
+// ───────── отрисовка
+const TABS=[["pult","Пульт"],["accs","Счета"],["trades","Сделки"],["fc","Прогноз"],["cash","Касса"],["set","Настройки"]];
+function render(){const st=stats();
+ $("#hCash").textContent=usd(S.cash);$("#hWR").innerHTML=`${st.wr.toFixed(0)}% / ${st.rr.toFixed(2)} <span class="chip ${st.useAuto?"c-acc":"c-done"}">${st.useAuto?"авто":"ручн"}</span>`;
+ $("#hEV").textContent=(st.ev>=0?"+":"")+st.ev.toFixed(2)+"R";$("#hEV").className="num "+(st.ev>=0?"up":"dn");$("#kEV").style.setProperty("--k",st.ev>=0?"var(--up)":"var(--dn)");
+ $("#hGoal").textContent=funded().filter(a=>a.size>=S.set.goalSize).length+"/"+S.set.goalN;
+ const ub=$("#bUndo");ub.hidden=!undo.length;if(undo.length)ub.title="Отменить: "+undo[undo.length-1].label;
+ $("#nav").innerHTML=TABS.map(([k,n])=>`<button data-tab="${k}" class="${tab===k?"on":""}">${n}</button>`).join("");
+ $("#main").innerHTML={pult:vPult,accs:vAccs,trades:vTrades,fc:vFc,cash:vCash,set:vSet}[tab]();bind()}
+
+function accCard(a,full){const f=F(a),t=tgt(a),tg=a.size*(1+t/100),prog=Math.max(0,Math.min(1,(a.bal-a.size)/(tg-a.size))),fl=floorBal(a),ddU=Math.max(0,Math.min(1,(a.size-a.bal)/(a.size-fl)));
+ const isCh=a.stage==="ch1"||a.stage==="ch2",isF=a.stage==="fund",p=isF?payInfo(a):null,isNext=isCh&&active()[S.ptr%Math.max(1,active().length)]?.id===a.id;
+ return `<div class="acc s-${a.stage}">
+ <div class="t"><b>${esc(a.name)}</b><span class="mono">${usd(a.bal)}</span><div class="chips"><span class="chip c-${a.stage}">${STAGE[a.stage]}</span>${isNext?'<span class="chip c-gold">следующий</span>':""}${isF?`<span class="chip c-acc">${esc(accStrat(a).name)}</span>`:""}</div></div>
+ ${isCh||isF?`<div class="kv"><span>${isF?"Профит до вывода "+S.set.payPct+"%":"Цель "+t+"%"}</span><span class="mono ${a.bal>=a.size?"up":"dn"}">${pct((a.bal-a.size)/a.size*100,2)} / ${t}%</span></div>
+ <div class="bar up"><i style="width:${(prog*100).toFixed(1)}%"></i></div>
+ <div class="kv"><span>Просадка (лимит ${f.dd}%)</span><span class="mono">${usd(a.bal-fl)} запас</span></div>
+ <div class="bar dd"><i style="width:${(ddU*100).toFixed(1)}%"></i></div>
+ <div class="kv"><span>Дневной запас (${f.ddd}%)</span><span class="mono ${room(a).day<a.size*f.ddd/200?"warn":""}">${usd(room(a).day)}</span></div>`:""}
+ ${isF?`<div class="kv"><span>Вывод</span><span>${a.pend?`<span class="warn">ждём ${usd(a.pend.amt)} ~${fmtD(a.pend.eta)}</span>`:p.ok?`<b class="up">доступен ${usd(p.amt)}</b>`:`с ${fmtD(p.date)}`}</span></div>`:""}
+ ${full?`<div class="kv"><span>${esc(a.firm)} · ${kk(a.size)} · сделок ${a.trades||0}</span><span class="dim">с ${fmtD(a.opened)}${a.paid?" · выведено "+usd(a.paid):""}</span></div>
+ <div class="row">${isF&&p.ok&&!a.pend?`<button class="btn sm up" data-pay="${a.id}">Запросить вывод</button>`:""}${a.pend?`<button class="btn sm up" data-got="${a.id}">Получено ${usd(a.pend.amt)}</button>`:""}<button class="btn sm" data-edit="${a.id}">Править</button></div>`:""}
+ </div>`}
+
+function vPipe(){const c1=S.accs.filter(a=>a.stage==="ch1").length,c2=S.accs.filter(a=>a.stage==="ch2").length,fN=funded().length,pend=S.accs.filter(a=>a.pend).reduce((s,a)=>s+a.pend.amt,0),g=funded().filter(a=>a.size>=S.set.goalSize).length;
+ return `<div class="card" data-k="pipe"><h3>Конвейер счетов</h3><div class="pipe"><div class="p p1"><b>${c1}</b><small>Ch этап 1</small></div><div class="p p2"><b>${c2}</b><small>Ch этап 2</small></div><div class="p p3"><b>${fN}</b><small>Фандед</small></div><div class="p p4"><b>${pend?usd(pend):"$"+Math.round(S.cash)}</b><small>${pend?"вывод в пути":"касса"}</small></div></div>
+ <div class="goal">${Array.from({length:S.set.goalN},(_,i)=>`<i class="${i<g?"on":""}"></i>`).join("")}</div><div class="note" style="margin-top:6px">Цель: ${g} из ${S.set.goalN} Ф по ${kk(S.set.goalSize)}</div></div>`}
+function vFundMap(){const F_=funded();if(!F_.length)return"";
+ return `<div class="card" data-k="stat"><h3>Фандеды по стратегиям</h3>${STR().map(sg=>{const L=F_.filter(a=>accStrat(a).id===sg.id);return `<div style="margin-bottom:10px"><div class="row"><span class="chip c-gold">${esc(sg.name)}</span><span class="note">${sg.ladder?"сигналы канала · ":""}риск по умолчанию ${sg.risk}%</span></div>${L.length?L.map(a=>{const rp=a.risk??sg.risk;return `<div class="kv" style="padding:4px 0 0 8px"><span><b style="color:var(--fg)">${esc(a.name)}</b> · ${esc(a.firm)}</span><span class="mono">${rp}% = ${usd(a.size*rp/100)}</span></div>`}).join(""):'<div class="note" style="padding-left:8px">нет счетов — назначь в «Счета → Править»</div>'}</div>`}).join("")}</div>`}
+function vPult(){const st=stats();const op=S.trades.filter(t=>t.status==="open");
+ const ladder=[];let L=S.chain.loss;for(let i=0;i<5;i++){const m=Math.min(S.set.cap,(st.rr*S.set.base+L)/st.rr);ladder.push(m);L+=m}
+ return `<div class="grid"><div class="col">
+ <div class="card" data-k="sig"><h3>Сигнал<span class="sp"></span><span class="chip c-acc">шаг серии ${S.chain.step}</span></h3>
+  <div class="f" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">
+   <label style="grid-column:1/-1">Стратегия сигнала<select id="dStrat">${STR().map(x=>`<option value="${x.id}" ${x.id===(curStrat||ladderStrat().id)?"selected":""}>${esc(x.name)}${x.ladder?" · Ch + Ф":" · только Ф"}</option>`).join("")}</select></label>
+   <label>Символ<select id="dSym">${SYMS.map(s=>`<option ${s===draft.sym?"selected":""}>${s}</option>`).join("")}</select></label>
+   <label>Направление<span class="seg"><button data-dir="L" class="L ${draft.dir==="L"?"on":""}">LONG</button><button data-dir="S" class="S ${draft.dir==="S"?"on":""}">SHORT</button></span></label>
+  </div>
+  <div class="f" style="margin-top:10px">
+   <label>Вход<input id="dE" class="mono" inputmode="decimal" value="${esc(draft.e)}" placeholder="2385.40"></label>
+   <label>Стоп<input id="dSL" class="mono" inputmode="decimal" value="${esc(draft.sl)}"></label>
+   <label>Тейк<input id="dTP" class="mono" inputmode="decimal" value="${esc(draft.tp)}"></label>
+  </div>
+  <div class="row" style="margin-top:10px"><button class="btn pri" id="bCalc">Рассчитать вход</button><span class="mut" id="rrLive"></span></div>
+  <div class="drop" id="drop" style="margin-top:12px" ${sample&&canImg?"":"hidden"}>Вставь скрин сигнала (Ctrl/Cmd+V) или нажми, чтобы выбрать файл — поля заполнятся сами<input type="file" id="fImg" accept="image/*" hidden></div>
+  <div class="note" id="imgSt" style="margin-top:6px"></div>
+  <details style="margin-top:6px"><summary class="mut" style="cursor:pointer;font-size:12.5px">Вставить текст сигнала из чата</summary>
+  <textarea id="dTxt" rows="3" style="margin-top:8px" placeholder="GOLD BUY 2385.4  SL 2378  TP 2400"></textarea>
+  <div class="row" style="margin-top:6px"><button class="btn sm" id="bParse">Разобрать и рассчитать</button><span class="note">разбирается прямо в браузере</span></div></details>
+ </div>
+ ${plan?vPlan():""}
+ <div class="card" data-k="open"><h3>Открытые сделки</h3>${op.length?op.map(vOpen).join(""):`<div class="empty">Нет открытых сделок</div>`}</div>
+ <div class="card" data-k="lad"><h3>Лестница риска текущей серии (RR ${st.rr.toFixed(2)})</h3>
+  <div class="lbars">${ladder.map((m,i)=>{const f=m/S.set.cap,col=f<.35?"var(--up)":f<.7?"var(--warn)":"var(--dn)";return `<div class="b ${i===0?"cur":""}" style="--bc:${col}"><b class="mono">${m.toFixed(2)}%</b><i style="height:${Math.max(8,f*80)}px"></i><span>шаг ${S.chain.step+i}</span></div>`}).join("")}</div>
+  <div class="note" style="margin-top:8px">Каждый SL поднимает риск следующего Ch так, чтобы один TP вернул все потери серии + ${S.set.base}%. Потолок ${S.set.cap}%. После TP — снова ${S.set.base}%. Ротация: каждая сделка — на следующий Ch из пула.</div>
+  <div class="row" style="margin-top:8px"><button class="btn sm" id="bReset">Сбросить серию на шаг 1</button></div>
+ </div>
+ </div><div class="col">
+ ${vPipe()}
+ <div class="card" data-k="steps"><h3>Следующие шаги</h3><ol class="steps">${nextSteps().map(x=>`<li class="${x.c}"><div>${esc(x.h)}<small>${esc(x.s)}</small></div></li>`).join("")||'<li><div>Добавь кассу и счета<small>Вкладки «Касса» и «Счета»</small></div></li>'}</ol></div>
+ <div class="card" data-k="accs"><h3>Счета в работе</h3><div class="accs">${S.accs.filter(a=>["ch1","ch2","fund"].includes(a.stage)).map(a=>accCard(a,false)).join("")||'<div class="empty">Пока нет счетов</div>'}</div></div>
+ ${vFundMap()}
+ </div></div>`}
+
+function indVals(){const l=plan.legs.find(x=>x.ch)||plan.legs[0],a=acc(l.acc);
+ return {e:plan.e,sl:plan.sl,tp:plan.tp,step:l.ch&&plan.step!=null?plan.step:1,firm:a.firm,size:a.size,ch:l.ch,rr:plan.rr}}
+function indText(){const v=indVals();return `TP ladder — ${plan.sym} ${plan.dir==="L"?"LONG":"SHORT"}\nВход: ${v.e}\nСтоп: ${v.sl}\nТейк: ${v.tp}\nТекущая ступень серии: ${v.step}\nФирма: ${v.firm}\nРазмер счёта: ${v.size}`}
+function indBlock(){const v=indVals(),c=(k,x)=>`<div class="ic"><div class="note">${k}</div><b class="mono">${x}</b></div>`;
+ return `<div class="ind"><div class="row" style="justify-content:space-between"><b style="font-size:13px">Значения для индикатора TP ladder</b><button class="btn sm" id="bInd">Копировать</button></div>
+ <div class="indg">${c("Вход",v.e)}${c("Стоп",v.sl)}${c("Тейк",v.tp)}${c("Ступень серии",v.ch?v.step:"— (фикс)")}${c("Фирма",esc(v.firm))}${c("Размер счёта",usd(v.size))}</div>
+ <div id="indBox"></div></div>`}
+function vPlan(){if(plan.err)return `<div class="card"><span class="dn">${esc(plan.err)}</span></div>`;
+ return `<div class="plan ${plan.dir}"><div class="dirbar ${plan.dir}"><span style="font-size:18px">${plan.dir==="L"?"▲ LONG":"▼ SHORT"}</span><span>${plan.sym}</span><span class="chip c-gold">${esc(plan.sname)}</span><span style="flex:1"></span><span class="mono">RR ${plan.rr.toFixed(2)}</span></div>
+ <div class="mono mut" style="font-size:12.5px">вход ${plan.e} · стоп ${plan.sl} · тейк ${plan.tp}</div>
+ ${indBlock()}
+ ${plan.legs.map((l,i)=>{const a=acc(l.acc),act=active();return `<div class="leg" style="--sc:${a.stage==="fund"?"var(--cf)":a.stage==="ch2"?"var(--c2)":"var(--c1)"}"><div><b>${esc(a.name)}</b> <span class="chip c-${a.stage}">${STAGE[a.stage]}</span><div class="note">${esc(a.firm)} · ${l.ch?"серия, шаг "+(plan.step??"—"):"фикс "+l.risk+"%"}</div>
+  <div class="row" style="margin-top:4px">${l.ch&&act.length>1?`<select data-ovr style="width:auto;padding:3px 6px;font-size:12px">${act.map(x=>`<option value="${x.id}" ${x.id===l.acc?"selected":""}>${esc(x.name)}</option>`).join("")}</select>`:""}<button class="btn sm" data-drop="${i}">не входить</button></div></div>
+  <div><div class="note">Лот</div><div class="big mono">${l.lot??"—"}</div></div><div><div class="note">Риск</div><b class="mono">${l.risk}%</b><div class="note mono">${usd(l.usd)}</div></div><div><div class="note">TP даст</div><b class="mono up">+${usd(l.usd*plan.rr)}</b></div></div>`}).join("")}
+ ${plan.nxt?`<div class="note" style="margin-top:8px;font-size:13px;color:var(--fg)">${plan.nxt}</div>`:""}
+ ${plan.warns.map(w=>`<div class="warn" style="font-size:12.5px;margin-top:6px">${esc(w)}</div>`).join("")}
+ <div class="row" style="margin-top:12px"><button class="btn pri" id="bTake">Вошёл — записать</button><button class="btn" id="bCancel">Отмена</button></div></div>`}
+
+function vOpen(t){return `<div class="open ${t.dir}"><div class="row"><b>${t.sym}</b><span class="chip ${t.dir==="L"?"c-fund":"c-burn"}">${t.dir==="L"?"LONG":"SHORT"}</span><span class="mono mut" style="font-size:12px">${t.e} / SL ${t.sl} / TP ${t.tp}</span></div>
+ <div class="note">${t.legs.map(l=>esc(acc(l.acc).name)+" "+l.lot+" лот ("+l.risk+"%)").join(" · ")}</div>
+ <div class="row" style="margin-top:6px"><button class="btn sm up" data-close="${t.id}" data-res="tp">TP</button><button class="btn sm dn" data-close="${t.id}" data-res="sl">SL</button><button class="btn sm" data-man="${t.id}">Вручную $</button><button class="btn sm" data-del="${t.id}">Удалить</button></div></div>`}
+
+function vAccs(){const adv=buyAdvice();const all=[...S.accs].sort((a,b)=>({fund:0,ch2:1,ch1:2,burn:3,done:4}[a.stage]-{fund:0,ch2:1,ch1:2,burn:3,done:4}[b.stage])||b.id-a.id);
+ const inc=funded().reduce((s,a)=>s+a.size*F(a).split/100,0);
+ const spent=S.accs.reduce((s,a)=>s+(a.cost||0),0),paid=S.accs.reduce((s,a)=>s+(a.paid||0),0),fEver=S.accs.filter(a=>a.fundAt).length,burn=S.accs.filter(a=>a.stage==="burn").length,dep=S.cashLog.filter(c=>c.amt>0&&!/^Вывод/.test(c.note)).reduce((s,c)=>s+c.amt,0);
+ return `<div class="col">
+ <div class="card" data-k="stat"><h3>Итоги лестницы</h3><div class="stats">
+  <div class="stat b"><small>Вложено своих</small><b class="mono">${usd(dep)}</b></div>
+  <div class="stat r"><small>Потрачено на Ch</small><b class="mono">${usd(spent)}</b></div>
+  <div class="stat g"><small>Получено выводов</small><b class="mono up">${usd(paid)}</b></div>
+  <div class="stat y"><small>Стало Ф / сгорело</small><b class="mono">${fEver} / ${burn}</b></div>
+  <div class="stat"><small>Цена одного Ф</small><b class="mono">${fEver?usd(spent/fEver):"—"}</b></div>
+  <div class="stat ${paid-spent>=0?"g":"r"}"><small>Итог (выводы − Ch)</small><b class="mono ${paid-spent>=0?"up":"dn"}">${usd(paid-spent)}</b></div></div></div>
+ <div class="card" data-k="accs"><h3>Купить / добавить счёт</h3>
+  <div class="f"><label>Фирма<select id="nFirm">${Object.keys(S.firms).map(f=>`<option>${f}</option>`).join("")}</select></label>
+  <label>Размер<select id="nSize">${TIERS.map(t=>`<option value="${t}" ${adv.best===t?"selected":""}>${kk(t)}</option>`).join("")}</select></label>
+  <label>Цена $<input id="nPrice" class="mono" inputmode="decimal" value="${S.prices[adv.best||10000]}"></label>
+  <label>Этап<select id="nStage"><option value="ch1">Ch этап 1</option><option value="ch2">Ch этап 2</option><option value="fund">Ф</option></select></label>
+  <label>Баланс сейчас<input id="nBal" class="mono" inputmode="decimal" placeholder="= размер"></label></div>
+  <div class="row" style="margin-top:10px"><button class="btn pri" id="bBuy">Купить из кассы</button><button class="btn" id="bAddEx">Добавить уже имеющийся (без списания)</button>
+  <span class="note">${adv.need>0?(adv.best?`Совет: Ch ${kk(adv.best)} — самый крупный по кассе`:`Не хватает ${usd(adv.short)} на Ch 10k`):"Пул заполнен"}</span></div></div>
+ <div class="card" data-k="accs"><h3>Все счета<span class="sp"></span><span class="note" style="text-transform:none;letter-spacing:0">Доход Ф при 3–5%/мес: <b class="up mono">${usd(inc*.03)}–${usd(inc*.05)}</b></span></h3><div class="accs">${all.map(a=>accCard(a,true)).join("")||'<div class="empty">Нет счетов</div>'}</div></div></div>`}
+
+function vTrades(){const st=stats();const cl=S.trades.filter(t=>t.status==="closed");const pnl=cl.reduce((s,t)=>s+t.legs.reduce((x,l)=>x+(l.pnl||0),0),0);
+ let streak=0,mx=0;[...cl].reverse().forEach(t=>{if(t.res==="sl"){streak++;mx=Math.max(mx,streak)}else if(t.res==="tp")streak=0});
+ return `<div class="col"><div class="card" data-k="stat"><h3>Статистика сигналов</h3><div class="stats">
+ <div class="stat b"><small>Сделок (TP/SL)</small><b class="mono">${st.tp}/${st.sl}</b></div>
+ <div class="stat y"><small>WR факт</small><b class="mono">${st.wrA==null?"—":st.wrA.toFixed(1)+"%"}</b></div>
+ <div class="stat"><small>RR факт (план)</small><b class="mono">${st.rrA==null?"—":st.rrA.toFixed(2)}</b></div>
+ <div class="stat ${st.ev>=0?"g":"r"}"><small>EV используемый</small><b class="mono ${st.ev>=0?"up":"dn"}">${st.ev.toFixed(2)}R</b></div>
+ <div class="stat r"><small>Макс серия SL</small><b class="mono">${mx}</b></div>
+ <div class="stat ${pnl>=0?"g":"r"}"><small>P&L по счетам</small><b class="mono ${pnl>=0?"up":"dn"}">${usd(pnl)}</b></div></div>
+ <div class="note" style="margin-top:8px">${st.useAuto?"WR/RR считаются автоматически по факту.":`Сейчас ручные WR/RR — авто включится после ${S.set.minAuto} сделок с TP/SL (сейчас ${st.n}).`}</div>
+ ${curve(cl)}</div>
+ ${cl.length?`<div class="card" data-k="stat"><h3>По стратегиям</h3><div class="tbl"><table><tr><th>Стратегия</th><th class="r">Сделок</th><th class="r">WR</th><th class="r">Ср. RR</th><th class="r">P&L по счетам</th></tr>${STR().map(sg=>{const a=cl.filter(t=>(t.strat||ladderStrat().id)===sg.id),w=a.filter(t=>t.res==="tp").length,l=a.filter(t=>t.res==="sl").length,rr_=a.length?a.reduce((x,t)=>x+t.rr,0)/a.length:0,p=a.reduce((x,t)=>x+t.legs.reduce((y,g)=>y+(g.pnl||0),0),0);return `<tr><td><b>${esc(sg.name)}</b></td><td class="r mono">${a.length}</td><td class="r mono">${w+l?(w/(w+l)*100).toFixed(0)+"%":"—"}</td><td class="r mono">${a.length?rr_.toFixed(2):"—"}</td><td class="r mono ${p>=0?"up":"dn"}">${usd(p)}</td></tr>`}).join("")}</table></div><div class="note" style="margin-top:6px">WR и RR для лестницы и прогноза считаются только по основной стратегии.</div></div>`:""}
+ ${cl.length?`<div class="card"><h3>По инструментам</h3><div class="tbl"><table><tr><th>Символ</th><th class="r">Сделок</th><th class="r">WR</th><th class="r">P&L</th></tr>${[...new Set(cl.map(t=>t.sym))].map(sy=>{const a=cl.filter(t=>t.sym===sy),w=a.filter(t=>t.res==="tp").length,l=a.filter(t=>t.res==="sl").length,p=a.reduce((s,t)=>s+t.legs.reduce((x,g)=>x+(g.pnl||0),0),0);return `<tr><td><b>${sy}</b></td><td class="r mono">${a.length}</td><td class="r mono">${w+l?(w/(w+l)*100).toFixed(0)+"%":"—"}</td><td class="r mono ${p>=0?"up":"dn"}">${usd(p)}</td></tr>`}).join("")}</table></div></div>`:""}
+ <div class="card"><h3>Журнал</h3><div class="tbl"><table><tr><th>#</th><th>Дата</th><th>Символ</th><th>Нпр</th><th>Шаг</th><th>RR</th><th>Итог</th><th>Счета · лот · $</th><th class="r">P&L</th></tr>
+ ${S.trades.map(t=>{const p=t.legs.reduce((x,l)=>x+(l.pnl||0),0);return `<tr><td class="mono dim">${t.id}</td><td>${fmtD(t.t)}</td><td><b>${t.sym}</b><div class="note">${esc(strat(t.strat).name)}</div></td><td class="${t.dir==="L"?"up":"dn"}">${t.dir==="L"?"L":"S"}</td><td class="mono">${t.step??"—"}</td><td class="mono">${t.rr.toFixed(2)}</td>
+ <td>${t.status==="open"?'<span class="chip c-gold">открыта</span>':`<span class="chip ${t.res==="tp"?"c-fund":t.res==="sl"?"c-burn":"c-done"}">${t.res.toUpperCase()}</span>`}</td>
+ <td class="note">${t.legs.map(l=>esc(acc(l.acc).name)+" "+l.lot+(l.pnl!=null?" "+usd(l.pnl):"")).join(" · ")}</td><td class="r mono ${p>=0?"up":"dn"}">${t.status==="open"?"":usd(p)}</td></tr>`}).join("")||'<tr><td colspan="9" class="empty">Пока пусто</td></tr>'}</table></div></div></div>`}
+
+function curve(cl){if(cl.length<2)return"";const pts=[0];[...cl].reverse().forEach(t=>pts.push(pts[pts.length-1]+t.legs.reduce((x,l)=>x+(l.pnl||0),0)));
+ const W=600,H=110,mn=Math.min(...pts),mx=Math.max(...pts),sp=(mx-mn)||1,X=i=>i/(pts.length-1)*W,Y=v=>H-6-(v-mn)/sp*(H-12);
+ return `<div style="margin-top:12px"><div class="note">Кривая P&L по всем счетам, $ (мин ${usd(mn)} · макс ${usd(mx)})</div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:110px;display:block"><line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-dasharray="4 4"/><polyline fill="none" stroke="var(--acc)" stroke-width="2" vector-effect="non-scaling-stroke" points="${pts.map((v,i)=>X(i).toFixed(1)+","+Y(v).toFixed(1)).join(" ")}"/></svg></div>`}
+function vFc(){const st=stats();const inc=funded().reduce((s,a)=>s+a.size*F(a).split/100,0);
+ return `<div class="col"><div class="card" data-k="fc"><h3>Прогноз от текущего состояния<span class="sp"></span><button class="btn sm pri" id="bFc">Пересчитать</button></h3>
+ <div class="note">Монте-Карло 500 путей · WR ${st.wr.toFixed(0)}% · RR ${st.rr.toFixed(2)} · ${S.set.sigs} сигн./день · пул ${S.set.pool} Ch · касса и выводы реинвестируются в самый крупный доступный Ch.</div>
+ ${fc?`<div class="stats" style="margin-top:12px">
+  <div class="stat"><small>Следующий Ф (медиана)</small><b class="mono">${wk(fc.fF.m)}</b>${rng(fc.fF)}<small>вероятность ${(fc.fF.p*100).toFixed(0)}%</small></div>
+  <div class="stat"><small>Следующий вывод в кассу</small><b class="mono">${wk(fc.fP.m)}</b>${rng(fc.fP)}<small>вероятность ${(fc.fP.p*100).toFixed(0)}%</small></div>
+  <div class="stat"><small>${S.set.goalN} Ф по ${kk(S.set.goalSize)}</small><b class="mono">${wk(fc.fG.m)}</b>${rng(fc.fG)}<small>дойти за 5 лет: ${(fc.fG.p*100).toFixed(0)}%</small></div></div>
+  ${Object.keys(fc.pa).length?`<h3 style="margin-top:14px">Шанс текущих Ch стать Ф</h3><div class="row">${Object.entries(fc.pa).map(([i,p])=>`<span class="chip c-acc">${esc(acc(+i).name)}: ${(p*100).toFixed(0)}%</span>`).join("")}</div>`:""}`:`<div class="empty">Нажми «Пересчитать»</div>`}
+ </div>
+ <div class="card" data-k="stat"><h3>Доход с фандедов сейчас</h3><div class="stats"><div class="stat"><small>Фандедов</small><b class="mono">${funded().length}</b></div><div class="stat"><small>3%/мес</small><b class="mono up">${usd(inc*.03)}</b></div><div class="stat"><small>5%/мес</small><b class="mono up">${usd(inc*.05)}</b></div></div>
+ <div class="note" style="margin-top:8px">Это ожидание, а не гарантия: при WR ниже ${(100/(1+st.rr)).toFixed(0)}% система в минусе (EV<0) и любые прогнозы ухудшаются.</div></div></div>`}
+
+function vCash(){return `<div class="col"><div class="card" data-k="cash"><h3>Касса</h3><div class="big2 mono">${usd(S.cash)}</div>
+ <div class="f" style="margin-top:10px"><label>Сумма $<input id="cAmt" class="mono" inputmode="decimal"></label><label>Комментарий<input id="cNote" placeholder="пополнение"></label></div>
+ <div class="row" style="margin-top:10px"><button class="btn up" id="cAdd">Пополнить</button><button class="btn dn" id="cSub">Снять</button></div>
+ <div class="note" style="margin-top:8px">После пополнения во вкладке «Пульт» сразу появится шаг, что купить.</div></div>
+ <div class="card" data-k="cash"><h3>Движение</h3><div class="tbl"><table><tr><th>Дата</th><th>Операция</th><th class="r">Сумма</th></tr>${S.cashLog.map(c=>`<tr><td>${fmtD(c.t)}</td><td>${esc(c.note)}</td><td class="r mono ${c.amt>=0?"up":"dn"}">${usd(c.amt)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">Пусто</td></tr>'}</table></div></div></div>`}
+
+function vSet(){const s=S.set;const n=(k,l,step)=>`<label>${l}<input class="mono" data-set="${k}" inputmode="decimal" value="${s[k]}"></label>`;
+ return `<div class="col"><div class="card"><h3>WR / RR и риск</h3><div class="f">${n("wrM","WR вручную, %")}${n("rrM","RR вручную")}
+ <label>Режим<select data-set="auto"><option value="1" ${s.auto?"selected":""}>авто по факту</option><option value="0" ${!s.auto?"selected":""}>только вручную</option></select></label>
+ ${n("minAuto","Авто после N сделок")}${n("base","Базовый риск Ch, %")}${n("cap","Потолок риска, %")}${n("fundRisk","Риск Ф в прогнозе, %")}${n("sigs","Сигналов в день (прогноз)")}${n("pool","Активных Ch в пуле")}
+ <label>Фирма для новых Ch (прогноз)<select data-set="defFirm">${Object.keys(S.firms).map(f=>`<option ${s.defFirm===f?"selected":""}>${f}</option>`).join("")}</select></label></div></div>
+ <div class="card"><h3>Выводы и цель</h3><div class="f">${n("payPct","Профит для вывода, %")}${n("payDays","Мин. торговых дней (по умолч.)")}${n("lag","Дней до поступления")}${n("goalN","Цель: кол-во Ф")}${n("goalSize","Цель: размер Ф")}${n("gbp","GBPUSD для UK100/EURGBP")}</div></div>
+ <div class="card"><h3>Правила фирм</h3><div class="tbl"><table><tr><th>Фирма</th><th>Этап 1 %</th><th>Этап 2 %</th><th>Общая DD %</th><th>Дневная %</th><th>Сплит %</th><th>Дней до вывода</th><th>Лоты как</th></tr>
+ ${Object.entries(S.firms).map(([f,v])=>`<tr><td><b>${f}</b></td>${["t1","t2","dd","ddd","split","pd"].map(k=>`<td><input class="mono" style="width:70px" data-firm="${f}" data-k="${k}" value="${v[k]??S.set.payDays}"></td>`).join("")}<td><select data-firm="${f}" data-k="grp"><option value="ftmo" ${v.grp==="ftmo"?"selected":""}>как FTMO / The5ers</option><option value="fp" ${v.grp==="fp"?"selected":""}>как FundingPips / FundedNext</option></select></td></tr>`).join("")}</table></div>
+ <div class="note" style="margin-top:6px">Размер контракта: FX 100 000, XAUUSD 100, UK100 0.9; индексы FTMO/5ers = 1, FundingPips: US500 50 · NAS100 20 · GER40 25 · US30 5. FundedNext — те же размеры контракта, что у FundingPips.</div></div>
+ <div class="card" data-k="set"><h3>Стратегии (для Ф и ручных систем)</h3>
+ <div class="note" style="margin-bottom:8px">Каждая стратегия — свой источник сигналов (советник, ручная система). У Ф в «Счета → Править» выбираешь стратегию и, если нужно, свой риск. Лестница и Ch работают только на основной стратегии («Ch + Ф»).</div>
+ <div class="tbl"><table><tr><th>Название</th><th>Риск Ф, %</th><th>Тип</th><th></th></tr>${STR().map(x=>`<tr><td><input data-sn="${x.id}" value="${esc(x.name)}" style="min-width:200px"></td><td><input class="mono" style="width:70px" data-sr="${x.id}" value="${x.risk}"></td><td>${x.ladder?'<span class="chip c-acc">Ch + Ф</span>':'<span class="chip c-gold">только Ф</span>'}</td><td>${x.ladder?"":`<button class="btn sm dn" data-sdel="${x.id}">Удалить</button>`}</td></tr>`).join("")}</table></div>
+ <div class="row" style="margin-top:8px"><button class="btn sm pri" id="bAddStrat">+ Стратегия</button><span class="note">напр.: «АС 1_19f советник», «1_22 ручная, только тип A»</span></div></div>
+ <div class="card"><h3>Цены челленджей</h3><div class="f">${TIERS.map(t=>`<label>${kk(t)} $<input class="mono" data-price="${t}" value="${S.prices[t]}"></label>`).join("")}</div></div>
+ <div class="card"><h3>Данные</h3><div class="row"><button class="btn" id="bExp">Копировать резервную копию</button><button class="btn" id="bImp">Восстановить из копии</button><button class="btn dn" id="bWipe">Очистить всё</button></div><div id="impBox"></div></div></div>`}
+
+// ───────── модалки
+function modal(html){$("#layer").innerHTML=`<div class="modal" id="mdl"><div class="card">${html}</div></div>`;$("#mdl").onclick=e=>{if(e.target.id==="mdl")$("#layer").innerHTML=""}}
+function editAcc(id){const a=acc(id);modal(`<h3>Править ${esc(a.name)}</h3><div class="f">
+ <label>Название<input id="eN" value="${esc(a.name)}"></label><label>Баланс<input id="eB" class="mono" value="${a.bal.toFixed(2)}"></label>
+ <label>Этап<select id="eS">${Object.entries(STAGE).map(([k,v])=>`<option value="${k}" ${a.stage===k?"selected":""}>${v}</option>`).join("")}</select></label>
+ <label>Фирма<select id="eF">${Object.keys(S.firms).map(f=>`<option ${a.firm===f?"selected":""}>${f}</option>`).join("")}</select></label>
+ <label>Стратегия (для Ф)<select id="eSt">${STR().map(x=>`<option value="${x.id}" ${accStrat(a).id===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></label><label>Свой риск, % (пусто = по стратегии)<input id="eR" class="mono" inputmode="decimal" value="${a.risk??""}"></label>
+ <label>Дата Ф / посл. вывода<input id="eD" type="date" value="${a.lastPay||a.fundAt||""}"></label></div>
+ <div class="row" style="margin-top:12px"><button class="btn pri" id="eOk">Сохранить</button><button class="btn" onclick="$('#layer').innerHTML=''">Отмена</button><span class="sp" style="flex:1"></span><button class="btn dn" id="eDel">Удалить счёт</button></div><div id="eConf"></div>`);
+ $("#eOk").onclick=()=>{snap("правка "+a.name);a.name=$("#eN").value;a.bal=+$("#eB").value||a.bal;const ns=$("#eS").value;if(ns==="fund"&&a.stage!=="fund"&&!a.fundAt)a.fundAt=today();a.stage=ns;a.firm=$("#eF").value;a.strat=$("#eSt").value;if($("#eR").value==="")delete a.risk;else a.risk=+$("#eR").value.replace(",",".");
+  if($("#eD").value){if(a.lastPay)a.lastPay=$("#eD").value;else a.fundAt=$("#eD").value}$("#layer").innerHTML="";save();render()};
+ $("#eDel").onclick=()=>{$("#eConf").innerHTML=`<div class="row" style="margin-top:10px"><span class="dn">Удалить без возврата?</span><button class="btn sm dn" id="eDel2">Да, удалить</button></div>`;$("#eDel2").onclick=()=>{snap("удаление счёта");S.accs=S.accs.filter(x=>x.id!==id);$("#layer").innerHTML="";save();render()}}}
+function manual(id){const t=S.trades.find(x=>x.id===id);modal(`<h3>Итог сделки ${t.sym} вручную, $</h3>${t.legs.map(l=>`<label>${esc(acc(l.acc).name)} (риск ${usd(l.usd)})<input class="mono" data-leg="${l.acc}" inputmode="decimal" placeholder="напр. -120 или 85"></label>`).join("")}
+ <label>Считать для серии как<select id="mRes"><option value="tp">TP (сброс серии)</option><option value="sl">SL (шаг вверх)</option></select></label>
+ <div class="row" style="margin-top:12px"><button class="btn pri" id="mOk">Записать</button></div>`);
+ $("#mOk").onclick=()=>{const m={};document.querySelectorAll("[data-leg]").forEach(i=>{if(i.value!=="")m[+i.dataset.leg]=+i.value});$("#layer").innerHTML="";closeTrade(id,$("#mRes").value,m)}}
+
+// ───────── скрин сигнала → поля
+async function readShot(blob){const stt=$("#imgSt");if(!sample){stt.textContent="Распознавание недоступно в этом окне — впиши вручную.";return}
+ stt.textContent="Claude читает скрин…";
+ try{const r=await sample.json(`На изображении торговый сигнал. Извлеки параметры и верни ТОЛЬКО JSON:
+{"sym": один из ${JSON.stringify(SYMS)} (GOLD/XAU → XAUUSD, DAX/DE40 → GER40, NASDAQ/US100/USTEC → NAS100, SPX/S&P → US500, DOW/DJ30 → US30, FTSE → UK100) или null,
+ "dir": "L" для buy/long или "S" для sell/short,
+ "entry": число, "sl": число, "tp": число (если тейков несколько — первый),
+ "note": короткая строка с прочими условиями сигнала на русском или ""}`,{images:[blob],modelTier:"default"});
+  if(r&&r.entry){draft={sym:SYMS.includes(r.sym)?r.sym:draft.sym,dir:r.dir==="S"?"S":"L",e:String(r.entry),sl:String(r.sl??""),tp:String(r.tp??""),note:r.note||""};plan=buildPlan();render();
+   $("#imgSt").textContent="Заполнено со скрина — проверь цифры перед входом."+(r.note?" Примечание: "+r.note:"")}
+  else stt.textContent="Не нашёл параметров на скрине — впиши вручную."}
+ catch(e){stt.textContent=e.code==="not_granted"?"Доступ к Claude не разрешён — впиши вручную.":"Не удалось прочитать скрин ("+(e.code||"ошибка")+")."}}
+
+// ───────── события
+function bind(){
+ document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;try{localStorage.setItem("pult_tab",tab)}catch(e){}render()});
+ const sync=()=>{if(!$("#dE"))return;draft.sym=$("#dSym").value;draft.e=$("#dE").value.replace(",",".");draft.sl=$("#dSL").value.replace(",",".");draft.tp=$("#dTP").value.replace(",",".");
+  const e=+draft.e,s=+draft.sl,t=+draft.tp;$("#rrLive").textContent=e&&s&&t&&e!==s?"RR "+(Math.abs(t-e)/Math.abs(e-s)).toFixed(2):""};
+ ["#dSym","#dE","#dSL","#dTP"].forEach(s=>{const el=$(s);if(el)el.oninput=sync});sync();
+ document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{sync();draft.dir=b.dataset.dir;render()});
+ $("#dStrat")&&($("#dStrat").onchange=()=>{curStrat=$("#dStrat").value;plan=null;render()});
+ $("#bCalc")&&($("#bCalc").onclick=()=>{sync();ovr=null;plan=buildPlan();render()});
+ ["#dE","#dSL","#dTP"].forEach(s=>{const el=$(s);if(el)el.onkeydown=e=>{if(e.key==="Enter"){sync();ovr=null;plan=buildPlan();render()}}});
+ $("#bParse")&&($("#bParse").onclick=()=>{const o=parseText($("#dTxt").value);if(!o.e&&!o.sl&&!o.tp){toast("Не нашёл цифры входа/стопа/тейка в тексте");return}
+  draft={sym:o.sym||draft.sym,dir:o.dir||draft.dir,e:o.e||"",sl:o.sl||"",tp:o.tp||"",note:""};ovr=null;plan=buildPlan();render();toast("Разобрано: "+draft.sym+" "+(draft.dir==="L"?"LONG":"SHORT")+" — проверь цифры")});
+ document.querySelectorAll("[data-ovr]").forEach(el=>el.onchange=()=>{ovr=+el.value;plan=buildPlan();render()});
+ document.querySelectorAll("[data-drop]").forEach(b=>b.onclick=()=>{plan.legs.splice(+b.dataset.drop,1);if(!plan.legs.length)plan=null;render()});
+ if(tab==="fc"&&!fc)setTimeout(()=>{if(tab==="fc"&&!fc){fc=forecast();render()}},40);
+ $("#bInd")&&($("#bInd").onclick=async()=>{const t=indText();try{await navigator.clipboard.writeText(t);toast("Значения скопированы")}catch(e){$("#indBox").innerHTML=`<textarea rows="7" style="margin-top:8px">${esc(t)}</textarea>`;$("#indBox textarea").select()}});
+ $("#bTake")&&($("#bTake").onclick=takePlan);$("#bCancel")&&($("#bCancel").onclick=()=>{plan=null;render()});
+ $("#bReset")&&($("#bReset").onclick=()=>{S.chain={step:1,loss:0};save();render()});
+ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeTrade(+b.dataset.close,b.dataset.res));
+ document.querySelectorAll("[data-man]").forEach(b=>b.onclick=()=>manual(+b.dataset.man));
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(b.dataset.c){snap("удаление сделки");S.trades=S.trades.filter(t=>t.id!==+b.dataset.del);save();render()}else{b.dataset.c=1;b.textContent="Точно удалить?";b.className="btn sm dn"}});
+ document.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>reqPay(+b.dataset.pay));
+ document.querySelectorAll("[data-got]").forEach(b=>b.onclick=()=>gotPay(+b.dataset.got));
+ document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editAcc(+b.dataset.edit));
+ const dr=$("#drop");if(dr){dr.onclick=()=>$("#fImg").click();$("#fImg").onchange=e=>{const f=e.target.files[0];if(f)readShot(f)};
+  dr.ondragover=e=>{e.preventDefault();dr.classList.add("hov")};dr.ondragleave=()=>dr.classList.remove("hov");dr.ondrop=e=>{e.preventDefault();dr.classList.remove("hov");const f=[...e.dataTransfer.files].find(x=>x.type.startsWith("image"));if(f)readShot(f)}}
+ if($("#nSize")){$("#nSize").onchange=()=>$("#nPrice").value=S.prices[+$("#nSize").value];
+  const add=pay=>{const sz=+$("#nSize").value,pr=pay?(+$("#nPrice").value||0):0;if(pay&&pr>S.cash){toast("В кассе "+usd(S.cash)+" — не хватает");return}buy($("#nFirm").value,sz,pr,$("#nStage").value,$("#nBal").value?+$("#nBal").value:sz)};
+  $("#bBuy").onclick=()=>add(true);$("#bAddEx").onclick=()=>add(false)}
+ if($("#cAdd")){const mv=sg=>{const v=+($("#cAmt").value.replace(",","."));if(!(v>0))return;snap(sg>0?"пополнение":"снятие");S.cash+=sg*v;S.cashLog.unshift({t:today(),amt:sg*v,note:$("#cNote").value||(sg>0?"Пополнение":"Снятие")});save();render()};$("#cAdd").onclick=()=>mv(1);$("#cSub").onclick=()=>mv(-1)}
+ document.querySelectorAll("[data-set]").forEach(i=>i.onchange=()=>{const k=i.dataset.set;S.set[k]=k==="auto"?i.value==="1":k==="defFirm"?i.value:+i.value.replace(",",".");save();render()});
+ document.querySelectorAll("[data-firm]").forEach(i=>i.onchange=()=>{const v=S.firms[i.dataset.firm];v[i.dataset.k]=i.dataset.k==="grp"?i.value:+i.value;save();render()});
+ document.querySelectorAll("[data-sn]").forEach(i=>i.onchange=()=>{strat(i.dataset.sn).name=i.value||"Стратегия";save();render()});
+ document.querySelectorAll("[data-sr]").forEach(i=>i.onchange=()=>{strat(i.dataset.sr).risk=+i.value.replace(",",".")||1;save();render()});
+ document.querySelectorAll("[data-sdel]").forEach(b=>b.onclick=()=>{if(!b.dataset.c){b.dataset.c=1;b.textContent="Точно?";return}snap("удаление стратегии");const id=b.dataset.sdel;S.strats=S.strats.filter(x=>x.id!==id);S.accs.forEach(a=>{if(a.strat===id)delete a.strat});if(curStrat===id)curStrat=null;save();render()});
+ $("#bAddStrat")&&($("#bAddStrat").onclick=()=>{snap("новая стратегия");S.strats.push({id:"s"+(S.seq++),name:"Новая стратегия",risk:1,ladder:false});save();render()});
+ document.querySelectorAll("[data-price]").forEach(i=>i.onchange=()=>{S.prices[i.dataset.price]=+i.value;save();render()});
+ $("#bFc")&&($("#bFc").onclick=()=>{$("#bFc").textContent="Считаю…";setTimeout(()=>{fc=forecast();render()},30)});
+ if($("#bExp")){$("#bExp").onclick=async()=>{const js=JSON.stringify(S);try{await navigator.clipboard.writeText(js);toast("Копия в буфере обмена")}catch(e){$("#impBox").innerHTML=`<textarea rows="5" style="margin-top:10px">${esc(js)}</textarea>`;$("#impBox textarea").select()}};
+  $("#bImp").onclick=()=>{$("#impBox").innerHTML=`<textarea id="impT" rows="5" style="margin-top:10px" placeholder="вставь копию"></textarea><button class="btn pri" id="impOk" style="margin-top:8px">Восстановить</button>`;$("#impOk").onclick=()=>{try{load(JSON.parse($("#impT").value));save();render();toast("Восстановлено")}catch(e){toast("Неверный формат")}}};
+  $("#bWipe").onclick=()=>{$("#impBox").innerHTML=`<div class="row" style="margin-top:10px"><span class="dn">Стереть все счета, сделки и кассу?</span><button class="btn sm dn" id="w2">Да, стереть</button></div>`;$("#w2").onclick=()=>{load({});save();render()}}}
+}
+document.addEventListener("paste",e=>{if(tab!=="pult"||!sample||!canImg)return;const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image"));if(it){e.preventDefault();readShot(it.getAsFile())}});
+
+// ───────── старт
+try{const t=localStorage.getItem("pult_tab");if(t)tab=t;const ls=localStorage.getItem("pult_state");if(ls)load(JSON.parse(ls))}catch(e){}
+$("#bUndo").onclick=doUndo;
+render();
+(async()=>{if(!window.claude)return;
+ try{sample=await claude.use("sample");if(sample){const lim=await sample.limits();canImg=!!(lim&&lim.images)}}catch(e){sample=null}
+ try{db=await claude.use("db")}catch(e){db=null}
+ if(db){const tm=setTimeout(()=>{$("#hSync").textContent="нет связи — локально";$("#hSync").className="chip c-ch2"},10000);
+  try{const d=await db.doc("pult/state").get();clearTimeout(tm);const data=d&&d.exists?JSON.parse(JSON.stringify(d.data())):null;if(data&&data.v)load(data);$("#hSync").textContent="синхронизировано";$("#hSync").className="chip c-fund"}catch(e){clearTimeout(tm);$("#hSync").textContent="локально";}}
+ render()})();
+</script>
+
+</body></html>

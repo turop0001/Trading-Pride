@@ -10,5 +10,10 @@ export default function handler(req, res) {
     res.status(200).send(html.pult);
     return;
   }
+  if (req.query.p === 'ladder') {
+    if (!keyOk(req)) { res.status(404).send(html.friend); return; }
+    res.status(200).send(html.ladder);
+    return;
+  }
   res.status(200).send(html.friend);
 }
