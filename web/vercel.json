@@ -1,0 +1,20 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "feed": false,
+      "state": false,
+      "channel": false
+    }
+  },
+  "ignoreCommand": "[ -z \"$VERCEL_GIT_PREVIOUS_SHA\" ] && exit 1; git diff --quiet $VERCEL_GIT_PREVIOUS_SHA HEAD -- .",
+  "crons": [
+    {
+      "path": "/api/prices",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/chtick",
+      "schedule": "40 3 * * *"
+    }
+  ]
+}
