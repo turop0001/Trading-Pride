@@ -1,68 +1,158 @@
 [
  {
   "collection": "pult",
-  "doc_id": "US500_C",
+  "doc_id": "EURUSD_A",
   "data": {
-   "date": "2026-11-09",
-   "sym": "US500",
-   "window": "C",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (вынос длиннее 4 свечей)",
-   "reasons": [
-    "свечей выноса 8 (>4)"
-   ],
-   "price": 7517.1,
-   "boxH": 7451.8,
-   "boxL": 7388.5,
+   "date": "2026-11-17",
+   "sym": "EURUSD",
+   "window": "A",
+   "status": "watch",
+   "direction": "—",
+   "note": "НАБЛЮДАЕМ",
+   "reasons": [],
+   "price": 1.10036,
+   "boxH": 1.10131,
+   "boxL": 1.09851,
    "prevH": null,
    "prevL": null,
    "signal": null,
    "trendH1": {
     "tr": "шорт",
-    "ratio": -1.09,
-    "pct": -2.33
+    "ratio": -4.3,
+    "pct": -2.07
    },
    "trendD1": {
     "tr": "шорт",
-    "ratio": -1.52,
-    "pct": -2.79
+    "ratio": -2.74,
+    "pct": -1.67
    },
-   "checked": "18:29"
+   "checked": "11:40"
   }
  },
  {
   "collection": "pult",
-  "doc_id": "UK100_C",
+  "doc_id": "AUDUSD_A",
   "data": {
-   "date": "2026-11-09",
-   "sym": "UK100",
-   "window": "C",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "ВХОД → SL −1R",
+   "date": "2026-11-17",
+   "sym": "AUDUSD",
+   "window": "A",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (лоя Азии в 10:00): недостаточный вынос — ждём коридор",
    "reasons": [],
-   "price": 10789.4,
-   "boxH": 10781.2,
-   "boxL": 10724.2,
+   "price": 0.67331,
+   "boxH": 0.67497,
+   "boxL": 0.67293,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
+   "trendH1": {
+    "tr": "шорт",
+    "ratio": -4.17,
+    "pct": -2.71
+   },
+   "trendD1": {
+    "tr": "шорт",
+    "ratio": -4.32,
+    "pct": -3.79
+   },
+   "checked": "11:40"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "UK100_A",
+  "data": {
+   "date": "2026-11-17",
+   "sym": "UK100",
+   "window": "A",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (лоя Азии в 11:20): недостаточный вынос — ждём коридор",
+   "reasons": [],
+   "price": 10806.2,
+   "boxH": 10847.3,
+   "boxL": 10806.2,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
+   "trendH1": {
+    "tr": "боковик",
+    "ratio": -0.45,
+    "pct": -0.37
+   },
+   "trendD1": {
+    "tr": "боковик",
+    "ratio": 0.27,
+    "pct": 0.44
+   },
+   "checked": "11:40"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "NAS100_A",
+  "data": {
+   "date": "2026-11-17",
+   "sym": "NAS100",
+   "window": "A",
+   "status": "skip",
+   "direction": "▲ LONG",
+   "note": "СКИП (вынос больше 3 ATR)",
+   "reasons": [
+    "вынос больше 3 ATR"
+   ],
+   "price": 27013.0,
+   "boxH": 27408.5,
+   "boxL": 27137.8,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
+   "trendH1": {
+    "tr": "боковик",
+    "ratio": -0.96,
+    "pct": -2.18
+   },
+   "trendD1": {
+    "tr": "боковик",
+    "ratio": -0.8,
+    "pct": -2.76
+   },
+   "checked": "11:30"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "US30_A",
+  "data": {
+   "date": "2026-11-17",
+   "sym": "US30",
+   "window": "A",
+   "status": "entry",
+   "direction": "▲ LONG",
+   "note": "ВХОД (11:40, 51335)",
+   "reasons": [],
+   "price": 51335.0,
+   "boxH": 51605.0,
+   "boxL": 51355.0,
    "prevH": null,
    "prevL": null,
    "signal": {
-    "date": "2026-11-09",
-    "window": "C",
-    "time": "18:00",
-    "t_utc": "2026-11-09 16:00:00+00:00",
-    "entry": 10786.4,
-    "stop": 10792.2,
-    "tp": 10763.4,
-    "be_at": 10780.7,
-    "side": "short",
+    "date": "2026-11-17",
+    "window": "A",
+    "time": "11:40",
+    "t_utc": "2026-11-17 09:40:00+00:00",
+    "entry": 51335.0,
+    "stop": 51246.0,
+    "tp": 51689.0,
+    "side": "long",
+    "be_at": 51512.0,
     "rr": 4.0,
     "trail": 1,
-    "lstep": 1.0,
-    "llag": 1.0,
+    "lstep": 2.0,
+    "llag": 2.0,
     "ver": 2,
-    "end_utc": "2026-11-09 20:00:00+00:00",
+    "end_utc": "2026-11-17 20:00:00+00:00",
     "ck": [
      1,
      2,
@@ -71,354 +161,374 @@
      5,
      6,
      7,
-     8,
-     9,
-     10
+     8
     ],
     "plus": [],
     "worse": [],
-    "ext": 10791.7,
-    "prob": "низкая",
-    "struct": "50/50",
-    "sconf": "нет",
-    "sscore": 0.0,
-    "sv": 2,
+    "prob": "—",
+    "sw": 2.56,
+    "why": [
+     "Вынос лоя Азии в 10:55, к сигналу 2.56 ATR (№2, 3)",
+     "ВХОД 11:40: вынос 2.56 ATR, инверсия M5 FVG, стоп 51246 (экстремум ± 0,5 ATR), лесенка 2/2 без TP; выполнены пункты 1, 2, 3, 4, 5, 6, 7, 8"
+    ],
     "src": "MT5"
    },
    "trendH1": {
-    "tr": "боковик",
-    "ratio": -0.21,
-    "pct": -0.37
+    "tr": "шорт",
+    "ratio": -2.2,
+    "pct": -2.29
    },
    "trendD1": {
     "tr": "боковик",
-    "ratio": -0.25,
-    "pct": -0.37
+    "ratio": -0.57,
+    "pct": -1.14
    },
-   "checked": "18:29"
+   "checked": "11:40"
   }
  },
  {
   "collection": "pult",
-  "doc_id": "GER40_C",
+  "doc_id": "USDJPY_A",
   "data": {
-   "date": "2026-11-09",
-   "sym": "GER40",
-   "window": "C",
-   "status": "skip",
-   "direction": "🔻 SHORT",
-   "note": "СКИП (слот без входов 17:00–17:30)",
-   "reasons": [
-    "касание 50% в слоте без входов 17:00–17:30"
-   ],
-   "price": 26255.5,
-   "boxH": 26181.5,
-   "boxL": 25920.5,
+   "date": "2026-11-17",
+   "sym": "USDJPY",
+   "window": "A",
+   "status": "prep",
+   "direction": "▲ LONG",
+   "note": "ВЫНОС (лоя Азии в 10:55): ждём закрытие M5 за FVG",
+   "reasons": [],
+   "price": 158.97,
+   "boxH": 159.613,
+   "boxL": 159.072,
    "prevH": null,
    "prevL": null,
    "signal": null,
    "trendH1": {
-    "tr": "боковик",
-    "ratio": 0.57,
-    "pct": 1.14
+    "tr": "лонг",
+    "ratio": 1.83,
+    "pct": 0.84
    },
    "trendD1": {
     "tr": "лонг",
-    "ratio": 1.82,
-    "pct": 3.73
+    "ratio": 1.6,
+    "pct": 0.95
    },
-   "checked": "18:29"
+   "checked": "11:40"
+  }
+ },
+ {
+  "collection": "pult",
+  "doc_id": "GER40_A",
+  "data": {
+   "date": "2026-11-17",
+   "sym": "GER40",
+   "window": "A",
+   "status": "skip",
+   "direction": "—",
+   "note": "СКИП (нет данных TradingView — смотреть вручную)",
+   "reasons": [],
+   "price": null,
+   "boxH": null,
+   "boxL": null,
+   "prevH": null,
+   "prevL": null,
+   "signal": null,
+   "checked": "11:40"
   }
  },
  {
   "collection": "pult_meta",
   "doc_id": "last",
   "data": {
-   "date": "2026-11-09",
-   "window": "C",
-   "time": "19:00",
-   "text": "отчёт дня отправлен",
-   "changed": [],
+   "date": "2026-11-17",
+   "window": "A",
+   "time": "11:40",
+   "text": "изменилось: US30",
+   "changed": [
+    "US30"
+   ],
    "log": [
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:37",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:26",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:27",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:38",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:28",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:39",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:29",
-     "window": "C",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
      "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "18:30",
-     "window": "—",
-     "text": "окно C закрыто, отчёт отправлен",
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
+     "text": "без изменений",
      "lines": []
     },
     {
-     "date": "2026-11-09",
-     "time": "19:00",
-     "window": "—",
-     "text": "отчёт дня отправлен",
-     "lines": []
+     "date": "2026-11-17",
+     "time": "11:40",
+     "window": "A",
+     "text": "изменилось: US30",
+     "lines": [
+      "🟢 US30 (▲ LONG) — ВХОД в 11:40"
+     ]
     }
    ]
   }
