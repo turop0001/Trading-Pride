@@ -12,6 +12,15 @@ on:
       cat:
         description: 'Только эта рубрика (news/smart/humor/motiv), для замены поста'
         default: ''
+      swap:
+        description: 'id черновика, у которого нужно заменить только картинку'
+        default: ''
+      chat:
+        description: 'chat_id сообщения с черновиком (для замены картинки)'
+        default: ''
+      mid:
+        description: 'message_id сообщения с черновиком (для замены картинки)'
+        default: ''
 
 permissions:
   contents: write
@@ -42,5 +51,8 @@ jobs:
           GIPHY_KEY: ${{ secrets.GIPHY_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CP_ONLY: ${{ github.event.inputs.cat }}
+          CP_SWAP: ${{ github.event.inputs.swap }}
+          CP_CHAT: ${{ github.event.inputs.chat }}
+          CP_MID: ${{ github.event.inputs.mid }}
           CP_DRY: ${{ github.event.inputs.dry || '0' }}
         run: python channel_poster/run.py

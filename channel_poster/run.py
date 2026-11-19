@@ -6,7 +6,7 @@
 Чужие тексты не копируются и не переписываются: источники нужны только как список тем и фактов.
 Секреты (GitHub): ANTHROPIC_API_KEY, CP_BOT_TOKEN (или TG_BOT_TOKEN), CP_OWNER_ID (или TG_CHAT_ID).
 CP_DRY=1 — ничего не отправлять, только показать черновики."""
-import os, re, json, html, datetime as dt, urllib.request, urllib.error, base64
+import os, re, json, html, random, datetime as dt, urllib.request, urllib.error, base64
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CH = json.load(open(os.path.join(HERE, 'sources.json'), encoding='utf-8'))['channels']
@@ -212,36 +212,44 @@ def make_card(cat, card, path):
 PIXABAY = os.environ.get('PIXABAY_KEY', ''); PEXELS = os.environ.get('PEXELS_KEY', ''); GIPHY = os.environ.get('GIPHY_KEY', '')
 
 
-def find_media(m, cat):
+def find_media(m, cat, used=None, v=0):
     """Лицензионные площадки: Pexels (фото/видео, свободная лицензия) и Giphy API. Нет ключа/результата -> None (будет карточка)."""
     import urllib.parse
+    used = used if used is not None else set()   # 20.11.2026: адреса уже использованных картинок/видео/GIF — не повторять; v — номер замены (другая страница выдачи)
     typ, q = (m or {}).get('type', 'card'), urllib.parse.quote((m or {}).get('query', '') or 'trading')
+    pg = 1 + (v % 4)
     try:
         if typ == 'gif' and GIPHY:
             r = []
             for qq in (q, urllib.parse.quote(urllib.parse.unquote(q).split()[0]), 'trading', 'money'):
-                r = json.loads(http('https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=12&rating=pg-13&lang=en' % (GIPHY, qq)))['data']
+                r = json.loads(http('https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=25&offset=%d&rating=pg-13&lang=en' % (GIPHY, qq, 25 * (v % 4))))['data']
+                r = [g for g in r if (g['images'].get('downsized_large', {}).get('url') or g['images']['original']['url']) not in used]
                 if r: break
+            random.shuffle(r)
             for g in r:
                 u = g['images'].get('downsized_large', {}).get('url') or g['images']['original']['url']
                 if int(g['images'].get('downsized_large', {}).get('size', 0) or 0) < 15000000: return ('animation', u)
         if typ == 'video' and PIXABAY:
-            for v in json.loads(http('https://pixabay.com/api/videos/?key=%s&q=%s&per_page=10&safesearch=true' % (PIXABAY, q)))['hits']:
-                if v.get('duration', 99) > 25: continue
-                m = v['videos'].get('medium') or v['videos'].get('small')
-                if m and m.get('size', 0) < 18000000: return ('video', m['url'])
+            hv = json.loads(http('https://pixabay.com/api/videos/?key=%s&q=%s&per_page=20&page=%d&safesearch=true' % (PIXABAY, q, pg)))['hits']
+            random.shuffle(hv)
+            for vv in hv:
+                if vv.get('duration', 99) > 25: continue
+                mm = vv['videos'].get('medium') or vv['videos'].get('small')
+                if mm and mm.get('size', 0) < 18000000 and mm['url'] not in used: return ('video', mm['url'])
         if typ in ('photo', 'video') and PIXABAY:
-            h = json.loads(http('https://pixabay.com/api/?key=%s&q=%s&image_type=photo&orientation=horizontal&safesearch=true&per_page=10' % (PIXABAY, q)))['hits']
-            if h: return ('photo', h[0]['largeImageURL'])
+            h = json.loads(http('https://pixabay.com/api/?key=%s&q=%s&image_type=photo&orientation=horizontal&safesearch=true&per_page=30&page=%d' % (PIXABAY, q, pg)))['hits']
+            h = [x for x in h if x['largeImageURL'] not in used]
+            if h: return ('photo', random.choice(h)['largeImageURL'])
         if typ == 'video' and PEXELS:
             r = json.loads(http('https://api.pexels.com/videos/search?query=%s&per_page=8&size=medium&orientation=landscape' % q, headers={'Authorization': PEXELS}))['videos']
-            for v in r:
-                if v.get('duration', 99) > 25: continue
-                fs = [f for f in v['video_files'] if f.get('file_type') == 'video/mp4' and 600 <= (f.get('width') or 0) <= 1300]
-                if fs: return ('video', sorted(fs, key=lambda f: f['width'])[-1]['link'])
+            for vv in r:
+                if vv.get('duration', 99) > 25: continue
+                fs = [f for f in vv['video_files'] if f.get('file_type') == 'video/mp4' and 600 <= (f.get('width') or 0) <= 1300]
+                if fs and sorted(fs, key=lambda f: f['width'])[-1]['link'] not in used: return ('video', sorted(fs, key=lambda f: f['width'])[-1]['link'])
         if typ in ('photo', 'video') and PEXELS:
-            r = json.loads(http('https://api.pexels.com/v1/search?query=%s&per_page=8&orientation=landscape' % q, headers={'Authorization': PEXELS}))['photos']
-            if r: return ('photo', r[0]['src']['large'])
+            r = json.loads(http('https://api.pexels.com/v1/search?query=%s&per_page=30&page=%d&orientation=landscape' % (q, pg), headers={'Authorization': PEXELS}))['photos']
+            r = [x for x in r if x['src']['large'] not in used]
+            if r: return ('photo', random.choice(r)['src']['large'])
     except Exception as e:
         print('! медиа не найдено:', str(e)[:100])
     return None
@@ -295,7 +303,69 @@ def tg(method, payload):
     return json.loads(http('https://api.telegram.org/bot%s/%s' % (TOKEN, method), json.dumps(payload).encode(), {'Content-Type': 'application/json'}, 'POST'))
 
 
+def used_media(drafts):
+    return set(x['murl'] for x in drafts.values() if x.get('murl'))
+
+
+def llm_media(text):
+    """Для старых черновиков без запроса к стоку: просим у модели 2–4 английских слова для поиска картинки."""
+    if not API_KEY: return None
+    try:
+        body = json.dumps({'model': MODEL, 'max_tokens': 80, 'messages': [{'role': 'user', 'content': 'Пост для телеграм-канала про трейдинг:\n' + text[:700] + '\n\nДай запрос для поиска подходящей бесплатной картинки на стоке: 2–4 слова на английском, конкретные предметы или сцена, без слов trading/chart/forex в каждом запросе. Ответ только JSON: {"type":"photo","query":"..."}'}]}).encode()
+        r = json.loads(http('https://api.anthropic.com/v1/messages', body, {'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json'}, 'POST', 60))
+        m = re.search(r'\{.*\}', r['content'][0]['text'], re.S)
+        return json.loads(m.group(0)) if m else None
+    except Exception as e:
+        print('! запрос к модели за поисковой фразой не вышел:', str(e)[:100]); return None
+
+
+def swap_media():
+    """20.11.2026: «🖼 Другая картинка» / «Картинка не подходит» меняет ТОЛЬКО медиа в черновике (текст и статус «ждёт решения» остаются)."""
+    did, chat, mid = os.environ.get('CP_SWAP', ''), os.environ.get('CP_CHAT', ''), os.environ.get('CP_MID', '')
+    drafts, sha = load_drafts(); d = drafts.get(did)
+    if not d: print('Черновик не найден:', did); return
+    n = int(d.get('nsw', 0)) + 1; d['nsw'] = n
+    base = {'type': d.get('mt') or 'photo', 'query': d.get('mq') or ''}
+    if not base['query']:
+        g = llm_media(d['text']); base = g or {'type': 'photo', 'query': {'news': 'stock market', 'smart': 'business strategy', 'humor': 'funny office', 'motiv': 'sunrise mountain', 'story': 'city night'}.get(d['cat'], 'finance')}
+        d['mq'], d['mt'] = base['query'], base.get('type', 'photo')
+    used = used_media(drafts); words = base['query'].split()
+    variants = [base['query'], ' '.join(words[:2]) or base['query'], (base['query'] + ' ' + ['business', 'city', 'money', 'screen'][n % 4]).strip(), {'news': 'stock market', 'smart': 'business', 'humor': 'funny', 'motiv': 'success', 'story': 'city'}.get(d['cat'], 'finance')]
+    got = None
+    for qv in variants:
+        got = find_media({'type': base.get('type', 'photo'), 'query': qv}, d['cat'], used, n)
+        if got: break
+    if not got:
+        for qv in variants:   # если нужного вида нет, пробуем обычное фото
+            got = find_media({'type': 'photo', 'query': qv}, d['cat'], used, n)
+            if got: break
+    kb = {'inline_keyboard': [[{'text': '✅ Опубликовать' + (' · утро 10:00' if d['cat'] == 'news' else ' · вечер 19:00'), 'callback_data': 'ap:' + did}], [{'text': '🖼 Другая картинка', 'callback_data': 'pc:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
+    if not got:
+        tg('editMessageReplyMarkup', {'chat_id': chat, 'message_id': int(mid), 'reply_markup': kb})
+        tg('sendMessage', {'chat_id': chat, 'text': 'Не нашёл новую картинку (сток ничего не вернул). Попробуй ещё раз позже.'}); save_drafts(drafts, sha); return
+    kind, url = got
+    med = {'type': {'photo': 'photo', 'video': 'video', 'animation': 'animation'}[kind], 'media': url, 'caption': html_text(d['text'])[:1024], 'parse_mode': 'HTML'}
+    r = tg('editMessageMedia', {'chat_id': chat, 'message_id': int(mid), 'media': med, 'reply_markup': kb})
+    if r.get('ok'):
+        res = r['result']; d['photo'] = res['photo'][-1]['file_id'] if res.get('photo') else (res.get('animation') or res.get('video') or {}).get('file_id', d.get('photo'))
+    else:
+        print('! editMessageMedia не вышло:', str(r)[:200])   # запасной путь: новое сообщение с новой картинкой, старое остаётся выше
+        d['photo'] = send_url_media(chat, kind, url, html_text(d['text']), kb)
+    d['kind'] = kind; d['murl'] = url; d['status'] = 'pending'
+    save_drafts(drafts, sha); print('Картинка заменена:', did, kind, url[:80])
+
+
 def main():
+    if os.environ.get('CP_SWAP'):
+        try: return swap_media()
+        except Exception as e:   # не оставляем на кнопках «⏳ Ищу…»: возвращаем обычные кнопки и сообщаем
+            print('! замена картинки упала:', repr(e)[:200])
+            did, chat, mid = os.environ.get('CP_SWAP', ''), os.environ.get('CP_CHAT', ''), os.environ.get('CP_MID', '')
+            try:
+                tg('editMessageReplyMarkup', {'chat_id': chat, 'message_id': int(mid), 'reply_markup': {'inline_keyboard': [[{'text': '✅ Опубликовать', 'callback_data': 'ap:' + did}], [{'text': '🖼 Другая картинка', 'callback_data': 'pc:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}})
+                tg('sendMessage', {'chat_id': chat, 'text': 'Не получилось заменить картинку (%s). Нажми «🖼 Другая картинка» ещё раз.' % repr(e)[:100]})
+            except Exception: pass
+            raise SystemExit(1)
     today = dt.datetime.now(dt.timezone.utc).date()
     if MODE != 'urgent' and os.environ.get('GITHUB_EVENT_NAME') == 'schedule':
         dd, _ = load_drafts()   # запоздавший запуск по расписанию (или после будильника /api/chtick): сегодняшние черновики уже есть — не дублировать
@@ -331,15 +401,17 @@ def main():
     if not (TOKEN and OWNER): print('НЕТ CP_BOT_TOKEN/CP_OWNER_ID'); return
     drafts, sha = load_drafts()
     if MODE == 'urgent' and any(v.get('urgent') and v.get('ts', '')[:10] == today.isoformat() for v in drafts.values()): print('Срочная за сегодня уже была'); return
+    used = used_media(drafts)
     for i, p in enumerate(posts):
         did = '%s-%s%d' % (today.strftime('%Y%m%d'), 'u' if MODE == 'urgent' else '', i + 1)
         drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'urgent': MODE == 'urgent', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
-        kb = {'inline_keyboard': [[{'text': '✅ Опубликовать' + (' · утро 10:00' if p['cat'] == 'news' else ' · вечер 19:00'), 'callback_data': 'ap:' + did}], [{'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
+        kb = {'inline_keyboard': [[{'text': '✅ Опубликовать' + (' · утро 10:00' if p['cat'] == 'news' else ' · вечер 19:00'), 'callback_data': 'ap:' + did}], [{'text': '🖼 Другая картинка', 'callback_data': 'pc:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
         try:
-            got = find_media(p.get('media'), p['cat'])
+            drafts[did]['mq'] = (p.get('media') or {}).get('query', ''); drafts[did]['mt'] = (p.get('media') or {}).get('type', 'photo')
+            got = find_media(p.get('media'), p['cat'], used)
             if got:
                 try:
-                    drafts[did]['photo'] = send_url_media(OWNER, got[0], got[1], html_text(p['text']), kb); drafts[did]['kind'] = got[0]
+                    drafts[did]['photo'] = send_url_media(OWNER, got[0], got[1], html_text(p['text']), kb); drafts[did]['kind'] = got[0]; drafts[did]['murl'] = got[1]; used.add(got[1])
                 except Exception as e:
                     print('! стоковое медиа не отправилось, делаю карточку:', str(e)[:100]); got = None
             if not got:

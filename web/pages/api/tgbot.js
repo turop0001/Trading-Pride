@@ -44,7 +44,7 @@ function statsText(data, days, title, subs) {
 }
 async function subsCount() { try { const r = await tg('getChatMemberCount', { chat_id: CHANNEL() }); return r.ok ? r.result : null; } catch (e) { return null; } }
 const MK = { photo: ['sendPhoto', 'photo'], video: ['sendVideo', 'video'], animation: ['sendAnimation', 'animation'] };
-const REASONS = { none: 'Без причины', ai: 'Звучит как ИИ', facts: 'Неточные факты', topic: 'Не по теме', long: 'Слишком длинно', pic: 'Картинка не подходит' };
+const REASONS = { none: 'Без причины', ai: 'Звучит как ИИ', facts: 'Неточные факты', topic: 'Не по теме', long: 'Слишком длинно', pic: '🖼 Другая картинка' };   // pic не отклоняет пост: меняется только медиа (см. swapPic)
 // Слоты публикации по МСК: 10:00 и 19:00 (UTC 07:00 и 16:00). Берём ближайший свободный.
 const SLOTS_UTC = [7, 16];
 function nextSlot(data, cat) {
@@ -71,7 +71,7 @@ async function showDrafts(chat, data) {
   const pend = Object.keys(data || {}).filter((id) => data[id].status === 'pending').sort();
   if (!pend.length) return send(chat, '📝 Черновиков, ждущих решения, нет.\n\nНовые приходят ежедневно утром. Можно запросить сейчас: /gen');
   for (const id of pend) {
-    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать' + slotTag(data[id].cat), callback_data: 'ap:' + id }], [{ text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
+    const kb = { inline_keyboard: [[{ text: '✅ Опубликовать' + slotTag(data[id].cat), callback_data: 'ap:' + id }], [{ text: '🖼 Другая картинка', callback_data: 'pc:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]] };
     if (data[id].photo) await tg((MK[data[id].kind] || MK.photo)[0], { chat_id: chat, [(MK[data[id].kind] || MK.photo)[1]]: data[id].photo, caption: htmlText(data[id].text).slice(0, 1024), parse_mode: 'HTML', reply_markup: kb });
     else await tg('sendMessage', { chat_id: chat, text: `Черновик ${id} · ${CAT[data[id].cat] || data[id].cat}\n\n${data[id].text}`.slice(0, 4000), reply_markup: kb });
   }
@@ -89,6 +89,14 @@ async function generate(chat, only) {
   const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST',
     headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: only ? { dry: '0', cat: only } : { dry: '0' } }) });
   return send(chat, r.status === 204 ? (only ? '⏳ Пишу замену. Пришлю новый черновик через 1–3 минуты.' : '⏳ Запустил подготовку постов. Готовлю черновики, это 1–3 минуты. Когда закончу, напишу «✅ Готово».') : `Не получилось запустить (код ${r.status}). Запустите вручную: GitHub → Actions → «Черновики постов» → Run workflow.`, BACK);
+}
+
+// 20.11.2026: замена только картинки (текст и статус «ждёт решения» не меняются): GitHub Actions ищет новое медиа (ключи Pixabay/Giphy лежат в секретах) и правит это же сообщение
+async function swapPic(chat, mid, id) {
+  const repo = process.env.GH_REPO || 'turop0001/Trading-Pride';
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST',
+    headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: { dry: '0', swap: id, chat: String(chat), mid: String(mid) } }) });
+  return r.status === 204;
 }
 
 async function menuAction(chat, act) {
@@ -148,12 +156,22 @@ export default async function handler(req, res) {
     if (act === 'm') { const T = { gen: '⏳ Запускаю…', drafts: '📝 Загружаю…', stats: '📊 Считаю…', week: '🗓 Считаю…', src: '📚 Открываю…' }; await tg('answerCallbackQuery', { callback_query_id: cb.id, text: T[id] || '' }); await menuAction(cb.message.chat.id, id); return res.status(200).send('ok'); }
     const { data, sha } = await readJson('channel/drafts.json', {}, 'channel');
     const d = data && data[id];
-    const BTN = [[{ text: '✅ Опубликовать' + slotTag(d && d.cat), callback_data: 'ap:' + id }], [{ text: '❌ Отклонить', callback_data: 'rj:' + id }]];
+    const BTN = [[{ text: '✅ Опубликовать' + slotTag(d && d.cat), callback_data: 'ap:' + id }], [{ text: '🖼 Другая картинка', callback_data: 'pc:' + id }, { text: '❌ Отклонить', callback_data: 'rj:' + id }]];
     const mk = (rows) => tg('editMessageReplyMarkup', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: { inline_keyboard: rows } });
     const edit = (t, extra) => mk([[{ text: t, callback_data: 'x:' + id }], ...(extra ? [extra] : [])]);
     const toast = (text, alert) => tg('answerCallbackQuery', { callback_query_id: cb.id, text, show_alert: !!alert });
     if (act === 'x') { await toast('Это статус, нажимать не нужно'); return res.status(200).send('ok'); }
     if (!d) { await toast('Черновик не найден'); return res.status(200).send('ok'); }
+    if (act === 'pc' || (act === 'rr' && arg === 'pic')) {   // только заменить картинку; пост остаётся в ожидании
+      if (d.status !== 'pending' && d.status !== 'rejected') { await toast('Уже обработан: ' + (ST[d.status] || d.status)); return res.status(200).send('ok'); }
+      if (d.status === 'rejected') { d.status = 'pending'; delete d.rej; delete d.reason; delete d.reason_code; }
+      if (d.swapping && Date.now() - d.swapping < 120000) { await toast('Уже ищу новую картинку'); return res.status(200).send('ok'); }
+      d.swapping = Date.now();
+      await writeJson('channel/drafts.json', data, sha, 'channel: ' + id + ' смена картинки', 'channel', true).catch(() => {});
+      const ok = await swapPic(cb.message.chat.id, cb.message.message_id, id);
+      await mk([[{ text: ok ? '⏳ Ищу другую картинку…' : '⚠️ Не запустилось, нажми ещё раз', callback_data: ok ? 'x:' + id : 'pc:' + id }]]);
+      await toast(ok ? '🖼 Ищу другую картинку (до минуты)' : 'Не удалось запустить поиск', !ok); return res.status(200).send('ok');
+    }
     if (act === 'rr' && d.status === 'rejected') {
       if (arg === 'custom') {
         Object.keys(data).forEach((k) => { delete data[k].await_reason; }); d.await_reason = true;
