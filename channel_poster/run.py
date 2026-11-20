@@ -43,13 +43,12 @@ def views_num(s):
 
 
 def fetch(u):
-    """Свежие посты публичной страницы канала: [(views, text)] за последние ~30 ч."""
+    """Посты публичной страницы канала (последние ~20): [(views, text, when)]. Отсечку по давности делает collect (у юмора и обучения она шире, они пишут реже)."""
     out = []
     try:
         page = http('https://t.me/s/' + u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=20)
     except Exception as e:
         print('  ! ' + u + ': ' + str(e)[:80]); return out
-    now = dt.datetime.now(dt.timezone.utc)
     for blk in page.split('tgme_widget_message_wrap')[1:]:
         m = re.search(r'tgme_widget_message_text[^>]*>(.*?)</div>', blk, re.S)
         if not m: continue
@@ -58,22 +57,28 @@ def fetch(u):
         d = re.search(r'datetime="([^"]+)"', blk)
         try:
             when = dt.datetime.fromisoformat(d.group(1))
-            if (now - when).total_seconds() > 30 * 3600: continue
         except Exception:
             continue
         v = re.search(r'tgme_widget_message_views">([^<]+)<', blk)
-        if len(t) > 40: out.append((views_num(v.group(1) if v else ''), t[:300]))
+        if len(t) > 40: out.append((views_num(v.group(1) if v else ''), t[:500], when))
     return out
 
 
+POOL_OF = {'news': ['news', 'analysis'], 'humor': ['humor', 'smart'], 'smart': ['smart', 'edu', 'analysis'], 'motiv': ['edu', 'smart', 'analysis'], 'story': ['analysis', 'edu', 'smart']}
+WIN_H = {'news': 36, 'analysis': 72, 'edu': 24 * 10, 'humor': 24 * 10, 'smart': 24 * 10}   # окно давности (часы) по рубрике канала
+
+
 def collect():
-    rows = []
+    """Пулы сырья по рубрикам каналов: {'news': [(views, text, id)], 'humor': [...], ...}. Топ-5 свежих постов каждого канала; id = хеш текста, чтобы не брать одну идею дважды."""
+    import hashlib
+    now = dt.datetime.now(dt.timezone.utc); pools = {}
     for c in CH:
-        got = sorted(fetch(c['u']), reverse=True)[:4]
-        print('  %-24s %d' % (c['u'], len(got)))
-        for v, t in got: rows.append((v, c['cat'], t))
-    rows.sort(reverse=True)
-    return rows[:45]
+        got = [x for x in fetch(c['u']) if (now - x[2]).total_seconds() <= WIN_H.get(c['cat'], 36) * 3600]
+        got = sorted(got, key=lambda x: x[0], reverse=True)[:5]
+        print('  %-24s %-8s %d' % (c['u'], c['cat'], len(got)))
+        for v, t, _ in got: pools.setdefault(c['cat'], []).append((v, t, hashlib.md5(t.encode()).hexdigest()[:10]))
+    for k in pools: pools[k].sort(reverse=True)
+    return pools
 
 
 ONLY = os.environ.get('CP_ONLY', '')
@@ -106,19 +111,19 @@ def lessons():
     return out
 
 
-def ask_llm(cats, rows, today):
-    extra = lessons()
+def ask_llm(cats, rows, today, extra_add=''):
+    extra = lessons() + extra_add
     wd = today.weekday()
     if 'news' in cats:
         extra += '\nНОВОСТЬ ДНЯ: ' + ('СРОЧНО. Пиши, только если есть действительно срочное мировое событие, о котором пишут минимум 3 источника или оно набрало взрывной охват и двигает форекс или индексы. Если такого нет, верни {"posts":[]}.' if MODE == 'urgent' else 'суббота: итоги недели на рынках и главное, что запомнилось.' if wd == 5 else 'воскресенье: что ждёт рынки на новой неделе (заседания ЦБ, ключевые данные, отчёты), только то, что есть в сырье, иначе общие ориентиры без выдуманных дат.' if wd == 6 else 'самая громкая мировая новость за ночь и утро.')
     seen = recent_topics()
     if seen: extra += '\nТЕМЫ, КОТОРЫЕ УЖЕ БЫЛИ В ПОСЛЕДНИЕ ДНИ (не повторяй, бери другое):\n' + seen
-    src = '\n'.join('[%s] %s' % (cat, t) for v, cat, t in rows) or '(источники сегодня пусты)'
+    src = '\n'.join('%d. %s' % (i + 1, t) for i, (v, t, _id) in enumerate(rows)) or '(источники сегодня пусты)'
     def q(i, c):   # живой вопрос к читателям: в историях всегда, в остальных примерно в каждом третьем посте
         return c == 'story' or (today.toordinal() + i) % 3 == 0
     want = '\n'.join('%d) %s%s' % (i + 1, CATS[c], ' [В КОНЦЕ ВОПРОС: ' + ('ответ смайлом-реакцией. Задай один конкретный вопрос из ситуации поста и сразу дай 2–3 варианта ответа смайлами, каждый со своим смыслом. Пример: «Было такое? 🔥 да, постоянно / 😅 пару раз / 😎 я по плану»' if True else 'ответ в комментариях (у канала есть группа обсуждения). Задай один конкретный вопрос из ситуации поста, на который легко ответить парой слов, и позови написать в комментариях естественно, без казёнщины. Пример: «а твой самый глупый слив какой был? расскажи в комментах»') + '. Не «а как вы думаете?»]' if q(i, c) else ' [без вопроса в конце]') for i, c in enumerate(cats))
     prompt = f"""Ты редактор телеграм-канала @trading_pride (трейдинг: форекс, индексы, акции; без крипты). Дата: {today}.
-Ниже — темы и обрывки из популярных трейдинг-каналов за сутки. Это ТОЛЬКО сырьё для понимания, что обсуждают сегодня.
+Ниже — свежие посты из популярных трейдинг-каналов. Для новости это факты дня. Для смешного и полезного это ИДЕИ: берёшь механику шутки или мысль и пишешь заново своими словами, со своим примером и деталями, не пересказывая предложение за предложением.
 Напиши {len(cats)} ОРИГИНАЛЬНЫХ поста на русском:
 {want}
 
@@ -128,7 +133,7 @@ def ask_llm(cats, rows, today):
 - Новость: только мировые события, которые двигают ФОРЕКС и ИНДЕКСЫ (ФРС и другие ЦБ, макростатистика США/ЕС/Британии/Японии/Китая, нефть, золото, доллар, отчёты мегакомпаний, геополитика с реальным рыночным эффектом). Без крипты и локальной российской повестки. Источники бывают на английском: пересказывай факты по-русски своими словами. Бери тему, которая встречается в нескольких источниках или набрала много просмотров.
 - Новость: только факты из сырья. Никаких выдуманных цифр, дат, имён. Не уверен — выбери другую тему или напиши «пишут, что…». В конце одна строка простыми словами, что это значит для трейдера, без прогноза цены.
 - Никаких призывов купить/продать, гарантий, «сигналов», обещаний дохода. Без ссылок и @упоминаний, без названий чужих каналов.
-- Смешное: своя ситуация из жизни трейдера (стоп выбило и цена развернулась, спред, «ещё одна свеча», торговля в пижаме). Добрый юмор, без оскорблений, не пересказ известных мемов.
+- Смешное: возьми идею из сырья (приём шутки: ожидание против реальности, диалог, самоирония, сравнение с бытом) и сделай свою версию со свежей ситуацией. ЗАПРЕЩЕНО писать про то, что стоп выбило и цена ушла дальше, что закрыл раньше времени, что рынок охотится за моим стопом: это уже было много раз. Добрый юмор, без оскорблений.
 - ФОРМАТ: 250–600 символов. Первая строка — крючок до 70 символов с одним эмодзи в начале. Дальше 2–4 короткие строки. Эмодзи по смыслу в начале ключевых строк, всего 3–6, без перебора. Никакой разметки (звёздочки, markdown, HTML).
 ЗАПРЕЩЕНО (так пишут нейросети, это сразу выдаёт текст):
 - Конструкции «не X, а Y», «это не просто X, это Y», «дело не в X».
@@ -141,9 +146,9 @@ def ask_llm(cats, rows, today):
 Примеры тона (свои, не копируй дословно):
   Новость: «🏦 ФРС опять никуда не торопится\nСтавку оставили как есть, и доллар сначала дёрнулся вниз, а потом вернулся обратно. Powell сказал, что ждёт ещё данных по инфляции. Для нас это значит: на ближайших свечах будет шумно, но направление пока не выбрано.»
   Смешное: «😅 Поставил стоп. Цена подошла, выбила, развернулась и улетела без меня\nЗнакомо? Рынок как будто читает мой терминал. Утешаю себя тем, что хоть депозит остался при мне.»
-- Для КАЖДОГО поста добавь "media": {{"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}}. Новости и умное: photo или video. Смешное: gif. Мотивация: photo или video. Не уверен: card.
+- Для КАЖДОГО поста добавь "media": {{"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}}. Новости и умное: photo или video. Смешное: gif. Мотивация: photo или video. Не уверен: card. Запрос к стоку делай КОНКРЕТНЫМ и непохожим на прошлые (список ниже), предмет или сцена, а не общие слова trading или chart.
 - Для КАЖДОГО поста добавь "card": надпись для запасной картинки: "title" (2–6 слов, без эмодзи, суть) и "sub" (до 6 слов, можно пусто).
-Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке.
+Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке. Для смешного, умного, мотивации и истории добавь в пост поле "src": номер выбранной идеи из СЫРЬЯ (число).
 
 {extra}
 
@@ -162,6 +167,89 @@ BAD = re.compile(r'https?://|t\.me|@\w|гарантир|100\s*%\s*прибыл|�
 def valid(p):
     t = p.get('text', '')
     return p.get('cat') in CATS and 200 <= len(t) <= 800 and not BAD.search(t) and sum(1 for ch in t if ord(ch) > 0x2000) >= 2 and 2 <= len((p.get('card') or {}).get('title', '')) <= 60
+
+
+FMT = {
+    'news': ['главная новость, реакция рынка, что смотреть дальше', 'цифры против прогноза: что вышло и что ждали', 'кто выиграл и кто проиграл на этой новости', 'что случилось, почему, какие инструменты заденет', 'коротко и сухо: факт, цифра, одна мысль', 'контекст: что было раньше и чем это отличается от прошлых раз'],
+    'humor': ['ожидание и реальность', 'диалог трейдера с самим собой', 'виды трейдеров по поведению', 'совет наоборот (сарказм)', 'сравнение трейдинга с бытовой ситуацией (кухня, пробки, спортзал)', 'мини-история из трёх строк с неожиданной концовкой', 'если бы рынок был человеком', 'мысли в понедельник утром, в пятницу вечером', 'подборка из 4 коротких шуток-наблюдений'],
+    'smart': ['термин простыми словами с примером', 'частая ошибка и как её исправить', 'одна цифра или факт и что из него следует', 'правило из практики с коротким примером', 'мини-чек-лист из 4–5 пунктов', 'вопрос новичка и ответ на него', 'как читать одну конкретную вещь на графике или в календаре'],
+    'motiv': ['история известного трейдера или инвестора (только проверяемые факты, без выдуманных цитат)', 'привычка недели, которую легко начать', 'как вести журнал сделок и что в нём смотреть', 'про терпение и дисциплину на примере из обычной жизни', 'как пережить серию неудач, не ломая план', 'итоги недели: что стоит проверить в своей торговле'],
+    'story': ['случай из истории рынка (только известные факты)', 'типичная ошибка новичка и чем она закончилась', 'как работает один рыночный механизм на живом примере'],
+}
+NEWS_AREAS = ['ЦБ и ставки', 'макроданные (инфляция, занятость, ВВП, продажи)', 'отчёты и новости мегакомпаний', 'нефть и энергетика', 'золото и металлы', 'доллар, евро, фунт, иена', 'геополитика с реальным эффектом на рынки', 'итоги дня на рынке акций США или Европы', 'Азия и Китай', 'что выходит на этой неделе (календарь)']
+STOP_RE = re.compile(r'стоп|выбил|выбива', re.I)
+OLD_STORY_BAD = re.compile(r'выбил[аио]?\b|выбива|охот\w+ за (моим )?стоп|закрыл\w* раньше|раньше времени|снял\w* мой стоп', re.I)
+
+
+def _words(t):
+    return set(w for w in re.findall(r'[а-яёa-z0-9]{5,}', t.lower()))
+
+
+def similar(t, recent, th=0.28):
+    a = _words(t)
+    for r in recent:
+        b = _words(r)
+        if a and b and len(a & b) / len(a | b) >= th: return True
+    return False
+
+
+def valid_ctx(p, recent_all, recent_nonnews):
+    """valid + не похоже на последние посты + запрет на заезженные сюжеты (стоп выбило, закрыл раньше) в смешном и полезном."""
+    if not valid(p): return False
+    t = p.get('text', '')
+    if similar(t, recent_all): print('  ~ похоже на недавний пост, пропуск'); return False
+    if p.get('cat') != 'news':
+        if OLD_STORY_BAD.search(t): print('  ~ заезженный сюжет про стоп, пропуск'); return False
+        if sum(1 for x in recent_nonnews[-8:] if STOP_RE.search(x)) >= 2 and STOP_RE.search(t): print('  ~ про стоп уже было, пропуск'); return False
+    return True
+
+
+def variety_extra(cat, drafts, pools, used_src):
+    """Подсказки на разнообразие: формат подачи, область темы, запрещённые эмодзи-начала, прошлые запросы к стоку."""
+    ds = sorted(drafts.values(), key=lambda v: v.get('ts', ''))
+    same = [v for v in ds if v.get('cat') == cat][-8:]
+    recent_fmt = set(v.get('fmt') for v in same[-5:])
+    fm = [f for f in FMT.get(cat, []) if f not in recent_fmt] or FMT.get(cat, [])
+    fmt = random.choice(fm) if fm else ''
+    out = ''
+    if fmt: out += '\nФОРМАТ ЭТОГО ПОСТА (держись его): ' + fmt + '.'
+    firsts = [v['text'].split('\n')[0][:2].strip() for v in same[-5:] if v.get('text')]
+    if firsts: out += '\nПЕРВЫЙ ЭМОДЗИ НЕ БРАТЬ ИЗ: ' + ' '.join(firsts) + ' (выбери другой по смыслу).'
+    if cat == 'news':
+        seen = ' | '.join(v['text'].split('\n')[0][:60] for v in same[-6:])
+        out += '\nОБЛАСТЬ ТЕМЫ выбери ТУ, которой не было в последних новостях (' + seen + '). Варианты: ' + '; '.join(NEWS_AREAS) + '. Не пиши снова про Nvidia, нефть и Иран, если они были в последних трёх новостях. Концовку вида «Для нас это значит» используй не в каждой новости: допустимы «что смотреть дальше», «кого заденет», короткая ирония, просто факт без вывода.'
+    else:
+        out += '\nНЕ ПОВТОРЯЙ тему и сюжет последних постов этой рубрики: ' + ' | '.join(v['text'].split('\n')[0][:60] for v in same[-6:]) + '. ЗАПРЕЩЕНО про то, что стоп выбило / закрыл раньше времени / рынок охотится за стопом.'
+    qs = [v.get('mq') for v in ds[-14:] if v.get('mq')]
+    if qs: out += '\nЗАПРОСЫ К СТОКУ, КОТОРЫЕ УЖЕ БЫЛИ (не повторяй, придумай другой предмет или сцену): ' + '; '.join(qs) + '.'
+    return out, fmt
+
+
+def gen_posts(cats, pools, today):
+    """По одному запросу к модели на пост (до 4 попыток каждый): сырьё своей рубрики, формат, проверка на похожесть. Недостающее потом дозаказывает будильник канала."""
+    try: drafts, _ = load_drafts()
+    except Exception: drafts = {}
+    ds = sorted(drafts.values(), key=lambda v: v.get('ts', ''))
+    recent_all = [v['text'] for v in ds[-16:]]; recent_nn = [v['text'] for v in ds if v.get('cat') != 'news'][-10:]
+    used_src = set(v.get('src_id') for v in drafts.values() if v.get('src_id'))
+    out = []
+    for c in cats:
+        cand = [x for k in POOL_OF.get(c, ['news']) for x in pools.get(k, []) if x[2] not in used_src]
+        top = cand[:14]; random.shuffle(top); rows = top[:8] if c != 'news' else cand[:45]
+        add, fmt = variety_extra(c, drafts, pools, used_src)
+        got = None
+        for att in range(4):
+            r = [p for p in ask_llm([c], rows, today, add) if p.get('cat') == c]
+            if r and valid_ctx(r[0], recent_all, recent_nn): got = r[0]; break
+            print('  попытка %d для %s не прошла' % (att + 1, c))
+        if got:
+            got['fmt'] = fmt
+            try:
+                si = int(got.get('src', 0))
+                if c != 'news' and 1 <= si <= len(rows): got['src_id'] = rows[si - 1][2]
+            except Exception: pass
+            out.append(got); recent_all.append(got['text'])
+    return out
 
 
 PALETTE = {'news': ((10, 25, 60), (30, 90, 200), 'НОВОСТИ РЫНКА'), 'smart': ((20, 20, 40), (90, 50, 160), 'ТРЕЙДЕРУ НА ЗАМЕТКУ'),
@@ -370,14 +458,12 @@ def main():
     if MODE != 'urgent' and os.environ.get('GITHUB_EVENT_NAME') == 'schedule':
         dd, _ = load_drafts()   # запоздавший запуск по расписанию (или после будильника /api/chtick): сегодняшние черновики уже есть — не дублировать
         if any(not v.get('urgent') and v.get('ts', '')[:10] == today.isoformat() for v in dd.values()): print('Черновики за сегодня уже есть'); return
-    print('Читаю каналы (только темы):'); rows = collect()
-    cats = plan(today); print('План:', cats, '· сырья:', len(rows))
+    print('Читаю каналы:'); pools = collect()
+    cats = plan(today); print('План:', cats, '· сырья по рубрикам:', {k: len(v) for k, v in pools.items()})
     posts = []; ask_ok = True
     if API_KEY:
         try:
-            for _ in range(3):
-                posts = [p for p in ask_llm(cats, rows, today) if valid(p)]
-                if len(posts) == len(cats) or (MODE == 'urgent' and not ask_ok): break
+            posts = gen_posts(cats, pools, today)
         except urllib.error.HTTPError as e:
             body = e.read().decode('utf-8', 'replace')[:300]
             print('Ошибка API Anthropic:', e.code, body)
@@ -407,7 +493,7 @@ def main():
         drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'urgent': MODE == 'urgent', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
         kb = {'inline_keyboard': [[{'text': '✅ Опубликовать' + (' · утро 10:00' if p['cat'] == 'news' else ' · вечер 19:00'), 'callback_data': 'ap:' + did}], [{'text': '🖼 Другая картинка', 'callback_data': 'pc:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
         try:
-            drafts[did]['mq'] = (p.get('media') or {}).get('query', ''); drafts[did]['mt'] = (p.get('media') or {}).get('type', 'photo')
+            drafts[did]['mq'] = (p.get('media') or {}).get('query', ''); drafts[did]['mt'] = (p.get('media') or {}).get('type', 'photo'); drafts[did]['fmt'] = p.get('fmt', ''); drafts[did]['src_id'] = p.get('src_id', '')
             got = find_media(p.get('media'), p['cat'], used)
             if got:
                 try:
