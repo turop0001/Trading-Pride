@@ -450,5 +450,33 @@
   "photo": "AgACAgQAAxkDAAOuawES04D_UJB9HpIKmnS4ZVji3eAAAswQaxs-4wxQKBRoUSPE1-UBAAMCAAN5AAM9BA",
   "kind": "photo",
   "murl": "https://pixabay.com/get/gf53de48cfd1885cb5d6b562f3d592501ae027acc2001a1b816bd7cff37aca77227f15db63e3f09aa21e46761f695116c61d0eb2f2bdebf770aec5743381669dd_1280.jpg"
+ },
+ "20261122-1": {
+  "cat": "news",
+  "text": "🔥 Nasdaq упал на 10.4% за неделю, такое бывает раз в два года\n\nИз последних 2133 торговых недель только 11 показали падение такого масштаба или хуже. Это 0.52% всех недель, отклонение на 3.27 стандартных девиаций от исторической нормы.\n\n📉 Tech сыпется седьмую неделю подряд, медь тоже летит вниз, спекулянты сбросили $10.8 млрд фьючерсов с конца сентября.\n\nКлассика «жирных хвостов»: экстремальные движения случаются чаще, чем предсказывает статистика. Но даже с этой поправкой такое падение выбивается из ряда.",
+  "status": "pending",
+  "urgent": false,
+  "ts": "2026-11-22T03:40:48+00:00",
+  "mq": "stock exchange board falling",
+  "mt": "photo",
+  "fmt": "цифры против прогноза: что вышло и что ждали",
+  "src_id": "",
+  "photo": "AgACAgQAAxkDAAOwawJkQaQD4m5h9-OuPvcHk2CbtiMAAi4SaxuTQBVQkAXsNI3QwQIBAAMCAAN5AAM9BA",
+  "kind": "photo",
+  "murl": "https://pixabay.com/get/g353a9d0f3340bb4e8c06bf64c2c1405237f66343237eefd845834a7532f6a75e6aaf1b2f73871632d3c2c597344d4a73429406ca6ab928a7aaeca747388026b2_1280.jpg"
+ },
+ "20261122-2": {
+  "cat": "motiv",
+  "text": "💪 Джесси Ливермор слил $3 млн в 1907, восстановился и через три года заработал миллион за один день\n\nВ 30 лет он потерял всё на хлопке. Не психанул, не ушёл из рынка. Просто сел и разобрал каждую сделку. Понял, что игнорировал собственные правила.\n\n📌 Вернулся с чистого листа: торговал только по плану, без эмоций. В 1910 шортил пшеницу на пике и забрал огромный куш за сутки.\n\n✅ Депозит можно вернуть. Главное не забыть, почему ты его потерял. Разбор ошибок работает лучше любой мотивашки.",
+  "status": "pending",
+  "urgent": false,
+  "ts": "2026-11-22T03:40:49+00:00",
+  "mq": "vintage stock ticker tape",
+  "mt": "photo",
+  "fmt": "история известного трейдера или инвестора (только проверяемые факты, без выдуманных цитат)",
+  "src_id": "d6b18d3bab",
+  "photo": "AgACAgQAAxkDAAOxawJkQrKTwKUfiWTfaQW79Tea7tcAAgsSaxtZkxRQHx1gAsMkAiUBAAMCAAN5AAM9BA",
+  "kind": "photo",
+  "murl": "https://pixabay.com/get/g3096bbc1965bb5e81a8cff20077d07021cc02ea4891d8aaf122fdc1d003fa07b0ffa4ce86522d85f5aa68575f35b2d32790ebfcbf1b54228ff9e3b5be4798421_1280.jpg"
  }
 }
