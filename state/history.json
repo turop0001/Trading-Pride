@@ -439,6 +439,10 @@
     "entry": 7277.9,
     "stop": 7297.5,
     "target": 7199.4,
-    "result": "сигнал Пульта в 17:40"
+    "result": "ВХОД → TP 🎯 +2,0R",
+    "shots": {
+      "m5": "state/shots/2026-11-23_US500_C_m5.png",
+      "h1": "state/shots/2026-11-23_US500_C_h1.png"
+    }
   }
 ]
