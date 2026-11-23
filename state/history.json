@@ -429,5 +429,16 @@
       "m5": "state/shots/2026-11-17_US30_A_m5.png",
       "h1": "state/shots/2026-11-17_US30_A_h1.png"
     }
+  },
+  {
+    "id": "2026-11-23_US500_C",
+    "date": "2026-11-23",
+    "symbol": "US500",
+    "type": "C",
+    "side": "short",
+    "entry": 7277.9,
+    "stop": 7297.5,
+    "target": 7199.4,
+    "result": "сигнал Пульта в 17:40"
   }
 ]
