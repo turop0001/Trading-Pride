@@ -148,7 +148,7 @@ def ask_llm(cats, rows, today, extra_add=''):
   Смешное: «😅 Поставил стоп. Цена подошла, выбила, развернулась и улетела без меня\nЗнакомо? Рынок как будто читает мой терминал. Утешаю себя тем, что хоть депозит остался при мне.»
 - Для КАЖДОГО поста добавь "media": {{"type":"photo|video|gif|card","query":"2–4 слова НА АНГЛИЙСКОМ для поиска подходящего бесплатного фото/видео/гифки (например: stock market screen, trader stress, gold bars, oil rig, success sunrise)"}}. Новости и умное: photo или video. Смешное: gif. Мотивация: photo или video. Не уверен: card. Запрос к стоку делай КОНКРЕТНЫМ и непохожим на прошлые (список ниже), предмет или сцена, а не общие слова trading или chart.
 - Для КАЖДОГО поста добавь "card": надпись для запасной картинки: "title" (2–6 слов, без эмодзи, суть) и "sub" (до 6 слов, можно пусто).
-Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке. Для смешного, умного, мотивации и истории добавь в пост поле "src": номер выбранной идеи из СЫРЬЯ (число).
+Верни ТОЛЬКО JSON: {{"posts":[{{"cat":"news|smart|humor|motiv|story","text":"...","media":{{"type":"..","query":".."}},"card":{{"title":"...","sub":"..."}}}}]}} — ровно {len(cats)} поста в том же порядке. Для смешного, умного, мотивации и истории добавь в пост поле "src": номер выбранной идеи из СЫРЬЯ (число).
 
 {extra}
 
@@ -225,6 +225,9 @@ def variety_extra(cat, drafts, pools, used_src):
     return out, fmt
 
 
+FAILED = []   # (рубрика, причина) для сообщения владельцу
+
+
 def gen_posts(cats, pools, today):
     """По одному запросу к модели на пост (до 4 попыток каждый): сырьё своей рубрики, формат, проверка на похожесть. Недостающее потом дозаказывает будильник канала."""
     try: drafts, _ = load_drafts()
@@ -237,11 +240,18 @@ def gen_posts(cats, pools, today):
         cand = [x for k in POOL_OF.get(c, ['news']) for x in pools.get(k, []) if x[2] not in used_src]
         top = cand[:14]; random.shuffle(top); rows = top[:8] if c != 'news' else cand[:45]
         add, fmt = variety_extra(c, drafts, pools, used_src)
-        got = None
+        got = None; soft = None; why = []
         for att in range(4):
-            r = [p for p in ask_llm([c], rows, today, add) if p.get('cat') == c]
-            if r and valid_ctx(r[0], recent_all, recent_nn): got = r[0]; break
-            print('  попытка %d для %s не прошла' % (att + 1, c))
+            r = [p for p in ask_llm([c], rows, today, add)]
+            if not r: why.append('модель вернула пустой ответ'); print('  попытка %d для %s: пустой ответ' % (att + 1, c)); continue
+            cand0 = dict(r[0]); cand0['cat'] = c   # рубрику задаёт план, а не ответ модели (для story модель отвечала smart/motiv и пост терялся)
+            if valid_ctx(cand0, recent_all, recent_nn): got = cand0; break
+            if valid(cand0) and soft is None: soft = cand0
+            why.append('жёсткая проверка' if not valid(cand0) else 'похож на прошлые или заезженный сюжет')
+            print('  попытка %d для %s не прошла (%s)' % (att + 1, c, why[-1]))
+        if not got and soft:
+            got = soft; got['soft'] = True; print('  беру запасной вариант для %s: прошёл жёсткую проверку, но похож на прошлые посты' % c)
+        if not got: FAILED.append((c, ', '.join(sorted(set(why))) or 'нет ответа'))
         if got:
             got['fmt'] = fmt
             try:
@@ -481,7 +491,12 @@ def main():
     else:
         print('НЕТ ANTHROPIC_API_KEY — черновики не сгенерированы')
     if MODE == 'urgent' and not posts: print('Срочного нет'); return
-    if not posts: print('Нет годных черновиков — выходим'); return
+    if not posts:
+        print('Нет годных черновиков — выходим')
+        if TOKEN and OWNER and not DRY and MODE != 'urgent':
+            try: tg('sendMessage', {'chat_id': OWNER, 'text': 'Автопостинг: черновик не получился (%s). Будильник попробует ещё раз; если не выйдет, напиши в чат Claude.' % '; '.join('%s: %s' % x for x in FAILED)[:200]})
+            except Exception: pass
+        return
     for p in posts: print('\n--- %s ---\n%s' % (p['cat'], p['text']))
     if DRY: print('\nCP_DRY=1: ничего не отправлено'); return
     if not (TOKEN and OWNER): print('НЕТ CP_BOT_TOKEN/CP_OWNER_ID'); return
@@ -489,7 +504,7 @@ def main():
     if MODE == 'urgent' and any(v.get('urgent') and v.get('ts', '')[:10] == today.isoformat() for v in drafts.values()): print('Срочная за сегодня уже была'); return
     used = used_media(drafts)
     for i, p in enumerate(posts):
-        did = '%s-%s%d' % (today.strftime('%Y%m%d'), 'u' if MODE == 'urgent' else '', i + 1)
+        did = '%s-%s' % (today.strftime('%Y%m%d'), ('u%d' % (i + 1)) if MODE == 'urgent' else ('1' if p['cat'] == 'news' else '2'))
         drafts[did] = {'cat': p['cat'], 'text': p['text'], 'status': 'pending', 'urgent': MODE == 'urgent', 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')}
         kb = {'inline_keyboard': [[{'text': '✅ Опубликовать' + (' · утро 10:00' if p['cat'] == 'news' else ' · вечер 19:00'), 'callback_data': 'ap:' + did}], [{'text': '🖼 Другая картинка', 'callback_data': 'pc:' + did}, {'text': '❌ Отклонить', 'callback_data': 'rj:' + did}]]}
         try:

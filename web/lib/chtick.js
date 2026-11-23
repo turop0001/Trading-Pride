@@ -78,7 +78,7 @@ async function ensureDrafts(data, now) {
   const only = needNews && needEve ? '' : needNews ? 'news' : eveningCat(now);
   const d = await fetch(`https://api.github.com/repos/${repo()}/actions/workflows/channel_posts.yml/dispatches`, { method: 'POST', headers: { ...ghh(), 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: 'main', inputs: only ? { dry: '0', cat: only } : { dry: '0' } }) });
   if (d.status !== 204) return 'dispatch' + d.status;
-  if (runs.length >= 1 || h >= 4.5) await alertOwner(data, '⚠️ К 07:30 МСК черновики на сегодня не готовы' + (only ? ' (не хватает: ' + (only === 'news' ? 'утренней новости' : 'вечернего поста') + ')' : '') + '. Запустил подготовку повторно, пришлю через 1–3 минуты.');
+  if (runs.length === 1 || runs.length === 4) await alertOwner(data, '⚠️ К 07:30 МСК черновики на сегодня не готовы' + (only ? ' (не хватает: ' + (only === 'news' ? 'утренней новости' : 'вечернего поста') + ')' : '') + '. Запустил подготовку повторно, пришлю через 1–3 минуты.');
   return 'dispatched' + (only ? ':' + only : '');
 }
 
