@@ -575,5 +575,33 @@
   "photo": "AgACAgQAAxkDAAO_awXwkHsYMzmjPQ7PcsqPUoFN1e0AAokQaxtYBDRQfiTsg-_WRUgBAAMCAAN5AAM9BA",
   "kind": "photo",
   "murl": "https://pixabay.com/get/gfd52748aa74fba284ad17383c42f8eb62df924849256f9e64c8eb22ca8ed550e8a34a51bcdbf96c98e986ebf7820cfe368c0274fe91b73d6460d2b8953c8e315_1280.jpg"
+ },
+ "20261125-1": {
+  "cat": "news",
+  "text": "💼 Бессет из минфина США включил тревогу по ФРС\n\nНовый глава Минфина заявил, что ФРС может переборщить с ужесточением и завалить рост экономики. Дескать, финансовые условия и так сильно ужесточились за последние месяцы.\n\n📉 Забавно, что индексы финансовых условий говорят обратное. Но министру виднее, когда нужно давить на регулятора.\n\n💡 Доллар и трежерис сейчас очень чувствительны к любым намёкам на смягчение риторики ФРС. Если рынок поверит, что центробанк может притормозить, пойдём вниз по индексу и вверх по индексам акций.",
+  "status": "pending",
+  "urgent": false,
+  "ts": "2026-11-25T03:30:42+00:00",
+  "mq": "treasury secretary speech podium",
+  "mt": "photo",
+  "fmt": "что случилось, почему, какие инструменты заденет",
+  "src_id": "",
+  "photo": "AgACAgQAAxkDAAPBawZWY-pa36FVD0IrRnpjCjcsDgsAAkYSaxt3RTVQwx6XjIyQ7fIBAAMCAAN5AAM9BA",
+  "kind": "photo",
+  "murl": "https://pixabay.com/get/g6cc99d883e27de311ed6329ca4b1d298fec00a5e1b24ee4915df894ad9c04c9979dbd48eb54143498e39f994093d1eefda16cecbc72d15b625da24625339c1ff_1280.jpg"
+ },
+ "20261125-2": {
+  "cat": "smart",
+  "text": "📐 Трачу час на анализ, а сделку держу пять минут\n\nСидишь, рисуешь уровни, смотришь объёмы, проверяешь корреляцию с индексом. Всё сходится. Входишь.\n\n⏱️ Через пять минут цена идёт против тебя на 0.3%, и ты уже закрываешь. Весь анализ в помойку. Страх сильнее логики.\n\n✅ Если потратил час на подготовку, дай сделке хотя бы час жизни. Или вообще не заходи. Таймфрейм анализа должен совпадать с таймфреймом удержания, иначе это просто самообман.",
+  "status": "pending",
+  "urgent": false,
+  "ts": "2026-11-25T03:30:43+00:00",
+  "mq": "trader analyzing charts desk",
+  "mt": "photo",
+  "fmt": "частая ошибка и как её исправить",
+  "src_id": "2d963f5752",
+  "photo": "AgACAgQAAxkDAAPCawZWZYG1KPy5Tkrt3qSJsjyuIdcAAu4Raxva1DVQC3_hAnAdwlsBAAMCAAN5AAM9BA",
+  "kind": "photo",
+  "murl": "https://pixabay.com/get/g65efd4b85befe07c1d232fba741762610b2521294dc95e9b116c4f2d8486f80562d676670a615b7061dfb52dce0cf2e99f8c328e083e689bbe10a426f018b729_1280.jpg"
  }
 }
