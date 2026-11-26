@@ -624,5 +624,32 @@
   "photo": "AgACAgQAAxkDAAPEawc3Kjt8NiCB06Vpfgon6nQtF7gAAm8RaxtiRj1Qls8r4z0YOrQBAAMCAAN5AAM9BA",
   "kind": "photo",
   "murl": "https://pixabay.com/get/g66601993b948cfc30ec6e2f0beceba0935b3a46d6ca071becf2e798cd8da73ba4e0a44abdcc51dcfe08de67880a4f0a886baad9c1d5eaa59af3c38aac00cbd6e_1280.jpg"
+ },
+ "20261126-1": {
+  "cat": "news",
+  "text": "🔥 S&P поставило рейтинг Nvidia под угрозу снижения\n\n📉 Агентство включило AA рейтинг компании в CreditWatch с негативным прогнозом. Причина: слишком большая зависимость от одного топ-менеджера. Возможно понижение на ступень в течение 90 дней.\n\n💻 Акции уже отыграли бурный отскок после недавних событий, теперь это добавляет нервозности. S&P планирует встречу с советом директоров.\n\nЕсли торгуешь техи или полупроводники, держи ухо востро: новость может давить на настроение инвесторов, пока агентство не примет решение.",
+  "status": "pending",
+  "urgent": false,
+  "ts": "2026-11-26T03:41:07+00:00",
+  "mq": "credit rating agency meeting",
+  "mt": "photo",
+  "fmt": "главная новость, реакция рынка, что смотреть дальше",
+  "src_id": "",
+  "photo": "AgACAgQAAxkDAAPGaweqVICv28Uq_PCHegXqwtO3jLkAAm4QaxtYQEVQxj6uOCLOgwQBAAMCAAN5AAM9BA",
+  "kind": "photo",
+  "murl": "https://pixabay.com/get/gde62b9f88b4ae0f1fc905184c0362e84addd6b633893c4d93c4431ac9f8b24b0083f0c366ae36645ead4f1d8149804ee0195a76756e083535d669e8665dc4f84_1280.jpg"
+ },
+ "20261126-2": {
+  "cat": "motiv",
+  "text": "✅ Конец недели: проверь свой журнал сделок\n\n📝 Если ты его не ведёшь, начни хотя бы с трёх граф: время входа, причина входа, результат. Без этого ты не увидишь, где сливаешь деньги системно.\n\n🔍 Прошёлся по своим записям за неделю и понял: половина убытков пришлась на сделки после 20:00, когда я уже уставший. Теперь просто не торгую в это время.\n\n📊 Журнал работает как зеркало: показывает твои косяки, которые ты сам не замечаешь в моменте.",
+  "status": "pending",
+  "urgent": false,
+  "ts": "2026-11-26T03:41:09+00:00",
+  "mq": "trading journal notebook pen",
+  "mt": "photo",
+  "fmt": "итоги недели: что стоит проверить в своей торговле",
+  "src_id": "5ce64e4e03",
+  "photo": "AgACAgIAAxkDAAPHaweqV26AhYYKS5qXq-Ycq48AATFoAAMcaxt5L0BIsc0t6_e7DngBAAMCAAN5AAM9BA",
+  "kind": "photo"
  }
 }
