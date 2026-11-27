@@ -266,6 +266,24 @@ PALETTE = {'news': ((10, 25, 60), (30, 90, 200), 'НОВОСТИ РЫНКА'), '
            'humor': ((70, 30, 10), (230, 120, 30), 'ТРЕЙДЕРСКИЙ ЮМОР'), 'motiv': ((6, 50, 45), (20, 160, 120), 'РОСТ И ДИСЦИПЛИНА')}
 
 
+def add_logo(img, width_frac=0.16, margin_frac=0.035, opacity=0.92):
+    """Логотип Trading Pride в правом нижнем углу карточки (report_assets/logo.png), с лёгкой тенью. Если файла нет, карточка остаётся без логотипа."""
+    from PIL import Image, ImageFilter
+    try:
+        lg = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'report_assets', 'logo.png')).convert('RGBA')
+        lg = lg.crop(lg.split()[3].getbbox())
+    except Exception:
+        return img
+    img = img.convert('RGBA'); W, H = img.size
+    w = int(W * width_frac); h = int(lg.height * w / lg.width); lg = lg.resize((w, h), Image.LANCZOS)
+    lg.putalpha(lg.split()[3].point(lambda v: int(v * opacity)))
+    m = int(W * margin_frac); x = W - w - m; y = H - h - m
+    sh = Image.new('RGBA', img.size, (0, 0, 0, 0)); blk = Image.new('RGBA', lg.size, (0, 0, 0, 255))
+    blk.putalpha(lg.split()[3].point(lambda v: int(v * 0.55))); sh.paste(blk, (x + 2, y + 3)); sh = sh.filter(ImageFilter.GaussianBlur(5))
+    img = Image.alpha_composite(img, sh); img.alpha_composite(lg, (x, y))
+    return img.convert('RGB')
+
+
 def make_card(cat, card, path):
     """Оригинальная картинка 1080x1080: градиент по рубрике + крупный заголовок + свечной узор. Без чужих изображений."""
     from PIL import Image, ImageDraw, ImageFont
@@ -303,7 +321,7 @@ def make_card(cat, card, path):
         d.text((64, y + 4), l, font=f, fill=(0, 0, 0, 90)); d.text((60, y), l, font=f, fill='white'); y += int(sz * 1.18)
     sub = (card.get('sub') or '').strip()
     if sub: d.text((60, y + 20), sub, font=font(46, False), fill=(255, 255, 255, 215))
-    d.text((60, 1005), '@trading_pride', font=font(36), fill=(255, 255, 255, 200))
+    img = add_logo(img)
     img.save(path, 'PNG')
 
 
@@ -353,7 +371,41 @@ def find_media(m, cat, used=None, v=0):
     return None
 
 
+def http_bytes(url, timeout=40):
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (compatible; TradingPrideBot/1.0)'})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read()
+
+
+def logo_photo(url):
+    """Скачивает стоковое фото, ставит логотип и возвращает путь к файлу; при любой ошибке None (тогда фото уходит как раньше, по ссылке)."""
+    try:
+        import io, hashlib
+        from PIL import Image
+        img = Image.open(io.BytesIO(http_bytes(url))).convert('RGB')
+        if img.width > 1600: img = img.resize((1600, int(img.height * 1600 / img.width)))
+        path = '/tmp/lp_%s.jpg' % hashlib.md5(url.encode()).hexdigest()[:10]
+        add_logo(img, 0.15).save(path, 'JPEG', quality=90)
+        return path
+    except Exception as e:
+        print('! логотип на фото не поставился, фото без логотипа:', str(e)[:100]); return None
+
+
+def edit_photo_file(chat, mid, path, caption, kb):
+    import uuid
+    bd = uuid.uuid4().hex; parts = []
+    def fld(n, v): parts.append(('--%s\r\nContent-Disposition: form-data; name="%s"\r\n\r\n%s\r\n' % (bd, n, v)).encode())
+    fld('chat_id', chat); fld('message_id', mid); fld('reply_markup', json.dumps(kb))
+    fld('media', json.dumps({'type': 'photo', 'media': 'attach://f', 'caption': caption[:1024], 'parse_mode': 'HTML'}))
+    parts.append(('--%s\r\nContent-Disposition: form-data; name="f"; filename="p.jpg"\r\nContent-Type: image/jpeg\r\n\r\n' % bd).encode() + open(path, 'rb').read() + b'\r\n')
+    parts.append(('--%s--\r\n' % bd).encode())
+    return json.loads(http('https://api.telegram.org/bot%s/editMessageMedia' % TOKEN, b''.join(parts), {'Content-Type': 'multipart/form-data; boundary=' + bd}, 'POST', 60))
+
+
 def send_url_media(chat, kind, url, caption, kb):
+    if kind == 'photo':
+        lp = logo_photo(url)
+        if lp: return send_photo(chat, lp, caption, kb)['result']['photo'][-1]['file_id']
     f = {'photo': 'photo', 'video': 'video', 'animation': 'animation'}[kind]
     p = {'chat_id': chat, f: url, 'caption': caption[:1024], 'parse_mode': 'HTML', 'reply_markup': kb}
     if kind == 'video': p['supports_streaming'] = True
@@ -443,7 +495,8 @@ def swap_media():
         tg('sendMessage', {'chat_id': chat, 'text': 'Не нашёл новую картинку (сток ничего не вернул). Попробуй ещё раз позже.'}); save_drafts(drafts, sha); return
     kind, url = got
     med = {'type': {'photo': 'photo', 'video': 'video', 'animation': 'animation'}[kind], 'media': url, 'caption': html_text(d['text'])[:1024], 'parse_mode': 'HTML'}
-    r = tg('editMessageMedia', {'chat_id': chat, 'message_id': int(mid), 'media': med, 'reply_markup': kb})
+    lp = logo_photo(url) if kind == 'photo' else None
+    r = edit_photo_file(chat, int(mid), lp, html_text(d['text']), kb) if lp else tg('editMessageMedia', {'chat_id': chat, 'message_id': int(mid), 'media': med, 'reply_markup': kb})
     if r.get('ok'):
         res = r['result']; d['photo'] = res['photo'][-1]['file_id'] if res.get('photo') else (res.get('animation') or res.get('video') or {}).get('file_id', d.get('photo'))
     else:
